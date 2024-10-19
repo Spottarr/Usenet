@@ -38,8 +38,10 @@ namespace UsenetTests.Util
                 {1, "one"},
             };
 
-            Assert.Single(dict);
-            Assert.Single(dict[1]);
+            Assert.Equal(1, dict.Count);
+#pragma warning disable xUnit2013
+            Assert.Equal(1, dict[1].Count);
+#pragma warning restore xUnit2013
 
             Assert.True(new HashSet<string> { "one" }.SetEquals(dict[1]));
         }
@@ -54,8 +56,8 @@ namespace UsenetTests.Util
                 {1, "one"},
             };
 
-            Assert.Single(dict);
-            Assert.Single(dict[1]);
+            Assert.Equal(2, dict.Count);
+            Assert.Equal(2, dict[1].Count);
 
             Assert.Equal(new List<string> { "one", "one" }, dict[1]);
         }
