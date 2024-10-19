@@ -20,8 +20,8 @@ namespace UsenetTests.Nntp.Models
             long lowWaterMark,
             long highWaterMark,
             NntpPostingStatus postingStatus,
-            string otherGroup,
-            long[] articleNumbers)
+            string? otherGroup,
+            long[]? articleNumbers)
         {
             var expected = new NntpGroup(
                 name,

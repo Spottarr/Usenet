@@ -20,7 +20,7 @@ namespace UsenetTests.Nntp.Parsers
         [InlineData("bbbbb", NntpPostingStatus.Unknown, "")]
         [InlineData("", NntpPostingStatus.Unknown, "")]
         [InlineData(null, NntpPostingStatus.Unknown, "")]
-        public void InputShouldBeParsedCorrectly(string input, NntpPostingStatus expectedStatus, string expectedOtherGroup)
+        public void InputShouldBeParsedCorrectly(string? input, NntpPostingStatus expectedStatus, string expectedOtherGroup)
         {
             NntpPostingStatus status = PostingStatusParser.Parse(input, out string otherGroup);
             Assert.Equal(expectedStatus, status);

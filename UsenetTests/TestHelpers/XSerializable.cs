@@ -19,7 +19,7 @@ namespace UsenetTests.TestHelpers
 
         public void Deserialize(IXunitSerializationInfo info)
         {
-            Object = JsonConvert.DeserializeObject<T>(info.GetValue<string>("objValue"));
+            Object = JsonConvert.DeserializeObject<T>(info.GetValue<string>("objValue"))!;
         }
 
         public void Serialize(IXunitSerializationInfo info)

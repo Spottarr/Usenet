@@ -22,7 +22,7 @@ namespace UsenetTests.TestHelpers
             MinLogLevel = LogLevel.Trace;
             Buffer = new List<Entry>();
         }
-        public IDisposable? BeginScope<TState>(TState state)
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull
         {
             return null;
         }
@@ -36,8 +36,8 @@ namespace UsenetTests.TestHelpers
             LogLevel logLevel,
             EventId eventId,
             TState state,
-            Exception exception,
-            Func<TState, Exception, string> formatter)
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
         {
             if (IsEnabled(logLevel))
             {

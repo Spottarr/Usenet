@@ -95,7 +95,7 @@ namespace UsenetTests.Nntp.Builders
         [Theory]
         [InlineData("Key", null, "value")]
         [InlineData(null, "Val", "key")]
-        public void SettingHeaderWithNullParametersShouldThrow(string key, string value, string expectedParamName)
+        public void SettingHeaderWithNullParametersShouldThrow(string? key, string? value, string expectedParamName)
         {
             var exception = Assert.Throws<ArgumentNullException>(() =>
             {
