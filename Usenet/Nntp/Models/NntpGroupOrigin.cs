@@ -1,5 +1,6 @@
 ﻿using System;
 using Usenet.Util;
+using HashCode = Usenet.Util.HashCode;
 
 namespace Usenet.Nntp.Models
 {

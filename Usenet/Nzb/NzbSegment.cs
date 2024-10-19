@@ -1,6 +1,7 @@
 ﻿using System;
 using Usenet.Nntp.Models;
 using Usenet.Util;
+using HashCode = Usenet.Util.HashCode;
 
 namespace Usenet.Nzb
 {

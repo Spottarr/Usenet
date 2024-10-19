@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Usenet.Extensions;
 using Usenet.Util;
+using HashCode = Usenet.Util.HashCode;
 
 namespace Usenet.Nzb
 {

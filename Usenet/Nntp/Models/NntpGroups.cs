@@ -6,6 +6,7 @@ using System.Linq;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Parsers;
 using Usenet.Util;
+using HashCode = Usenet.Util.HashCode;
 
 namespace Usenet.Nntp.Models
 {

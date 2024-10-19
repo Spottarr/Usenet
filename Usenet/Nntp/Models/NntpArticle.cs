@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Usenet.Extensions;
 using Usenet.Util;
+using HashCode = Usenet.Util.HashCode;
 
 namespace Usenet.Nntp.Models
 {
