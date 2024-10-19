@@ -24,8 +24,8 @@ jobs:
         name: Spottarr.Usenet
         path: ./package/Spottarr.Usenet.${{ github.event.release.tag_name }}.nupkg
 
-    - name: Publish package (GitHub)
-      run: dotnet nuget push ./package/*.nupkg --api-key ${{ secrets.GH_API_KEY }} --source https://nuget.pkg.github.com/sonarr/index.json
+    #- name: Publish package (GitHub)
+    #  run: dotnet nuget push ./package/*.nupkg --api-key ${{ secrets.GH_API_KEY }} --source https://nuget.pkg.github.com/sonarr/index.json
 
     - name: Publish package (NuGet)
       run: dotnet nuget push ./package/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
