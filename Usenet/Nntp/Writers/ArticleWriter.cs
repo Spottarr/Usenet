@@ -20,7 +20,7 @@ namespace Usenet.Nntp.Writers
         {
             WriteHeader(connection, NntpHeaders.MessageId, article.MessageId);
             WriteHeader(connection, NntpHeaders.Newsgroups, article.Groups.ToString());
-            foreach (KeyValuePair<string, ImmutableHashSet<string>> header in article.Headers)
+            foreach (KeyValuePair<string, ImmutableList<string>> header in article.Headers)
             {
                 if (header.Key == NntpHeaders.MessageId ||
                     header.Key == NntpHeaders.Newsgroups)

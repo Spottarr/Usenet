@@ -30,7 +30,7 @@ namespace Usenet.Nntp.Models
         /// <summary>
         /// The header dictionary of the <see cref="NntpArticle"/>.
         /// </summary>
-        public ImmutableDictionary<string, ImmutableHashSet<string>> Headers { get; }
+        public ImmutableDictionary<string, ImmutableList<string>> Headers { get; }
 
         /// <summary>
         /// The body of the <see cref="NntpArticle"/>.
@@ -55,7 +55,7 @@ namespace Usenet.Nntp.Models
             Number = number;
             MessageId = messageId ?? NntpMessageId.Empty;
             Groups = groups ?? NntpGroups.Empty;
-            Headers = (headers ?? MultiValueDictionary<string, string>.Empty).ToImmutableDictionaryWithHashSets();
+            Headers = (headers ?? MultiValueDictionary<string, string>.Empty).ToImmutableDictionaryWithLists();
 
             switch (body)
             {
@@ -109,10 +109,10 @@ namespace Usenet.Nntp.Models
             }
 
             // compare headers
-            foreach (KeyValuePair<string, ImmutableHashSet<string>> pair in Headers)
+            foreach (KeyValuePair<string, ImmutableList<string>> pair in Headers)
             {
-                if (!other.Headers.TryGetValue(pair.Key, out ImmutableHashSet<string> value) ||
-                    !pair.Value.SetEquals(value))
+                if (!other.Headers.TryGetValue(pair.Key, out ImmutableList<string> value) ||
+                    !pair.Value.ToImmutableHashSet().SetEquals(value))
                 {
                     return false;
                 }

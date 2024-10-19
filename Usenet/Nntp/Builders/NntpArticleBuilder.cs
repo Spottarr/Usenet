@@ -65,7 +65,7 @@ namespace Usenet.Nntp.Builders
             dateTime = null;
             body = null;
 
-            foreach (KeyValuePair<string, ImmutableHashSet<string>> header in article.Headers)
+            foreach (KeyValuePair<string, ImmutableList<string>> header in article.Headers)
             {
                 foreach (string value in header.Value)
                 {
