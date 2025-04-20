@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using Usenet.Util;
@@ -122,12 +123,12 @@ namespace Usenet.Yenc
             {
                 builder.Append(' ').Append(YencKeywords.Size).Append('=').Append(header.PartSize);
                 builder.Append(' ').Append(YencKeywords.Part).Append('=').Append(header.PartNumber);
-                builder.Append(' ').Append(YencKeywords.PartCrc32).Append('=').AppendFormat("{0:x}", checksum);
+                builder.Append(' ').Append(YencKeywords.PartCrc32).Append('=').AppendFormat(CultureInfo.InvariantCulture, "{0:x}", checksum);
             }
             else
             {
                 builder.Append(' ').Append(YencKeywords.Size).Append('=').Append(header.FileSize);
-                builder.Append(' ').Append(YencKeywords.Crc32).Append('=').AppendFormat("{0:x}", checksum);
+                builder.Append(' ').Append(YencKeywords.Crc32).Append('=').AppendFormat(CultureInfo.InvariantCulture, "{0:x}", checksum);
             }
 
             return builder.ToString();

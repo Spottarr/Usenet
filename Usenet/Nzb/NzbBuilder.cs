@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.FileProviders;
 using Usenet.Nntp.Builders;
@@ -150,7 +151,7 @@ namespace Usenet.Nzb
 
         private string GetSubject(IFileInfo fileInfo)
         {
-            string segmentCount = GetSegmentCount(fileInfo).ToString();
+            string segmentCount = GetSegmentCount(fileInfo).ToString(CultureInfo.InvariantCulture);
             string one = "1".PadLeft(segmentCount.Length, '0');
             return $"\"{fileInfo.Name}\" yEnc ({one}/{segmentCount})";
         }

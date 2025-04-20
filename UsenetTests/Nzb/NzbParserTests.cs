@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Xml;
 using Usenet.Exceptions;
@@ -79,7 +80,7 @@ namespace UsenetTests.Nzb
         [Fact]
         internal void FileDateShouldBeParsed()
         {
-            DateTimeOffset expected = DateTimeOffset.Parse(@"2017-06-01T06:49:13+00:00");
+            DateTimeOffset expected = DateTimeOffset.Parse(@"2017-06-01T06:49:13+00:00", CultureInfo.InvariantCulture);
             const string nzbText = @"
 <nzb xmlns=""http://www.newzbin.com/DTD/2003/nzb"">
   <file date=""1496299753""></file>

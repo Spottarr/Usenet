@@ -322,7 +322,7 @@ namespace Usenet.Nntp.Builders
 
             if (dateTime.HasValue)
             {
-                string formattedDate = dateTime.Value.ToUniversalTime().ToString(dateFormat);
+                string formattedDate = dateTime.Value.ToUniversalTime().ToString(dateFormat, CultureInfo.InvariantCulture);
                 headers.Add(NntpHeaders.Date, $"{formattedDate} +0000");
             }
 
