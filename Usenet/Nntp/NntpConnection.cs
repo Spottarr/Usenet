@@ -20,7 +20,7 @@ namespace Usenet.Nntp
     /// </summary>
     /// <remarks>This implementation of the <see cref="INntpConnection"/> interface does support SSL encryption but
     /// does not support compressed multi-line results.</remarks>
-    public class NntpConnection : INntpConnection
+    public sealed class NntpConnection : INntpConnection
     {
         private readonly ILogger log = Logger.Create<NntpConnection>();
         private readonly TcpClient client = new TcpClient();
