@@ -156,7 +156,7 @@ namespace Usenet.Nzb
             return $"\"{fileInfo.Name}\" yEnc ({one}/{segmentCount})";
         }
 
-        private IEnumerable<NzbSegment> GetSegments(IFileInfo fileInfo)
+        private List<NzbSegment> GetSegments(IFileInfo fileInfo)
         {
             Guid fileGuid = Guid.NewGuid();
             var segments = new List<NzbSegment>();

@@ -57,7 +57,7 @@ namespace Usenet.Yenc
             return new ValidationResult(failures);
         }
 
-        private static void ValidatePart(YencArticle article, ICollection<ValidationFailure> failures)
+        private static void ValidatePart(YencArticle article, List<ValidationFailure> failures)
         {
             YencHeader header = article.Header;
             YencFooter footer = article.Footer;
