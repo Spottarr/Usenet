@@ -106,7 +106,7 @@ namespace Usenet.Nntp
                 return new CountingStream(stream);
             }
             var sslStream = new SslStream(stream);
-            await sslStream.AuthenticateAsClientAsync(hostname);
+            await sslStream.AuthenticateAsClientAsync(hostname).ConfigureAwait(false);
             return new CountingStream(sslStream);
         }
 
