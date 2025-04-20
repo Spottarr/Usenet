@@ -27,7 +27,7 @@ namespace Usenet.Yenc
                     continue;
                 }
 
-                if (enumerator.Current.StartsWith(yBegin))
+                if (enumerator.Current.StartsWith(yBegin, StringComparison.Ordinal))
                 {
                     return ParseLine(enumerator.Current);
                 }
@@ -41,7 +41,7 @@ namespace Usenet.Yenc
             {
                 throw new InvalidYencDataException(Resources.Yenc.MissingPartHeader);
             }
-            if (enumerator.MoveNext() && enumerator.Current != null && enumerator.Current.StartsWith(yPart))
+            if (enumerator.MoveNext() && enumerator.Current != null && enumerator.Current.StartsWith(yPart, StringComparison.Ordinal))
             {
                 return ParseLine(enumerator.Current);
             }
