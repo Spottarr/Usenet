@@ -50,7 +50,13 @@ namespace Usenet.Nntp.Models
         /// Converts a string implicitly to a <see cref="NntpMessageId"/>.
         /// </summary>
         /// <param name="value">The string to convert.</param>
-        public static implicit operator NntpMessageId(string value) => new NntpMessageId(value);
+        public static implicit operator NntpMessageId(string value) => FromString(value);
+        
+        /// <summary>
+        /// Converts a string implicitly to a <see cref="NntpMessageId"/>.
+        /// </summary>
+        /// <param name="value">The string to convert.</param>
+        public static NntpMessageId FromString(string value) => new NntpMessageId(value);
 
         /// <summary>
         /// Represents the empty <see cref="NntpMessageId"/>. The field is read-only.
