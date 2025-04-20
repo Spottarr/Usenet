@@ -6,7 +6,7 @@ namespace UsenetTests.Nzb
     public class NzbSegmentTests
     {
         [Fact]
-        public void EqualsWithSameValuesShouldReturnTrue()
+        internal void EqualsWithSameValuesShouldReturnTrue()
         {
             var expected = new NzbSegment(1, 1000, 1200, "1234567890@base.msg");
             var actual = new NzbSegment(1, 1000, 1200, "1234567890@base.msg");
@@ -18,7 +18,7 @@ namespace UsenetTests.Nzb
         [InlineData(1, 1000, 1300, "1234567890@base.msg")]
         [InlineData(1, 1100, 1200, "1234567890@base.msg")]
         [InlineData(2, 1000, 1200, "1234567890@base.msg")]
-        public void EqualsWithDifferentValuesShouldReturnFalse(int number, long offset, long size, string messageId)
+        internal void EqualsWithDifferentValuesShouldReturnFalse(int number, long offset, long size, string messageId)
         {
             var expected = new NzbSegment(1, 1000, 1200, "1234567890@base.msg");
             var actual = new NzbSegment(number, offset, size, messageId);

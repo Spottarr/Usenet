@@ -8,7 +8,7 @@ namespace UsenetTests.Nntp.Models
     public class NntpArticleTests
     {
         [Fact]
-        public void EqualsWithSameValuesShouldReturnTrue()
+        internal void EqualsWithSameValuesShouldReturnTrue()
         {
             var article1 = new NntpArticle(0, "123@bla.nl", null, new MultiValueDictionary<string, string>
             {

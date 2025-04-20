@@ -117,7 +117,7 @@ namespace UsenetTests.Nzb
 
         [Theory]
         [MemberData(nameof(EqualsWithDifferentValues))]
-        public void EqualsWithDifferentValuesShouldReturnFalse(XSerializable<NzbFile> expected, XSerializable<NzbFile> actual)
+        internal void EqualsWithDifferentValuesShouldReturnFalse(XSerializable<NzbFile> expected, XSerializable<NzbFile> actual)
         {
             Assert.NotEqual(expected.Object, actual.Object);
         }

@@ -17,7 +17,7 @@ namespace UsenetTests.Nzb
 
         [Theory]
         [InlineData(@"yenc.multipart.joystick.jpg")]
-        public void ShouldBuildDocumentFromFile(string fileName)
+        internal void ShouldBuildDocumentFromFile(string fileName)
         {
             IFileInfo file = testData.GetEmbeddedFile(fileName);
             NzbDocument actualDocument = new NzbBuilder()

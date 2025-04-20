@@ -18,7 +18,7 @@ namespace UsenetTests.Nntp.Models
 
         [Theory]
         [MemberData(nameof(EqualsWithSameValues))]
-        public void EqualsWithSameValuesShouldReturnTrue(XSerializable<NntpGroupOrigin> group1, XSerializable<NntpGroupOrigin> group2)
+        internal void EqualsWithSameValuesShouldReturnTrue(XSerializable<NntpGroupOrigin> group1, XSerializable<NntpGroupOrigin> group2)
         {
             Assert.Equal(group1.Object, group2.Object);
         }
@@ -41,7 +41,7 @@ namespace UsenetTests.Nntp.Models
 
         [Theory]
         [MemberData(nameof(EqualsWithDifferentValues))]
-        public void EqualsWithDifferentValuesShouldReturnFalse(XSerializable<NntpGroupOrigin> group1, XSerializable<NntpGroupOrigin> group2)
+        internal void EqualsWithDifferentValuesShouldReturnFalse(XSerializable<NntpGroupOrigin> group1, XSerializable<NntpGroupOrigin> group2)
         {
             Assert.NotEqual(group1.Object, group2.Object);
         }

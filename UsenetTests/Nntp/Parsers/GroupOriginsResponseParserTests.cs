@@ -31,7 +31,7 @@ namespace UsenetTests.Nntp.Parsers
 
         [Theory]
         [MemberData(nameof(MultiLineParseData))]
-        public void ResponseShouldBeParsedCorrectly(
+        internal void ResponseShouldBeParsedCorrectly(
             int responseCode, 
             string responseMessage, 
             string[] lines,

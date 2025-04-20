@@ -15,7 +15,7 @@ namespace UsenetTests.Nntp.Models
 
         [Theory]
         [MemberData(nameof(DateTimeData))]
-        public void DateTimeShouldBeConvertedToUsenetString(string expected, DateTime dateTime)
+        internal void DateTimeShouldBeConvertedToUsenetString(string expected, DateTime dateTime)
         {
             var actual = (NntpDateTime) dateTime;
             Assert.Equal(expected, actual);
@@ -29,7 +29,7 @@ namespace UsenetTests.Nntp.Models
 
         [Theory]
         [MemberData(nameof(DateTimeOffsetData))]
-        public void DateTimeOffsetShouldBeConvertedToUsenetString(string expected, DateTimeOffset dateTime)
+        internal void DateTimeOffsetShouldBeConvertedToUsenetString(string expected, DateTimeOffset dateTime)
         {
             var actual = (NntpDateTime)dateTime;
             Assert.Equal(expected, actual);

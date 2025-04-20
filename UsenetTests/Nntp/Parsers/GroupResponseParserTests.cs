@@ -23,7 +23,7 @@ namespace UsenetTests.Nntp.Parsers
 
         [Theory]
         [MemberData(nameof(ParseData))]
-        public void ResponseShouldBeParsedCorrectly(
+        internal void ResponseShouldBeParsedCorrectly(
             int responseCode, 
             string responseMessage,
             XSerializable<NntpGroup> expectedGroup)

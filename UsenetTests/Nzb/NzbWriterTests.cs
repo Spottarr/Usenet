@@ -20,7 +20,7 @@ namespace UsenetTests.Nzb
         [Theory]
         [InlineData(@"nzb.sabnzbd.nzb")]
         [InlineData(@"nzb.sabnzbd-no-namespace.nzb")]
-        public void ShouldWriteDocumentToFile(string fileName)
+        internal void ShouldWriteDocumentToFile(string fileName)
         {
             IFileInfo file = testData.GetEmbeddedFile(fileName);
             NzbDocument expected = NzbParser.Parse(file.ReadAllText(UsenetEncoding.Default));

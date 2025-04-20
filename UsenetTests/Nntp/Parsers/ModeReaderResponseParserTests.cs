@@ -11,7 +11,7 @@ namespace UsenetTests.Nntp.Parsers
         [InlineData(201, "NNTP Service Ready, posting prohibited", NntpModeReaderResponseType.PostingProhibited)]
         [InlineData(502, "Transit service only", NntpModeReaderResponseType.ReadingServiceUnavailable)]
         [InlineData(999, "", NntpModeReaderResponseType.Unknown)]
-        public void ResponseShouldBeParsedCorrectly(
+        internal void ResponseShouldBeParsedCorrectly(
             int responseCode, 
             string responseMessage, 
             NntpModeReaderResponseType expectedResponseType)

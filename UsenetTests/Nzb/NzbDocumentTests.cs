@@ -38,7 +38,7 @@ namespace UsenetTests.Nzb
 
         [Theory]
         [MemberData(nameof(EqualsWithSameValues))]
-        public void EqualsWithSameValuesShouldReturnTrue(XSerializable<NzbDocument> expected, XSerializable<NzbDocument> actual)
+        internal void EqualsWithSameValuesShouldReturnTrue(XSerializable<NzbDocument> expected, XSerializable<NzbDocument> actual)
         {
             Assert.Equal(expected.Object, actual.Object);
         }

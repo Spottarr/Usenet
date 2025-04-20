@@ -13,7 +13,7 @@ namespace UsenetTests.Nntp.Parsers
         [InlineData(423, "No article with that number", NntpStatResponseType.NoArticleWithThatNumber, 0, "")]
         [InlineData(430, "No such article found", NntpStatResponseType.NoArticleWithThatMessageId, 0, "")]
         [InlineData(999, "Unspecified response", NntpStatResponseType.Unknown, 0, "")]
-        public void ResponseShouldBeParsedCorrectly(
+        internal void ResponseShouldBeParsedCorrectly(
             int responseCode, 
             string responseMessage, 
             NntpStatResponseType expectedResponseType,
