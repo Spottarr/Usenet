@@ -22,7 +22,7 @@ namespace UsenetTests.Yenc
         [InlineData(@"yenc.multipart.00000021.ntx")]
         [InlineData(@"yenc.singlepart.test (1.2).ntx")]
         [InlineData(@"yenc.multipart.test (1.2).ntx")]
-        public void ArticleShouldBeValid(string fileName)
+        internal void ArticleShouldBeValid(string fileName)
         {
             YencArticle article = YencArticleDecoder.Decode(
                 testData.GetEmbeddedFile(fileName).ReadAllLines(UsenetEncoding.Default));
@@ -40,7 +40,7 @@ namespace UsenetTests.Yenc
         [InlineData(@"yenc.multipart.00000021 (missing checksum).ntx", YencValidationErrorCodes.MissingChecksum)]
         [InlineData(@"yenc.multipart.00000021 (part mismatch).ntx", YencValidationErrorCodes.PartMismatch)]
         [InlineData(@"yenc.multipart.00000021 (size mismatch).ntx", YencValidationErrorCodes.SizeMismatch)]
-        public void ArticleShouldBeInvalid(string fileName, string errorCode)
+        internal void ArticleShouldBeInvalid(string fileName, string errorCode)
         {
             YencArticle article = YencArticleDecoder.Decode(
                 testData.GetEmbeddedFile(fileName).ReadAllLines(UsenetEncoding.Default));

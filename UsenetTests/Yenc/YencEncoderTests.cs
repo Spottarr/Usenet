@@ -19,7 +19,7 @@ namespace UsenetTests.Yenc
         }
 
         [Fact]
-        public void ShouldBeEncodedAsSinglePartFile()
+        internal void ShouldBeEncodedAsSinglePartFile()
         {
             List<string> expectedText = testData
                 .GetEmbeddedFile(@"yenc.singlepart.test (1.2).ntx")
@@ -39,7 +39,7 @@ namespace UsenetTests.Yenc
         }
 
         [Fact]
-        public void ShouldBeEncodedAsPartOfMultiPartFile()
+        internal void ShouldBeEncodedAsPartOfMultiPartFile()
         {
             List<string> expectedText = testData
                 .GetEmbeddedFile(@"yenc.multipart.test (1.2).ntx")

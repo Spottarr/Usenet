@@ -86,7 +86,7 @@ namespace UsenetTests.Nntp.Writers
 
         [Theory]
         [MemberData(nameof(ArticleWriteData))]
-        public void ArticleShouldBeWrittenCorrectly(XSerializable<NntpArticle> article, string[] expectedLines)
+        internal void ArticleShouldBeWrittenCorrectly(XSerializable<NntpArticle> article, string[] expectedLines)
         {
             using var connection = new MockConnection();
             ArticleWriter.Write(connection, article.Object);
@@ -94,7 +94,7 @@ namespace UsenetTests.Nntp.Writers
         }
     }
 
-    public class MockConnection : INntpConnection
+    internal class MockConnection : INntpConnection
     {
         private readonly List<string> lines = [];
 

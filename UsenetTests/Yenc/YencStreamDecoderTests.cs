@@ -18,7 +18,7 @@ namespace UsenetTests.Yenc
         }
 
         [Fact]
-        public void SinglePartFileShouldBeDecoded()
+        internal void SinglePartFileShouldBeDecoded()
         {
             byte[] expectedData = testData.GetEmbeddedFile(@"yenc.singlepart.testfile.txt").ReadAllBytes();
 
@@ -36,7 +36,7 @@ namespace UsenetTests.Yenc
         }
 
         [Fact]
-        public void FilePartShouldBeDecoded()
+        internal void FilePartShouldBeDecoded()
         {
             const int expectedDataLength = 11250;
             YencStream actualStream = YencStreamDecoder.Decode(
@@ -48,7 +48,7 @@ namespace UsenetTests.Yenc
         }
 
         [Fact]
-        public void MultiPartFileShouldBeDecoded()
+        internal void MultiPartFileShouldBeDecoded()
         {
             const string expectedFileName = "joystick.jpg";
             byte[] expected = testData.GetEmbeddedFile(@"yenc.multipart.joystick.jpg").ReadAllBytes();

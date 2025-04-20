@@ -5,7 +5,7 @@ using Microsoft.Extensions.FileProviders;
 
 namespace UsenetTests.Extensions
 {
-    public static class FileInfoExtensions
+    internal static class FileInfoExtensions
     {
         public static string ReadAllText(this IFileInfo fileInfo, Encoding encoding)
         {
