@@ -7,11 +7,11 @@ namespace UsenetTests.Nntp.Models
 {
     public class NntpDateTimeTests
     {
-        public static IEnumerable<object[]> DateTimeData = new[]
-        {
-            new object[] { "20170523 153211 GMT", new DateTime(2017, 5, 23, 15, 32, 11, DateTimeKind.Utc) },
-            new object[] { "20170523 153211 GMT", new DateTime(2017, 5, 23, 15, 32, 11, DateTimeKind.Utc).ToLocalTime() }
-        };
+        public static readonly IEnumerable<object[]> DateTimeData =
+        [
+            ["20170523 153211 GMT", new DateTime(2017, 5, 23, 15, 32, 11, DateTimeKind.Utc)],
+            ["20170523 153211 GMT", new DateTime(2017, 5, 23, 15, 32, 11, DateTimeKind.Utc).ToLocalTime()]
+        ];
 
         [Theory]
         [MemberData(nameof(DateTimeData))]
@@ -21,11 +21,11 @@ namespace UsenetTests.Nntp.Models
             Assert.Equal(expected, actual);
         }
 
-        public static IEnumerable<object[]> DateTimeOffsetData = new[]
-        {
-            new object[] { "20170523 153211 GMT", new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero),  },
-            new object[] { "20170523 153211 GMT", new DateTimeOffset(2017, 5, 23, 17, 32, 11, TimeSpan.FromHours(+2)) }
-        };
+        public static readonly IEnumerable<object[]> DateTimeOffsetData =
+        [
+            ["20170523 153211 GMT", new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero)],
+            ["20170523 153211 GMT", new DateTimeOffset(2017, 5, 23, 17, 32, 11, TimeSpan.FromHours(+2))]
+        ];
 
         [Theory]
         [MemberData(nameof(DateTimeOffsetData))]

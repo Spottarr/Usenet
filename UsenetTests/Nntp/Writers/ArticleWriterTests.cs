@@ -13,10 +13,9 @@ namespace UsenetTests.Nntp.Writers
 {
     public class ArticleWriterTests
     {
-        public static IEnumerable<object[]> ArticleWriteData = new[]
-        {
-            new object[] 
-            {
+        public static readonly IEnumerable<object[]> ArticleWriteData =
+        [
+            [
                 new XSerializable<NntpArticle>(new NntpArticle(0, "1@example.com", "group", null, new List<string>(0))), new []
                 {
                     "Message-ID: <1@example.com>",
@@ -24,9 +23,8 @@ namespace UsenetTests.Nntp.Writers
                     "",
                     "."
                 }
-            },
-            new object[]
-            {
+            ],
+            [
                 new XSerializable<NntpArticle>(new NntpArticle(0, "<2@example.com>", "group", null, new List<string>(0))), new []
                 {
                     "Message-ID: <2@example.com>",
@@ -34,9 +32,8 @@ namespace UsenetTests.Nntp.Writers
                     "",
                     "."
                 }
-            },
-            new object[]
-            {
+            ],
+            [
                 new XSerializable<NntpArticle>(new NntpArticle(0, "3@example.com", "group", new MultiValueDictionary<string, string>
                 {
                     { "From", "\"Demo User\" <nobody@example.net>"},
@@ -51,10 +48,9 @@ namespace UsenetTests.Nntp.Writers
                     "",
                     "This is just a test article.",
                     "."
-                },
-            },
-            new object[]
-            {
+                }
+            ],
+            [
                 new XSerializable<NntpArticle>(new NntpArticle(0, "4@example.com", "group", new MultiValueDictionary<string, string>
                 {
                     { "Message-ID", "<9999@example.com>"}, // not allowed, should be ignored
@@ -68,10 +64,9 @@ namespace UsenetTests.Nntp.Writers
                     "",
                     "This is just a test article.",
                     "."
-                },
-            },
-            new object[]
-            {
+                }
+            ],
+            [
                 new XSerializable<NntpArticle>(new NntpArticle(0, "5@example.com", "group", new MultiValueDictionary<string, string>
                 {
                     { "Message-ID", "9999@example.com"}, // not allowed, should be ignored
@@ -85,9 +80,9 @@ namespace UsenetTests.Nntp.Writers
                     "",
                     "This is just a test article.",
                     "."
-                },
-            },
-        };
+                }
+            ]
+        ];
 
         [Theory]
         [MemberData(nameof(ArticleWriteData))]
@@ -101,7 +96,7 @@ namespace UsenetTests.Nntp.Writers
 
     public class MockConnection : INntpConnection
     {
-        private readonly List<string> lines = new List<string>();
+        private readonly List<string> lines = [];
 
         public void Dispose()
         {

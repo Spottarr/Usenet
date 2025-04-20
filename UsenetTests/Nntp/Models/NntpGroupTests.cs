@@ -37,19 +37,19 @@ namespace UsenetTests.Nntp.Models
             Assert.Equal(expected, actual);
         }
 
-        public static IEnumerable<object[]> EqualsWithSameValues = new[]
-        {
-            new object[]
-            {
-                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, null, new long[]{1,2,3})),
-                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, null, new long[]{1,2,3})),
-            },
-            new object[]
-            {
+        public static readonly IEnumerable<object[]> EqualsWithSameValues =
+        [
+            [
+                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, null,
+                    [1,2,3])),
+                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, null,
+                    [1,2,3]))
+            ],
+            [
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", null)),
-                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", null)),
-            },
-        };
+                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", null))
+            ]
+        ];
 
         [Theory]
         [MemberData(nameof(EqualsWithSameValues))]
@@ -58,44 +58,50 @@ namespace UsenetTests.Nntp.Models
             Assert.Equal(group1.Object, group2.Object);
         }
 
-        public static IEnumerable<object[]> EqualsWithDifferentValues = new[]
-        {
-            new object[]
-            {
-                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", new long[]{1,2,3})),
-                new XSerializable<NntpGroup>(new NntpGroup("group2", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", new long[]{1,2,3})),
-            },
-            new object[]
-            {
-                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", new long[]{1,2,3})),
-                new XSerializable<NntpGroup>(new NntpGroup("group1", 11, 1, 10, NntpPostingStatus.PostingPermitted, "other", new long[]{1,2,3})),
-            },
-            new object[]
-            {
-                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", new long[]{1,2,3})),
-                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 2, 10, NntpPostingStatus.PostingPermitted, "other", new long[]{1,2,3})),
-            },
-            new object[]
-            {
-                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", new long[]{1,2,3})),
-                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 11, NntpPostingStatus.PostingPermitted, "other", new long[]{1,2,3})),
-            },
-            new object[]
-            {
-                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", new long[]{1,2,3})),
-                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.ArticlesFromPeersNotPermitted, "other", new long[]{1,2,3})),
-            },
-            new object[]
-            {
-                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", new long[]{1,2,3})),
-                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "aaaaa", new long[]{1,2,3})),
-            },
-            new object[]
-            {
-                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", new long[]{1,2,3})),
-                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", null)),
-            },
-        };
+        public static readonly IEnumerable<object[]> EqualsWithDifferentValues =
+        [
+            [
+                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
+                    [1,2,3])),
+                new XSerializable<NntpGroup>(new NntpGroup("group2", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
+                    [1,2,3]))
+            ],
+            [
+                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
+                    [1,2,3])),
+                new XSerializable<NntpGroup>(new NntpGroup("group1", 11, 1, 10, NntpPostingStatus.PostingPermitted, "other",
+                    [1,2,3]))
+            ],
+            [
+                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
+                    [1,2,3])),
+                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 2, 10, NntpPostingStatus.PostingPermitted, "other",
+                    [1,2,3]))
+            ],
+            [
+                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
+                    [1,2,3])),
+                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 11, NntpPostingStatus.PostingPermitted, "other",
+                    [1,2,3]))
+            ],
+            [
+                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
+                    [1,2,3])),
+                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.ArticlesFromPeersNotPermitted, "other",
+                    [1,2,3]))
+            ],
+            [
+                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
+                    [1,2,3])),
+                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "aaaaa",
+                    [1,2,3]))
+            ],
+            [
+                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
+                    [1,2,3])),
+                new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", null))
+            ]
+        ];
 
         [Theory]
         [MemberData(nameof(EqualsWithDifferentValues))]
