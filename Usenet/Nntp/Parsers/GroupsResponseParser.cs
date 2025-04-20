@@ -31,7 +31,7 @@ namespace Usenet.Nntp.Parsers
         {
             if (!IsSuccessResponse(code) || dataBlock == null)
             {
-                return new NntpGroupsResponse(code, message, false, new NntpGroup[0]);
+                return new NntpGroupsResponse(code, message, false, []);
             }
 
             IEnumerable<NntpGroup> groups = EnumerateGroups(dataBlock);

@@ -18,7 +18,7 @@ namespace Usenet.Nntp.Parsers
         {
             if (!IsSuccessResponse(code) || dataBlock == null)
             {
-                return new NntpGroupOriginsResponse(code, message, false, new NntpGroupOrigin[0]);
+                return new NntpGroupOriginsResponse(code, message, false, []);
             }
 
             IEnumerable<NntpGroupOrigin> groupOrigins = EnumerateGroupOrigins(dataBlock);
