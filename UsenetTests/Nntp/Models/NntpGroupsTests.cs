@@ -31,35 +31,32 @@ namespace UsenetTests.Nntp.Models
         [Fact]
         internal void ConstructWithMultipleGroupsShouldReturnMultipleGroupsString()
         {
-            var groups = new NntpGroups(new [] { "group1", "group2"});
+            var groups = new NntpGroups(["group1", "group2"]);
             Assert.Equal("group1;group2", groups.ToString());
         }
 
         [Fact]
         internal void ConstructWithSameGroupsShouldReturnSingleGroupString()
         {
-            var groups = new NntpGroups(new[] { "group1", "group1" });
+            var groups = new NntpGroups(["group1", "group1"]);
             Assert.Equal("group1", groups.ToString());
         }
 
-        public static readonly IEnumerable<object[]> EqualsWithSameValues = new[]
-        {
-            new object[]
-            {
+        public static readonly IEnumerable<object[]> EqualsWithSameValues =
+        [
+            [
                 new XSerializable<NntpGroups>(new NntpGroups("group1;group2")),
-                new XSerializable<NntpGroups>(new NntpGroups("group1;group2")),
-            },
-            new object[]
-            {
+                new XSerializable<NntpGroups>(new NntpGroups("group1;group2"))
+            ],
+            [
                 new XSerializable<NntpGroups>(new NntpGroups("group3;group4")),
-                new XSerializable<NntpGroups>(new NntpGroups("group4;group3")),
-            },
-            new object[]
-            {
+                new XSerializable<NntpGroups>(new NntpGroups("group4;group3"))
+            ],
+            [
                 new XSerializable<NntpGroups>(new NntpGroups("group5;group6")),
-                new XSerializable<NntpGroups>(new NntpGroups("group6;group5;group5")),
-            },
-        };
+                new XSerializable<NntpGroups>(new NntpGroups("group6;group5;group5"))
+            ]
+        ];
 
         [Theory]
         [MemberData(nameof(EqualsWithSameValues))]

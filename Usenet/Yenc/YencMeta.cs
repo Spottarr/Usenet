@@ -104,7 +104,7 @@ namespace Usenet.Yenc
             }
 
             // parse other items
-            string[] pairs = nameSplit[0].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] pairs = nameSplit[0].Split([' '], StringSplitOptions.RemoveEmptyEntries);
             if (pairs.Length == 0)
             {
                 return dictionary;
