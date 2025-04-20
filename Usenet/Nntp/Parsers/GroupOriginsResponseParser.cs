@@ -48,7 +48,7 @@ namespace Usenet.Nntp.Parsers
                     continue;
                 }
 
-                long.TryParse(lineSplit[1], out long createdAtTimestamp);
+                _ = long.TryParse(lineSplit[1], out long createdAtTimestamp);
 
                 yield return new NntpGroupOrigin(
                     lineSplit[0],

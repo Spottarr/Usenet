@@ -34,7 +34,7 @@ namespace Usenet.Nntp.Parsers
                 log.InvalidResponseMessage(message);
             }
 
-            long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out long number);
+            _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out long number);
             string messageId = responseSplit.Length > 1 ? responseSplit[1] : string.Empty;
 
             return new NntpLastResponse(code, message, true, responseType, number, messageId);

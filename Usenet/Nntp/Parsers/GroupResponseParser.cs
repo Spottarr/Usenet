@@ -26,9 +26,9 @@ namespace Usenet.Nntp.Parsers
                 log.InvalidGroupResponseMessage(message);
             }
 
-            long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out long articleCount);
-            long.TryParse(responseSplit.Length > 1 ? responseSplit[1] : null, out long lowWaterMark);
-            long.TryParse(responseSplit.Length > 2 ? responseSplit[2] : null, out long highWaterMark);
+            _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out long articleCount);
+            _ = long.TryParse(responseSplit.Length > 1 ? responseSplit[1] : null, out long lowWaterMark);
+            _ = long.TryParse(responseSplit.Length > 2 ? responseSplit[2] : null, out long highWaterMark);
             string name = responseSplit.Length > 3 ? responseSplit[3] : string.Empty;
 
             return new NntpGroupResponse(

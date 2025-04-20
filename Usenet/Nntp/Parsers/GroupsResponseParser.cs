@@ -72,13 +72,13 @@ namespace Usenet.Nntp.Parsers
                 }
 
                 var argCount = 1;
-                long.TryParse(lineSplit[argCount++], out long highWaterMark);
-                long.TryParse(lineSplit[argCount++], out long lowWaterMark);
+                _ = long.TryParse(lineSplit[argCount++], out long highWaterMark);
+                _ = long.TryParse(lineSplit[argCount++], out long lowWaterMark);
 
                 var articleCount = 0L;
                 if (requestType == GroupStatusRequestType.Extended)
                 {
-                    long.TryParse(lineSplit[argCount++], out articleCount);
+                    _ = long.TryParse(lineSplit[argCount++], out articleCount);
                 }
 
                 NntpPostingStatus postingStatus = PostingStatusParser.Parse(lineSplit[argCount], out string otherGroup);
