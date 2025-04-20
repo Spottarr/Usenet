@@ -10,7 +10,7 @@ namespace Usenet.Yenc
     /// The article is completely decoded in memory.
     /// Based on Kristian Hellang's yEnc project https://github.com/khellang/yEnc.
     /// </summary>
-    public class YencArticleDecoder
+    public static class YencArticleDecoder
     {
         private const string yEnd = YencKeywords.YEnd + " ";
 
@@ -58,7 +58,7 @@ namespace Usenet.Yenc
                         continue;
                     }
 
-                    if (enumerator.Current.StartsWith(yEnd))
+                    if (enumerator.Current.StartsWith(yEnd, StringComparison.Ordinal))
                     {
                         footer = YencMeta.ParseFooter(YencMeta.ParseLine(enumerator.Current));
 

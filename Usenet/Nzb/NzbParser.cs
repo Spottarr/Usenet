@@ -15,7 +15,7 @@ namespace Usenet.Nzb
     /// It takes an xml string as input and parses it into an instance of the <see cref="NzbDocument"/> class.
     /// Based on Kristian Hellang's Nzb project https://github.com/khellang/Nzb.
     /// </summary>
-    public class NzbParser
+    public static class NzbParser
     {
         private static readonly Regex fileNameRegex = new Regex("\"([^\"]*)\"");
 
@@ -125,7 +125,7 @@ namespace Usenet.Nzb
             return new NntpGroups(groups);
         }
 
-        private static IEnumerable<NzbSegment> GetSegments(NzbParserContext context, XContainer segentsElement)
+        private static List<NzbSegment> GetSegments(NzbParserContext context, XContainer segentsElement)
         {
             IOrderedEnumerable<XElement> elements = segentsElement?
                 .Elements(context.Namespace + NzbKeywords.Segment)
