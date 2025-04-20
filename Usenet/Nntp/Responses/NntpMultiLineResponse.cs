@@ -26,7 +26,7 @@ namespace Usenet.Nntp.Responses
             bool success,
             IEnumerable<string> lines) : base(code, message, success)
         {
-            Lines = lines ?? new string[0];
+            Lines = lines ?? [];
         }
     }
 }

@@ -61,7 +61,7 @@ namespace Usenet.Nntp
 
             IEnumerable<string> dataBlock = parser.IsSuccessResponse(response.Code)
                 ? ReadMultiLineDataBlock()
-                : new string[0];
+                : [];
 
             return parser.Parse(response.Code, response.Message, dataBlock);
         }

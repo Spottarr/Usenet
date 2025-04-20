@@ -26,7 +26,7 @@ namespace UsenetTests.Nntp.Parsers
             ],
             [
                 231, "list of new newsgroups follows", 231, (int)GroupStatusRequestType.Basic,
-                new string[0], new XSerializable<NntpGroup[]>([])
+                Array.Empty<string>(), new XSerializable<NntpGroup[]>([])
             ],
             [
                 215, "list of new newsgroups follows", 215, (int)GroupStatusRequestType.Extended,
@@ -42,7 +42,7 @@ namespace UsenetTests.Nntp.Parsers
             ],
             [
                 215, "list of new newsgroups follows", 215, (int)GroupStatusRequestType.Extended,
-                new string[0], new XSerializable<NntpGroup[]>([])
+                Array.Empty<string>(), new XSerializable<NntpGroup[]>([])
             ]
         ];
 

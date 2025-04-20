@@ -85,7 +85,7 @@ namespace Usenet.Nntp.Parsers
                 // get body if requested
                 IEnumerable<string> bodyLines = (requestType & ArticleRequestType.Body) == ArticleRequestType.Body
                     ? EnumerateBodyLines(enumerator)
-                    : new string[0];
+                    : [];
 
                 if (dataBlock is ICollection<string>)
                 {
