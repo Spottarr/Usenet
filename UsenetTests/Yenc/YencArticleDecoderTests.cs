@@ -20,7 +20,7 @@ namespace UsenetTests.Yenc
         [Fact]
         public void SinglePartFileShouldBeDecoded()
         {
-            byte[] expectedData = testData.GetEmbeddedFile(@"yenc.singlepart.testfile.txt").ReadAllBytes();
+            var expectedData = testData.GetEmbeddedFile(@"yenc.singlepart.testfile.txt").ReadAllBytes().ToList();
 
             YencArticle actualArticle = YencArticleDecoder.Decode(
                 testData.GetEmbeddedFile(@"yenc.singlepart.00000005.ntx").ReadAllLines(UsenetEncoding.Default));
@@ -43,7 +43,7 @@ namespace UsenetTests.Yenc
                 testData.GetEmbeddedFile(@"yenc.multipart.00000020.ntx").ReadAllLines(UsenetEncoding.Default));
 
             Assert.True(actualArticle.Header.IsFilePart);
-            Assert.Equal(expectedDataLength, actualArticle.Data.Length);
+            Assert.Equal(expectedDataLength, actualArticle.Data.Count);
         }
 
         [Fact]

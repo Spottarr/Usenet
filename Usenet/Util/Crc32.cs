@@ -15,7 +15,7 @@
             lookupTable = CreateLookupTable();
         }
 
-        public static uint CalculateChecksum(byte[] buffer)
+        public static uint CalculateChecksum(IEnumerable<byte> buffer)
         {
             Guard.ThrowIfNull(buffer, nameof(buffer));
             

@@ -33,11 +33,11 @@ namespace Usenet.Yenc
                 return new ValidationResult(failures);
             }
 
-            if (footer.PartSize != article.Data.Length)
+            if (footer.PartSize != article.Data.Count)
             {
                 failures.Add(new ValidationFailure(
                     YencValidationErrorCodes.SizeMismatch, Resources.Yenc.SizeMismatch,
-                    new { DataSize = article.Data.Length, FooterSize = footer.PartSize }));
+                    new { DataSize = article.Data.Count, FooterSize = footer.PartSize }));
             }
 
             if (!footer.Crc32.HasValue)
@@ -69,11 +69,11 @@ namespace Usenet.Yenc
                     new { HeaderPart = header.PartNumber, FooterPart = footer.PartNumber }));
             }
 
-            if (!(footer.PartSize == article.Data.Length && footer.PartSize == header.PartSize))
+            if (!(footer.PartSize == article.Data.Count && footer.PartSize == header.PartSize))
             {
                 failures.Add(new ValidationFailure(
                     YencValidationErrorCodes.SizeMismatch, Resources.Yenc.PartSizeMismatch,
-                    new { DataSize = article.Data.Length, HeaderSize = header.PartSize, FooterSize = footer.PartSize }));
+                    new { DataSize = article.Data.Count, HeaderSize = header.PartSize, FooterSize = footer.PartSize }));
             }
 
             if (!footer.PartCrc32.HasValue)
