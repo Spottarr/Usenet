@@ -9,8 +9,8 @@ namespace UsenetTests.Util
         [Fact]
         public void CountingStreamShouldCountBytesRead()
         {
-            var memStream = new MemoryStream(new byte[10]);
-            var stream = new CountingStream(memStream);
+            using var memStream = new MemoryStream(new byte[10]);
+            using var stream = new CountingStream(memStream);
             stream.ReadByte();
             stream.ReadByte();
             stream.ReadByte();
@@ -23,8 +23,8 @@ namespace UsenetTests.Util
         [Fact]
         public void CountingStreamShouldCountBytesWritten()
         {
-            var memStream = new MemoryStream(new byte[10]);
-            var stream = new CountingStream(memStream);
+            using var memStream = new MemoryStream(new byte[10]);
+            using var stream = new CountingStream(memStream);
             stream.WriteByte(1);
             stream.WriteByte(2);
             stream.WriteByte(3);
@@ -37,8 +37,8 @@ namespace UsenetTests.Util
         [Fact]
         public void ResetCountersShouldResetBytesReadAndBytesWritten()
         {
-            var memStream = new MemoryStream(new byte[10]);
-            var stream = new CountingStream(memStream);
+            using var memStream = new MemoryStream(new byte[10]);
+            using var stream = new CountingStream(memStream);
             stream.ReadByte();
             stream.ReadByte();
             stream.WriteByte(1);

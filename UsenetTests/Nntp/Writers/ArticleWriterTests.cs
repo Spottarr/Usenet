@@ -88,7 +88,7 @@ namespace UsenetTests.Nntp.Writers
         [MemberData(nameof(ArticleWriteData))]
         public void ArticleShouldBeWrittenCorrectly(XSerializable<NntpArticle> article, string[] expectedLines)
         {
-            var connection = new MockConnection();
+            using var connection = new MockConnection();
             ArticleWriter.Write(connection, article.Object);
             Assert.Equal(expectedLines, connection.GetLines());
         }
@@ -100,7 +100,6 @@ namespace UsenetTests.Nntp.Writers
 
         public void Dispose()
         {
-            throw new NotImplementedException();
         }
 
         public Task<TResponse> ConnectAsync<TResponse>(string hostname, int port, bool useSsl, IResponseParser<TResponse> parser)
