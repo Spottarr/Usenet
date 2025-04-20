@@ -77,5 +77,11 @@ namespace Usenet.Util
             BytesRead = 0;
             BytesWritten = 0;
         }
+        
+        protected override void Dispose(bool disposing)
+        {
+            if(disposing) innerStream.Dispose();
+            base.Dispose(disposing);
+        }
     }
 }
