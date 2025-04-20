@@ -64,7 +64,7 @@ namespace Usenet.Extensions
         /// <param name="comp">The <see cref="StringComparison"/> to use.</param>
         /// <returns>A value indicating whether the source string contains the toCheck string.</returns>
         public static bool Contains(this string source, string toCheck, StringComparison comp) => 
-            source.IndexOf(toCheck, comp) >= 0;
+            source.Contains(toCheck, comp);
 
         /// <summary>
         /// Removes all whitespace from a string.
