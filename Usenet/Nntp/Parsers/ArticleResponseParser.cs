@@ -118,7 +118,7 @@ namespace Usenet.Nntp.Parsers
                 }
                 else
                 {
-                    int splitPos = line.IndexOf(':');
+                    int splitPos = line.IndexOf(':', StringComparison.Ordinal);
                     if (splitPos < 0)
                     {
                         log.InvalidHeaderLine(line);
