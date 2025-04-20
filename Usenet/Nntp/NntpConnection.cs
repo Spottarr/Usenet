@@ -32,8 +32,8 @@ namespace Usenet.Nntp
         public async Task<TResponse> ConnectAsync<TResponse>(string hostname, int port, bool useSsl, IResponseParser<TResponse> parser)
         {
             log.LogInformation("Connecting: {hostname} {port} (Use SSl = {useSsl})", hostname, port, useSsl);
-            await client.ConnectAsync(hostname, port);
-            Stream = await GetStreamAsync(hostname, useSsl);
+            await client.ConnectAsync(hostname, port).ConfigureAwait(false);
+            Stream = await GetStreamAsync(hostname, useSsl).ConfigureAwait(false);
             writer = new StreamWriter(Stream, UsenetEncoding.Default) { AutoFlush = true };
             reader = new NntpStreamReader(Stream, UsenetEncoding.Default);
             return GetResponse(parser);

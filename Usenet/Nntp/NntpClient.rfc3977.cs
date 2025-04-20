@@ -20,7 +20,7 @@ namespace Usenet.Nntp
         public async Task<bool> ConnectAsync(string hostname, int port, bool useSsl)
         {
             Guard.ThrowIfNullOrWhiteSpace(hostname, nameof(hostname));
-            NntpResponse response = await connection.ConnectAsync(hostname, port, useSsl, new ResponseParser(200, 201));
+            NntpResponse response = await connection.ConnectAsync(hostname, port, useSsl, new ResponseParser(200, 201)).ConfigureAwait(false);
             return response.Success;
         }
 
