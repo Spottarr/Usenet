@@ -17,7 +17,7 @@ namespace Usenet.Nntp.Parsers
             {
                 return new NntpGroupResponse(
                     code, message, false,
-                    new NntpGroup(string.Empty, 0, 0, 0, NntpPostingStatus.Unknown, string.Empty, new long[0]));
+                    new NntpGroup(string.Empty, 0, 0, 0, NntpPostingStatus.Unknown, string.Empty, []));
             }
 
             string[] responseSplit = message.Split(' ');
@@ -40,7 +40,7 @@ namespace Usenet.Nntp.Parsers
                     highWaterMark, 
                     NntpPostingStatus.Unknown,
                     string.Empty, 
-                    new long[0]));
+                    []));
         }
     }
 }

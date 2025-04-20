@@ -20,7 +20,7 @@ namespace Usenet.Nntp.Parsers
                 return new NntpGroupResponse(
                     code, message, false,
                     new NntpGroup(string.Empty, 0, 0, 0, NntpPostingStatus.Unknown,
-                        string.Empty, new long[0]));
+                        string.Empty, []));
             }
 
             string[] responseSplit = message.Split(' ');

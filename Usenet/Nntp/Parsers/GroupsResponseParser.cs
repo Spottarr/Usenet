@@ -94,7 +94,7 @@ namespace Usenet.Nntp.Parsers
                     highWaterMark,
                     postingStatus,
                     otherGroup,
-                    new long[0]);
+                    []);
             }
         }
     }
