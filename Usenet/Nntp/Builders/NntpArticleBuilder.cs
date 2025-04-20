@@ -78,7 +78,7 @@ namespace Usenet.Nntp.Builders
                             }
                             else
                             {
-                                log.LogWarning("Found more than 1 {messageId} header. Skipping it.", NntpHeaders.MessageId);
+                                log.HeaderOccursMoreThanOnce(NntpHeaders.MessageId);
                             }
                             break;
 
@@ -89,7 +89,7 @@ namespace Usenet.Nntp.Builders
                             }
                             else
                             {
-                                log.LogWarning("Found more than 1 {from} header. Skipping it.", NntpHeaders.From);
+                                log.HeaderOccursMoreThanOnce(NntpHeaders.From);
                             }
                             break;
 
@@ -100,7 +100,7 @@ namespace Usenet.Nntp.Builders
                             }
                             else
                             {
-                                log.LogWarning("Found more than 1 {subject} header. Skipping it.", NntpHeaders.Subject);
+                                log.HeaderOccursMoreThanOnce(NntpHeaders.Subject);
                             }
                             break;
 
@@ -115,12 +115,12 @@ namespace Usenet.Nntp.Builders
                                 }
                                 else
                                 {
-                                    log.LogWarning("{date} header has invalid value {value}. Skipping it.", NntpHeaders.Date, value);
+                                    log.InvalidHeader(NntpHeaders.Date, value);
                                 }
                             }
                             else
                             {
-                                log.LogWarning("Found more than 1 {date} header. Skipping it.", NntpHeaders.Date);
+                                log.HeaderOccursMoreThanOnce(NntpHeaders.Date);
                             }
                             break;
 

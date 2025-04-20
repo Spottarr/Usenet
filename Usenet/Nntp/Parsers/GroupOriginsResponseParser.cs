@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Usenet.Extensions;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
 
@@ -43,7 +44,7 @@ namespace Usenet.Nntp.Parsers
                 string[] lineSplit = line.Split(' ');
                 if (lineSplit.Length < 3)
                 {
-                    log.LogError("Invalid newsgroup origin line: {Line} Expected: {{group}} {{timestamp}} {{createdby}}", line);
+                    log.InvalidGroupOriginLine(line);
                     continue;
                 }
 

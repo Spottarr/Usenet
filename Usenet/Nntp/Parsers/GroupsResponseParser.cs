@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Usenet.Extensions;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
 
@@ -52,16 +53,21 @@ namespace Usenet.Nntp.Parsers
             }
 
             int checkParameterCount = requestType == GroupStatusRequestType.Basic ? 4 : 5;
-            string errorMessage = requestType == GroupStatusRequestType.Basic
-                ? "Invalid newsgroup information line: {Line} Expected: {{group}} {{high}} {{low}} {{status}}"
-                : "Invalid newsgroup information line: {Line} Expected: {{group}} {{high}} {{low}} {{count}} {{status}}";
 
             foreach (string line in dataBlock)
             {
                 string[] lineSplit = line.Split(' ');
                 if (lineSplit.Length < checkParameterCount)
                 {
-                    log.LogError(errorMessage, line);
+                    if (requestType == GroupStatusRequestType.Basic)
+                    {
+                        log.InvalidGroupBasicInformationLine(line);
+                    }
+                    else
+                    {
+                        log.InvalidGroupExtendedInformationLine(line);
+                    }
+                    
                     continue;
                 }
 
@@ -78,7 +84,7 @@ namespace Usenet.Nntp.Parsers
                 NntpPostingStatus postingStatus = PostingStatusParser.Parse(lineSplit[argCount], out string otherGroup);
                 if (postingStatus == NntpPostingStatus.Unknown)
                 {
-                    log.LogError("Invalid posting status {Status} in line: {Line}", lineSplit[argCount], line);
+                    log.InvalidPostingStatus(lineSplit[argCount], line);
                 }
 
                 yield return new NntpGroup(

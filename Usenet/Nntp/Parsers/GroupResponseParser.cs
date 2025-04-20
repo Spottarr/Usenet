@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Usenet.Extensions;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
 
@@ -22,7 +23,7 @@ namespace Usenet.Nntp.Parsers
             string[] responseSplit = message.Split(' ');
             if (responseSplit.Length < 4)
             {
-                log.LogError("Invalid response message: {Message} Expected: {{count}} {{low}} {{high}} {{group}}", message);
+                log.InvalidGroupResponseMessage(message);
             }
 
             long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out long articleCount);

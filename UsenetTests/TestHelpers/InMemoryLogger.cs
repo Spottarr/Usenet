@@ -55,7 +55,7 @@ namespace UsenetTests.TestHelpers
         {
             foreach (var entry in Buffer)
             {
-                logger.Log(entry.LogLevel, entry.EventId, entry.Message);
+                //logger.Log(entry.LogLevel, entry.EventId, entry.Message);
             }
             Buffer.Clear();
         }
