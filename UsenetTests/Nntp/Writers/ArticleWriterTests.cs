@@ -94,7 +94,7 @@ namespace UsenetTests.Nntp.Writers
         }
     }
 
-    internal class MockConnection : INntpConnection
+    internal sealed class MockConnection : INntpConnection
     {
         private readonly List<string> lines = [];
 

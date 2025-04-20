@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace UsenetTests.TestHelpers
 {
-    internal class InMemoryLogger : ILogger
+    internal sealed class InMemoryLogger : ILogger
     {
-        internal class Entry
+        internal sealed class Entry
         {
             public LogLevel LogLevel;
             public EventId EventId;
