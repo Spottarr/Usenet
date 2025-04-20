@@ -52,7 +52,7 @@ namespace Usenet.Nzb
         {
             if (value <= 0)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(value));
             }
             partSize = value;
             return this;
