@@ -63,9 +63,9 @@ namespace Usenet.Nntp.Models
                 return false;
             }
             return 
-                Name.Equals(other.Name) &&
+                Name.Equals(other.Name, StringComparison.Ordinal) &&
                 CreatedAt.Equals(other.CreatedAt) &&
-                CreatedBy.Equals(other.CreatedBy);
+                CreatedBy.Equals(other.CreatedBy, StringComparison.Ordinal);
         }
 
         /// <summary>

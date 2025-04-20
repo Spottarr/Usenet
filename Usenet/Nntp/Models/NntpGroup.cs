@@ -120,12 +120,12 @@ namespace Usenet.Nntp.Models
             }
 
             bool equals =
-                Name.Equals(other.Name) &&
+                Name.Equals(other.Name, StringComparison.Ordinal) &&
                 ArticleCount.Equals(other.ArticleCount) &&
                 LowWaterMark.Equals(other.LowWaterMark) &&
                 HighWaterMark.Equals(other.HighWaterMark) &&
                 PostingStatus.Equals(other.PostingStatus) &&
-                OtherGroup.Equals(other.OtherGroup);
+                OtherGroup.Equals(other.OtherGroup, StringComparison.Ordinal);
 
             if (!equals)
             {
