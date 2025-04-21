@@ -18,7 +18,7 @@
         /// <param name="message">The response message received from the server.</param>
         /// <param name="success">A value indicating whether the command succeeded or failed.</param>
         /// <param name="dateTime">The date and time received from the server.</param>
-        public NntpDateResponse(int code, string message, bool success, DateTimeOffset dateTime) 
+        public NntpDateResponse(int code, string message, bool success, DateTimeOffset dateTime)
             : base(code, message, success)
         {
             DateTime = dateTime;

@@ -24,6 +24,5 @@ namespace UsenetTests.Nzb
             var actual = new NzbSegment(number, offset, size, messageId);
             Assert.NotEqual(expected, actual);
         }
-
     }
 }

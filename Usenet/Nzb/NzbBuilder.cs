@@ -93,6 +93,7 @@ namespace Usenet.Nzb
             {
                 _groupsBuilder.Add(group);
             }
+
             return this;
         }
 
@@ -116,7 +117,7 @@ namespace Usenet.Nzb
 
         private MultiValueDictionary<string, string> GetMetaData()
         {
-            var headers = 
+            var headers =
                 from pair in _metaData
                 from val in pair.Value
                 select new Tuple<string, string>(pair.Key, val);
@@ -126,6 +127,7 @@ namespace Usenet.Nzb
             {
                 dict.Add(header.Item1, header.Item2);
             }
+
             return dict;
         }
 
@@ -134,11 +136,11 @@ namespace Usenet.Nzb
             var date = DateTimeOffset.UtcNow;
             return _files
                 .Select(f => new NzbFile(
-                    f.Poster ?? _documentPoster, 
-                    GetSubject(f.FileInfo), 
-                    f.FileInfo.Name, 
-                    date, 
-                    new NntpGroupsBuilder().Add(f.Groups).Add(_groupsBuilder.Groups).Build(), 
+                    f.Poster ?? _documentPoster,
+                    GetSubject(f.FileInfo),
+                    f.FileInfo.Name,
+                    date,
+                    new NntpGroupsBuilder().Add(f.Groups).Add(_groupsBuilder.Groups).Build(),
                     GetSegments(f.FileInfo)))
                 .ToList();
         }
@@ -163,6 +165,7 @@ namespace Usenet.Nzb
                 segments.Add(new NzbSegment(number, offset, size, messageId));
                 offset += size;
             }
+
             return segments;
         }
 
@@ -173,6 +176,7 @@ namespace Usenet.Nzb
             {
                 count++;
             }
+
             return count;
         }
 
@@ -191,4 +195,3 @@ namespace Usenet.Nzb
         }
     }
 }
-

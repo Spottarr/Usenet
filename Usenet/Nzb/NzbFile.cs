@@ -17,8 +17,8 @@ namespace Usenet.Nzb
         public string Poster { get; }
 
         /// <summary>
-        /// A slightly munged copy of the article's subject. The segment counter (xx/yy) 
-        /// usually found at the end, is replaced with (1/yy). You can use the yy to 
+        /// A slightly munged copy of the article's subject. The segment counter (xx/yy)
+        /// usually found at the end, is replaced with (1/yy). You can use the yy to
         /// confirm all segments are present.
         /// </summary>
         public string Subject { get; }
@@ -52,18 +52,18 @@ namespace Usenet.Nzb
         /// Creates a new instance of the <see cref="NzbFile"/> class.
         /// </summary>
         /// <param name="poster">The name of the poster. This is a copy of the article's From header field.</param>
-        /// <param name="subject">A slightly munged copy of the article's subject. The segment counter (xx/yy) 
-        ///     usually found at the end, is replaced with (1/yy). You can use the yy to 
+        /// <param name="subject">A slightly munged copy of the article's subject. The segment counter (xx/yy)
+        ///     usually found at the end, is replaced with (1/yy). You can use the yy to
         ///     confirm all segments are present.</param>
         /// <param name="fileName">The file name extracted from the subject.</param>
         /// <param name="date">The date the server saw this article.</param>
         /// <param name="groups">The list of groups that reference this file.</param>
         /// <param name="segments">The list of segments that make up this file.</param>
         public NzbFile(
-            string poster, 
-            string subject, 
+            string poster,
+            string subject,
             string fileName,
-            DateTimeOffset date, 
+            DateTimeOffset date,
             NntpGroups groups,
             IEnumerable<NzbSegment> segments)
         {
@@ -73,7 +73,7 @@ namespace Usenet.Nzb
             Date = date;
             Groups = groups ?? NntpGroups.Empty;
             Segments = (segments ?? new List<NzbSegment>(0)).OrderBy(s => s.Number).ToImmutableList();
-            Size = Segments.Sum(s => s.Size);   
+            Size = Segments.Sum(s => s.Size);
         }
 
         /// <summary>
@@ -99,6 +99,7 @@ namespace Usenet.Nzb
             {
                 return false;
             }
+
             return
                 Poster.Equals(other.Poster, StringComparison.Ordinal) &&
                 Subject.Equals(other.Subject, StringComparison.Ordinal) &&
@@ -122,8 +123,8 @@ namespace Usenet.Nzb
         /// <param name="first">The first <see cref="NzbFile"/>.</param>
         /// <param name="second">The second <see cref="NzbFile"/>.</param>
         /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-        public static bool operator ==(NzbFile first, NzbFile second) => 
-            (object) first == null ? (object) second == null : first.Equals(second);
+        public static bool operator ==(NzbFile first, NzbFile second) =>
+            (object)first == null ? (object)second == null : first.Equals(second);
 
         /// <summary>
         /// Returns a value indicating whether the frst <see cref="NzbFile"/> value is unequal to the second <see cref="NzbFile"/> value.
@@ -132,6 +133,5 @@ namespace Usenet.Nzb
         /// <param name="second">The second <see cref="NzbFile"/>.</param>
         /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
         public static bool operator !=(NzbFile first, NzbFile second) => !(first == second);
-
     }
 }

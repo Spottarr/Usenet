@@ -23,7 +23,7 @@ namespace UsenetTests.Yenc
             Assert.Equal(584, actualArticle.Header.FileSize);
             Assert.Equal("testfile.txt", actualArticle.Header.FileName);
             Assert.Equal(584, actualArticle.Footer.PartSize);
-            Assert.Equal("ded29f4f", ((int) actualArticle.Footer.Crc32.GetValueOrDefault()).ToString("x", CultureInfo.InvariantCulture));
+            Assert.Equal("ded29f4f", ((int)actualArticle.Footer.Crc32.GetValueOrDefault()).ToString("x", CultureInfo.InvariantCulture));
             Assert.Equal(expectedData, actualArticle.Data);
         }
 

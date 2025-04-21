@@ -111,7 +111,7 @@ namespace Usenet.Nntp.Models
         /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
         public bool Equals(NntpGroup other)
         {
-            if ((object) other == null)
+            if ((object)other == null)
             {
                 return false;
             }
@@ -135,6 +135,7 @@ namespace Usenet.Nntp.Models
             {
                 ArticleNumbers = ArticleNumbers.ToList();
             }
+
             if (!(other.ArticleNumbers is ICollection<long>))
             {
                 other.ArticleNumbers = other.ArticleNumbers.ToList();
@@ -157,7 +158,7 @@ namespace Usenet.Nntp.Models
         /// <param name="second">The second <see cref="NntpGroup"/>.</param>
         /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
         public static bool operator ==(NntpGroup first, NntpGroup second) =>
-            (object) first == null ? (object) second == null : first.Equals(second);
+            (object)first == null ? (object)second == null : first.Equals(second);
 
         /// <summary>
         /// Returns a value indicating whether the frst <see cref="NntpGroup"/> value is unequal to the second <see cref="NntpGroup"/> value.

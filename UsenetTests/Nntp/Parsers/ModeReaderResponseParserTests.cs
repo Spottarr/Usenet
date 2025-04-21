@@ -12,8 +12,8 @@ namespace UsenetTests.Nntp.Parsers
         [InlineData(502, "Transit service only", NntpModeReaderResponseType.ReadingServiceUnavailable)]
         [InlineData(999, "", NntpModeReaderResponseType.Unknown)]
         internal void ResponseShouldBeParsedCorrectly(
-            int responseCode, 
-            string responseMessage, 
+            int responseCode,
+            string responseMessage,
             NntpModeReaderResponseType expectedResponseType)
         {
             var modeReaderResponse = new ModeReaderResponseParser().Parse(responseCode, responseMessage);

@@ -40,6 +40,7 @@ namespace Usenet.Nntp.Models
                 _groups = ImmutableList<string>.Empty;
                 return;
             }
+
             var parsedGroups = doParse ? GroupsParser.Parse(groups) : groups;
             _groups = parsedGroups.OrderBy(g => g).ToImmutableList();
         }
@@ -72,7 +73,7 @@ namespace Usenet.Nntp.Models
         /// </summary>
         /// <param name="value">The string to convert.</param>
         public static implicit operator NntpGroups(string value) => FromString(value);
-        
+
         /// <summary>
         /// Converts a string implicitly to a <see cref="NntpGroups"/>.
         /// </summary>
@@ -105,8 +106,8 @@ namespace Usenet.Nntp.Models
         /// <param name="first">The first <see cref="NntpGroups"/>.</param>
         /// <param name="second">The second <see cref="NntpGroups"/>.</param>
         /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-        public static bool operator ==(NntpGroups first, NntpGroups second) => 
-            (object) first == null ? (object) second == null : first.Equals(second);
+        public static bool operator ==(NntpGroups first, NntpGroups second) =>
+            (object)first == null ? (object)second == null : first.Equals(second);
 
         /// <summary>
         /// Returns a value indicating whether the frst <see cref="NntpGroups"/> value is unequal to the second <see cref="NntpGroups"/> value.

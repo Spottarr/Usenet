@@ -34,12 +34,12 @@ namespace Usenet.Nntp.Parsers
             return new NntpGroupResponse(
                 code, message, true,
                 new NntpGroup(
-                    name, 
-                    articleCount, 
-                    lowWaterMark, 
-                    highWaterMark, 
+                    name,
+                    articleCount,
+                    lowWaterMark,
+                    highWaterMark,
                     NntpPostingStatus.Unknown,
-                    string.Empty, 
+                    string.Empty,
                     []));
         }
     }

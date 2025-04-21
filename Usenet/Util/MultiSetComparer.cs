@@ -25,7 +25,7 @@
         /// using the default <see cref="IEqualityComparer{T}"/> for the type specified by the generic argument.
         /// </summary>
         public MultiSetComparer() : this(EqualityComparer<T>.Default)
-        {            
+        {
         }
 
         /// <summary>
@@ -41,23 +41,28 @@
             {
                 return second == null;
             }
+
             if (second == null)
             {
                 return false;
             }
+
             if (ReferenceEquals(first, second))
             {
                 return true;
             }
-            if (!(first is ICollection<T> firstCollection) || 
+
+            if (!(first is ICollection<T> firstCollection) ||
                 !(second is ICollection<T> secondCollection))
             {
                 return !HaveMismatchedElement(first, second);
             }
+
             if (firstCollection.Count != secondCollection.Count)
             {
                 return false;
             }
+
             if (firstCollection.Count == 0)
             {
                 return true;
@@ -75,6 +80,7 @@
             {
                 return true;
             }
+
             foreach (var pair in firstElementCounts)
             {
                 var firstElementCount = pair.Value;
@@ -84,6 +90,7 @@
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -104,6 +111,7 @@
                     dictionary[element] = num;
                 }
             }
+
             return dictionary;
         }
 

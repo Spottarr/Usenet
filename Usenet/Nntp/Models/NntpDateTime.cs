@@ -57,7 +57,7 @@
         /// </summary>
         /// <param name="value">The value to convert.</param>
         public static implicit operator NntpDateTime(DateTimeOffset value) => FromDateTimeOffset(value);
-        
+
         /// <summary>
         /// Converts a <see cref="DateTimeOffset"/> implicitly to a <see cref="NntpDateTime"/>.
         /// </summary>
@@ -90,7 +90,7 @@
         /// <param name="first">The first <see cref="NntpDateTime"/>.</param>
         /// <param name="second">The second <see cref="NntpDateTime"/>.</param>
         /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-        public static bool operator ==(NntpDateTime first, NntpDateTime second) => 
+        public static bool operator ==(NntpDateTime first, NntpDateTime second) =>
             (object)first == null ? (object)second == null : first.Equals(second);
 
         /// <summary>

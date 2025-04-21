@@ -119,6 +119,5 @@ namespace UsenetTests.Nzb
         {
             Assert.NotEqual(expected.Object, actual.Object);
         }
-
     }
 }

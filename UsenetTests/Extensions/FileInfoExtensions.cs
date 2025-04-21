@@ -23,6 +23,7 @@ namespace UsenetTests.Extensions
             {
                 lines.Add(line);
             }
+
             return lines;
         }
 

@@ -25,10 +25,12 @@ namespace Usenet.Nntp
             {
                 return true;
             }
+
             if (userResponse.Code != 381 || string.IsNullOrWhiteSpace(password))
             {
                 return false;
             }
+
             var passResponse = _connection.Command($"AUTHINFO PASS {password}", new ResponseParser(281));
             return passResponse.Success;
         }

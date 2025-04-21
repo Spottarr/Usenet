@@ -16,7 +16,7 @@ namespace Usenet.Yenc
         public static ValidationResult Validate(YencArticle article)
         {
             Guard.ThrowIfNull(article, nameof(article));
-            
+
             var failures = new List<ValidationFailure>();
 
             var header = article.Header;
@@ -55,6 +55,7 @@ namespace Usenet.Yenc
                     YencValidationErrorCodes.ChecksumMismatch, Resources.Yenc.ChecksumMismatch,
                     new { CalculatedChecksum = calculatedCrc32, FooterChecksum = footer.Crc32.Value }));
             }
+
             return new ValidationResult(failures);
         }
 

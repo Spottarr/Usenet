@@ -11,14 +11,17 @@
         /// Unknown
         /// </summary>
         Unknown,
+
         /// <summary>
         /// Posting is allowed (response code 200)
         /// </summary>
         PostingAllowed = 200,
+
         /// <summary>
         /// Posting is not allowed (response code 201)
         /// </summary>
         PostingProhibited = 201,
+
         /// <summary>
         /// Reading service permanently unavailale (response code 502)
         /// </summary>

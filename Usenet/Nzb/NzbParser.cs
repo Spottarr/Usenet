@@ -36,6 +36,7 @@ namespace Usenet.Nzb
             {
                 ns = XNamespace.None;
             }
+
             nzbElement = doc.Element(ns + NzbKeywords.Nzb);
 
             if (nzbElement == null)
@@ -43,10 +44,7 @@ namespace Usenet.Nzb
                 throw new InvalidNzbDataException(Resources.Nzb.MissingNzbElement);
             }
 
-            var context = new NzbParserContext
-            {
-                Namespace = ns
-            };
+            var context = new NzbParserContext { Namespace = ns };
 
             var metaData = GetMetaData(context, nzbElement);
             var files = GetFiles(context, nzbElement);
@@ -62,7 +60,7 @@ namespace Usenet.Nzb
                 return null;
             }
 
-            var headers = 
+            var headers =
                 from metaElement in headElement.Elements(context.Namespace + NzbKeywords.Meta)
                 let typeAttribute = metaElement.Attribute(NzbKeywords.Type)
                 where typeAttribute != null
@@ -73,6 +71,7 @@ namespace Usenet.Nzb
             {
                 dict.Add(header.Item1, header.Item2);
             }
+
             return dict;
         }
 
@@ -82,13 +81,14 @@ namespace Usenet.Nzb
 
         private static NzbFile GetFile(NzbParserContext context, XElement fileElement)
         {
-            var poster = (string) fileElement.Attribute(NzbKeywords.Poster) ?? string.Empty;
+            var poster = (string)fileElement.Attribute(NzbKeywords.Poster) ?? string.Empty;
             if (!long.TryParse((string)fileElement.Attribute(NzbKeywords.Date) ?? "0", out var unixTimestamp))
             {
                 throw new InvalidNzbDataException(Resources.Nzb.InvalidDateAttriubute);
             }
+
             var date = DateTimeOffset.FromUnixTimeSeconds(unixTimestamp);
-            var subject = (string) fileElement.Attribute(NzbKeywords.Subject) ?? string.Empty;
+            var subject = (string)fileElement.Attribute(NzbKeywords.Subject) ?? string.Empty;
             var fileName = GetFileName(subject);
             var groups = GetGroups(context, fileElement.Element(context.Namespace + NzbKeywords.Groups));
             IEnumerable<NzbSegment> segments = GetSegments(context, fileElement.Element(context.Namespace + NzbKeywords.Segments));
@@ -103,6 +103,7 @@ namespace Usenet.Nzb
             {
                 return match.Groups[1].Value;
             }
+
             var len = subject.LastIndexOf(" (", StringComparison.OrdinalIgnoreCase);
             return RemoveTrailingYenc(len < 0 ? subject : subject.Substring(0, len));
         }
@@ -141,6 +142,7 @@ namespace Usenet.Nzb
                 segments.Add(segment);
                 offset += segment.Size;
             }
+
             return segments;
         }
 
@@ -150,10 +152,12 @@ namespace Usenet.Nzb
             {
                 throw new InvalidNzbDataException(Resources.Nzb.InvalidOrMissingNumberAttribute);
             }
+
             if (!long.TryParse((string)element.Attribute(NzbKeywords.Bytes), out var size))
             {
                 throw new InvalidNzbDataException(Resources.Nzb.InvalidOrMissingBytesAttribute);
             }
+
             return new NzbSegment(number, offset, size, element.Value);
         }
     }

@@ -6,7 +6,7 @@
     /// </summary>
     internal class YencLineDecoder
     {
-        public static int Decode(byte[] encodedBytes, byte[] decodedBytes, int decodedOffset) => 
+        public static int Decode(byte[] encodedBytes, byte[] decodedBytes, int decodedOffset) =>
             Decode(encodedBytes, 0, encodedBytes.Length, decodedBytes, decodedOffset);
 
         public static int Decode(byte[] encodedBytes, int encodedOffset, int encodedCount, byte[] decodedBytes, int decodedOffset)
@@ -21,16 +21,18 @@
                     isEscaped = true;
                     continue;
                 }
+
                 if (isEscaped)
                 {
                     isEscaped = false;
-                    decodedBytes[decodedOffset++] = (byte) (@byte - 106);
+                    decodedBytes[decodedOffset++] = (byte)(@byte - 106);
                 }
                 else
                 {
-                    decodedBytes[decodedOffset++] = (byte) (@byte - 42);
+                    decodedBytes[decodedOffset++] = (byte)(@byte - 42);
                 }
             }
+
             return decodedOffset - saveOffset;
         }
     }

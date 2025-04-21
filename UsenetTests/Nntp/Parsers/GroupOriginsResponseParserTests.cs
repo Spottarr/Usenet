@@ -12,10 +12,9 @@ namespace UsenetTests.Nntp.Parsers
         [
             [
                 215, "information follows",
-                new []
+                new[]
                 {
-                    "misc.test 930445408 <creatme@isc.org>",
-                    "alt.rfc-writers.recovery 930562309 <m@example.com>",
+                    "misc.test 930445408 <creatme@isc.org>", "alt.rfc-writers.recovery 930562309 <m@example.com>",
                     "tx.natives.recovery 930678923 <sob@academ.com>"
                 },
                 new XSerializable<NntpGroupOrigin[]>([
@@ -29,8 +28,8 @@ namespace UsenetTests.Nntp.Parsers
         [Theory]
         [MemberData(nameof(MultiLineParseData))]
         internal void ResponseShouldBeParsedCorrectly(
-            int responseCode, 
-            string responseMessage, 
+            int responseCode,
+            string responseMessage,
             string[] lines,
             XSerializable<NntpGroupOrigin[]> expectedGroupOrigins)
         {

@@ -30,20 +30,20 @@ namespace Usenet.Nzb
         public async Task WriteAsync(NzbDocument nzbDocument)
         {
             Guard.ThrowIfNull(nzbDocument, nameof(nzbDocument));
-            
+
             using (var writer = GetXmlWriter())
             {
                 await writer.WriteDocTypeAsync(
-                    NzbKeywords.Nzb, 
-                    NzbKeywords.PubId,
-                    NzbKeywords.SysId, 
-                    null)
+                        NzbKeywords.Nzb,
+                        NzbKeywords.PubId,
+                        NzbKeywords.SysId,
+                        null)
                     .ConfigureAwait(false);
 
                 await writer.WriteStartElementAsync(
-                    null,
-                    NzbKeywords.Nzb, 
-                    NzbKeywords.Namespace)
+                        null,
+                        NzbKeywords.Nzb,
+                        NzbKeywords.Namespace)
                     .ConfigureAwait(false);
 
                 await WriteHeadAsync(writer, nzbDocument).ConfigureAwait(false);
@@ -62,7 +62,7 @@ namespace Usenet.Nzb
         public void Write(NzbDocument nzbDocument)
         {
             Guard.ThrowIfNull(nzbDocument, nameof(nzbDocument));
-            
+
             using (var writer = GetXmlWriter())
             {
                 writer.WriteDocType(
@@ -83,12 +83,8 @@ namespace Usenet.Nzb
             }
         }
 
-        private XmlWriter GetXmlWriter() => XmlWriter.Create(_textWriter, new XmlWriterSettings
-        {
-            Encoding = _textWriter.Encoding,
-            Async = true,
-            Indent = true
-        });
+        private XmlWriter GetXmlWriter() =>
+            XmlWriter.Create(_textWriter, new XmlWriterSettings { Encoding = _textWriter.Encoding, Async = true, Indent = true });
 
         private static async Task WriteHeadAsync(XmlWriter writer, NzbDocument nzbDocument)
         {
@@ -103,6 +99,7 @@ namespace Usenet.Nzb
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 }
             }
+
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
 
@@ -119,6 +116,7 @@ namespace Usenet.Nzb
                     writer.WriteEndElement();
                 }
             }
+
             writer.WriteEndElement();
         }
 
@@ -128,7 +126,8 @@ namespace Usenet.Nzb
             {
                 await writer.WriteStartElementAsync(null, NzbKeywords.File, null).ConfigureAwait(false);
                 await writer.WriteAttributeStringAsync(null, NzbKeywords.Poster, null, file.Poster).ConfigureAwait(false);
-                await writer.WriteAttributeStringAsync(null, NzbKeywords.Date, null, file.Date.ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture)).ConfigureAwait(false);
+                await writer.WriteAttributeStringAsync(null, NzbKeywords.Date, null, file.Date.ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture))
+                    .ConfigureAwait(false);
                 await writer.WriteAttributeStringAsync(null, NzbKeywords.Subject, null, file.Subject).ConfigureAwait(false);
                 await WriteGroupsAsync(writer, file).ConfigureAwait(false);
                 await WriteSegmentsAsync(writer, file).ConfigureAwait(false);
@@ -157,6 +156,7 @@ namespace Usenet.Nzb
             {
                 await writer.WriteElementStringAsync(null, NzbKeywords.Group, null, group).ConfigureAwait(false);
             }
+
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
 
@@ -167,6 +167,7 @@ namespace Usenet.Nzb
             {
                 writer.WriteElementString(NzbKeywords.Group, group);
             }
+
             writer.WriteEndElement();
         }
 
@@ -176,11 +177,14 @@ namespace Usenet.Nzb
             foreach (var segment in file.Segments)
             {
                 await writer.WriteStartElementAsync(null, NzbKeywords.Segment, null).ConfigureAwait(false);
-                await writer.WriteAttributeStringAsync(null, NzbKeywords.Bytes, null, segment.Size.ToString(CultureInfo.InvariantCulture)).ConfigureAwait(false);
-                await writer.WriteAttributeStringAsync(null, NzbKeywords.Number, null, segment.Number.ToString(CultureInfo.InvariantCulture)).ConfigureAwait(false);
+                await writer.WriteAttributeStringAsync(null, NzbKeywords.Bytes, null, segment.Size.ToString(CultureInfo.InvariantCulture))
+                    .ConfigureAwait(false);
+                await writer.WriteAttributeStringAsync(null, NzbKeywords.Number, null, segment.Number.ToString(CultureInfo.InvariantCulture))
+                    .ConfigureAwait(false);
                 await writer.WriteStringAsync(segment.MessageId.Value).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
+
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
 
@@ -195,6 +199,7 @@ namespace Usenet.Nzb
                 writer.WriteString(segment.MessageId.Value);
                 writer.WriteEndElement();
             }
+
             writer.WriteEndElement();
         }
     }

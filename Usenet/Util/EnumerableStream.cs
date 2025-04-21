@@ -44,10 +44,12 @@
             {
                 throw new ArgumentOutOfRangeException(nameof(offset));
             }
+
             if (count < 0 || offset + count > buffer.Length)
             {
                 throw new ArgumentOutOfRangeException(nameof(count));
             }
+
             var total = 0;
             while (count > 0)
             {
@@ -59,6 +61,7 @@
                         // no more chunks available
                         return total;
                     }
+
                     _currentChunk = _enumerator.Current;
                     _currentOffset = 0;
                 }
@@ -75,6 +78,7 @@
                 total += copyCount;
                 count -= copyCount;
             }
+
             return total;
         }
 

@@ -91,7 +91,7 @@ namespace Usenet.Nntp.Models
         /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
         public bool Equals(NntpArticle other)
         {
-            if ((object) other == null)
+            if ((object)other == null)
             {
                 return false;
             }
@@ -122,6 +122,7 @@ namespace Usenet.Nntp.Models
             {
                 Body = Body.ToList();
             }
+
             if (!(other.Body is ICollection<string>))
             {
                 other.Body = other.Body.ToList();
@@ -145,7 +146,7 @@ namespace Usenet.Nntp.Models
         /// <param name="second">The second <see cref="NntpArticle"/>.</param>
         /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
         public static bool operator ==(NntpArticle first, NntpArticle second) =>
-            (object) first == null ? (object) second == null : first.Equals(second);
+            (object)first == null ? (object)second == null : first.Equals(second);
 
         /// <summary>
         /// Returns a value indicating whether the frst <see cref="NntpArticle"/> value is unequal to the second <see cref="NntpArticle"/> value.

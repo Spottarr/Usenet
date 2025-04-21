@@ -84,6 +84,7 @@ namespace Usenet.Nntp.Builders
             {
                 return;
             }
+
             foreach (var group in values)
             {
                 if (!_groups.Contains(group))
@@ -99,6 +100,7 @@ namespace Usenet.Nntp.Builders
             {
                 return;
             }
+
             foreach (var group in values)
             {
                 _groups.RemoveAll(g => g == group);

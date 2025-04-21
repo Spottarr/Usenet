@@ -8,7 +8,7 @@ namespace Usenet.Nntp.Parsers
     {
         private readonly ILogger _log = Logger.Create<LastResponseParser>();
 
-        public bool IsSuccessResponse(int code) => code == (int) NntpLastResponseType.ArticleExists;
+        public bool IsSuccessResponse(int code) => code == (int)NntpLastResponseType.ArticleExists;
 
         public NntpLastResponse Parse(int code, string message)
         {

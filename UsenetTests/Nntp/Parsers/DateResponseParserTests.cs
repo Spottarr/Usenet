@@ -17,8 +17,8 @@ namespace UsenetTests.Nntp.Parsers
         [Theory]
         [MemberData(nameof(ParseData))]
         internal void ResponseShouldBeParsedCorrectly(
-            int responseCode, 
-            string responseMessage, 
+            int responseCode,
+            string responseMessage,
             DateTimeOffset expectedDateTime)
         {
             var dateResponse = new DateResponseParser().Parse(responseCode, responseMessage);

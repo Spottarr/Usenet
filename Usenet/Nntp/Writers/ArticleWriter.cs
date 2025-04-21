@@ -28,6 +28,7 @@ namespace Usenet.Nntp.Writers
                     // skip message-id and newsgroups, they are already written
                     continue;
                 }
+
                 foreach (var value in header.Value)
                 {
                     WriteHeader(connection, header.Key, value);
@@ -41,6 +42,7 @@ namespace Usenet.Nntp.Writers
             {
                 val = new NntpMessageId(val);
             }
+
             var line = $"{key}: {val}";
             if (line.Length <= MaxHeaderLength)
             {
@@ -56,6 +58,7 @@ namespace Usenet.Nntp.Writers
                 connection.WriteLine(StringShims.Concat("\t".AsSpan(), line.AsSpan(0, MaxHeaderLength - 1)));
                 line = line.Substring(MaxHeaderLength - 1);
             }
+
             connection.WriteLine("\t" + line);
         }
 
@@ -68,6 +71,7 @@ namespace Usenet.Nntp.Writers
                     connection.WriteLine("." + line);
                     continue;
                 }
+
                 connection.WriteLine(line);
             }
         }

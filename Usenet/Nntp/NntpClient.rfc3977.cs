@@ -126,7 +126,7 @@ namespace Usenet.Nntp
         /// <returns>An article response object.</returns>
         public NntpArticleResponse Article(NntpMessageId messageId) =>
             _connection.MultiLineCommand(
-                $"ARTICLE {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}", 
+                $"ARTICLE {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}",
                 new ArticleResponseParser(ArticleRequestType.Article));
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace Usenet.Nntp
         /// <returns>An article response object.</returns>
         public NntpArticleResponse Head(NntpMessageId messageId) =>
             _connection.MultiLineCommand(
-                $"HEAD {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}", 
+                $"HEAD {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}",
                 new ArticleResponseParser(ArticleRequestType.Head));
 
         /// <summary>
@@ -198,7 +198,7 @@ namespace Usenet.Nntp
         /// <returns>An article response object.</returns>
         public NntpArticleResponse Body(NntpMessageId messageId) =>
             _connection.MultiLineCommand(
-                $"BODY {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}", 
+                $"BODY {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}",
                 new ArticleResponseParser(ArticleRequestType.Body));
 
         /// <summary>
@@ -270,6 +270,7 @@ namespace Usenet.Nntp
             {
                 return false;
             }
+
             ArticleWriter.Write(_connection, article);
             var subsequentResponse = _connection.GetResponse(new ResponseParser(240));
             return subsequentResponse.Success;
@@ -286,6 +287,7 @@ namespace Usenet.Nntp
             {
                 return false;
             }
+
             ArticleWriter.Write(_connection, article);
             var subsequentResponse = _connection.GetResponse(new ResponseParser(235));
             return subsequentResponse.Success;

@@ -77,10 +77,12 @@ namespace Usenet.Nntp
             {
                 throw new NntpException("Received no response.");
             }
+
             if (responseText.Length < 3 || !IntShims.TryParse(responseText.AsSpan(0, 3), out var code))
             {
                 throw new NntpException("Received invalid response.");
             }
+
             return parser.Parse(code, responseText.Substring(3).Trim());
         }
 
@@ -106,6 +108,7 @@ namespace Usenet.Nntp
             {
                 return new CountingStream(stream);
             }
+
             var sslStream = new SslStream(stream);
             await sslStream.AuthenticateAsClientAsync(hostname).ConfigureAwait(false);
             return new CountingStream(sslStream);

@@ -43,8 +43,8 @@ namespace Usenet.Extensions
         /// </summary>
         /// <param name="str">The string to convert.</param>
         /// <returns>The integer value obtained from the string or null if the string does not represent a valid integer.</returns>
-        public static int? ToIntSafe(this string str) => 
-            str != null && int.TryParse(str, out var value) ? (int?) value : null;
+        public static int? ToIntSafe(this string str) =>
+            str != null && int.TryParse(str, out var value) ? (int?)value : null;
 
         /// <summary>
         /// Converts a string safely to an integer. If the string does not represent a valid integer the specified default value will be returned.
@@ -52,7 +52,7 @@ namespace Usenet.Extensions
         /// <param name="str">The string to convert.</param>
         /// <param name="defaultValue">The default value to use when the string is not a valid integer.</param>
         /// <returns>The integer value obtained from the string or the specified default value if the string does not represent a valid integer.</returns>
-        public static int ToIntSafe(this string str, int defaultValue) => 
+        public static int ToIntSafe(this string str, int defaultValue) =>
             str != null && int.TryParse(str, out var value) ? value : defaultValue;
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Usenet.Extensions
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static string Pack(this string source) => 
+        public static string Pack(this string source) =>
             source == null ? null : _whitespaceRegex.Replace(source, string.Empty);
 
         public static int IndexOf(this string source, char value, StringComparison comparisonType)

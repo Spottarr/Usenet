@@ -27,7 +27,7 @@ namespace UsenetTests.Yenc
             Assert.Equal(584, actualData.Length);
             Assert.Equal(expectedData, actualData);
         }
-        
+
         [Theory]
         [EmbeddedResourceData(@"yenc.multipart.00000020.ntx")]
         internal void FilePartShouldBeDecoded(IFileInfo actual)
@@ -39,7 +39,7 @@ namespace UsenetTests.Yenc
             Assert.True(actualStream.Header.IsFilePart);
             Assert.Equal(expectedDataLength, actualData.Length);
         }
-        
+
         [Theory]
         [EmbeddedResourceData(@"yenc.multipart.joystick.jpg", @"yenc.multipart.00000020.ntx", @"yenc.multipart.00000021.ntx")]
         internal void MultiPartFileShouldBeDecoded(IFileInfo expectedFile, IFileInfo part1File, IFileInfo partFile)
@@ -63,6 +63,5 @@ namespace UsenetTests.Yenc
             Assert.Equal(expectedFileName, actualFileName);
             Assert.Equal(expected, actual.ToArray());
         }
-
     }
 }

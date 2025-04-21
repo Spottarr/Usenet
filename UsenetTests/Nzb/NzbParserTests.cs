@@ -107,6 +107,7 @@ namespace UsenetTests.Nzb
 
             Assert.Throws<InvalidNzbDataException>(() => NzbParser.Parse(nzbText));
         }
+
         [Fact]
         internal void MissingSegmentNumberShouldThrow()
         {

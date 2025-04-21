@@ -13,18 +13,19 @@
         public static uint CalculateChecksum(IEnumerable<byte> buffer)
         {
             Guard.ThrowIfNull(buffer, nameof(buffer));
-            
+
             var value = Seed;
             foreach (var b in buffer)
             {
                 value = (value >> 8) ^ _lookupTable[(value & 0xFF) ^ b];
             }
+
             return value ^ Seed;
         }
 
         public static uint Initialize() => Seed;
 
-        public static uint Calculate(uint value, int @byte) => 
+        public static uint Calculate(uint value, int @byte) =>
             (value >> 8) ^ _lookupTable[(value & 0xFF) ^ @byte];
 
         public static uint Finalize(uint value) => value ^ Seed;
@@ -39,8 +40,10 @@
                 {
                     entry = (entry & 1) == 1 ? (entry >> 1) ^ Polynomial : entry >> 1;
                 }
+
                 table[i] = entry;
             }
+
             return table;
         }
     }

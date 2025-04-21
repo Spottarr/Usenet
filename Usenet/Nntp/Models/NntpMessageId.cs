@@ -49,7 +49,7 @@ namespace Usenet.Nntp.Models
         /// </summary>
         /// <param name="value">The string to convert.</param>
         public static implicit operator NntpMessageId(string value) => FromString(value);
-        
+
         /// <summary>
         /// Converts a string implicitly to a <see cref="NntpMessageId"/>.
         /// </summary>
@@ -72,7 +72,7 @@ namespace Usenet.Nntp.Models
         /// </summary>
         /// <param name="other">A <see cref="NntpMessageId"/> object to compare to this instance.</param>
         /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-        public bool Equals(NntpMessageId other) => (object) other != null && Value == other.Value;
+        public bool Equals(NntpMessageId other) => (object)other != null && Value == other.Value;
 
         /// <summary>
         /// Returns a value indicating whether this instance is equal to the specified <see cref="object"/> value.
@@ -87,8 +87,8 @@ namespace Usenet.Nntp.Models
         /// <param name="first">The first <see cref="NntpMessageId"/>.</param>
         /// <param name="second">The second <see cref="NntpMessageId"/>.</param>
         /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-        public static bool operator ==(NntpMessageId first, NntpMessageId second) => 
-            (object) first == null ? (object) second == null : first.Equals(second);
+        public static bool operator ==(NntpMessageId first, NntpMessageId second) =>
+            (object)first == null ? (object)second == null : first.Equals(second);
 
         /// <summary>
         /// Returns a value indicating whether the frst <see cref="NntpMessageId"/> value is unequal to the second <see cref="NntpMessageId"/> value.

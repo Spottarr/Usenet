@@ -19,7 +19,7 @@ namespace Usenet.Util
 #if NET8_0_OR_GREATER
             ArgumentNullException.ThrowIfNull(obj, name);
 #else
-            if (obj == null) 
+            if (obj == null)
                 throw new ArgumentNullException(name, Resources.Util.NullValueNotAllowed);
 #endif
         }

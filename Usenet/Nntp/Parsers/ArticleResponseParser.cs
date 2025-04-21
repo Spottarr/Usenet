@@ -109,6 +109,7 @@ namespace Usenet.Nntp.Parsers
                     // no more headers (skip empty line)
                     break;
                 }
+
                 if (char.IsWhiteSpace(line[0]) && prevHeader != null)
                 {
                     prevHeader.Value += " " + line.Trim();
@@ -122,7 +123,6 @@ namespace Usenet.Nntp.Parsers
                     }
                     else
                     {
-
                         prevHeader = new Header(line.Substring(0, splitPos), line.Substring(splitPos + 1).Trim());
                         headers.Add(prevHeader);
                     }
@@ -134,6 +134,7 @@ namespace Usenet.Nntp.Parsers
             {
                 dict.Add(header.Key, header.Value);
             }
+
             return dict;
         }
 
@@ -143,6 +144,7 @@ namespace Usenet.Nntp.Parsers
             {
                 yield break;
             }
+
             while (enumerator.MoveNext())
             {
                 yield return enumerator.Current;

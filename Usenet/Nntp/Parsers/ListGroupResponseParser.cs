@@ -42,11 +42,11 @@ namespace Usenet.Nntp.Parsers
 
             return new NntpGroupResponse(code, message, true,
                 new NntpGroup(
-                    name, 
-                    articleCount, 
-                    lowWaterMark, 
-                    highWaterMark, 
-                    NntpPostingStatus.Unknown, 
+                    name,
+                    articleCount,
+                    lowWaterMark,
+                    highWaterMark,
+                    NntpPostingStatus.Unknown,
                     string.Empty,
                     articleNumbers));
         }
@@ -57,12 +57,14 @@ namespace Usenet.Nntp.Parsers
             {
                 yield break;
             }
+
             foreach (var line in dataBlock)
             {
                 if (!long.TryParse(line, out var number))
                 {
                     continue;
                 }
+
                 yield return number;
             }
         }

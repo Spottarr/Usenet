@@ -17,6 +17,7 @@ namespace Usenet.Nntp.Parsers
             {
                 return null;
             }
+
             var valueParts = value.Split(_valuePartsSeparator, StringSplitOptions.RemoveEmptyEntries);
             if (valueParts.Length > 2)
             {
@@ -50,10 +51,12 @@ namespace Usenet.Nntp.Parsers
             {
                 throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
             }
+
             if (!int.TryParse(dateTimeParts[0], out day))
             {
                 throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
             }
+
             var monthString = dateTimeParts[1];
             var monthIndex = Array.FindIndex(DateTimeFormatInfo.InvariantInfo.AbbreviatedMonthNames,
                 m => string.Equals(m, monthString, StringComparison.OrdinalIgnoreCase));
@@ -61,11 +64,13 @@ namespace Usenet.Nntp.Parsers
             {
                 throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
             }
+
             month = monthIndex + 1;
             if (!int.TryParse(dateTimeParts[2], out year))
             {
                 throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
             }
+
             if (dateTimeParts[2].Length <= 2)
             {
                 year += 100 * GetCentury(year, month, day);
@@ -92,14 +97,17 @@ namespace Usenet.Nntp.Parsers
             {
                 throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
             }
+
             if (!int.TryParse(timeParts[0], out hour))
             {
                 throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
             }
+
             if (!int.TryParse(timeParts[1], out minute))
             {
                 throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
             }
+
             second = 0;
             if (timeParts.Length > 2 && !int.TryParse(timeParts[2], out second))
             {

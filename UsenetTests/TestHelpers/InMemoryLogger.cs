@@ -20,6 +20,7 @@ namespace UsenetTests.TestHelpers
             MinLogLevel = LogLevel.Trace;
             Buffer = new List<Entry>();
         }
+
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull
         {
             return null;
@@ -40,12 +41,7 @@ namespace UsenetTests.TestHelpers
             if (IsEnabled(logLevel))
             {
                 var str = formatter(state, exception);
-                Buffer.Add(new Entry
-                {
-                    LogLevel = logLevel,
-                    EventId = eventId,
-                    Message = str
-                });
+                Buffer.Add(new Entry { LogLevel = logLevel, EventId = eventId, Message = str });
             }
         }
 
@@ -55,6 +51,7 @@ namespace UsenetTests.TestHelpers
             {
                 //logger.Log(entry.LogLevel, entry.EventId, entry.Message);
             }
+
             Buffer.Clear();
         }
     }

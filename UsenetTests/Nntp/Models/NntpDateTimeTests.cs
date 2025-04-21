@@ -15,7 +15,7 @@ namespace UsenetTests.Nntp.Models
         [MemberData(nameof(DateTimeData))]
         internal void DateTimeShouldBeConvertedToUsenetString(string expected, DateTime dateTime)
         {
-            var actual = (NntpDateTime) dateTime;
+            var actual = (NntpDateTime)dateTime;
             Assert.Equal(expected, actual);
         }
 

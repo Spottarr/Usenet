@@ -44,6 +44,7 @@
                     ResetCounters();
                 }
             }
+
             return bytesRead;
         }
 
@@ -63,7 +64,7 @@
 
         /// <inheritdoc/>
         public override bool CanRead => true;
-        
+
         /// <inheritdoc/>
         public override bool CanWrite => true;
 
@@ -75,10 +76,10 @@
             BytesRead = 0;
             BytesWritten = 0;
         }
-        
+
         protected override void Dispose(bool disposing)
         {
-            if(disposing) _innerStream.Dispose();
+            if (disposing) _innerStream.Dispose();
             base.Dispose(disposing);
         }
     }

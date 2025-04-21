@@ -25,7 +25,7 @@ namespace Usenet.Nntp.Responses
         /// <param name="message">The response message received from the server.</param>
         /// <param name="success">A value indicating whether the command succeeded or failed.</param>
         /// <param name="groups">The list of <see cref="NntpGroup"/> objects received from the server.</param>
-        public NntpGroupsResponse(int code, string message, bool success, IEnumerable<NntpGroup> groups) 
+        public NntpGroupsResponse(int code, string message, bool success, IEnumerable<NntpGroup> groups)
             : base(code, message, success)
         {
             switch (groups)

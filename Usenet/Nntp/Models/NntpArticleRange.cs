@@ -61,7 +61,7 @@ namespace Usenet.Nntp.Models
         /// Returns the text representation of the value formatted according to the NNTP specifications.
         /// </summary>
         /// <returns>The text representation of the value formatted according to the NNTP specifications</returns>
-        public override string ToString() => 
+        public override string ToString() =>
             To == null ? $"{From}-" : (To.Value == From ? From.ToString(CultureInfo.InvariantCulture) : $"{From}-{To.Value}");
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Usenet.Nntp.Models
         /// </summary>
         /// <param name="other">A <see cref="NntpArticleRange"/> object to compare to this instance.</param>
         /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-        public bool Equals(NntpArticleRange other) => 
+        public bool Equals(NntpArticleRange other) =>
             (object)other != null && From == other.From && To == other.To;
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Usenet.Nntp.Models
         /// <param name="first">The first <see cref="NntpArticleRange"/>.</param>
         /// <param name="second">The second <see cref="NntpArticleRange"/>.</param>
         /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-        public static bool operator ==(NntpArticleRange first, NntpArticleRange second) => 
+        public static bool operator ==(NntpArticleRange first, NntpArticleRange second) =>
             (object)first == null ? (object)second == null : first.Equals(second);
 
         /// <summary>
@@ -101,6 +101,5 @@ namespace Usenet.Nntp.Models
         /// <param name="second">The second <see cref="NntpArticleRange"/>.</param>
         /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
         public static bool operator !=(NntpArticleRange first, NntpArticleRange second) => !(first == second);
-
     }
 }

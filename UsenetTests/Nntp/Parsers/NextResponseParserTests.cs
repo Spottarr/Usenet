@@ -13,10 +13,10 @@ namespace UsenetTests.Nntp.Parsers
         [InlineData(421, "No next article to retrieve", NntpNextResponseType.NoNextArticleInGroup, 0, "")]
         [InlineData(999, "Unspecified response", NntpNextResponseType.Unknown, 0, "")]
         internal void ResponseShouldBeParsedCorrectly(
-            int responseCode, 
+            int responseCode,
             string responseMessage,
             NntpNextResponseType expectedResponseType,
-            long expectedArticleNumber, 
+            long expectedArticleNumber,
             string expectedMessageId)
         {
             var nextResponse = new NextResponseParser().Parse(responseCode, responseMessage);

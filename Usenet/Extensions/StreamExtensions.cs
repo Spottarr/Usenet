@@ -12,10 +12,12 @@ namespace Usenet.Extensions
             {
                 stream.Seek(0L, SeekOrigin.Begin);
             }
+
             if (stream is MemoryStream memoryStream)
             {
                 return memoryStream.ToArray();
             }
+
             using (var ms = new MemoryStream())
             {
                 stream.CopyTo(ms);

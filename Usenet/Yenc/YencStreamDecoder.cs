@@ -43,6 +43,7 @@ namespace Usenet.Yenc
                 {
                     headers.Merge(YencMeta.GetPartHeaders(enumerator), false);
                 }
+
                 return new YencStream(YencMeta.ParseHeader(headers), EnumerateData(enumerator, encoding));
             }
         }
@@ -60,7 +61,10 @@ namespace Usenet.Yenc
                 if (enumerator.Current.StartsWith(YEnd, StringComparison.Ordinal))
                 {
                     // skip rest if there is some
-                    while (enumerator.MoveNext()) { }
+                    while (enumerator.MoveNext())
+                    {
+                    }
+
                     yield break;
                 }
 

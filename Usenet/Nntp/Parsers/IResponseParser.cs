@@ -19,7 +19,6 @@
         /// <param name="code">The response code received from the server.</param>
         /// <param name="message">The response message received from the server.</param>
         /// <returns>A new instance of type <typeparamref name="TResponse"/>.</returns>
-
         TResponse Parse(int code, string message);
     }
 }

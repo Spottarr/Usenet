@@ -19,10 +19,12 @@ namespace Usenet.Nntp.Parsers
             {
                 return groups;
             }
+
             foreach (var value in values)
             {
                 AddGroups(groups, value);
             }
+
             return groups;
         }
 
@@ -32,6 +34,7 @@ namespace Usenet.Nntp.Parsers
             {
                 return;
             }
+
             foreach (var group in value.Split(new[] { NntpGroups.GroupSeperator }, StringSplitOptions.RemoveEmptyEntries))
             {
                 var packed = group.Pack();

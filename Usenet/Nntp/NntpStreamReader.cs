@@ -40,14 +40,17 @@ namespace Usenet.Nntp
             {
                 return null;
             }
+
             if (line.Length == 0 || line[0] != '.')
             {
                 return line;
             }
+
             if (line.Length == 1)
             {
                 return null;
             }
+
             return line[1] == '.' ? line.Substring(1) : line;
         }
     }

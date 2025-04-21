@@ -62,8 +62,10 @@ namespace Usenet.Extensions
                 {
                     continue;
                 }
+
                 target[item.Key] = item.Value;
             }
+
             return target;
         }
 

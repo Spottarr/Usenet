@@ -4,7 +4,7 @@ using HashCode = Usenet.Util.HashCode;
 namespace Usenet.Nntp.Models
 {
     /// <summary>
-    /// Represents origin information about a <see cref="NntpGroup"/> like who created the 
+    /// Represents origin information about a <see cref="NntpGroup"/> like who created the
     /// <see cref="NntpGroup"/> and when. Can be retrieved from the server with the
     /// <a href="https://tools.ietf.org/html/rfc3977#section-7.6.4">LIST ACTIVE.TIMES</a> command.
     /// (<a href="https://tools.ietf.org/html/rfc2980#section-2.1.3">Some older information</a>).
@@ -61,7 +61,8 @@ namespace Usenet.Nntp.Models
             {
                 return false;
             }
-            return 
+
+            return
                 Name.Equals(other.Name, StringComparison.Ordinal) &&
                 CreatedAt.Equals(other.CreatedAt) &&
                 CreatedBy.Equals(other.CreatedBy, StringComparison.Ordinal);
@@ -80,8 +81,8 @@ namespace Usenet.Nntp.Models
         /// <param name="first">The first <see cref="NntpGroupOrigin"/>.</param>
         /// <param name="second">The second <see cref="NntpGroupOrigin"/>.</param>
         /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-        public static bool operator ==(NntpGroupOrigin first, NntpGroupOrigin second) => 
-            (object) first == null ? (object) second == null : first.Equals(second);
+        public static bool operator ==(NntpGroupOrigin first, NntpGroupOrigin second) =>
+            (object)first == null ? (object)second == null : first.Equals(second);
 
         /// <summary>
         /// Returns a value indicating whether the frst <see cref="NntpGroupOrigin"/> value is unequal to the second <see cref="NntpGroupOrigin"/> value.
@@ -90,6 +91,5 @@ namespace Usenet.Nntp.Models
         /// <param name="second">The second <see cref="NntpGroupOrigin"/>.</param>
         /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
         public static bool operator !=(NntpGroupOrigin first, NntpGroupOrigin second) => !(first == second);
-
     }
 }

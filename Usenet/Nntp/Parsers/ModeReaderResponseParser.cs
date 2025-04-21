@@ -18,6 +18,7 @@ namespace Usenet.Nntp.Parsers
             {
                 _log.InvalidResponseCode(code);
             }
+
             return new NntpModeReaderResponse(code, message, success, responseType);
         }
 

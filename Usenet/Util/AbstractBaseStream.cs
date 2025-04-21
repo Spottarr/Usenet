@@ -7,7 +7,9 @@
     public abstract class AbstractBaseStream : Stream
     {
         /// <inheritdoc/>
-        public override void Flush() { }
+        public override void Flush()
+        {
+        }
 
         /// <inheritdoc/>
         public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
@@ -23,13 +25,13 @@
 
         /// <inheritdoc/>
         public override bool CanRead => false;
-        
+
         /// <inheritdoc/>
         public override bool CanSeek => false;
-        
+
         /// <inheritdoc/>
         public override bool CanWrite => false;
-        
+
         /// <inheritdoc/>
         public override long Length => throw new NotSupportedException();
 

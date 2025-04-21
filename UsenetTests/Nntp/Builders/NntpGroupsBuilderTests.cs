@@ -30,7 +30,7 @@ namespace UsenetTests.Nntp.Builders
         public void AddMultipleGroupsShouldResultInMultipleGroupsString()
         {
             var builder = new NntpGroupsBuilder().Add(["group1", "group2"]).Add("group3");
-            Assert.Equal(["group1","group2","group3"], builder.Groups);
+            Assert.Equal(["group1", "group2", "group3"], builder.Groups);
         }
 
         [Fact]

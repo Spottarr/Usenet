@@ -11,6 +11,7 @@ namespace Usenet.Nntp.Parsers
             {
                 return NntpPostingStatus.Unknown;
             }
+
             switch (input[0])
             {
                 case 'y': return NntpPostingStatus.PostingPermitted;

@@ -14,8 +14,8 @@ namespace UsenetTests.Nntp.Models
         [InlineData("misc.test", 1234, 3000234, 3002322, NntpPostingStatus.PostingPermitted, "", new long[0])]
         [InlineData("rec.food.drink.tea", 3, 51, 100, NntpPostingStatus.PostingPermitted, "", new long[0])]
         public void SerializedInstanceShouldBeDeserializedCorrectly(
-            string name, 
-            long articleCount, 
+            string name,
+            long articleCount,
             long lowWaterMark,
             long highWaterMark,
             NntpPostingStatus postingStatus,
@@ -40,9 +40,9 @@ namespace UsenetTests.Nntp.Models
         [
             [
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, null,
-                    [1,2,3])),
+                    [1, 2, 3])),
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, null,
-                    [1,2,3]))
+                    [1, 2, 3]))
             ],
             [
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", null)),
@@ -61,43 +61,43 @@ namespace UsenetTests.Nntp.Models
         [
             [
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
-                    [1,2,3])),
+                    [1, 2, 3])),
                 new XSerializable<NntpGroup>(new NntpGroup("group2", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
-                    [1,2,3]))
+                    [1, 2, 3]))
             ],
             [
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
-                    [1,2,3])),
+                    [1, 2, 3])),
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 11, 1, 10, NntpPostingStatus.PostingPermitted, "other",
-                    [1,2,3]))
+                    [1, 2, 3]))
             ],
             [
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
-                    [1,2,3])),
+                    [1, 2, 3])),
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 2, 10, NntpPostingStatus.PostingPermitted, "other",
-                    [1,2,3]))
+                    [1, 2, 3]))
             ],
             [
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
-                    [1,2,3])),
+                    [1, 2, 3])),
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 11, NntpPostingStatus.PostingPermitted, "other",
-                    [1,2,3]))
+                    [1, 2, 3]))
             ],
             [
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
-                    [1,2,3])),
+                    [1, 2, 3])),
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.ArticlesFromPeersNotPermitted, "other",
-                    [1,2,3]))
+                    [1, 2, 3]))
             ],
             [
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
-                    [1,2,3])),
+                    [1, 2, 3])),
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "aaaaa",
-                    [1,2,3]))
+                    [1, 2, 3]))
             ],
             [
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
-                    [1,2,3])),
+                    [1, 2, 3])),
                 new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", null))
             ]
         ];

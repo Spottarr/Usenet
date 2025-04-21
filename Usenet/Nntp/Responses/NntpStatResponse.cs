@@ -33,7 +33,7 @@ namespace Usenet.Nntp.Responses
         /// <param name="number">The <see cref="NntpArticle"/> number received from the server.</param>
         /// <param name="messageId">The <see cref="NntpMessageId"/> received from the server.</param>
         public NntpStatResponse(int code, string message, bool success, NntpStatResponseType responseType, long number, NntpMessageId messageId)
-            : base (code, message, success)
+            : base(code, message, success)
         {
             ResponseType = responseType;
             Number = number;

@@ -132,6 +132,7 @@ namespace Usenet.Nzb
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -149,7 +150,7 @@ namespace Usenet.Nzb
         /// <param name="second">The second <see cref="NzbDocument"/>.</param>
         /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
         public static bool operator ==(NzbDocument first, NzbDocument second) =>
-            (object) first == null ? (object) second == null : first.Equals(second);
+            (object)first == null ? (object)second == null : first.Equals(second);
 
         /// <summary>
         /// Returns a value indicating whether the frst <see cref="NzbDocument"/> value is unequal to the second <see cref="NzbDocument"/> value.

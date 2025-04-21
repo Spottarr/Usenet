@@ -50,6 +50,5 @@ namespace Usenet.Nntp
         /// </summary>
         /// <returns>A multi-line response object containing the overview database information.</returns>
         public NntpMultiLineResponse Xover() => _connection.MultiLineCommand("XOVER", new MultiLineResponseParser(224));
-
     }
 }

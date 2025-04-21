@@ -53,6 +53,5 @@ namespace Usenet.Nntp
         /// <returns></returns>
         public NntpMultiLineResponse Xzver() => throw new NotImplementedException();
         //connection.MultiLineCommand("XZVER", new MultiLineResponseParser(224), true);
-
     }
 }

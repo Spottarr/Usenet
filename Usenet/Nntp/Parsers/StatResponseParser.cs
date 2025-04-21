@@ -8,12 +8,12 @@ namespace Usenet.Nntp.Parsers
     {
         private readonly ILogger _log = Logger.Create<StatResponseParser>();
 
-        public bool IsSuccessResponse(int code) => code == (int) NntpStatResponseType.ArticleExists;
+        public bool IsSuccessResponse(int code) => code == (int)NntpStatResponseType.ArticleExists;
 
         public NntpStatResponse Parse(int code, string message)
         {
             var responseType = Enum.IsDefined(typeof(NntpStatResponseType), code)
-                ? (NntpStatResponseType) code
+                ? (NntpStatResponseType)code
                 : NntpStatResponseType.Unknown;
 
             if (responseType == NntpStatResponseType.Unknown)

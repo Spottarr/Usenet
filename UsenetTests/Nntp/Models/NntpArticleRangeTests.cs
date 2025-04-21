@@ -39,8 +39,7 @@ namespace UsenetTests.Nntp.Models
             },
             new object[]
             {
-                new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)),
-                new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)),
+                new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)), new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)),
             },
             new object[]
             {
@@ -55,7 +54,7 @@ namespace UsenetTests.Nntp.Models
         {
             Assert.Equal(range1.Object, range2.Object);
         }
-        
+
         public static readonly IEnumerable<object[]> EqualsWithDifferentValues = new[]
         {
             new object[]
@@ -65,8 +64,7 @@ namespace UsenetTests.Nntp.Models
             },
             new object[]
             {
-                new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)),
-                new XSerializable<NntpArticleRange>(NntpArticleRange.Range(9, 88)),
+                new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)), new XSerializable<NntpArticleRange>(NntpArticleRange.Range(9, 88)),
             },
             new object[]
             {

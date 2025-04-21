@@ -106,6 +106,5 @@ namespace UsenetTests.Nntp.Parsers
             var actualDate = HeaderDateParser.Parse(headerValue).GetValueOrDefault();
             Assert.Equal(expectedDate, actualDate);
         }
-
     }
 }

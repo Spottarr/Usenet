@@ -15,7 +15,7 @@ namespace UsenetTests.Nntp.Models
         {
             var actual = new NntpMessageId(messageId);
             Assert.Equal(expectedMessageId, actual.ToString());
-            Assert.Equal(expectedMessageId.Trim('<','>'), actual.Value);
+            Assert.Equal(expectedMessageId.Trim('<', '>'), actual.Value);
         }
 
         [Theory]

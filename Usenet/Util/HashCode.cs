@@ -18,7 +18,7 @@
         /// <param name="hash">The current hash code.</param>
         /// <param name="obj">The object to calculate the hash code for.</param>
         /// <returns>A 32-bit signed integer hash code.</returns>
-        public static int Hash<T>(this int hash, T obj) => 
+        public static int Hash<T>(this int hash, T obj) =>
             unchecked(hash * 23 + EqualityComparer<T>.Default.GetHashCode(obj));
 
         /// <summary>
@@ -41,7 +41,7 @@
         /// <param name="hash">The current hash code.</param>
         /// <param name="dictionary">The dictionary.</param>
         /// <returns></returns>
-        public static int Hash<TKey, TValue>(this int hash, IDictionary<TKey, TValue> dictionary) => 
+        public static int Hash<TKey, TValue>(this int hash, IDictionary<TKey, TValue> dictionary) =>
             dictionary?.Aggregate(hash, (current, pair) => current.Hash(pair.Key).Hash(pair.Value)) ?? hash;
     }
 }

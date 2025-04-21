@@ -13,71 +13,35 @@ namespace UsenetTests.Nntp.Writers
         public static readonly IEnumerable<object[]> ArticleWriteData =
         [
             [
-                new XSerializable<NntpArticle>(new NntpArticle(0, "1@example.com", "group", null, new List<string>(0))), new []
-                {
-                    "Message-ID: <1@example.com>",
-                    "Newsgroups: group",
-                    "",
-                    "."
-                }
+                new XSerializable<NntpArticle>(new NntpArticle(0, "1@example.com", "group", null, new List<string>(0))),
+                new[] { "Message-ID: <1@example.com>", "Newsgroups: group", "", "." }
             ],
             [
-                new XSerializable<NntpArticle>(new NntpArticle(0, "<2@example.com>", "group", null, new List<string>(0))), new []
-                {
-                    "Message-ID: <2@example.com>",
-                    "Newsgroups: group",
-                    "",
-                    "."
-                }
+                new XSerializable<NntpArticle>(new NntpArticle(0, "<2@example.com>", "group", null, new List<string>(0))),
+                new[] { "Message-ID: <2@example.com>", "Newsgroups: group", "", "." }
             ],
             [
-                new XSerializable<NntpArticle>(new NntpArticle(0, "3@example.com", "group", new MultiValueDictionary<string, string>
+                new XSerializable<NntpArticle>(new NntpArticle(0, "3@example.com", "group",
+                    new MultiValueDictionary<string, string> { { "From", "\"Demo User\" <nobody@example.net>" }, },
+                    new List<string> { "This is just a test article." })),
+                new[]
                 {
-                    { "From", "\"Demo User\" <nobody@example.net>"},
-                }, new List<string>
-                {
-                    "This is just a test article."
-                })), new []
-                {
-                    "Message-ID: <3@example.com>",
-                    "Newsgroups: group",
-                    "From: \"Demo User\" <nobody@example.net>",
-                    "",
-                    "This is just a test article.",
-                    "."
+                    "Message-ID: <3@example.com>", "Newsgroups: group", "From: \"Demo User\" <nobody@example.net>", "", "This is just a test article.", "."
                 }
             ],
             [
                 new XSerializable<NntpArticle>(new NntpArticle(0, "4@example.com", "group", new MultiValueDictionary<string, string>
                 {
-                    { "Message-ID", "<9999@example.com>"}, // not allowed, should be ignored
-                }, new List<string>
-                {
-                    "This is just a test article."
-                })), new []
-                {
-                    "Message-ID: <4@example.com>",
-                    "Newsgroups: group",
-                    "",
-                    "This is just a test article.",
-                    "."
-                }
+                    { "Message-ID", "<9999@example.com>" }, // not allowed, should be ignored
+                }, new List<string> { "This is just a test article." })),
+                new[] { "Message-ID: <4@example.com>", "Newsgroups: group", "", "This is just a test article.", "." }
             ],
             [
                 new XSerializable<NntpArticle>(new NntpArticle(0, "5@example.com", "group", new MultiValueDictionary<string, string>
                 {
-                    { "Message-ID", "9999@example.com"}, // not allowed, should be ignored
-                }, new List<string>
-                {
-                    "This is just a test article."
-                })), new []
-                {
-                    "Message-ID: <5@example.com>",
-                    "Newsgroups: group",
-                    "",
-                    "This is just a test article.",
-                    "."
-                }
+                    { "Message-ID", "9999@example.com" }, // not allowed, should be ignored
+                }, new List<string> { "This is just a test article." })),
+                new[] { "Message-ID: <5@example.com>", "Newsgroups: group", "", "This is just a test article.", "." }
             ]
         ];
 
@@ -119,7 +83,7 @@ namespace UsenetTests.Nntp.Writers
             lines.Add(line);
         }
 
-        public CountingStream Stream => throw  new NotImplementedException();
+        public CountingStream Stream => throw new NotImplementedException();
 
         public TResponse GetResponse<TResponse>(IResponseParser<TResponse> parser)
         {

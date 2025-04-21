@@ -38,6 +38,7 @@ namespace Usenet.Yenc
             {
                 yield return GetPartHeaderLine(header);
             }
+
             var encodedBytes = new byte[1024];
             var encodedOffset = 0;
             var lastCol = header.LineLength - 1;
@@ -50,6 +51,7 @@ namespace Usenet.Yenc
                     // end of stream
                     break;
                 }
+
                 checksum = Crc32.Calculate(checksum, @byte);
                 var val = (@byte + 42) % 256;
 
@@ -84,11 +86,13 @@ namespace Usenet.Yenc
                 // reset offset
                 encodedOffset = 0;
             }
+
             if (encodedOffset > 0)
             {
                 // return remainder
                 yield return encoding.GetString(encodedBytes, 0, encodedOffset);
             }
+
             checksum = Crc32.Finalize(checksum);
             yield return GetFooterLine(header, checksum);
         }

@@ -15,7 +15,7 @@ namespace UsenetTests.Nntp.Parsers
                 new XSerializable<NntpGroup>(new NntpGroup("misc.test", 1234, 3000234, 3002322, NntpPostingStatus.Unknown, string.Empty, new List<long>(0)))
             ],
             [
-                211, "1234 3000234 3000236 misc.test list follows", new [] {"3000234", "3000235", "3000236"},
+                211, "1234 3000234 3000236 misc.test list follows", new[] { "3000234", "3000235", "3000236" },
                 new XSerializable<NntpGroup>(new NntpGroup("misc.test", 1234, 3000234, 3000236, NntpPostingStatus.Unknown, string.Empty,
                     [3000234L, 3000235L, 3000236L]))
             ],

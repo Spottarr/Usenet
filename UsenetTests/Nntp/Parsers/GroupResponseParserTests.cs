@@ -23,11 +23,11 @@ namespace UsenetTests.Nntp.Parsers
         [Theory]
         [MemberData(nameof(ParseData))]
         internal void ResponseShouldBeParsedCorrectly(
-            int responseCode, 
+            int responseCode,
             string responseMessage,
             XSerializable<NntpGroup> expectedGroup)
         {
-            var groupResponse = new GroupResponseParser().Parse(responseCode, responseMessage);            
+            var groupResponse = new GroupResponseParser().Parse(responseCode, responseMessage);
             Assert.Equal(expectedGroup.Object, groupResponse.Group);
         }
     }

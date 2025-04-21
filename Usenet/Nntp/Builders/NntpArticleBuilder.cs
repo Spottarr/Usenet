@@ -17,12 +17,9 @@ namespace Usenet.Nntp.Builders
 
         private const string DateFormat = "dd MMM yyyy HH:mm:ss";
 
-        private static readonly string[] _reservedHeaderKeys = {
-            NntpHeaders.Date,
-            NntpHeaders.From,
-            NntpHeaders.Subject,
-            NntpHeaders.MessageId,
-            NntpHeaders.Newsgroups
+        private static readonly string[] _reservedHeaderKeys =
+        {
+            NntpHeaders.Date, NntpHeaders.From, NntpHeaders.Subject, NntpHeaders.MessageId, NntpHeaders.Newsgroups
         };
 
         private MultiValueDictionary<string, string> _headers;
@@ -77,6 +74,7 @@ namespace Usenet.Nntp.Builders
                             {
                                 _log.HeaderOccursMoreThanOnce(NntpHeaders.MessageId);
                             }
+
                             break;
 
                         case NntpHeaders.From:
@@ -88,6 +86,7 @@ namespace Usenet.Nntp.Builders
                             {
                                 _log.HeaderOccursMoreThanOnce(NntpHeaders.From);
                             }
+
                             break;
 
                         case NntpHeaders.Subject:
@@ -99,14 +98,14 @@ namespace Usenet.Nntp.Builders
                             {
                                 _log.HeaderOccursMoreThanOnce(NntpHeaders.Subject);
                             }
+
                             break;
 
                         case NntpHeaders.Date:
                             if (_dateTime == null)
                             {
-
                                 if (DateTimeOffset.TryParseExact(value, DateFormat, CultureInfo.InvariantCulture,
-                                    DateTimeStyles.None, out var headerDateTime))
+                                        DateTimeStyles.None, out var headerDateTime))
                                 {
                                     _dateTime = headerDateTime;
                                 }
@@ -119,6 +118,7 @@ namespace Usenet.Nntp.Builders
                             {
                                 _log.HeaderOccursMoreThanOnce(NntpHeaders.Date);
                             }
+
                             break;
 
                         case NntpHeaders.Newsgroups:
@@ -206,6 +206,7 @@ namespace Usenet.Nntp.Builders
             {
                 _groupsBuilder.Add(value);
             }
+
             return this;
         }
 
@@ -221,6 +222,7 @@ namespace Usenet.Nntp.Builders
             {
                 _groupsBuilder.Remove(value);
             }
+
             return this;
         }
 
@@ -238,6 +240,7 @@ namespace Usenet.Nntp.Builders
             {
                 throw new NntpException(Resources.Nntp.ReservedHeaderKeyNotAllowed);
             }
+
             _headers.Add(key, value);
             return this;
         }
@@ -256,6 +259,7 @@ namespace Usenet.Nntp.Builders
             {
                 throw new NntpException(Resources.Nntp.ReservedHeaderKeyNotAllowed);
             }
+
             _headers.Remove(key, value);
             return this;
         }
@@ -286,6 +290,7 @@ namespace Usenet.Nntp.Builders
             {
                 bodyList.Add(line);
             }
+
             return this;
         }
 
@@ -299,14 +304,17 @@ namespace Usenet.Nntp.Builders
             {
                 throw new NntpException(Resources.Nntp.MessageIdHeaderNotSet);
             }
+
             if (string.IsNullOrWhiteSpace(_from))
             {
                 throw new NntpException(Resources.Nntp.FromHeaderNotSet);
             }
+
             if (string.IsNullOrWhiteSpace(_subject))
             {
                 throw new NntpException(Resources.Nntp.SubjectHeaderNotSet);
             }
+
             if (_groupsBuilder.IsEmpty)
             {
                 throw new NntpException(Resources.Nntp.NewsgroupsHeaderNotSet);
@@ -315,7 +323,7 @@ namespace Usenet.Nntp.Builders
             var groups = _groupsBuilder.Build();
 
             _headers.Add(NntpHeaders.From, _from);
-            _headers.Add(NntpHeaders.Subject, _subject);            
+            _headers.Add(NntpHeaders.Subject, _subject);
 
             if (_dateTime.HasValue)
             {
@@ -333,6 +341,7 @@ namespace Usenet.Nntp.Builders
                 // memoize the body lines
                 _body = _body.ToList();
             }
+
             return (ICollection<string>)_body;
         }
     }

@@ -18,6 +18,7 @@ namespace Usenet.Yenc
             {
                 throw new InvalidYencDataException(Resources.Yenc.MissingHeader);
             }
+
             while (enumerator.MoveNext())
             {
                 if (enumerator.Current == null)
@@ -30,6 +31,7 @@ namespace Usenet.Yenc
                     return ParseLine(enumerator.Current);
                 }
             }
+
             throw new InvalidYencDataException(Resources.Yenc.MissingHeader);
         }
 
@@ -39,10 +41,12 @@ namespace Usenet.Yenc
             {
                 throw new InvalidYencDataException(Resources.Yenc.MissingPartHeader);
             }
+
             if (enumerator.MoveNext() && enumerator.Current != null && enumerator.Current.StartsWith(YPart, StringComparison.Ordinal))
             {
                 return ParseLine(enumerator.Current);
             }
+
             throw new InvalidYencDataException(Resources.Yenc.MissingPartHeader);
         }
 
@@ -107,6 +111,7 @@ namespace Usenet.Yenc
             {
                 return dictionary;
             }
+
             foreach (var pair in pairs)
             {
                 var parts = pair.Split('=');
@@ -114,8 +119,10 @@ namespace Usenet.Yenc
                 {
                     continue;
                 }
+
                 dictionary.Add(parts[0], parts[1]);
             }
+
             return dictionary;
         }
     }

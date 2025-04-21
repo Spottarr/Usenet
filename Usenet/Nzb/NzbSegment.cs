@@ -71,6 +71,7 @@ namespace Usenet.Nzb
             {
                 return false;
             }
+
             return
                 Number.Equals(other.Number) &&
                 Offset.Equals(other.Offset) &&
@@ -91,8 +92,8 @@ namespace Usenet.Nzb
         /// <param name="first">The first <see cref="NzbSegment"/>.</param>
         /// <param name="second">The second <see cref="NzbSegment"/>.</param>
         /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-        public static bool operator ==(NzbSegment first, NzbSegment second) => 
-            (object) first == null ? (object) second == null : first.Equals(second);
+        public static bool operator ==(NzbSegment first, NzbSegment second) =>
+            (object)first == null ? (object)second == null : first.Equals(second);
 
         /// <summary>
         /// Returns a value indicating whether the frst <see cref="NzbSegment"/> value is unequal to the second <see cref="NzbSegment"/> value.
