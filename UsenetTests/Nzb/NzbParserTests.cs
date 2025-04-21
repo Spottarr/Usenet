@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Xml;
+using Microsoft.Extensions.FileProviders;
 using Usenet.Exceptions;
 using Usenet.Nzb;
 using Usenet.Util;
@@ -11,21 +12,14 @@ using Xunit;
 
 namespace UsenetTests.Nzb
 {
-    public class NzbParserTests : IClassFixture<TestData>
+    public class NzbParserTests
     {
-        private readonly TestData testData;
-
-        public NzbParserTests(TestData testData)
-        {
-            this.testData = testData;
-        }
-
         [Theory]
-        [InlineData(@"nzb.sabnzbd.nzb")]
-        [InlineData(@"nzb.sabnzbd-no-namespace.nzb")]
-        internal void ValidNzbDataShouldBeParsed(string fileName)
+        [EmbeddedResourceData(@"nzb.sabnzbd.nzb")]
+        [EmbeddedResourceData(@"nzb.sabnzbd-no-namespace.nzb")]
+        internal void ValidNzbDataShouldBeParsed(IFileInfo file)
         {
-            string nzbData = testData.GetEmbeddedFile(fileName).ReadAllText(UsenetEncoding.Default);
+            string nzbData = file.ReadAllText(UsenetEncoding.Default);
             NzbDocument actualDocument = NzbParser.Parse(nzbData);
 
             Assert.Equal("Your File!", actualDocument.MetaData["title"].Single());
