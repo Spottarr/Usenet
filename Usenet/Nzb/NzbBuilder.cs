@@ -50,10 +50,7 @@ namespace Usenet.Nzb
         /// <returns>The <see cref="NzbBuilder"/> so that additional calls can be chained.</returns>
         public NzbBuilder SetPartSize(long value)
         {
-            if (value <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(value));
-            }
+            Guard.ThrowIfNegativeOrZero(value, nameof(value));
             partSize = value;
             return this;
         }
