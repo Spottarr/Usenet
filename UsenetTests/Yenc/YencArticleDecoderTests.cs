@@ -1,6 +1,4 @@
 ﻿using System.Globalization;
-using System.IO;
-using System.Linq;
 using Microsoft.Extensions.FileProviders;
 using Usenet.Util;
 using Usenet.Yenc;
@@ -8,61 +6,60 @@ using UsenetTests.Extensions;
 using UsenetTests.TestHelpers;
 using Xunit;
 
-namespace UsenetTests.Yenc
+namespace UsenetTests.Yenc;
+
+public class YencArticleDecoderTests
 {
-    public class YencArticleDecoderTests
+    [Theory]
+    [EmbeddedResourceData(@"yenc.singlepart.testfile.txt", @"yenc.singlepart.00000005.ntx")]
+    internal void SinglePartFileShouldBeDecoded(IFileInfo expected, IFileInfo actual)
     {
-        [Theory]
-        [EmbeddedResourceData(@"yenc.singlepart.testfile.txt", @"yenc.singlepart.00000005.ntx")]
-        internal void SinglePartFileShouldBeDecoded(IFileInfo expected, IFileInfo actual)
-        {
-            var expectedData = expected.ReadAllBytes().ToList();
+        var expectedData = expected.ReadAllBytes().ToList();
 
-            YencArticle actualArticle = YencArticleDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default));
+        var actualArticle = YencArticleDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default));
 
-            Assert.False(actualArticle.Header.IsFilePart);
-            Assert.Equal(128, actualArticle.Header.LineLength);
-            Assert.Equal(584, actualArticle.Header.FileSize);
-            Assert.Equal("testfile.txt", actualArticle.Header.FileName);
-            Assert.Equal(584, actualArticle.Footer.PartSize);
-            Assert.Equal("ded29f4f", ((int) actualArticle.Footer.Crc32.GetValueOrDefault()).ToString("x", CultureInfo.InvariantCulture));
-            Assert.Equal(expectedData, actualArticle.Data);
-        }
+        Assert.False(actualArticle.Header.IsFilePart);
+        Assert.Equal(128, actualArticle.Header.LineLength);
+        Assert.Equal(584, actualArticle.Header.FileSize);
+        Assert.Equal("testfile.txt", actualArticle.Header.FileName);
+        Assert.Equal(584, actualArticle.Footer.PartSize);
+        Assert.Equal("ded29f4f", ((int)actualArticle.Footer.Crc32.GetValueOrDefault()).ToString("x", CultureInfo.InvariantCulture));
+        Assert.Equal(expectedData, actualArticle.Data);
+    }
 
-        [Theory]
-        [EmbeddedResourceData(@"yenc.multipart.00000020.ntx")]
-        internal void FilePartShouldBeDecoded(IFileInfo actual)
-        {
-            const int expectedDataLength = 11250;
+    [Theory]
+    [EmbeddedResourceData(@"yenc.multipart.00000020.ntx")]
+    internal void FilePartShouldBeDecoded(IFileInfo actual)
+    {
+        const int expectedDataLength = 11250;
 
-            YencArticle actualArticle = YencArticleDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default));
+        var actualArticle = YencArticleDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default));
 
-            Assert.True(actualArticle.Header.IsFilePart);
-            Assert.Equal(expectedDataLength, actualArticle.Data.Count);
-        }
+        Assert.True(actualArticle.Header.IsFilePart);
+        Assert.Equal(expectedDataLength, actualArticle.Data.Count);
+    }
 
-        [Theory]
-        [EmbeddedResourceData(@"yenc.multipart.joystick.jpg", @"yenc.multipart.00000020.ntx", @"yenc.multipart.00000021.ntx")]
-        internal void MultiPartFileShouldBeDecoded(IFileInfo expectedFile, IFileInfo part1File, IFileInfo part2File)
-        {
-            const string expectedFileName = "joystick.jpg";
-            byte[] expected = expectedFile.ReadAllBytes();
+    [Theory]
+    [EmbeddedResourceData(@"yenc.multipart.joystick.jpg", @"yenc.multipart.00000020.ntx", @"yenc.multipart.00000021.ntx")]
+    internal void MultiPartFileShouldBeDecoded(IFileInfo expectedFile, IFileInfo part1File, IFileInfo part2File)
+    {
+        const string expectedFileName = "joystick.jpg";
+        var expected = expectedFile.ReadAllBytes();
 
-            YencArticle part1 = YencArticleDecoder.Decode(part1File.ReadAllLines(UsenetEncoding.Default));
-            YencArticle part2 = YencArticleDecoder.Decode(part2File.ReadAllLines(UsenetEncoding.Default));
+        var part1 = YencArticleDecoder.Decode(part1File.ReadAllLines(UsenetEncoding.Default));
+        var part2 = YencArticleDecoder.Decode(part2File.ReadAllLines(UsenetEncoding.Default));
 
-            using var actual = new MemoryStream();
+        using var actual = new MemoryStream();
 
-            actual.Seek(part1.Header.PartOffset, SeekOrigin.Begin);
-            actual.Write(part1.Data.ToArray(), 0, (int)part1.Header.PartSize);
+        actual.Seek(part1.Header.PartOffset, SeekOrigin.Begin);
+        actual.Write(part1.Data.ToArray(), 0, (int)part1.Header.PartSize);
 
-            actual.Seek(part2.Header.PartOffset, SeekOrigin.Begin);
-            actual.Write(part2.Data.ToArray(), 0, (int)part2.Header.PartSize);
+        actual.Seek(part2.Header.PartOffset, SeekOrigin.Begin);
+        actual.Write(part2.Data.ToArray(), 0, (int)part2.Header.PartSize);
 
-            string actualFileName = part1.Header.FileName;
+        var actualFileName = part1.Header.FileName;
 
-            Assert.Equal(expectedFileName, actualFileName);
-            Assert.Equal(expected, actual.ToArray());
-        }
+        Assert.Equal(expectedFileName, actualFileName);
+        Assert.Equal(expected, actual.ToArray());
     }
 }

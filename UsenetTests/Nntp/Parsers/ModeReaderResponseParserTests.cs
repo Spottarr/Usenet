@@ -2,22 +2,21 @@
 using Usenet.Nntp.Responses;
 using Xunit;
 
-namespace UsenetTests.Nntp.Parsers
+namespace UsenetTests.Nntp.Parsers;
+
+public class ModeReaderResponseParserTests
 {
-    public class ModeReaderResponseParserTests
+    [Theory]
+    [InlineData(200, "Reader mode, posting permitted", NntpModeReaderResponseType.PostingAllowed)]
+    [InlineData(201, "NNTP Service Ready, posting prohibited", NntpModeReaderResponseType.PostingProhibited)]
+    [InlineData(502, "Transit service only", NntpModeReaderResponseType.ReadingServiceUnavailable)]
+    [InlineData(999, "", NntpModeReaderResponseType.Unknown)]
+    internal void ResponseShouldBeParsedCorrectly(
+        int responseCode,
+        string responseMessage,
+        NntpModeReaderResponseType expectedResponseType)
     {
-        [Theory]
-        [InlineData(200, "Reader mode, posting permitted", NntpModeReaderResponseType.PostingAllowed)]
-        [InlineData(201, "NNTP Service Ready, posting prohibited", NntpModeReaderResponseType.PostingProhibited)]
-        [InlineData(502, "Transit service only", NntpModeReaderResponseType.ReadingServiceUnavailable)]
-        [InlineData(999, "", NntpModeReaderResponseType.Unknown)]
-        internal void ResponseShouldBeParsedCorrectly(
-            int responseCode, 
-            string responseMessage, 
-            NntpModeReaderResponseType expectedResponseType)
-        {
-            NntpModeReaderResponse modeReaderResponse = new ModeReaderResponseParser().Parse(responseCode, responseMessage);
-            Assert.Equal(expectedResponseType, modeReaderResponse.ResponseType);
-        }
+        var modeReaderResponse = new ModeReaderResponseParser().Parse(responseCode, responseMessage);
+        Assert.Equal(expectedResponseType, modeReaderResponse.ResponseType);
     }
 }

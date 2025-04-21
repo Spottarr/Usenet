@@ -5,7 +5,7 @@ namespace Usenet.Nntp.Parsers;
 
 internal static class HeaderDateParser
 {
-    private const string _dateTimeRegexString =
+    private const string DateTimeRegexString =
         @"(?:\s*"
         + @"(?<dayName>Sun|Mon|Tue|Wed|Thu|Fri|Sat),)?\s*"
         + @"(?<day>\d{1,2})\s+"
@@ -15,7 +15,7 @@ internal static class HeaderDateParser
         + @"(?<tz>[+-]\d+|(?:UT|UTC|GMT|Z|EDT|EST|CDT|CST|MDT|MST|PDT|PST|A|N|M|Y|[A-Z]+)"
         + @")?";
 
-    private static readonly Regex _dateTimeRegex = new Regex(_dateTimeRegexString, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly Regex _dateTimeRegex = new(DateTimeRegexString, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     /// <summary>
     /// Parses header date/time strings as described in the
@@ -45,7 +45,7 @@ internal static class HeaderDateParser
         var tz = matches.Groups["tz"].Value;
         var zone = ParseZone(tz);
 
-        int monthIndex = 1 + Array.FindIndex(DateTimeFormatInfo.InvariantInfo.AbbreviatedMonthNames,
+        var monthIndex = 1 + Array.FindIndex(DateTimeFormatInfo.InvariantInfo.AbbreviatedMonthNames,
             m => string.Equals(m, month, StringComparison.OrdinalIgnoreCase));
 
         if (matches.Groups["year"].Value.Length < 4)
@@ -58,8 +58,8 @@ internal static class HeaderDateParser
 
     private static int GetCentury(int year, int month, int day)
     {
-        DateTime today = DateTime.UtcNow.Date;
-        int currentCentury = today.Year / 100;
+        var today = DateTime.UtcNow.Date;
+        var currentCentury = today.Year / 100;
         return new DateTime(currentCentury * 100 + year, month, day, 0, 0, 0, DateTimeKind.Utc) > today
             ? currentCentury - 1
             : currentCentury;
@@ -69,7 +69,7 @@ internal static class HeaderDateParser
     {
         // The time zone must be as specified in RFC822, https://tools.ietf.org/html/rfc822#section-5
 
-        if (!short.TryParse(value, out short zone))
+        if (!short.TryParse(value, out var zone))
         {
             switch (value)
             {
@@ -129,8 +129,8 @@ internal static class HeaderDateParser
             throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
         }
 
-        int minute = zone % 100;
-        int hour = zone / 100;
+        var minute = zone % 100;
+        var hour = zone / 100;
         return TimeSpan.FromMinutes(hour * 60 + minute);
     }
 }

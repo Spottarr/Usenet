@@ -1,46 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using Usenet.Extensions;
+﻿using Usenet.Extensions;
 using Usenet.Nntp.Models;
 
-namespace Usenet.Nntp.Parsers
+namespace Usenet.Nntp.Parsers;
+
+internal static class GroupsParser
 {
-    internal static class GroupsParser
+    public static IEnumerable<string> Parse(string value)
     {
-        public static IEnumerable<string> Parse(string value)
+        var groups = new List<string>();
+        AddGroups(groups, value);
+        return groups;
+    }
+
+    public static IEnumerable<string> Parse(IEnumerable<string> values)
+    {
+        var groups = new List<string>();
+        if (values == null)
         {
-            var groups = new List<string>();
+            return groups;
+        }
+
+        foreach (var value in values)
+        {
             AddGroups(groups, value);
-            return groups;
         }
 
-        public static IEnumerable<string> Parse(IEnumerable<string> values)
+        return groups;
+    }
+
+    private static void AddGroups(List<string> groups, string value)
+    {
+        if (value == null)
         {
-            var groups = new List<string>();
-            if (values == null)
-            {
-                return groups;
-            }
-            foreach (string value in values)
-            {
-                AddGroups(groups, value);
-            }
-            return groups;
+            return;
         }
 
-        private static void AddGroups(List<string> groups, string value)
+        foreach (var group in value.Split(new[] { NntpGroups.GroupSeperator }, StringSplitOptions.RemoveEmptyEntries))
         {
-            if (value == null)
+            var packed = group.Pack();
+            if (packed.Length > 0 && !groups.Contains(packed))
             {
-                return;
-            }
-            foreach (string group in value.Split(new[] { NntpGroups.GroupSeperator }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                string packed = group.Pack();
-                if (packed.Length > 0 && !groups.Contains(packed))
-                {
-                    groups.Add(packed);
-                }
+                groups.Add(packed);
             }
         }
     }

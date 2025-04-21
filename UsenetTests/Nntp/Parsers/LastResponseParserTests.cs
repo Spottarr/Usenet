@@ -2,27 +2,26 @@
 using Usenet.Nntp.Responses;
 using Xunit;
 
-namespace UsenetTests.Nntp.Parsers
+namespace UsenetTests.Nntp.Parsers;
+
+public class LastResponseParserTests
 {
-    public class LastResponseParserTests
+    [Theory]
+    [InlineData(223, "123 <123@poster.com> retrieved", NntpLastResponseType.ArticleExists, 123, "123@poster.com")]
+    [InlineData(412, "No newsgroup selected", NntpLastResponseType.NoGroupSelected, 0, "")]
+    [InlineData(420, "No current article selected", NntpLastResponseType.CurrentArticleInvalid, 0, "")]
+    [InlineData(422, "No previous article to retrieve", NntpLastResponseType.NoPreviousArticleInGroup, 0, "")]
+    [InlineData(999, "Unspecified response", NntpLastResponseType.Unknown, 0, "")]
+    internal void ResponseShouldBeParsedCorrectly(
+        int responseCode,
+        string responseMessage,
+        NntpLastResponseType expectedResponseType,
+        long expectedArticleNumber,
+        string expectedMessageId)
     {
-        [Theory]
-        [InlineData(223, "123 <123@poster.com> retrieved", NntpLastResponseType.ArticleExists, 123, "123@poster.com")]
-        [InlineData(412, "No newsgroup selected", NntpLastResponseType.NoGroupSelected, 0, "")]
-        [InlineData(420, "No current article selected", NntpLastResponseType.CurrentArticleInvalid, 0, "")]
-        [InlineData(422, "No previous article to retrieve", NntpLastResponseType.NoPreviousArticleInGroup, 0, "")]
-        [InlineData(999, "Unspecified response", NntpLastResponseType.Unknown, 0, "")]
-        internal void ResponseShouldBeParsedCorrectly(
-            int responseCode, 
-            string responseMessage,
-            NntpLastResponseType expectedResponseType,
-            long expectedArticleNumber, 
-            string expectedMessageId)
-        {
-            NntpLastResponse lastResponse = new LastResponseParser().Parse(responseCode, responseMessage);
-            Assert.Equal(expectedResponseType, lastResponse.ResponseType);
-            Assert.Equal(expectedArticleNumber, lastResponse.Number);
-            Assert.Equal(expectedMessageId, lastResponse.MessageId.Value);
-        }
+        var lastResponse = new LastResponseParser().Parse(responseCode, responseMessage);
+        Assert.Equal(expectedResponseType, lastResponse.ResponseType);
+        Assert.Equal(expectedArticleNumber, lastResponse.Number);
+        Assert.Equal(expectedMessageId, lastResponse.MessageId.Value);
     }
 }

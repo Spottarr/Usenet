@@ -5,40 +5,39 @@ using System.Reflection;
 using UsenetTests.TestHelpers;
 using Xunit;
 
-namespace UsenetTests
+namespace UsenetTests;
+
+public class LoggerTests
 {
-    public class LoggerTests
+    [Fact]
+    public void ShouldUseNullLogger()
     {
-        [Fact]
-        public void ShouldUseNullLogger()
-        {
-            Usenet.Logger.Factory = null;
-            var logger = Usenet.Logger.Create<LoggerTests>();
-            var actualLogger = GetActualLogger(logger);
+        Usenet.Logger.Factory = null;
+        var logger = Usenet.Logger.Create<LoggerTests>();
+        var actualLogger = GetActualLogger(logger);
 
-            Assert.IsType<NullLogger>(actualLogger);
-        }
+        Assert.IsType<NullLogger>(actualLogger);
+    }
 
-        [Fact]
-        public void ShouldUseSetLogger()
-        {
-            var loggerFactoryMock = new Mock<ILoggerFactory>();
-            loggerFactoryMock
-                .Setup(m => m.CreateLogger(It.IsAny<string>()))
-                .Returns(new InMemoryLogger());
+    [Fact]
+    public void ShouldUseSetLogger()
+    {
+        var loggerFactoryMock = new Mock<ILoggerFactory>();
+        loggerFactoryMock
+            .Setup(m => m.CreateLogger(It.IsAny<string>()))
+            .Returns(new InMemoryLogger());
 
-            Usenet.Logger.Factory = loggerFactoryMock.Object;
-            var logger = Usenet.Logger.Create<LoggerTests>();
-            var actualLogger = GetActualLogger(logger);
+        Usenet.Logger.Factory = loggerFactoryMock.Object;
+        var logger = Usenet.Logger.Create<LoggerTests>();
+        var actualLogger = GetActualLogger(logger);
 
-            Assert.IsType<InMemoryLogger>(actualLogger);
-        }
+        Assert.IsType<InMemoryLogger>(actualLogger);
+    }
 
-        private static object? GetActualLogger(ILogger logger)
-        {
-            var loggerType = logger.GetType();
-            var field = loggerType.GetField("_logger", BindingFlags.Instance | BindingFlags.NonPublic);
-            return field?.GetValue(logger);
-        }
+    private static object? GetActualLogger(ILogger logger)
+    {
+        var loggerType = logger.GetType();
+        var field = loggerType.GetField("_logger", BindingFlags.Instance | BindingFlags.NonPublic);
+        return field?.GetValue(logger);
     }
 }
