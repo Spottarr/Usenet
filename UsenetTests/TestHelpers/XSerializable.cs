@@ -1,31 +1,30 @@
 ﻿using Newtonsoft.Json;
 using Xunit.Abstractions;
 
-namespace UsenetTests.TestHelpers
+namespace UsenetTests.TestHelpers;
+
+internal sealed class XSerializable<T> : IXunitSerializable
 {
-    internal sealed class XSerializable<T> : IXunitSerializable
+    public T Object { get; private set; }
+
+    public XSerializable()
     {
-        public T Object { get; private set; }
+        Object = default!;
+    }
 
-        public XSerializable()
-        {
-            Object = default!;
-        }
+    public XSerializable(T objectToSerialize)
+    {
+        Object = objectToSerialize;
+    }
 
-        public XSerializable(T objectToSerialize)
-        {
-            Object = objectToSerialize;
-        }
+    public void Deserialize(IXunitSerializationInfo info)
+    {
+        Object = JsonConvert.DeserializeObject<T>(info.GetValue<string>("objValue"))!;
+    }
 
-        public void Deserialize(IXunitSerializationInfo info)
-        {
-            Object = JsonConvert.DeserializeObject<T>(info.GetValue<string>("objValue"))!;
-        }
-
-        public void Serialize(IXunitSerializationInfo info)
-        {
-            var json = JsonConvert.SerializeObject(Object);
-            info.AddValue("objValue", json);
-        }
+    public void Serialize(IXunitSerializationInfo info)
+    {
+        var json = JsonConvert.SerializeObject(Object);
+        info.AddValue("objValue", json);
     }
 }

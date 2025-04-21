@@ -1,186 +1,185 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Usenet.Nntp.Parsers
+namespace Usenet.Nntp.Parsers;
+
+internal static class HeaderDateParser
 {
-    internal static class HeaderDateParser
+    /// <summary>
+    /// Parses header date/time strings as described in the
+    /// <a href="https://tools.ietf.org/html/rfc5322#section-3.3">Date and Time Specification</a>.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    internal static DateTimeOffset? Parse(string value)
     {
-        /// <summary>
-        /// Parses header date/time strings as described in the
-        /// <a href="https://tools.ietf.org/html/rfc5322#section-3.3">Date and Time Specification</a>.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        internal static DateTimeOffset? Parse(string value)
+        if (string.IsNullOrWhiteSpace(value))
         {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return null;
-            }
-
-            var valueParts = value.Split(_valuePartsSeparator, StringSplitOptions.RemoveEmptyEntries);
-            if (valueParts.Length > 2)
-            {
-                throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
-            }
-
-            // skip day-of-week for now
-            //string dayOfWeek = valueParts.Length == 2 ? valueParts[0] : null;
-
-            var dateTime = valueParts.Length == 2 ? valueParts[1] : valueParts[0];
-
-            // remove obsolete whitespace from time part
-            dateTime = Regex.Replace(dateTime, @"\s+:\s+", ":");
-
-            var dateTimeParts = dateTime.Split(_datePartSeparators, StringSplitOptions.RemoveEmptyEntries);
-            if (dateTimeParts.Length != 5 && (dateTimeParts.Length != 6 || dateTimeParts[5] != "(UTC)"))
-            {
-                throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
-            }
-
-            ParseDate(dateTimeParts, out var year, out var month, out var day);
-            ParseTime(dateTimeParts[3], out var hour, out var minute, out var second);
-            var zone = ParseZone(dateTimeParts[4]);
-
-            return new DateTimeOffset(year, month, day, hour, minute, second, 0, zone);
+            return null;
         }
 
-        private static void ParseDate(string[] dateTimeParts, out int year, out int month, out int day)
+        var valueParts = value.Split(_valuePartsSeparator, StringSplitOptions.RemoveEmptyEntries);
+        if (valueParts.Length > 2)
         {
-            if (dateTimeParts.Length < 3)
-            {
-                throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
-            }
-
-            if (!int.TryParse(dateTimeParts[0], out day))
-            {
-                throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
-            }
-
-            var monthString = dateTimeParts[1];
-            var monthIndex = Array.FindIndex(DateTimeFormatInfo.InvariantInfo.AbbreviatedMonthNames,
-                m => string.Equals(m, monthString, StringComparison.OrdinalIgnoreCase));
-            if (monthIndex < 0)
-            {
-                throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
-            }
-
-            month = monthIndex + 1;
-            if (!int.TryParse(dateTimeParts[2], out year))
-            {
-                throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
-            }
-
-            if (dateTimeParts[2].Length <= 2)
-            {
-                year += 100 * GetCentury(year, month, day);
-            }
+            throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
         }
 
-        private static int GetCentury(int year, int month, int day)
+        // skip day-of-week for now
+        //string dayOfWeek = valueParts.Length == 2 ? valueParts[0] : null;
+
+        var dateTime = valueParts.Length == 2 ? valueParts[1] : valueParts[0];
+
+        // remove obsolete whitespace from time part
+        dateTime = Regex.Replace(dateTime, @"\s+:\s+", ":");
+
+        var dateTimeParts = dateTime.Split(_datePartSeparators, StringSplitOptions.RemoveEmptyEntries);
+        if (dateTimeParts.Length != 5 && (dateTimeParts.Length != 6 || dateTimeParts[5] != "(UTC)"))
         {
-            var today = DateTime.UtcNow.Date;
-            var currentCentury = today.Year / 100;
-            return new DateTime(currentCentury * 100 + year, month, day, 0, 0, 0, DateTimeKind.Utc) > today
-                ? currentCentury - 1
-                : currentCentury;
+            throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
         }
 
-        private static readonly char[] _valuePartsSeparator = [','];
-        private static readonly char[] _timePartsSeparator = [':'];
-        private static readonly char[] _datePartSeparators = [' ', '\n', '\r', '\t'];
+        ParseDate(dateTimeParts, out var year, out var month, out var day);
+        ParseTime(dateTimeParts[3], out var hour, out var minute, out var second);
+        var zone = ParseZone(dateTimeParts[4]);
 
-        private static void ParseTime(string value, out int hour, out int minute, out int second)
+        return new DateTimeOffset(year, month, day, hour, minute, second, 0, zone);
+    }
+
+    private static void ParseDate(string[] dateTimeParts, out int year, out int month, out int day)
+    {
+        if (dateTimeParts.Length < 3)
         {
-            var timeParts = value.Split(_timePartsSeparator, StringSplitOptions.RemoveEmptyEntries);
-            if (timeParts.Length < 2 || timeParts.Length > 3)
-            {
-                throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
-            }
-
-            if (!int.TryParse(timeParts[0], out hour))
-            {
-                throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
-            }
-
-            if (!int.TryParse(timeParts[1], out minute))
-            {
-                throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
-            }
-
-            second = 0;
-            if (timeParts.Length > 2 && !int.TryParse(timeParts[2], out second))
-            {
-                throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
-            }
+            throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
         }
 
-        private static TimeSpan ParseZone(string value)
+        if (!int.TryParse(dateTimeParts[0], out day))
         {
-            // The time zone must be as specified in RFC822, https://tools.ietf.org/html/rfc822#section-5
-
-            if (!short.TryParse(value, out var zone))
-            {
-                switch (value)
-                {
-                    // UTC is not specified in RFC822, but allowing it since it is commonly used
-                    case "UTC":
-                    case "UT":
-                    case "GMT":
-                    case "Z":
-                        break;
-
-                    case "EDT":
-                        zone = -0400;
-                        break;
-
-                    case "EST":
-                    case "CDT":
-                        zone = -0500;
-                        break;
-
-                    case "CST":
-                    case "MDT":
-                        zone = -0600;
-                        break;
-
-                    case "MST":
-                    case "PDT":
-                        zone = -0700;
-                        break;
-
-                    case "PST":
-                        zone = -0800;
-                        break;
-
-                    case "A":
-                        zone = -0100;
-                        break;
-
-                    case "N":
-                        zone = +0100;
-                        break;
-
-                    case "M":
-                        zone = -1200;
-                        break;
-
-                    case "Y":
-                        zone = +1200;
-                        break;
-
-                    default:
-                        throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
-                }
-            }
-            else if (-9999 > zone || zone > 9999)
-            {
-                throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
-            }
-
-            var minute = zone % 100;
-            var hour = zone / 100;
-            return TimeSpan.FromMinutes(hour * 60 + minute);
+            throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
         }
+
+        var monthString = dateTimeParts[1];
+        var monthIndex = Array.FindIndex(DateTimeFormatInfo.InvariantInfo.AbbreviatedMonthNames,
+            m => string.Equals(m, monthString, StringComparison.OrdinalIgnoreCase));
+        if (monthIndex < 0)
+        {
+            throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
+        }
+
+        month = monthIndex + 1;
+        if (!int.TryParse(dateTimeParts[2], out year))
+        {
+            throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
+        }
+
+        if (dateTimeParts[2].Length <= 2)
+        {
+            year += 100 * GetCentury(year, month, day);
+        }
+    }
+
+    private static int GetCentury(int year, int month, int day)
+    {
+        var today = DateTime.UtcNow.Date;
+        var currentCentury = today.Year / 100;
+        return new DateTime(currentCentury * 100 + year, month, day, 0, 0, 0, DateTimeKind.Utc) > today
+            ? currentCentury - 1
+            : currentCentury;
+    }
+
+    private static readonly char[] _valuePartsSeparator = [','];
+    private static readonly char[] _timePartsSeparator = [':'];
+    private static readonly char[] _datePartSeparators = [' ', '\n', '\r', '\t'];
+
+    private static void ParseTime(string value, out int hour, out int minute, out int second)
+    {
+        var timeParts = value.Split(_timePartsSeparator, StringSplitOptions.RemoveEmptyEntries);
+        if (timeParts.Length < 2 || timeParts.Length > 3)
+        {
+            throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
+        }
+
+        if (!int.TryParse(timeParts[0], out hour))
+        {
+            throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
+        }
+
+        if (!int.TryParse(timeParts[1], out minute))
+        {
+            throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
+        }
+
+        second = 0;
+        if (timeParts.Length > 2 && !int.TryParse(timeParts[2], out second))
+        {
+            throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
+        }
+    }
+
+    private static TimeSpan ParseZone(string value)
+    {
+        // The time zone must be as specified in RFC822, https://tools.ietf.org/html/rfc822#section-5
+
+        if (!short.TryParse(value, out var zone))
+        {
+            switch (value)
+            {
+                // UTC is not specified in RFC822, but allowing it since it is commonly used
+                case "UTC":
+                case "UT":
+                case "GMT":
+                case "Z":
+                    break;
+
+                case "EDT":
+                    zone = -0400;
+                    break;
+
+                case "EST":
+                case "CDT":
+                    zone = -0500;
+                    break;
+
+                case "CST":
+                case "MDT":
+                    zone = -0600;
+                    break;
+
+                case "MST":
+                case "PDT":
+                    zone = -0700;
+                    break;
+
+                case "PST":
+                    zone = -0800;
+                    break;
+
+                case "A":
+                    zone = -0100;
+                    break;
+
+                case "N":
+                    zone = +0100;
+                    break;
+
+                case "M":
+                    zone = -1200;
+                    break;
+
+                case "Y":
+                    zone = +1200;
+                    break;
+
+                default:
+                    throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
+            }
+        }
+        else if (-9999 > zone || zone > 9999)
+        {
+            throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
+        }
+
+        var minute = zone % 100;
+        var hour = zone / 100;
+        return TimeSpan.FromMinutes(hour * 60 + minute);
     }
 }

@@ -5,28 +5,27 @@ using UsenetTests.Extensions;
 using UsenetTests.TestHelpers;
 using Xunit;
 
-namespace UsenetTests.Nzb
+namespace UsenetTests.Nzb;
+
+public class NzbWriterTests
 {
-    public class NzbWriterTests
+    [Theory]
+    [EmbeddedResourceData(@"nzb.sabnzbd.nzb")]
+    [EmbeddedResourceData(@"nzb.sabnzbd-no-namespace.nzb")]
+    internal void ShouldWriteDocumentToFile(IFileInfo file)
     {
-        [Theory]
-        [EmbeddedResourceData(@"nzb.sabnzbd.nzb")]
-        [EmbeddedResourceData(@"nzb.sabnzbd-no-namespace.nzb")]
-        internal void ShouldWriteDocumentToFile(IFileInfo file)
-        {
-            var expected = NzbParser.Parse(file.ReadAllText(UsenetEncoding.Default));
+        var expected = NzbParser.Parse(file.ReadAllText(UsenetEncoding.Default));
 
-            using var stream = new MemoryStream();
-            using var writer = new StreamWriter(stream, UsenetEncoding.Default);
-            using var reader = new StreamReader(stream, UsenetEncoding.Default);
+        using var stream = new MemoryStream();
+        using var writer = new StreamWriter(stream, UsenetEncoding.Default);
+        using var reader = new StreamReader(stream, UsenetEncoding.Default);
 
-            // write to file and read back for comparison
-            writer.WriteNzbDocument(expected);
-            stream.Position = 0;
-            var actual = NzbParser.Parse(reader.ReadToEnd());
+        // write to file and read back for comparison
+        writer.WriteNzbDocument(expected);
+        stream.Position = 0;
+        var actual = NzbParser.Parse(reader.ReadToEnd());
 
-            // compare
-            Assert.Equal(expected, actual);
-        }
+        // compare
+        Assert.Equal(expected, actual);
     }
 }

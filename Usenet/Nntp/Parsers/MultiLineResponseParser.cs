@@ -1,19 +1,18 @@
 ﻿using Usenet.Nntp.Responses;
 
-namespace Usenet.Nntp.Parsers
+namespace Usenet.Nntp.Parsers;
+
+internal class MultiLineResponseParser : IMultiLineResponseParser<NntpMultiLineResponse>
 {
-    internal class MultiLineResponseParser : IMultiLineResponseParser<NntpMultiLineResponse>
+    private readonly int[] successCodes;
+
+    public MultiLineResponseParser(params int[] successCodes)
     {
-        private readonly int[] successCodes;
-
-        public MultiLineResponseParser(params int[] successCodes)
-        {
-            this.successCodes = successCodes ?? [];
-        }
-
-        public bool IsSuccessResponse(int code) => successCodes.Contains(code);
-
-        public NntpMultiLineResponse Parse(int code, string message, IEnumerable<string> dataBlock) =>
-            new NntpMultiLineResponse(code, message, IsSuccessResponse(code), dataBlock);
+        this.successCodes = successCodes ?? [];
     }
+
+    public bool IsSuccessResponse(int code) => successCodes.Contains(code);
+
+    public NntpMultiLineResponse Parse(int code, string message, IEnumerable<string> dataBlock) =>
+        new NntpMultiLineResponse(code, message, IsSuccessResponse(code), dataBlock);
 }
