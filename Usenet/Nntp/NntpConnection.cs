@@ -48,7 +48,9 @@ namespace Usenet.Nntp
             ThrowIfNotConnected();
             Guard.ThrowIfNull(command, nameof(command));
             
-            var logCommand = command.StartsWith(AuthInfoPass, StringComparison.Ordinal) ? $"{AuthInfoPass} [omitted]" : command;
+            var logCommand = command.StartsWith(AuthInfoPass, StringComparison.Ordinal) 
+                ? $"{AuthInfoPass} [REDACTED]" 
+                : command;
             log.SendingCommand(logCommand);
             writer.WriteLine(command);
             return GetResponse(parser);
