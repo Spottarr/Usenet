@@ -62,10 +62,8 @@ internal static class DictionaryExtensions
             {
                 continue;
             }
-
             target[item.Key] = item.Value;
         }
-
         return target;
     }
 

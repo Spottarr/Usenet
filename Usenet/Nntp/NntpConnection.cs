@@ -1,7 +1,7 @@
 ﻿using System.Net.Security;
 using System.Net.Sockets;
-using Microsoft.Extensions.Logging;
 using Usenet.Exceptions;
+using Microsoft.Extensions.Logging;
 using Usenet.Extensions;
 using Usenet.Nntp.Parsers;
 using Usenet.Util;
@@ -16,10 +16,10 @@ namespace Usenet.Nntp;
 /// does not support compressed multi-line results.</remarks>
 public sealed class NntpConnection : INntpConnection
 {
-    private readonly ILogger _log = Logger.Create<NntpConnection>();
-    private readonly TcpClient _client = new TcpClient();
-    private StreamWriter _writer;
-    private NntpStreamReader _reader;
+    private readonly ILogger log = Logger.Create<NntpConnection>();
+    private readonly TcpClient client = new TcpClient();
+    private StreamWriter writer;
+    private NntpStreamReader reader;
     private const string AuthInfoPass = "AUTHINFO PASS";
 
     /// <inheritdoc/>
@@ -28,11 +28,11 @@ public sealed class NntpConnection : INntpConnection
     /// <inheritdoc/>
     public async Task<TResponse> ConnectAsync<TResponse>(string hostname, int port, bool useSsl, IResponseParser<TResponse> parser)
     {
-        _log.Connecting(hostname, port, useSsl);
-        await _client.ConnectAsync(hostname, port).ConfigureAwait(false);
+        log.Connecting(hostname, port, useSsl);
+        await client.ConnectAsync(hostname, port).ConfigureAwait(false);
         Stream = await GetStreamAsync(hostname, useSsl).ConfigureAwait(false);
-        _writer = new StreamWriter(Stream, UsenetEncoding.Default) { AutoFlush = true };
-        _reader = new NntpStreamReader(Stream, UsenetEncoding.Default);
+        writer = new StreamWriter(Stream, UsenetEncoding.Default) { AutoFlush = true };
+        reader = new NntpStreamReader(Stream, UsenetEncoding.Default);
         return GetResponse(parser);
     }
 
@@ -45,8 +45,8 @@ public sealed class NntpConnection : INntpConnection
         var logCommand = command.StartsWith(AuthInfoPass, StringComparison.Ordinal)
             ? $"{AuthInfoPass} [REDACTED]"
             : command;
-        _log.SendingCommand(logCommand);
-        _writer.WriteLine(command);
+        log.SendingCommand(logCommand);
+        writer.WriteLine(command);
         return GetResponse(parser);
     }
 
@@ -69,19 +69,17 @@ public sealed class NntpConnection : INntpConnection
     {
         Guard.ThrowIfNull(parser, nameof(parser));
 
-        var responseText = _reader.ReadLine();
-        _log.ReceivedResponse(responseText);
+        var responseText = reader.ReadLine();
+        log.ReceivedResponse(responseText);
 
         if (responseText == null)
         {
             throw new NntpException("Received no response.");
         }
-
         if (responseText.Length < 3 || !IntShims.TryParse(responseText.AsSpan(0, 3), out var code))
         {
             throw new NntpException("Received invalid response.");
         }
-
         return parser.Parse(code, responseText.Substring(3).Trim());
     }
 
@@ -89,12 +87,12 @@ public sealed class NntpConnection : INntpConnection
     public void WriteLine(string line)
     {
         ThrowIfNotConnected();
-        _writer.WriteLine(line);
+        writer.WriteLine(line);
     }
 
     private void ThrowIfNotConnected()
     {
-        if (!_client.Connected)
+        if (!client.Connected)
         {
             throw new NntpException("Client not connected.");
         }
@@ -102,12 +100,11 @@ public sealed class NntpConnection : INntpConnection
 
     private async Task<CountingStream> GetStreamAsync(string hostname, bool useSsl)
     {
-        var stream = _client.GetStream();
+        var stream = client.GetStream();
         if (!useSsl)
         {
             return new CountingStream(stream);
         }
-
         var sslStream = new SslStream(stream);
         await sslStream.AuthenticateAsClientAsync(hostname).ConfigureAwait(false);
         return new CountingStream(sslStream);
@@ -116,7 +113,7 @@ public sealed class NntpConnection : INntpConnection
     private IEnumerable<string> ReadMultiLineDataBlock()
     {
         string line;
-        while ((line = _reader.ReadLine()) != null)
+        while ((line = reader.ReadLine()) != null)
         {
             yield return line;
         }
@@ -125,8 +122,8 @@ public sealed class NntpConnection : INntpConnection
     /// <inheritdoc/>
     public void Dispose()
     {
-        _client?.Dispose();
-        _writer?.Dispose();
-        _reader?.Dispose();
+        client?.Dispose();
+        writer?.Dispose();
+        reader?.Dispose();
     }
 }
