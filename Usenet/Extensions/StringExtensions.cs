@@ -8,7 +8,7 @@ namespace Usenet.Extensions;
 /// </summary>
 internal static class StringExtensions
 {
-    private static readonly Regex _whitespaceRegex = new Regex(@"\s+");
+    private static readonly Regex _whitespaceRegex = new(@"\s+", RegexOptions.Compiled);
 
     /// <summary>
     /// Throws an <exception cref="ArgumentNullException">ArgumentNullException</exception> if the specified string is null.

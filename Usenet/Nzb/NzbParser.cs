@@ -8,13 +8,13 @@ using Usenet.Util;
 namespace Usenet.Nzb;
 
 /// <summary>
-/// Represents a <a href="https://sabnzbd.org/wiki/extra/nzb-spec">NZB</a> document parser. 
+/// Represents a <a href="https://sabnzbd.org/wiki/extra/nzb-spec">NZB</a> document parser.
 /// It takes an xml string as input and parses it into an instance of the <see cref="NzbDocument"/> class.
 /// Based on Kristian Hellang's Nzb project https://github.com/khellang/Nzb.
 /// </summary>
 public static class NzbParser
 {
-    private static readonly Regex _fileNameRegex = new Regex("\"([^\"]*)\"");
+    private static readonly Regex _fileNameRegex = new("\"([^\"]*)\"", RegexOptions.Compiled);
 
     /// <summary>
     /// Parses the xml input string into an instance of the <see cref="NzbDocument"/> class.
