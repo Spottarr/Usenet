@@ -1,7 +1,7 @@
 ﻿using System.Net.Security;
 using System.Net.Sockets;
-using Usenet.Exceptions;
 using Microsoft.Extensions.Logging;
+using Usenet.Exceptions;
 using Usenet.Extensions;
 using Usenet.Nntp.Parsers;
 using Usenet.Util;

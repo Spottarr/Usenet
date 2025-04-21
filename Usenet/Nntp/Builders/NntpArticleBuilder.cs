@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
+using Microsoft.Extensions.Logging;
 using Usenet.Exceptions;
 using Usenet.Extensions;
-using Microsoft.Extensions.Logging;
 using Usenet.Nntp.Models;
 using Usenet.Util;
 
