@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Microsoft.Extensions.Logging;
+using Usenet.Extensions;
 using Usenet.Nntp.Responses;
 
 namespace Usenet.Nntp.Parsers
@@ -21,7 +22,7 @@ namespace Usenet.Nntp.Parsers
                 return new NntpDateResponse(code, message, true, dateTime);
             }
             
-            log.LogError("Invalid response message: {Message} Expected: {{yyyymmddhhmmss}}", message);
+            log.InvalidDateResponseMessage(message);
             return new NntpDateResponse(code, message, false, DateTimeOffset.MinValue);
         }
     }

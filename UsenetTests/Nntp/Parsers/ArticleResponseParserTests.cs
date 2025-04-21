@@ -12,17 +12,15 @@ namespace UsenetTests.Nntp.Parsers
 {
     public class ArticleResponseParserTests
     {
-        public static readonly IEnumerable<object[]> MultiLineParseData = new[]
-        {
-            new object[]
-            {
+        public static readonly IEnumerable<object[]> MultiLineParseData =
+        [
+            [
                 220, "123 <123@poster.com>", (int) ArticleRequestType.Article,
                 Array.Empty<string>(),
                 new XSerializable<NntpArticle>(new NntpArticle(123, "<123@poster.com>", null, null,
                     new List<string>(0)))
-            },
-            new object[]
-            {
+            ],
+            [
                 220, "123 <123@poster.com>", (int) ArticleRequestType.Article,
                 new[]
                 {
@@ -42,9 +40,8 @@ namespace UsenetTests.Nntp.Parsers
                         "This is just a test article (1).",
                         "With two lines."
                     }))
-            },
-            new object[]
-            {
+            ],
+            [
                 222, "123 <123@poster.com>", (int) ArticleRequestType.Body,
                 new[]
                 {
@@ -56,9 +53,8 @@ namespace UsenetTests.Nntp.Parsers
                     "This is just a test article (2).",
                     "With two lines."
                 }))
-            },
-            new object[]
-            {
+            ],
+            [
                 221, "123 <123@poster.com>", (int) ArticleRequestType.Head,
                 new[]
                 {
@@ -73,9 +69,8 @@ namespace UsenetTests.Nntp.Parsers
                         {"Multi", "line1 line2 line3"},
                         {"Path", "pathost!demo!whitehouse!not-for-mail"},
                     }, new List<string>(0)))
-            },
-            new object[]
-            {
+            ],
+            [
                 221, "123 <123@poster.com>", (int) ArticleRequestType.Head,
                 new[]
                 {
@@ -87,12 +82,12 @@ namespace UsenetTests.Nntp.Parsers
                     {
                         {"Path", "pathost!demo!whitehouse!not-for-mail"},
                     }, new List<string>(0)))
-            },
-        };
+            ]
+        ];
 
         [Theory]
         [MemberData(nameof(MultiLineParseData))]
-        public void MultiLineResponseShouldBeParsedCorrectly(
+        internal void MultiLineResponseShouldBeParsedCorrectly(
             int responseCode, 
             string responseMessage, 
             int requestType,
@@ -106,29 +101,25 @@ namespace UsenetTests.Nntp.Parsers
             Assert.Equal(expectedArticle, actualArticle);
         }
 
-        public static readonly IEnumerable<object[]> InvalidMultiLineParseData = new[]
-        {
-            new object[]
-            {
-                412, "No newsgroup selected", (int) ArticleRequestType.Article, Array.Empty<string>(),
-            },
-            new object[]
-            {
-                420, "No current article selected", (int) ArticleRequestType.Article, Array.Empty<string>(),
-            },
-            new object[]
-            {
-                423, "No article with that number", (int) ArticleRequestType.Article, Array.Empty<string>(),
-            },
-            new object[]
-            {
-                430, "No such article found", (int) ArticleRequestType.Article, Array.Empty<string>(),
-            }
-        };
+        public static readonly IEnumerable<object[]> InvalidMultiLineParseData =
+        [
+            [
+                412, "No newsgroup selected", (int) ArticleRequestType.Article, Array.Empty<string>()
+            ],
+            [
+                420, "No current article selected", (int) ArticleRequestType.Article, Array.Empty<string>()
+            ],
+            [
+                423, "No article with that number", (int) ArticleRequestType.Article, Array.Empty<string>()
+            ],
+            [
+                430, "No such article found", (int) ArticleRequestType.Article, Array.Empty<string>()
+            ]
+        ];
 
         [Theory]
         [MemberData(nameof(InvalidMultiLineParseData))]
-        public void InvalidMultiLineResponseShouldBeParsedCorrectly(
+        internal void InvalidMultiLineResponseShouldBeParsedCorrectly(
             int responseCode,
             string responseMessage,
             int requestType,

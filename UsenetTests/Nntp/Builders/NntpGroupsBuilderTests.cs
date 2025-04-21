@@ -25,14 +25,14 @@ namespace UsenetTests.Nntp.Builders
         public void AddSingleGroupShouldResultInSingleGroupString()
         {
             NntpGroupsBuilder builder = new NntpGroupsBuilder().Add("group1");
-            Assert.Equal(new[] { "group1" }, builder.Groups);
+            Assert.Equal(["group1"], builder.Groups);
         }
 
         [Fact]
         public void AddMultipleGroupsShouldResultInMultipleGroupsString()
         {
-            NntpGroupsBuilder builder = new NntpGroupsBuilder().Add(new[] { "group1", "group2" }).Add("group3");
-            Assert.Equal(new []{"group1","group2","group3" }, builder.Groups);
+            NntpGroupsBuilder builder = new NntpGroupsBuilder().Add(["group1", "group2"]).Add("group3");
+            Assert.Equal(["group1","group2","group3"], builder.Groups);
         }
 
         [Fact]

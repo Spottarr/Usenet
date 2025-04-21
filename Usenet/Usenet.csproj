@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net9.0</TargetFrameworks>
+    <NeutralLanguage>en</NeutralLanguage>
     <Authors>Spotarr</Authors>
     <PackageDescription>A library for working with Usenet. It offers an NNTP client, an NZB file parser, builder, writer, a yEnc encoder and decoder. It is mainly focused on keeping memory usage low. Server responses can be enumerated as they come in. Binary messages will be encoded to yEnc format streaming and yEnc-encoded data will be decoded to binary data streaming.</PackageDescription>
     <PackageProjectUrl>https://github.com/Spottarr/Usenet</PackageProjectUrl>
@@ -22,9 +23,9 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
-    <PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.4" />
+    <PackageReference Include="System.Collections.Immutable" Version="9.0.4" />
   </ItemGroup>
   
   <ItemGroup>

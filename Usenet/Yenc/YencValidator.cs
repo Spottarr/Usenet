@@ -7,7 +7,7 @@ namespace Usenet.Yenc
     /// Represents a yEnc-encoded article validator.
     /// Based on Kristian Hellang's yEnc project https://github.com/khellang/yEnc.
     /// </summary>
-    public class YencValidator
+    public static class YencValidator
     {
         /// <summary>
         /// Validates the specified <see cref="YencArticle"/>.
@@ -16,6 +16,8 @@ namespace Usenet.Yenc
         /// <returns>A <see cref="ValidationResult"/> containing a list of 0 or more validation failures.</returns>
         public static ValidationResult Validate(YencArticle article)
         {
+            Guard.ThrowIfNull(article, nameof(article));
+            
             var failures = new List<ValidationFailure>();
 
             YencHeader header = article.Header;
@@ -33,11 +35,11 @@ namespace Usenet.Yenc
                 return new ValidationResult(failures);
             }
 
-            if (footer.PartSize != article.Data.Length)
+            if (footer.PartSize != article.Data.Count)
             {
                 failures.Add(new ValidationFailure(
                     YencValidationErrorCodes.SizeMismatch, Resources.Yenc.SizeMismatch,
-                    new { DataSize = article.Data.Length, FooterSize = footer.PartSize }));
+                    new { DataSize = article.Data.Count, FooterSize = footer.PartSize }));
             }
 
             if (!footer.Crc32.HasValue)
@@ -57,7 +59,7 @@ namespace Usenet.Yenc
             return new ValidationResult(failures);
         }
 
-        private static void ValidatePart(YencArticle article, ICollection<ValidationFailure> failures)
+        private static void ValidatePart(YencArticle article, List<ValidationFailure> failures)
         {
             YencHeader header = article.Header;
             YencFooter footer = article.Footer;
@@ -69,11 +71,11 @@ namespace Usenet.Yenc
                     new { HeaderPart = header.PartNumber, FooterPart = footer.PartNumber }));
             }
 
-            if (!(footer.PartSize == article.Data.Length && footer.PartSize == header.PartSize))
+            if (!(footer.PartSize == article.Data.Count && footer.PartSize == header.PartSize))
             {
                 failures.Add(new ValidationFailure(
                     YencValidationErrorCodes.SizeMismatch, Resources.Yenc.PartSizeMismatch,
-                    new { DataSize = article.Data.Length, HeaderSize = header.PartSize, FooterSize = footer.PartSize }));
+                    new { DataSize = article.Data.Count, HeaderSize = header.PartSize, FooterSize = footer.PartSize }));
             }
 
             if (!footer.PartCrc32.HasValue)

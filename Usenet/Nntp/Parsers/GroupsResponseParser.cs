@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Usenet.Extensions;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
 
@@ -30,7 +31,7 @@ namespace Usenet.Nntp.Parsers
         {
             if (!IsSuccessResponse(code) || dataBlock == null)
             {
-                return new NntpGroupsResponse(code, message, false, new NntpGroup[0]);
+                return new NntpGroupsResponse(code, message, false, []);
             }
 
             IEnumerable<NntpGroup> groups = EnumerateGroups(dataBlock);
@@ -52,33 +53,38 @@ namespace Usenet.Nntp.Parsers
             }
 
             int checkParameterCount = requestType == GroupStatusRequestType.Basic ? 4 : 5;
-            string errorMessage = requestType == GroupStatusRequestType.Basic
-                ? "Invalid newsgroup information line: {Line} Expected: {{group}} {{high}} {{low}} {{status}}"
-                : "Invalid newsgroup information line: {Line} Expected: {{group}} {{high}} {{low}} {{count}} {{status}}";
 
             foreach (string line in dataBlock)
             {
                 string[] lineSplit = line.Split(' ');
                 if (lineSplit.Length < checkParameterCount)
                 {
-                    log.LogError(errorMessage, line);
+                    if (requestType == GroupStatusRequestType.Basic)
+                    {
+                        log.InvalidGroupBasicInformationLine(line);
+                    }
+                    else
+                    {
+                        log.InvalidGroupExtendedInformationLine(line);
+                    }
+                    
                     continue;
                 }
 
                 var argCount = 1;
-                long.TryParse(lineSplit[argCount++], out long highWaterMark);
-                long.TryParse(lineSplit[argCount++], out long lowWaterMark);
+                _ = long.TryParse(lineSplit[argCount++], out long highWaterMark);
+                _ = long.TryParse(lineSplit[argCount++], out long lowWaterMark);
 
                 var articleCount = 0L;
                 if (requestType == GroupStatusRequestType.Extended)
                 {
-                    long.TryParse(lineSplit[argCount++], out articleCount);
+                    _ = long.TryParse(lineSplit[argCount++], out articleCount);
                 }
 
                 NntpPostingStatus postingStatus = PostingStatusParser.Parse(lineSplit[argCount], out string otherGroup);
                 if (postingStatus == NntpPostingStatus.Unknown)
                 {
-                    log.LogError("Invalid posting status {Status} in line: {Line}", lineSplit[argCount], line);
+                    log.InvalidPostingStatus(lineSplit[argCount], line);
                 }
 
                 yield return new NntpGroup(
@@ -88,7 +94,7 @@ namespace Usenet.Nntp.Parsers
                     highWaterMark,
                     postingStatus,
                     otherGroup,
-                    new long[0]);
+                    []);
             }
         }
     }

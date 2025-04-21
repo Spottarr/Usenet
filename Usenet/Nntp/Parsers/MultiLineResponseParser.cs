@@ -10,7 +10,7 @@ namespace Usenet.Nntp.Parsers
 
         public MultiLineResponseParser(params int[] successCodes)
         {
-            this.successCodes = successCodes ?? new int[0];
+            this.successCodes = successCodes ?? [];
         }
 
         public bool IsSuccessResponse(int code) => successCodes.Contains(code);

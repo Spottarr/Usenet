@@ -6,20 +6,12 @@ using Xunit;
 
 namespace UsenetTests.Nzb
 {
-    public class NzbBuilderTests : IClassFixture<TestData>
+    public class NzbBuilderTests
     {
-        private readonly TestData testData;
-
-        public NzbBuilderTests(TestData testData)
-        {
-            this.testData = testData;
-        }
-
         [Theory]
-        [InlineData(@"yenc.multipart.joystick.jpg")]
-        public void ShouldBuildDocumentFromFile(string fileName)
+        [EmbeddedResourceData(@"yenc.multipart.joystick.jpg")]
+        internal void ShouldBuildDocumentFromFile(IFileInfo file)
         {
-            IFileInfo file = testData.GetEmbeddedFile(fileName);
             NzbDocument actualDocument = new NzbBuilder()
                 .AddFile(file)
                 .AddGroups("alt.binaries.newzbin")

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Usenet.Extensions;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
 
@@ -17,7 +18,7 @@ namespace Usenet.Nntp.Parsers
         {
             if (!IsSuccessResponse(code) || dataBlock == null)
             {
-                return new NntpGroupOriginsResponse(code, message, false, new NntpGroupOrigin[0]);
+                return new NntpGroupOriginsResponse(code, message, false, []);
             }
 
             IEnumerable<NntpGroupOrigin> groupOrigins = EnumerateGroupOrigins(dataBlock);
@@ -43,11 +44,11 @@ namespace Usenet.Nntp.Parsers
                 string[] lineSplit = line.Split(' ');
                 if (lineSplit.Length < 3)
                 {
-                    log.LogError("Invalid newsgroup origin line: {Line} Expected: {{group}} {{timestamp}} {{createdby}}", line);
+                    log.InvalidGroupOriginLine(line);
                     continue;
                 }
 
-                long.TryParse(lineSplit[1], out long createdAtTimestamp);
+                _ = long.TryParse(lineSplit[1], out long createdAtTimestamp);
 
                 yield return new NntpGroupOrigin(
                     lineSplit[0],

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
 
@@ -62,7 +63,7 @@ namespace Usenet.Nntp.Models
         /// </summary>
         /// <returns>The text representation of the value formatted according to the NNTP specifications</returns>
         public override string ToString() => 
-            To == null ? $"{From}-" : (To.Value == From ? From.ToString() : $"{From}-{To.Value}");
+            To == null ? $"{From}-" : (To.Value == From ? From.ToString(CultureInfo.InvariantCulture) : $"{From}-{To.Value}");
 
         /// <summary>
         /// Returns the hash code for this instance.

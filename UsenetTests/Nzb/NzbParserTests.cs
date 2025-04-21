@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Xml;
+using Microsoft.Extensions.FileProviders;
 using Usenet.Exceptions;
 using Usenet.Nzb;
 using Usenet.Util;
@@ -10,21 +12,14 @@ using Xunit;
 
 namespace UsenetTests.Nzb
 {
-    public class NzbParserTests : IClassFixture<TestData>
+    public class NzbParserTests
     {
-        private readonly TestData testData;
-
-        public NzbParserTests(TestData testData)
-        {
-            this.testData = testData;
-        }
-
         [Theory]
-        [InlineData(@"nzb.sabnzbd.nzb")]
-        [InlineData(@"nzb.sabnzbd-no-namespace.nzb")]
-        public void ValidNzbDataShouldBeParsed(string fileName)
+        [EmbeddedResourceData(@"nzb.sabnzbd.nzb")]
+        [EmbeddedResourceData(@"nzb.sabnzbd-no-namespace.nzb")]
+        internal void ValidNzbDataShouldBeParsed(IFileInfo file)
         {
-            string nzbData = testData.GetEmbeddedFile(fileName).ReadAllText(UsenetEncoding.Default);
+            string nzbData = file.ReadAllText(UsenetEncoding.Default);
             NzbDocument actualDocument = NzbParser.Parse(nzbData);
 
             Assert.Equal("Your File!", actualDocument.MetaData["title"].Single());
@@ -35,7 +30,7 @@ namespace UsenetTests.Nzb
         }
 
         [Fact]
-        public void MinimalNzbDataShouldBeParsed()
+        internal void MinimalNzbDataShouldBeParsed()
         {
             const string nzbText = @"<nzb xmlns=""http://www.newzbin.com/DTD/2003/nzb""></nzb>";
             NzbDocument actualDocument = NzbParser.Parse(nzbText);
@@ -45,7 +40,7 @@ namespace UsenetTests.Nzb
         }
 
         [Fact]
-        public void MultipleMetaDataKeysShouldBeParsed()
+        internal void MultipleMetaDataKeysShouldBeParsed()
         {
             const string nzbText = @"
 <nzb xmlns=""http://www.newzbin.com/DTD/2003/nzb"">
@@ -63,7 +58,7 @@ namespace UsenetTests.Nzb
         }
 
         [Fact]
-        public void MinimalFileShouldBeParsed()
+        internal void MinimalFileShouldBeParsed()
         {
             const string nzbText = @"
 <nzb xmlns=""http://www.newzbin.com/DTD/2003/nzb"">
@@ -77,9 +72,9 @@ namespace UsenetTests.Nzb
         }
 
         [Fact]
-        public void FileDateShouldBeParsed()
+        internal void FileDateShouldBeParsed()
         {
-            DateTimeOffset expected = DateTimeOffset.Parse(@"2017-06-01T06:49:13+00:00");
+            DateTimeOffset expected = DateTimeOffset.Parse(@"2017-06-01T06:49:13+00:00", CultureInfo.InvariantCulture);
             const string nzbText = @"
 <nzb xmlns=""http://www.newzbin.com/DTD/2003/nzb"">
   <file date=""1496299753""></file>
@@ -90,7 +85,7 @@ namespace UsenetTests.Nzb
         }
 
         [Fact]
-        public void InvalidFileDateShouldThrow()
+        internal void InvalidFileDateShouldThrow()
         {
             const string nzbText = @"
 <nzb xmlns=""http://www.newzbin.com/DTD/2003/nzb"">
@@ -101,7 +96,7 @@ namespace UsenetTests.Nzb
         }
 
         [Fact]
-        public void InvalidSegmentNumberShouldThrow()
+        internal void InvalidSegmentNumberShouldThrow()
         {
             const string nzbText = @"
 <nzb xmlns=""http://www.newzbin.com/DTD/2003/nzb"">
@@ -115,7 +110,7 @@ namespace UsenetTests.Nzb
             Assert.Throws<InvalidNzbDataException>(() => NzbParser.Parse(nzbText));
         }
         [Fact]
-        public void MissingSegmentNumberShouldThrow()
+        internal void MissingSegmentNumberShouldThrow()
         {
             const string nzbText = @"
 <nzb xmlns=""http://www.newzbin.com/DTD/2003/nzb"">
@@ -131,7 +126,7 @@ namespace UsenetTests.Nzb
 
 
         [Fact]
-        public void InvalidSegmentSizeShouldThrow()
+        internal void InvalidSegmentSizeShouldThrow()
         {
             const string nzbText = @"
 <nzb xmlns=""http://www.newzbin.com/DTD/2003/nzb"">
@@ -146,7 +141,7 @@ namespace UsenetTests.Nzb
         }
 
         [Fact]
-        public void MissingSegmentSizeShouldThrow()
+        internal void MissingSegmentSizeShouldThrow()
         {
             const string nzbText = @"
 <nzb xmlns=""http://www.newzbin.com/DTD/2003/nzb"">
@@ -161,7 +156,7 @@ namespace UsenetTests.Nzb
         }
 
         [Fact]
-        public void InvalidXmlShouldThrow()
+        internal void InvalidXmlShouldThrow()
         {
             const string nzbText = @"sdfsfasfasdfasdf";
             Assert.Throws<XmlException>(() => NzbParser.Parse(nzbText));
@@ -175,7 +170,7 @@ namespace UsenetTests.Nzb
         }
 
         [Fact]
-        public void FileShouldBeExtractedFromSubjectWhenQuoted()
+        internal void FileShouldBeExtractedFromSubjectWhenQuoted()
         {
             const string nzbText = @"
 <nzb xmlns=""http://www.newzbin.com/DTD/2003/nzb"">
@@ -187,7 +182,7 @@ namespace UsenetTests.Nzb
         }
 
         [Fact]
-        public void FileShouldBeExtractedFromSubjectWhenNotQuoted()
+        internal void FileShouldBeExtractedFromSubjectWhenNotQuoted()
         {
             const string nzbText = @"
 <nzb xmlns=""http://www.newzbin.com/DTD/2003/nzb"">
@@ -199,7 +194,7 @@ namespace UsenetTests.Nzb
         }
 
         [Fact]
-        public void FileShouldBeExtractedFromSubjectWhenNotQuotedAndNoParenthesis()
+        internal void FileShouldBeExtractedFromSubjectWhenNotQuotedAndNoParenthesis()
         {
             const string nzbText = @"
 <nzb xmlns=""http://www.newzbin.com/DTD/2003/nzb"">

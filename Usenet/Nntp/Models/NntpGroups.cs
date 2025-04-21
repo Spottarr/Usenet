@@ -74,7 +74,13 @@ namespace Usenet.Nntp.Models
         /// Converts a string implicitly to a <see cref="NntpGroups"/>.
         /// </summary>
         /// <param name="value">The string to convert.</param>
-        public static implicit operator NntpGroups(string value) => new NntpGroupsBuilder().Add(value).Build();
+        public static implicit operator NntpGroups(string value) => FromString(value);
+        
+        /// <summary>
+        /// Converts a string implicitly to a <see cref="NntpGroups"/>.
+        /// </summary>
+        /// <param name="value">The string to convert.</param>
+        public static NntpGroups FromString(string value) => new NntpGroupsBuilder().Add(value).Build();
 
         /// <summary>
         /// Returns the hash code for this instance.

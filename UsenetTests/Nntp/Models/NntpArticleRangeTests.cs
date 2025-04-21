@@ -8,7 +8,7 @@ namespace UsenetTests.Nntp.Models
     public class NntpArticleRangeTests
     {
         [Fact]
-        public void SingleArticleShouldHaveCorrectStringRepresentation()
+        internal void SingleArticleShouldHaveCorrectStringRepresentation()
         {
             const string expected = "8";
             string actual = NntpArticleRange.SingleArticle(8).ToString();
@@ -16,7 +16,7 @@ namespace UsenetTests.Nntp.Models
         }
 
         [Fact]
-        public void AllFollowingShouldHaveCorrectStringRepresentation()
+        internal void AllFollowingShouldHaveCorrectStringRepresentation()
         {
             const string expected = "8-";
             string actual = NntpArticleRange.AllFollowing(8).ToString();
@@ -24,7 +24,7 @@ namespace UsenetTests.Nntp.Models
         }
 
         [Fact]
-        public void RangeShouldHaveCorrectStringRepresentation()
+        internal void RangeShouldHaveCorrectStringRepresentation()
         {
             const string expected = "8-88";
             string actual = NntpArticleRange.Range(8, 88).ToString();
@@ -52,10 +52,11 @@ namespace UsenetTests.Nntp.Models
 
         [Theory]
         [MemberData(nameof(EqualsWithSameValues))]
-        public void EqualsWithSameValuesShouldReturnTrue(XSerializable<NntpArticleRange> range1, XSerializable<NntpArticleRange> range2)
+        internal void EqualsWithSameValuesShouldReturnTrue(XSerializable<NntpArticleRange> range1, XSerializable<NntpArticleRange> range2)
         {
             Assert.Equal(range1.Object, range2.Object);
         }
+        
         public static readonly IEnumerable<object[]> EqualsWithDifferentValues = new[]
         {
             new object[]
@@ -77,7 +78,7 @@ namespace UsenetTests.Nntp.Models
 
         [Theory]
         [MemberData(nameof(EqualsWithDifferentValues))]
-        public void EqualsWithDifferentValuesShouldReturnFalse(XSerializable<NntpArticleRange> range1, XSerializable<NntpArticleRange> range2)
+        internal void EqualsWithDifferentValuesShouldReturnFalse(XSerializable<NntpArticleRange> range1, XSerializable<NntpArticleRange> range2)
         {
             Assert.NotEqual(range1.Object, range2.Object);
         }

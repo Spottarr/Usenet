@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Usenet.Exceptions;
 using Microsoft.Extensions.Logging;
+using Usenet.Extensions;
 using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Responses;
 using Usenet.Util;
@@ -18,12 +20,13 @@ namespace Usenet.Nntp
     /// </summary>
     /// <remarks>This implementation of the <see cref="INntpConnection"/> interface does support SSL encryption but
     /// does not support compressed multi-line results.</remarks>
-    public class NntpConnection : INntpConnection
+    public sealed class NntpConnection : INntpConnection
     {
         private readonly ILogger log = Logger.Create<NntpConnection>();
         private readonly TcpClient client = new TcpClient();
         private StreamWriter writer;
         private NntpStreamReader reader;
+        private const string AuthInfoPass = "AUTHINFO PASS";
 
         /// <inheritdoc/>
         public CountingStream Stream { get; private set; }
@@ -31,19 +34,24 @@ namespace Usenet.Nntp
         /// <inheritdoc/>
         public async Task<TResponse> ConnectAsync<TResponse>(string hostname, int port, bool useSsl, IResponseParser<TResponse> parser)
         {
-            log.LogInformation("Connecting: {hostname} {port} (Use SSl = {useSsl})", hostname, port, useSsl);
-            await client.ConnectAsync(hostname, port);
-            Stream = await GetStreamAsync(hostname, useSsl);
+            log.Connecting(hostname, port, useSsl);
+            await client.ConnectAsync(hostname, port).ConfigureAwait(false);
+            Stream = await GetStreamAsync(hostname, useSsl).ConfigureAwait(false);
             writer = new StreamWriter(Stream, UsenetEncoding.Default) { AutoFlush = true };
             reader = new NntpStreamReader(Stream, UsenetEncoding.Default);
             return GetResponse(parser);
         }
-
+        
         /// <inheritdoc/>
         public TResponse Command<TResponse>(string command, IResponseParser<TResponse> parser)
         {
             ThrowIfNotConnected();
-            log.LogInformation("Sending command: {Command}",command.StartsWith("AUTHINFO PASS", StringComparison.Ordinal) ? "AUTHINFO PASS [omitted]" : command);
+            Guard.ThrowIfNull(command, nameof(command));
+            
+            var logCommand = command.StartsWith(AuthInfoPass, StringComparison.Ordinal) 
+                ? $"{AuthInfoPass} [REDACTED]" 
+                : command;
+            log.SendingCommand(logCommand);
             writer.WriteLine(command);
             return GetResponse(parser);
         }
@@ -51,11 +59,13 @@ namespace Usenet.Nntp
         /// <inheritdoc/>
         public TResponse MultiLineCommand<TResponse>(string command, IMultiLineResponseParser<TResponse> parser) //, bool decompress = false)
         {
+            Guard.ThrowIfNull(parser, nameof(parser));
+            
             NntpResponse response = Command(command, new ResponseParser());
 
             IEnumerable<string> dataBlock = parser.IsSuccessResponse(response.Code)
                 ? ReadMultiLineDataBlock()
-                : new string[0];
+                : [];
 
             return parser.Parse(response.Code, response.Message, dataBlock);
         }
@@ -63,14 +73,16 @@ namespace Usenet.Nntp
         /// <inheritdoc/>
         public TResponse GetResponse<TResponse>(IResponseParser<TResponse> parser)
         {
+            Guard.ThrowIfNull(parser, nameof(parser));
+            
             string responseText = reader.ReadLine();
-            log.LogInformation("Response received: {Response}", responseText);
+            log.ReceivedResponse(responseText);
 
             if (responseText == null)
             {
                 throw new NntpException("Received no response.");
             }
-            if (responseText.Length < 3 || !int.TryParse(responseText.Substring(0, 3), out int code))
+            if (responseText.Length < 3 || !IntShims.TryParse(responseText.AsSpan(0, 3), out int code))
             {
                 throw new NntpException("Received invalid response.");
             }
@@ -100,7 +112,7 @@ namespace Usenet.Nntp
                 return new CountingStream(stream);
             }
             var sslStream = new SslStream(stream);
-            await sslStream.AuthenticateAsClientAsync(hostname);
+            await sslStream.AuthenticateAsClientAsync(hostname).ConfigureAwait(false);
             return new CountingStream(sslStream);
         }
 

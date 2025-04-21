@@ -68,7 +68,7 @@ namespace Usenet.Nzb
 
             using (var reader = new StreamReader(stream, encoding))
             {
-                return NzbParser.Parse(await reader.ReadToEndAsync());
+                return NzbParser.Parse(await reader.ReadToEndAsync().ConfigureAwait(false));
             }
         }
 

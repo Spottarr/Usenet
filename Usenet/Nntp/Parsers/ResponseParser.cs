@@ -9,7 +9,7 @@ namespace Usenet.Nntp.Parsers
 
         public ResponseParser(params int[] successCodes)
         {
-            this.successCodes = successCodes ?? new int[0];
+            this.successCodes = successCodes ?? [];
         }
 
         public bool IsSuccessResponse(int code) => successCodes.Contains(code);

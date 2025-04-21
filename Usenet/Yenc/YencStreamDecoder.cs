@@ -59,7 +59,7 @@ namespace Usenet.Yenc
                     continue;
                 }
 
-                if (enumerator.Current.StartsWith(yEnd))
+                if (enumerator.Current.StartsWith(yEnd, StringComparison.Ordinal))
                 {
                     // skip rest if there is some
                     while (enumerator.MoveNext()) { }

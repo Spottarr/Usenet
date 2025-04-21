@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Usenet.Extensions;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
@@ -57,10 +58,10 @@ namespace Usenet.Nntp.Parsers
             string[] responseSplit = message.Split(' ');
             if (responseSplit.Length < 2)
             {
-                log.LogError("Invalid response message: {Message} Expected: {{number}} {{messageid}}", message);
+                log.InvalidResponseMessage(message);
             }
 
-            long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out long number);
+            _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out long number);
             string messageId = responseSplit.Length > 1 ? responseSplit[1] : string.Empty;
 
             if (dataBlock == null)
@@ -84,7 +85,7 @@ namespace Usenet.Nntp.Parsers
                 // get body if requested
                 IEnumerable<string> bodyLines = (requestType & ArticleRequestType.Body) == ArticleRequestType.Body
                     ? EnumerateBodyLines(enumerator)
-                    : new string[0];
+                    : [];
 
                 if (dataBlock is ICollection<string>)
                 {
@@ -117,10 +118,10 @@ namespace Usenet.Nntp.Parsers
                 }
                 else
                 {
-                    int splitPos = line.IndexOf(':');
+                    int splitPos = line.IndexOf(':', StringComparison.Ordinal);
                     if (splitPos < 0)
                     {
-                        log.LogError("Invalid header line: {Line} Expected: {{key}}:{{value}}", line);
+                        log.InvalidHeaderLine(line);
                     }
                     else
                     {

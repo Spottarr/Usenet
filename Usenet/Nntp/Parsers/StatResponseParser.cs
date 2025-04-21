@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using Usenet.Extensions;
 using Usenet.Nntp.Responses;
 
 namespace Usenet.Nntp.Parsers
@@ -18,7 +19,7 @@ namespace Usenet.Nntp.Parsers
 
             if (responseType == NntpStatResponseType.Unknown)
             {
-                log.LogError("Invalid response code: {Code}", code);
+                log.InvalidResponseCode(code);
             }
 
             if (!IsSuccessResponse(code))
@@ -30,10 +31,10 @@ namespace Usenet.Nntp.Parsers
             string[] responseSplit = message.Split(' ');
             if (responseSplit.Length < 2)
             {
-                log.LogError("Invalid response message: {Message} Expected: {{number}} {{messageid}}", message);
+                log.InvalidResponseMessage(message);
             }
 
-            long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out long number);
+            _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out long number);
             string messageId = responseSplit.Length > 1 ? responseSplit[1] : string.Empty;
 
             return new NntpStatResponse(code, message, true, responseType, number, messageId);

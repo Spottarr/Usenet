@@ -8,14 +8,9 @@
     {
         private const uint polynomial = 0xEDB88320;
         private const uint seed = 0xFFFFFFFF;
-        private static readonly uint[] lookupTable;
+        private static readonly uint[] lookupTable = CreateLookupTable();
 
-        static Crc32()
-        {
-            lookupTable = CreateLookupTable();
-        }
-
-        public static uint CalculateChecksum(byte[] buffer)
+        public static uint CalculateChecksum(IEnumerable<byte> buffer)
         {
             Guard.ThrowIfNull(buffer, nameof(buffer));
             

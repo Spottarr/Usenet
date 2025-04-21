@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using Usenet.Util;
@@ -30,6 +31,10 @@ namespace Usenet.Yenc
         /// <returns>The yEnc-encoded text.</returns>
         public static IEnumerable<string> Encode(YencHeader header, Stream stream, Encoding encoding)
         {
+            Guard.ThrowIfNull(header, nameof(header));
+            Guard.ThrowIfNull(stream, nameof(stream));
+            Guard.ThrowIfNull(encoding, nameof(encoding));
+            
             yield return GetHeaderLine(header);
             if (header.IsFilePart)
             {
@@ -122,12 +127,12 @@ namespace Usenet.Yenc
             {
                 builder.Append(' ').Append(YencKeywords.Size).Append('=').Append(header.PartSize);
                 builder.Append(' ').Append(YencKeywords.Part).Append('=').Append(header.PartNumber);
-                builder.Append(' ').Append(YencKeywords.PartCrc32).Append('=').AppendFormat("{0:x}", checksum);
+                builder.Append(' ').Append(YencKeywords.PartCrc32).Append('=').AppendFormat(CultureInfo.InvariantCulture, "{0:x}", checksum);
             }
             else
             {
                 builder.Append(' ').Append(YencKeywords.Size).Append('=').Append(header.FileSize);
-                builder.Append(' ').Append(YencKeywords.Crc32).Append('=').AppendFormat("{0:x}", checksum);
+                builder.Append(' ').Append(YencKeywords.Crc32).Append('=').AppendFormat(CultureInfo.InvariantCulture, "{0:x}", checksum);
             }
 
             return builder.ToString();

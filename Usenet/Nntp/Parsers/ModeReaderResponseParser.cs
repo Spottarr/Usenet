@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using Usenet.Extensions;
 using Usenet.Nntp.Responses;
 
 namespace Usenet.Nntp.Parsers
@@ -16,7 +17,7 @@ namespace Usenet.Nntp.Parsers
             bool success = responseType != NntpModeReaderResponseType.Unknown;
             if (!success)
             {
-                log.LogError("Invalid response code: {Code}", code);
+                log.InvalidResponseCode(code);
             }
             return new NntpModeReaderResponse(code, message, success, responseType);
         }

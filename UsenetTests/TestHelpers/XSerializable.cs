@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace UsenetTests.TestHelpers
 {
-    public class XSerializable<T> : IXunitSerializable
+    internal sealed class XSerializable<T> : IXunitSerializable
     {
         public T Object { get; private set; }
 

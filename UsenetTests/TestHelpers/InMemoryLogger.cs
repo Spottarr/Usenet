@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace UsenetTests.TestHelpers
 {
-    public class InMemoryLogger : ILogger
+    internal sealed class InMemoryLogger : ILogger
     {
-        public class Entry
+        internal sealed class Entry
         {
             public LogLevel LogLevel;
             public EventId EventId;
@@ -55,7 +55,7 @@ namespace UsenetTests.TestHelpers
         {
             foreach (var entry in Buffer)
             {
-                logger.Log(entry.LogLevel, entry.EventId, entry.Message);
+                //logger.Log(entry.LogLevel, entry.EventId, entry.Message);
             }
             Buffer.Clear();
         }

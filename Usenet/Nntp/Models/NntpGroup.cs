@@ -72,7 +72,7 @@ namespace Usenet.Nntp.Models
             ArticleCount = articleCount;
             LowWaterMark = lowWaterMark;
             HighWaterMark = highWaterMark;
-            PostingStatus = Enum.IsDefined(typeof(NntpPostingStatus), postingStatus) ? postingStatus : NntpPostingStatus.Unknown;
+            PostingStatus = EnumShim.IsDefined(postingStatus) ? postingStatus : NntpPostingStatus.Unknown;
             OtherGroup = otherGroup ?? string.Empty;
 
             switch (articleNumbers)
@@ -120,12 +120,12 @@ namespace Usenet.Nntp.Models
             }
 
             bool equals =
-                Name.Equals(other.Name) &&
+                Name.Equals(other.Name, StringComparison.Ordinal) &&
                 ArticleCount.Equals(other.ArticleCount) &&
                 LowWaterMark.Equals(other.LowWaterMark) &&
                 HighWaterMark.Equals(other.HighWaterMark) &&
                 PostingStatus.Equals(other.PostingStatus) &&
-                OtherGroup.Equals(other.OtherGroup);
+                OtherGroup.Equals(other.OtherGroup, StringComparison.Ordinal);
 
             if (!equals)
             {

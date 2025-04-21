@@ -28,7 +28,7 @@ namespace Usenet.Nntp.Parsers
             return groups;
         }
 
-        private static void AddGroups(ICollection<string> groups, string value)
+        private static void AddGroups(List<string> groups, string value)
         {
             if (value == null)
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.FileProviders;
 using Usenet.Nntp.Builders;
@@ -49,10 +50,7 @@ namespace Usenet.Nzb
         /// <returns>The <see cref="NzbBuilder"/> so that additional calls can be chained.</returns>
         public NzbBuilder SetPartSize(long value)
         {
-            if (value <= 0)
-            {
-                throw new ArgumentOutOfRangeException();
-            }
+            Guard.ThrowIfNegativeOrZero(value, nameof(value));
             partSize = value;
             return this;
         }
@@ -150,12 +148,12 @@ namespace Usenet.Nzb
 
         private string GetSubject(IFileInfo fileInfo)
         {
-            string segmentCount = GetSegmentCount(fileInfo).ToString();
+            string segmentCount = GetSegmentCount(fileInfo).ToString(CultureInfo.InvariantCulture);
             string one = "1".PadLeft(segmentCount.Length, '0');
             return $"\"{fileInfo.Name}\" yEnc ({one}/{segmentCount})";
         }
 
-        private IEnumerable<NzbSegment> GetSegments(IFileInfo fileInfo)
+        private List<NzbSegment> GetSegments(IFileInfo fileInfo)
         {
             Guid fileGuid = Guid.NewGuid();
             var segments = new List<NzbSegment>();

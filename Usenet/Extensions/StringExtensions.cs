@@ -57,21 +57,20 @@ namespace Usenet.Extensions
             str != null && int.TryParse(str, out int value) ? value : defaultValue;
 
         /// <summary>
-        /// Checks if the source string contains the specified toCheck string using the specified <see cref="StringComparison"/>.
-        /// </summary>
-        /// <param name="source">The source string.</param>
-        /// <param name="toCheck">The string to search for in the source string.</param>
-        /// <param name="comp">The <see cref="StringComparison"/> to use.</param>
-        /// <returns>A value indicating whether the source string contains the toCheck string.</returns>
-        public static bool Contains(this string source, string toCheck, StringComparison comp) => 
-            source.IndexOf(toCheck, comp) >= 0;
-
-        /// <summary>
         /// Removes all whitespace from a string.
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
         public static string Pack(this string source) => 
             source == null ? null : whitespaceRegex.Replace(source, string.Empty);
+
+        public static int IndexOf(this string source, char value, StringComparison comparisonType)
+        {
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+            return source.IndexOf(value, comparisonType);
+#else
+            return source.IndexOf(value);
+#endif
+        }
     }
 }

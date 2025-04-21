@@ -21,7 +21,7 @@ namespace Usenet.Yenc
         /// <summary>
         /// The binary data obtained by decoding the yEnc-encoded article.
         /// </summary>
-        public byte[] Data { get; set; }
+        public IReadOnlyList<byte> Data { get; }
 
         /// <summary>
         /// Creates a new instance of the <see cref="YencArticle"/> class.

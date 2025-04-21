@@ -12,7 +12,7 @@ namespace UsenetTests.Nntp.Parsers
         [InlineData(420, "No current article selected", NntpLastResponseType.CurrentArticleInvalid, 0, "")]
         [InlineData(422, "No previous article to retrieve", NntpLastResponseType.NoPreviousArticleInGroup, 0, "")]
         [InlineData(999, "Unspecified response", NntpLastResponseType.Unknown, 0, "")]
-        public void ResponseShouldBeParsedCorrectly(
+        internal void ResponseShouldBeParsedCorrectly(
             int responseCode, 
             string responseMessage,
             NntpLastResponseType expectedResponseType,

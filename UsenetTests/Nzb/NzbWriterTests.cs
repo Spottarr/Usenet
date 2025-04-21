@@ -8,21 +8,13 @@ using Xunit;
 
 namespace UsenetTests.Nzb
 {
-    public class NzbWriterTests : IClassFixture<TestData>
+    public class NzbWriterTests
     {
-        private readonly TestData testData;
-
-        public NzbWriterTests(TestData testData)
-        {
-            this.testData = testData;
-        }
-
         [Theory]
-        [InlineData(@"nzb.sabnzbd.nzb")]
-        [InlineData(@"nzb.sabnzbd-no-namespace.nzb")]
-        public void ShouldWriteDocumentToFile(string fileName)
+        [EmbeddedResourceData(@"nzb.sabnzbd.nzb")]
+        [EmbeddedResourceData(@"nzb.sabnzbd-no-namespace.nzb")]
+        internal void ShouldWriteDocumentToFile(IFileInfo file)
         {
-            IFileInfo file = testData.GetEmbeddedFile(fileName);
             NzbDocument expected = NzbParser.Parse(file.ReadAllText(UsenetEncoding.Default));
 
             using var stream = new MemoryStream();

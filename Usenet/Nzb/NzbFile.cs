@@ -103,9 +103,9 @@ namespace Usenet.Nzb
                 return false;
             }
             return
-                Poster.Equals(other.Poster) &&
-                Subject.Equals(other.Subject) &&
-                FileName.Equals(other.FileName) &&
+                Poster.Equals(other.Poster, StringComparison.Ordinal) &&
+                Subject.Equals(other.Subject, StringComparison.Ordinal) &&
+                FileName.Equals(other.FileName, StringComparison.Ordinal) &&
                 Date.Equals(other.Date) &&
                 Groups.Equals(other.Groups) &&
                 Size.Equals(other.Size) &&
