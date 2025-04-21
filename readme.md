@@ -10,10 +10,13 @@ Binary messages will be encoded to yEnc format streaming and yEnc-encoded data w
 
 The NNTP client is compliant with [RFC 2980](https://tools.ietf.org/html/rfc2980), [RFC 3977](https://tools.ietf.org/html/rfc3977), [RFC 4643](https://tools.ietf.org/html/rfc4643) and [RFC 6048](https://tools.ietf.org/html/rfc6048).
 
+[![Nuget](https://img.shields.io/nuget/v/Spottarr.Usenet)](https://www.nuget.org/packages/Spottarr.Usenet)
+[![Nuget Prerelease](https://img.shields.io/nuget/vpre/Spottarr.Usenet?label=nuget%20prerelease)](https://www.nuget.org/packages/Spottarr.Usenet)
+
 ## Getting Started ##
-Install [Nuget](https://www.nuget.org/packages/Usenet) package:
-```
-PM> Install-Package Usenet
+Install [Nuget](https://www.nuget.org/packages/Spottarr.Usenet) package:
+```zsh
+dotnet add package Spottarr.Usenet
 ```
 
 ## Examples ##
