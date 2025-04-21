@@ -63,5 +63,14 @@ namespace Usenet.Extensions
         /// <returns></returns>
         public static string Pack(this string source) => 
             source == null ? null : whitespaceRegex.Replace(source, string.Empty);
+
+        public static int IndexOf(this string source, char value, StringComparison comparisonType)
+        {
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+            return source.IndexOf(value, comparisonType);
+#else
+            return source.IndexOf(value);
+#endif
+        }
     }
 }
