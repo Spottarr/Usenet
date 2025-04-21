@@ -57,7 +57,7 @@ public class ArticleWriterTests
 
 internal sealed class MockConnection : INntpConnection
 {
-    private readonly List<string> lines = [];
+    private readonly List<string> _lines = [];
 
     public void Dispose()
     {
@@ -80,7 +80,7 @@ internal sealed class MockConnection : INntpConnection
 
     public void WriteLine(string line)
     {
-        lines.Add(line);
+        _lines.Add(line);
     }
 
     public CountingStream Stream => throw new NotImplementedException();
@@ -92,6 +92,6 @@ internal sealed class MockConnection : INntpConnection
 
     public string[] GetLines()
     {
-        return lines.ToArray();
+        return _lines.ToArray();
     }
 }

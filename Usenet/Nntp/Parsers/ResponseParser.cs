@@ -4,14 +4,14 @@ namespace Usenet.Nntp.Parsers;
 
 internal class ResponseParser : IResponseParser<NntpResponse>
 {
-    private readonly int[] successCodes;
+    private readonly int[] _successCodes;
 
     public ResponseParser(params int[] successCodes)
     {
-        this.successCodes = successCodes ?? [];
+        _successCodes = successCodes ?? [];
     }
 
-    public bool IsSuccessResponse(int code) => successCodes.Contains(code);
+    public bool IsSuccessResponse(int code) => _successCodes.Contains(code);
 
     public NntpResponse Parse(int code, string message) =>
         new NntpResponse(code, message, IsSuccessResponse(code));

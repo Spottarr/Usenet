@@ -5,7 +5,7 @@ namespace Usenet.Nntp.Parsers;
 
 internal static class HeaderDateParser
 {
-    private const string _dateTimeRegexString =
+    private const string DateTimeRegexString =
         @"(?:\s*"
         + @"(?<dayName>Sun|Mon|Tue|Wed|Thu|Fri|Sat),)?\s*"
         + @"(?<day>\d{1,2})\s+"
@@ -15,7 +15,7 @@ internal static class HeaderDateParser
         + @"(?<tz>[+-]\d+|(?:UT|UTC|GMT|Z|EDT|EST|CDT|CST|MDT|MST|PDT|PST|A|N|M|Y|[A-Z]+)"
         + @")?";
 
-    private static readonly Regex _dateTimeRegex = new(_dateTimeRegexString, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly Regex _dateTimeRegex = new(DateTimeRegexString, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     /// <summary>
     /// Parses header date/time strings as described in the

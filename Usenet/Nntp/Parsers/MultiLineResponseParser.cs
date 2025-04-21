@@ -4,14 +4,14 @@ namespace Usenet.Nntp.Parsers;
 
 internal class MultiLineResponseParser : IMultiLineResponseParser<NntpMultiLineResponse>
 {
-    private readonly int[] successCodes;
+    private readonly int[] _successCodes;
 
     public MultiLineResponseParser(params int[] successCodes)
     {
-        this.successCodes = successCodes ?? [];
+        _successCodes = successCodes ?? [];
     }
 
-    public bool IsSuccessResponse(int code) => successCodes.Contains(code);
+    public bool IsSuccessResponse(int code) => _successCodes.Contains(code);
 
     public NntpMultiLineResponse Parse(int code, string message, IEnumerable<string> dataBlock) =>
         new NntpMultiLineResponse(code, message, IsSuccessResponse(code), dataBlock);
