@@ -10,6 +10,10 @@ namespace UsenetTests.Nntp.Parsers
     {
         public static readonly IEnumerable<object[]> ParseData =
         [
+            ["Mon, 1 May 2017 1:55", new DateTimeOffset(2017, 5, 1, 1, 55, 0, TimeSpan.Zero)],
+            ["1 May 2017 1:55:33", new DateTimeOffset(2017, 5, 1, 1, 55, 33, TimeSpan.Zero)],
+            ["01 May 2017 13:55", new DateTimeOffset(2017, 5, 1, 13, 55, 0, TimeSpan.Zero)],
+            ["01 May 2017 13:55:33", new DateTimeOffset(2017, 5, 1, 13, 55, 33, TimeSpan.Zero)],
             ["01 May 2017 13:55:33 +0000", new DateTimeOffset(2017, 5, 1, 13, 55, 33, TimeSpan.Zero)],
             ["01 May 2017 13:55:33 -0000", new DateTimeOffset(2017, 5, 1, 13, 55, 33, TimeSpan.Zero)],
             ["01 May 2017 13:55:33 +0000 (UTC)", new DateTimeOffset(2017, 5, 1, 13, 55, 33, TimeSpan.Zero)],
@@ -20,6 +24,9 @@ namespace UsenetTests.Nntp.Parsers
             ["01 May 2017 13:55 +1030", new DateTimeOffset(2017, 5, 1, 13, 55, 0, TimeSpan.FromMinutes(10 * 60 + 30))],
             ["01 May 2017 13:55 -1030", new DateTimeOffset(2017, 5, 1, 13, 55, 0, -TimeSpan.FromMinutes(10 * 60 + 30))],
 
+            ["01 May 2017 13:55+1030", new DateTimeOffset(2017, 5, 1, 13, 55, 0, TimeSpan.FromMinutes(10 * 60 + 30))],
+            ["01 May 2017 13:55-1030", new DateTimeOffset(2017, 5, 1, 13, 55, 0, -TimeSpan.FromMinutes(10 * 60 + 30))],
+            
             ["1 Jan 2017 00:00:00 +0000", new DateTimeOffset(2017, 1, 1, 0, 0, 0, TimeSpan.Zero)],
             ["1 Feb 2017 00:00:00 +0000", new DateTimeOffset(2017, 2, 1, 0, 0, 0, TimeSpan.Zero)],
             ["1 Mar 2017 00:00:00 +0000", new DateTimeOffset(2017, 3, 1, 0, 0, 0, TimeSpan.Zero)],
@@ -74,7 +81,7 @@ namespace UsenetTests.Nntp.Parsers
 
         [Theory]
         [MemberData(nameof(TimezoneParseFailureData))]
-        internal void HeaderDateShouldBeNotBeParsedCorrectly(string headerDate, Type exceptionType)
+        internal void HeaderDateShouldNotBeParsedCorrectly(string headerDate, Type exceptionType)
         {
             Assert.Throws(exceptionType, () => HeaderDateParser.Parse(headerDate));
         }
