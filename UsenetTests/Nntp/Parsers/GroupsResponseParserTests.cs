@@ -54,7 +54,7 @@ namespace UsenetTests.Nntp.Parsers
             string[] lines,
             XSerializable<NntpGroup[]> expectedGroups)
         {
-            NntpGroupsResponse response = new GroupsResponseParser(validCode, (GroupStatusRequestType)requestType)
+            var response = new GroupsResponseParser(validCode, (GroupStatusRequestType)requestType)
                 .Parse(responseCode, responseMessage, lines.ToList());
 
             Assert.Equal(expectedGroups.Object, response.Groups);

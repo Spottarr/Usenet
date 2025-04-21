@@ -57,8 +57,8 @@ namespace Usenet.Nntp.Models
         /// <see cref="PostingStatus"/> is <see cref="NntpPostingStatus.OnlyArticlesFromPeersPermittedFiledLocally"/>.</param>
         /// <param name="articleNumbers">A list of <see cref="NntpArticle"/> numbers in the <see cref="NntpGroup"/>.</param>
         public NntpGroup(
-            string name, 
-            long articleCount, 
+            string name,
+            long articleCount,
             long lowWaterMark,
             long highWaterMark,
             NntpPostingStatus postingStatus,
@@ -116,7 +116,7 @@ namespace Usenet.Nntp.Models
                 return false;
             }
 
-            bool equals =
+            var equals =
                 Name.Equals(other.Name, StringComparison.Ordinal) &&
                 ArticleCount.Equals(other.ArticleCount) &&
                 LowWaterMark.Equals(other.LowWaterMark) &&
@@ -156,7 +156,7 @@ namespace Usenet.Nntp.Models
         /// <param name="first">The first <see cref="NntpGroup"/>.</param>
         /// <param name="second">The second <see cref="NntpGroup"/>.</param>
         /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-        public static bool operator ==(NntpGroup first, NntpGroup second) => 
+        public static bool operator ==(NntpGroup first, NntpGroup second) =>
             (object) first == null ? (object) second == null : first.Equals(second);
 
         /// <summary>

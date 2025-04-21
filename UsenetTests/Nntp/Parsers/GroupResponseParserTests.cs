@@ -27,7 +27,7 @@ namespace UsenetTests.Nntp.Parsers
             string responseMessage,
             XSerializable<NntpGroup> expectedGroup)
         {
-            NntpGroupResponse groupResponse = new GroupResponseParser().Parse(responseCode, responseMessage);            
+            var groupResponse = new GroupResponseParser().Parse(responseCode, responseMessage);            
             Assert.Equal(expectedGroup.Object, groupResponse.Group);
         }
     }

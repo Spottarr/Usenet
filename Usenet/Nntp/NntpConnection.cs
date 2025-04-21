@@ -36,15 +36,15 @@ namespace Usenet.Nntp
             reader = new NntpStreamReader(Stream, UsenetEncoding.Default);
             return GetResponse(parser);
         }
-        
+
         /// <inheritdoc/>
         public TResponse Command<TResponse>(string command, IResponseParser<TResponse> parser)
         {
             ThrowIfNotConnected();
             Guard.ThrowIfNull(command, nameof(command));
-            
-            var logCommand = command.StartsWith(AuthInfoPass, StringComparison.Ordinal) 
-                ? $"{AuthInfoPass} [REDACTED]" 
+
+            var logCommand = command.StartsWith(AuthInfoPass, StringComparison.Ordinal)
+                ? $"{AuthInfoPass} [REDACTED]"
                 : command;
             log.SendingCommand(logCommand);
             writer.WriteLine(command);
@@ -55,10 +55,10 @@ namespace Usenet.Nntp
         public TResponse MultiLineCommand<TResponse>(string command, IMultiLineResponseParser<TResponse> parser) //, bool decompress = false)
         {
             Guard.ThrowIfNull(parser, nameof(parser));
-            
-            NntpResponse response = Command(command, new ResponseParser());
 
-            IEnumerable<string> dataBlock = parser.IsSuccessResponse(response.Code)
+            var response = Command(command, new ResponseParser());
+
+            var dataBlock = parser.IsSuccessResponse(response.Code)
                 ? ReadMultiLineDataBlock()
                 : [];
 
@@ -69,15 +69,15 @@ namespace Usenet.Nntp
         public TResponse GetResponse<TResponse>(IResponseParser<TResponse> parser)
         {
             Guard.ThrowIfNull(parser, nameof(parser));
-            
-            string responseText = reader.ReadLine();
+
+            var responseText = reader.ReadLine();
             log.ReceivedResponse(responseText);
 
             if (responseText == null)
             {
                 throw new NntpException("Received no response.");
             }
-            if (responseText.Length < 3 || !IntShims.TryParse(responseText.AsSpan(0, 3), out int code))
+            if (responseText.Length < 3 || !IntShims.TryParse(responseText.AsSpan(0, 3), out var code))
             {
                 throw new NntpException("Received invalid response.");
             }
@@ -101,7 +101,7 @@ namespace Usenet.Nntp
 
         private async Task<CountingStream> GetStreamAsync(string hostname, bool useSsl)
         {
-            NetworkStream stream = client.GetStream();
+            var stream = client.GetStream();
             if (!useSsl)
             {
                 return new CountingStream(stream);

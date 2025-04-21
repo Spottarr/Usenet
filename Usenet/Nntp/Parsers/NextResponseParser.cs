@@ -12,7 +12,7 @@ namespace Usenet.Nntp.Parsers
 
         public NntpNextResponse Parse(int code, string message)
         {
-            NntpNextResponseType responseType = Enum.IsDefined(typeof(NntpNextResponseType), code)
+            var responseType = Enum.IsDefined(typeof(NntpNextResponseType), code)
                 ? (NntpNextResponseType) code
                 : NntpNextResponseType.Unknown;
 
@@ -27,14 +27,14 @@ namespace Usenet.Nntp.Parsers
             }
 
             // get stat
-            string[] responseSplit = message.Split(' ');
+            var responseSplit = message.Split(' ');
             if (responseSplit.Length < 2)
             {
                 log.InvalidResponseMessage(message);
             }
 
-            _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out long number);
-            string messageId = responseSplit.Length > 1 ? responseSplit[1] : string.Empty;
+            _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out var number);
+            var messageId = responseSplit.Length > 1 ? responseSplit[1] : string.Empty;
 
             return new NntpNextResponse(code, message, true, responseType, number, messageId);
         }

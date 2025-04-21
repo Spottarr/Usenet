@@ -20,7 +20,7 @@ namespace Usenet.Nntp.Writers
         {
             WriteHeader(connection, NntpHeaders.MessageId, article.MessageId);
             WriteHeader(connection, NntpHeaders.Newsgroups, article.Groups.ToString());
-            foreach (KeyValuePair<string, ImmutableList<string>> header in article.Headers)
+            foreach (var header in article.Headers)
             {
                 if (header.Key == NntpHeaders.MessageId ||
                     header.Key == NntpHeaders.Newsgroups)
@@ -28,7 +28,7 @@ namespace Usenet.Nntp.Writers
                     // skip message-id and newsgroups, they are already written
                     continue;
                 }
-                foreach (string value in header.Value)
+                foreach (var value in header.Value)
                 {
                     WriteHeader(connection, header.Key, value);
                 }
@@ -41,7 +41,7 @@ namespace Usenet.Nntp.Writers
             {
                 val = new NntpMessageId(val);
             }
-            string line = $"{key}: {val}";
+            var line = $"{key}: {val}";
             if (line.Length <= maxHeaderLength)
             {
                 connection.WriteLine(line);
@@ -61,7 +61,7 @@ namespace Usenet.Nntp.Writers
 
         private static void WriteBody(INntpConnection connection, NntpArticle article)
         {
-            foreach (string line in article.Body)
+            foreach (var line in article.Body)
             {
                 if (line.Length > 0 && line[0] == '.')
                 {

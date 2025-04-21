@@ -14,8 +14,8 @@
         {
             Guard.ThrowIfNull(buffer, nameof(buffer));
             
-            uint value = seed;
-            foreach (byte b in buffer)
+            var value = seed;
+            foreach (var b in buffer)
             {
                 value = (value >> 8) ^ lookupTable[(value & 0xFF) ^ b];
             }
@@ -34,7 +34,7 @@
             var table = new uint[256];
             for (uint i = 0; i < 256; i++)
             {
-                uint entry = i;
+                var entry = i;
                 for (var j = 0; j < 8; j++)
                 {
                     entry = (entry & 1) == 1 ? (entry >> 1) ^ polynomial : entry >> 1;

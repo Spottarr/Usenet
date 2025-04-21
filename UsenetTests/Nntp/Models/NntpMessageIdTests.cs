@@ -37,7 +37,7 @@ namespace UsenetTests.Nntp.Models
         internal void SerializedInstanceShouldBeDeserializedCorrectly(string messageId)
         {
             var expectedMessageId = new NntpMessageId(messageId);
-            string json = JsonConvert.SerializeObject(expectedMessageId);
+            var json = JsonConvert.SerializeObject(expectedMessageId);
             var actualMessageId = JsonConvert.DeserializeObject<NntpMessageId>(json);
             Assert.Equal(expectedMessageId, actualMessageId);
         }

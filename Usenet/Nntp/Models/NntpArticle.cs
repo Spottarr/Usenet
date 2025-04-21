@@ -44,10 +44,10 @@ namespace Usenet.Nntp.Models
         /// <param name="headers">The headers of the <see cref="NntpArticle"/>.</param>
         /// <param name="body">The body of the <see cref="NntpArticle"/>.</param>
         public NntpArticle(
-            long number, 
-            NntpMessageId messageId, 
-            NntpGroups groups, 
-            IDictionary<string, ICollection<string>> headers, 
+            long number,
+            NntpMessageId messageId,
+            NntpGroups groups,
+            IDictionary<string, ICollection<string>> headers,
             IEnumerable<string> body)
         {
             Number = number;
@@ -96,7 +96,7 @@ namespace Usenet.Nntp.Models
                 return false;
             }
 
-            bool equals =
+            var equals =
                 Number.Equals(other.Number) &&
                 MessageId.Equals(other.MessageId) &&
                 Groups.Equals(other.Groups);
@@ -107,9 +107,9 @@ namespace Usenet.Nntp.Models
             }
 
             // compare headers
-            foreach (KeyValuePair<string, ImmutableList<string>> pair in Headers)
+            foreach (var pair in Headers)
             {
-                if (!other.Headers.TryGetValue(pair.Key, out ImmutableList<string> value) ||
+                if (!other.Headers.TryGetValue(pair.Key, out var value) ||
                     !pair.Value.ToImmutableHashSet().SetEquals(value))
                 {
                     return false;
@@ -144,7 +144,7 @@ namespace Usenet.Nntp.Models
         /// <param name="first">The first <see cref="NntpArticle"/>.</param>
         /// <param name="second">The second <see cref="NntpArticle"/>.</param>
         /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-        public static bool operator ==(NntpArticle first, NntpArticle second) => 
+        public static bool operator ==(NntpArticle first, NntpArticle second) =>
             (object) first == null ? (object) second == null : first.Equals(second);
 
         /// <summary>

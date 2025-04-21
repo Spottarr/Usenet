@@ -34,16 +34,16 @@ namespace Usenet.Yenc
             Guard.ThrowIfNull(encodedLines, nameof(encodedLines));
             Guard.ThrowIfNull(encoding, nameof(encoding));
 
-            using (IEnumerator<string> enumerator = encodedLines.GetEnumerator())
+            using (var enumerator = encodedLines.GetEnumerator())
             {
-                IDictionary<string, string> headers = YencMeta.GetHeaders(enumerator);
-                int part = headers.GetAndConvert(YencKeywords.Part, int.Parse);
+                var headers = YencMeta.GetHeaders(enumerator);
+                var part = headers.GetAndConvert(YencKeywords.Part, int.Parse);
                 if (part > 0)
                 {
                     headers.Merge(YencMeta.GetPartHeaders(enumerator), false);
                 }
 
-                YencHeader header = YencMeta.ParseHeader(headers);
+                var header = YencMeta.ParseHeader(headers);
                 YencFooter footer = null;
 
                 // create buffer for part or entire file if single part
@@ -66,7 +66,7 @@ namespace Usenet.Yenc
                         break;
                     }
 
-                    byte[] encodedBytes = encoding.GetBytes(enumerator.Current);
+                    var encodedBytes = encoding.GetBytes(enumerator.Current);
                     decodedBytesIndex += YencLineDecoder.Decode(encodedBytes, decodedBytes, decodedBytesIndex);
                 }
                 return new YencArticle(header, footer, decodedBytes);

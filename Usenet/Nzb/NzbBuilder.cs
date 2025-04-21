@@ -89,7 +89,7 @@ namespace Usenet.Nzb
         public NzbBuilder AddGroups(params NntpGroups[] groups)
         {
             Guard.ThrowIfNull(groups, nameof(groups));
-            foreach (NntpGroups group in groups)
+            foreach (var group in groups)
             {
                 groupsBuilder.Add(group);
             }
@@ -116,13 +116,13 @@ namespace Usenet.Nzb
 
         private MultiValueDictionary<string, string> GetMetaData()
         {
-            IEnumerable<Tuple<string, string>> headers = 
+            var headers = 
                 from pair in metaData
                 from val in pair.Value
                 select new Tuple<string, string>(pair.Key, val);
 
             var dict = new MultiValueDictionary<string, string>();
-            foreach (Tuple<string, string> header in headers)
+            foreach (var header in headers)
             {
                 dict.Add(header.Item1, header.Item2);
             }
@@ -131,7 +131,7 @@ namespace Usenet.Nzb
 
         private List<NzbFile> GetFiles()
         {
-            DateTimeOffset date = DateTimeOffset.UtcNow;
+            var date = DateTimeOffset.UtcNow;
             return files
                 .Select(f => new NzbFile(
                     f.Poster ?? documentPoster, 
@@ -145,21 +145,21 @@ namespace Usenet.Nzb
 
         private string GetSubject(IFileInfo fileInfo)
         {
-            string segmentCount = GetSegmentCount(fileInfo).ToString(CultureInfo.InvariantCulture);
-            string one = "1".PadLeft(segmentCount.Length, '0');
+            var segmentCount = GetSegmentCount(fileInfo).ToString(CultureInfo.InvariantCulture);
+            var one = "1".PadLeft(segmentCount.Length, '0');
             return $"\"{fileInfo.Name}\" yEnc ({one}/{segmentCount})";
         }
 
         private List<NzbSegment> GetSegments(IFileInfo fileInfo)
         {
-            Guid fileGuid = Guid.NewGuid();
+            var fileGuid = Guid.NewGuid();
             var segments = new List<NzbSegment>();
-            int segmentCount = GetSegmentCount(fileInfo);
+            var segmentCount = GetSegmentCount(fileInfo);
             var offset = 0L;
             for (var number = 1; number <= segmentCount; number++)
             {
-                string messageId = $"part{number}of{segmentCount}.{fileGuid:n}@{messageBase}";
-                long size = number < segmentCount ? partSize : fileInfo.Length - offset;
+                var messageId = $"part{number}of{segmentCount}.{fileGuid:n}@{messageBase}";
+                var size = number < segmentCount ? partSize : fileInfo.Length - offset;
                 segments.Add(new NzbSegment(number, offset, size, messageId));
                 offset += size;
             }

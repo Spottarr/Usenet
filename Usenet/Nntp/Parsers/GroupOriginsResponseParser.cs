@@ -18,7 +18,7 @@ namespace Usenet.Nntp.Parsers
                 return new NntpGroupOriginsResponse(code, message, false, []);
             }
 
-            IEnumerable<NntpGroupOrigin> groupOrigins = EnumerateGroupOrigins(dataBlock);
+            var groupOrigins = EnumerateGroupOrigins(dataBlock);
             if (dataBlock is ICollection<string>)
             {
                 // no need to keep enumerator if input is not a stream
@@ -36,16 +36,16 @@ namespace Usenet.Nntp.Parsers
                 yield break;
             }
 
-            foreach (string line in dataBlock)
+            foreach (var line in dataBlock)
             {
-                string[] lineSplit = line.Split(' ');
+                var lineSplit = line.Split(' ');
                 if (lineSplit.Length < 3)
                 {
                     log.InvalidGroupOriginLine(line);
                     continue;
                 }
 
-                _ = long.TryParse(lineSplit[1], out long createdAtTimestamp);
+                _ = long.TryParse(lineSplit[1], out var createdAtTimestamp);
 
                 yield return new NntpGroupOrigin(
                     lineSplit[0],

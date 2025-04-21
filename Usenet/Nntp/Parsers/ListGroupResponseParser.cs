@@ -21,18 +21,18 @@ namespace Usenet.Nntp.Parsers
                         string.Empty, []));
             }
 
-            string[] responseSplit = message.Split(' ');
+            var responseSplit = message.Split(' ');
             if (responseSplit.Length < 4)
             {
                 log.InvalidGroupResponseMessage(message);
             }
 
-            _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out long articleCount);
-            _ = long.TryParse(responseSplit.Length > 1 ? responseSplit[1] : null, out long lowWaterMark);
-            _ = long.TryParse(responseSplit.Length > 2 ? responseSplit[2] : null, out long highWaterMark);
-            string name = responseSplit.Length > 3 ? responseSplit[3] : string.Empty;
+            _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out var articleCount);
+            _ = long.TryParse(responseSplit.Length > 1 ? responseSplit[1] : null, out var lowWaterMark);
+            _ = long.TryParse(responseSplit.Length > 2 ? responseSplit[2] : null, out var highWaterMark);
+            var name = responseSplit.Length > 3 ? responseSplit[3] : string.Empty;
 
-            IEnumerable<long> articleNumbers = EnumerateArticleNumbers(dataBlock);
+            var articleNumbers = EnumerateArticleNumbers(dataBlock);
             if (dataBlock is ICollection<string>)
             {
                 // no need to keep enumerator if input is not a stream
@@ -57,9 +57,9 @@ namespace Usenet.Nntp.Parsers
             {
                 yield break;
             }
-            foreach (string line in dataBlock)
+            foreach (var line in dataBlock)
             {
-                if (!long.TryParse(line, out long number))
+                if (!long.TryParse(line, out var number))
                 {
                     continue;
                 }

@@ -48,13 +48,13 @@ namespace Usenet.Yenc
 
         public static YencHeader ParseHeader(IDictionary<string, string> headers)
         {
-            string name = headers.GetOrDefault(YencKeywords.Name);
-            long size = headers.GetAndConvert(YencKeywords.Size, long.Parse);
-            int line = headers.GetAndConvert(YencKeywords.Line, int.Parse);
-            int part = headers.GetAndConvert(YencKeywords.Part, int.Parse);
-            int total = headers.GetAndConvert(YencKeywords.Total, int.Parse);
-            long begin = headers.GetAndConvert(YencKeywords.Begin, long.Parse);
-            long end = headers.GetAndConvert(YencKeywords.End, long.Parse);
+            var name = headers.GetOrDefault(YencKeywords.Name);
+            var size = headers.GetAndConvert(YencKeywords.Size, long.Parse);
+            var line = headers.GetAndConvert(YencKeywords.Line, int.Parse);
+            var part = headers.GetAndConvert(YencKeywords.Part, int.Parse);
+            var total = headers.GetAndConvert(YencKeywords.Total, int.Parse);
+            var begin = headers.GetAndConvert(YencKeywords.Begin, long.Parse);
+            var end = headers.GetAndConvert(YencKeywords.End, long.Parse);
 
             return new YencHeader(
                 name,
@@ -68,8 +68,8 @@ namespace Usenet.Yenc
 
         public static YencFooter ParseFooter(IDictionary<string, string> footer)
         {
-            long size = footer.GetAndConvert(YencKeywords.Size, long.Parse);
-            int part = footer.GetAndConvert(YencKeywords.Part, int.Parse);
+            var size = footer.GetAndConvert(YencKeywords.Size, long.Parse);
+            var part = footer.GetAndConvert(YencKeywords.Part, int.Parse);
             var crc32 = footer.GetAndConvert<uint?>(YencKeywords.Crc32, crc => Convert.ToUInt32(crc, 16));
             var partCrc32 = footer.GetAndConvert<uint?>(YencKeywords.PartCrc32, crc => Convert.ToUInt32(crc, 16));
 
@@ -88,7 +88,7 @@ namespace Usenet.Yenc
             }
 
             // name is always last item on the header line
-            string[] nameSplit = line.Split(new[] { $"{YencKeywords.Name}=" }, StringSplitOptions.RemoveEmptyEntries);
+            var nameSplit = line.Split(new[] { $"{YencKeywords.Name}=" }, StringSplitOptions.RemoveEmptyEntries);
             if (nameSplit.Length == 0)
             {
                 return new Dictionary<string, string>(0);
@@ -102,14 +102,14 @@ namespace Usenet.Yenc
             }
 
             // parse other items
-            string[] pairs = nameSplit[0].Split([' '], StringSplitOptions.RemoveEmptyEntries);
+            var pairs = nameSplit[0].Split([' '], StringSplitOptions.RemoveEmptyEntries);
             if (pairs.Length == 0)
             {
                 return dictionary;
             }
-            foreach (string pair in pairs)
+            foreach (var pair in pairs)
             {
-                string[] parts = pair.Split('=');
+                var parts = pair.Split('=');
                 if (parts.Length < 2)
                 {
                     continue;

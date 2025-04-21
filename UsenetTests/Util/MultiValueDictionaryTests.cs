@@ -133,7 +133,7 @@ namespace UsenetTests.Util
                 {1, "one"},
             };
 
-            string json = JsonConvert.SerializeObject(expected);
+            var json = JsonConvert.SerializeObject(expected);
             var actual = JsonConvert.DeserializeObject<MultiValueDictionary<int, string>>(json);
             Assert.Equal(expected, actual);
         }

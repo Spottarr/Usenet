@@ -40,7 +40,7 @@ namespace Usenet.Nntp.Models
                 this.groups = ImmutableList<string>.Empty;
                 return;
             }
-            IEnumerable<string> parsedGroups = doParse ? GroupsParser.Parse(groups) : groups;
+            var parsedGroups = doParse ? GroupsParser.Parse(groups) : groups;
             this.groups = parsedGroups.OrderBy(g => g).ToImmutableList();
         }
 

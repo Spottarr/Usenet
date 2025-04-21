@@ -31,7 +31,7 @@ namespace Usenet.Nzb
         {
             Guard.ThrowIfNull(nzbDocument, nameof(nzbDocument));
             
-            using (XmlWriter writer = GetXmlWriter())
+            using (var writer = GetXmlWriter())
             {
                 await writer.WriteDocTypeAsync(
                     NzbKeywords.Nzb, 
@@ -63,7 +63,7 @@ namespace Usenet.Nzb
         {
             Guard.ThrowIfNull(nzbDocument, nameof(nzbDocument));
             
-            using (XmlWriter writer = GetXmlWriter())
+            using (var writer = GetXmlWriter())
             {
                 writer.WriteDocType(
                     NzbKeywords.Nzb,
@@ -93,9 +93,9 @@ namespace Usenet.Nzb
         private static async Task WriteHeadAsync(XmlWriter writer, NzbDocument nzbDocument)
         {
             await writer.WriteStartElementAsync(null, NzbKeywords.Head, null).ConfigureAwait(false);
-            foreach (KeyValuePair<string, ImmutableHashSet<string>> header in nzbDocument.MetaData)
+            foreach (var header in nzbDocument.MetaData)
             {
-                foreach (string value in header.Value)
+                foreach (var value in header.Value)
                 {
                     await writer.WriteStartElementAsync(null, NzbKeywords.Meta, null).ConfigureAwait(false);
                     await writer.WriteAttributeStringAsync(null, NzbKeywords.Type, null, header.Key).ConfigureAwait(false);
@@ -109,9 +109,9 @@ namespace Usenet.Nzb
         private static void WriteHead(XmlWriter writer, NzbDocument nzbDocument)
         {
             writer.WriteStartElement(NzbKeywords.Head);
-            foreach (KeyValuePair<string, ImmutableHashSet<string>> header in nzbDocument.MetaData)
+            foreach (var header in nzbDocument.MetaData)
             {
-                foreach (string value in header.Value)
+                foreach (var value in header.Value)
                 {
                     writer.WriteStartElement(NzbKeywords.Meta);
                     writer.WriteAttributeString(NzbKeywords.Type, header.Key);
@@ -124,7 +124,7 @@ namespace Usenet.Nzb
 
         private static async Task WriteFilesAsync(XmlWriter writer, NzbDocument nzbDocument)
         {
-            foreach (NzbFile file in nzbDocument.Files)
+            foreach (var file in nzbDocument.Files)
             {
                 await writer.WriteStartElementAsync(null, NzbKeywords.File, null).ConfigureAwait(false);
                 await writer.WriteAttributeStringAsync(null, NzbKeywords.Poster, null, file.Poster).ConfigureAwait(false);
@@ -138,7 +138,7 @@ namespace Usenet.Nzb
 
         private static void WriteFiles(XmlWriter writer, NzbDocument nzbDocument)
         {
-            foreach (NzbFile file in nzbDocument.Files)
+            foreach (var file in nzbDocument.Files)
             {
                 writer.WriteStartElement(NzbKeywords.File);
                 writer.WriteAttributeString(NzbKeywords.Poster, file.Poster);
@@ -153,7 +153,7 @@ namespace Usenet.Nzb
         private static async Task WriteGroupsAsync(XmlWriter writer, NzbFile file)
         {
             await writer.WriteStartElementAsync(null, NzbKeywords.Groups, null).ConfigureAwait(false);
-            foreach (string group in file.Groups)
+            foreach (var group in file.Groups)
             {
                 await writer.WriteElementStringAsync(null, NzbKeywords.Group, null, group).ConfigureAwait(false);
             }
@@ -163,7 +163,7 @@ namespace Usenet.Nzb
         private static void WriteGroups(XmlWriter writer, NzbFile file)
         {
             writer.WriteStartElement(NzbKeywords.Groups);
-            foreach (string group in file.Groups)
+            foreach (var group in file.Groups)
             {
                 writer.WriteElementString(NzbKeywords.Group, group);
             }
@@ -173,7 +173,7 @@ namespace Usenet.Nzb
         private static async Task WriteSegmentsAsync(XmlWriter writer, NzbFile file)
         {
             await writer.WriteStartElementAsync(null, NzbKeywords.Segments, null).ConfigureAwait(false);
-            foreach (NzbSegment segment in file.Segments)
+            foreach (var segment in file.Segments)
             {
                 await writer.WriteStartElementAsync(null, NzbKeywords.Segment, null).ConfigureAwait(false);
                 await writer.WriteAttributeStringAsync(null, NzbKeywords.Bytes, null, segment.Size.ToString(CultureInfo.InvariantCulture)).ConfigureAwait(false);
@@ -187,7 +187,7 @@ namespace Usenet.Nzb
         private static void WriteSegments(XmlWriter writer, NzbFile file)
         {
             writer.WriteStartElement(NzbKeywords.Segments);
-            foreach (NzbSegment segment in file.Segments)
+            foreach (var segment in file.Segments)
             {
                 writer.WriteStartElement(NzbKeywords.Segment);
                 writer.WriteAttributeString(NzbKeywords.Bytes, segment.Size.ToString(CultureInfo.InvariantCulture));

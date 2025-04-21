@@ -32,7 +32,7 @@ namespace Usenet.Yenc
             Guard.ThrowIfNull(header, nameof(header));
             Guard.ThrowIfNull(stream, nameof(stream));
             Guard.ThrowIfNull(encoding, nameof(encoding));
-            
+
             yield return GetHeaderLine(header);
             if (header.IsFilePart)
             {
@@ -40,29 +40,29 @@ namespace Usenet.Yenc
             }
             var encodedBytes = new byte[1024];
             var encodedOffset = 0;
-            int lastCol = header.LineLength - 1;
-            uint checksum = Crc32.Initialize();
+            var lastCol = header.LineLength - 1;
+            var checksum = Crc32.Initialize();
             for (var offset = 0; offset < header.PartSize; offset++)
             {
-                int @byte = stream.ReadByte();
+                var @byte = stream.ReadByte();
                 if (@byte == -1)
                 {
                     // end of stream
                     break;
                 }
                 checksum = Crc32.Calculate(checksum, @byte);
-                int val = (@byte + 42) % 256;
+                var val = (@byte + 42) % 256;
 
                 // encode dot only in first column
-                bool encodeDot = encodedOffset == 0;
+                var encodeDot = encodedOffset == 0;
 
                 // encode white space only in first and last column
-                bool encodeWhitespace = encodedOffset == 0 || encodedOffset == lastCol;
+                var encodeWhitespace = encodedOffset == 0 || encodedOffset == lastCol;
 
                 // encode critical characters
-                if (val == YencCharacters.Null || 
-                    val == YencCharacters.Lf || 
-                    val == YencCharacters.Cr || 
+                if (val == YencCharacters.Null ||
+                    val == YencCharacters.Lf ||
+                    val == YencCharacters.Cr ||
                     val == YencCharacters.Equal ||
                     val == YencCharacters.Dot && encodeDot ||
                     val == YencCharacters.Space && encodeWhitespace ||
@@ -112,8 +112,8 @@ namespace Usenet.Yenc
 
         private static string GetPartHeaderLine(YencHeader header)
         {
-            long begin = header.PartOffset + 1;
-            long end = header.PartOffset + header.PartSize;
+            var begin = header.PartOffset + 1;
+            var end = header.PartOffset + header.PartSize;
             return $"{YencKeywords.YPart} {YencKeywords.Begin}={begin} {YencKeywords.End}={end}";
         }
 

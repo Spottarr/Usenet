@@ -31,7 +31,7 @@ namespace UsenetTests.Nntp.Models
                 otherGroup,
                 articleNumbers);
 
-            string json = JsonConvert.SerializeObject(expected);
+            var json = JsonConvert.SerializeObject(expected);
             var actual = JsonConvert.DeserializeObject<NntpGroup>(json);
             Assert.Equal(expected, actual);
         }

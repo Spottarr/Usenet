@@ -68,7 +68,7 @@
                     continue;
                 }
 
-                int copyCount = Math.Min(count, currentChunk.Length - currentOffset);
+                var copyCount = Math.Min(count, currentChunk.Length - currentOffset);
                 Buffer.BlockCopy(currentChunk, currentOffset, buffer, offset, copyCount);
                 currentOffset += copyCount;
                 offset += copyCount;

@@ -17,7 +17,7 @@ namespace Usenet.Nntp.Parsers
             {
                 return null;
             }
-            string[] valueParts = value.Split(ValuePartsSeparator, StringSplitOptions.RemoveEmptyEntries);
+            var valueParts = value.Split(ValuePartsSeparator, StringSplitOptions.RemoveEmptyEntries);
             if (valueParts.Length > 2)
             {
                 throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
@@ -26,20 +26,20 @@ namespace Usenet.Nntp.Parsers
             // skip day-of-week for now
             //string dayOfWeek = valueParts.Length == 2 ? valueParts[0] : null;
 
-            string dateTime = valueParts.Length == 2 ? valueParts[1] : valueParts[0];
+            var dateTime = valueParts.Length == 2 ? valueParts[1] : valueParts[0];
 
             // remove obsolete whitespace from time part
             dateTime = Regex.Replace(dateTime, @"\s+:\s+", ":");
 
-            string[] dateTimeParts = dateTime.Split(DatePartSeparators, StringSplitOptions.RemoveEmptyEntries);
+            var dateTimeParts = dateTime.Split(DatePartSeparators, StringSplitOptions.RemoveEmptyEntries);
             if (dateTimeParts.Length != 5 && (dateTimeParts.Length != 6 || dateTimeParts[5] != "(UTC)"))
             {
                 throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
             }
 
-            ParseDate(dateTimeParts, out int year, out int month, out int day);
-            ParseTime(dateTimeParts[3], out int hour, out int minute, out int second);
-            TimeSpan zone = ParseZone(dateTimeParts[4]);
+            ParseDate(dateTimeParts, out var year, out var month, out var day);
+            ParseTime(dateTimeParts[3], out var hour, out var minute, out var second);
+            var zone = ParseZone(dateTimeParts[4]);
 
             return new DateTimeOffset(year, month, day, hour, minute, second, 0, zone);
         }
@@ -54,8 +54,8 @@ namespace Usenet.Nntp.Parsers
             {
                 throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
             }
-            string monthString = dateTimeParts[1];
-            int monthIndex = Array.FindIndex(DateTimeFormatInfo.InvariantInfo.AbbreviatedMonthNames,
+            var monthString = dateTimeParts[1];
+            var monthIndex = Array.FindIndex(DateTimeFormatInfo.InvariantInfo.AbbreviatedMonthNames,
                 m => string.Equals(m, monthString, StringComparison.OrdinalIgnoreCase));
             if (monthIndex < 0)
             {
@@ -74,8 +74,8 @@ namespace Usenet.Nntp.Parsers
 
         private static int GetCentury(int year, int month, int day)
         {
-            DateTime today = DateTime.UtcNow.Date;
-            int currentCentury = today.Year / 100;
+            var today = DateTime.UtcNow.Date;
+            var currentCentury = today.Year / 100;
             return new DateTime(currentCentury * 100 + year, month, day, 0, 0, 0, DateTimeKind.Utc) > today
                 ? currentCentury - 1
                 : currentCentury;
@@ -87,7 +87,7 @@ namespace Usenet.Nntp.Parsers
 
         private static void ParseTime(string value, out int hour, out int minute, out int second)
         {
-            string[] timeParts = value.Split(TimePartsSeparator, StringSplitOptions.RemoveEmptyEntries);
+            var timeParts = value.Split(TimePartsSeparator, StringSplitOptions.RemoveEmptyEntries);
             if (timeParts.Length < 2 || timeParts.Length > 3)
             {
                 throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
@@ -111,7 +111,7 @@ namespace Usenet.Nntp.Parsers
         {
             // The time zone must be as specified in RFC822, https://tools.ietf.org/html/rfc822#section-5
 
-            if (!short.TryParse(value, out short zone))
+            if (!short.TryParse(value, out var zone))
             {
                 switch (value)
                 {
@@ -170,8 +170,8 @@ namespace Usenet.Nntp.Parsers
                 throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
             }
 
-            int minute = zone % 100;
-            int hour = zone / 100;
+            var minute = zone % 100;
+            var hour = zone / 100;
             return TimeSpan.FromMinutes(hour * 60 + minute);
         }
     }

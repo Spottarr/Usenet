@@ -14,11 +14,11 @@ namespace UsenetTests.Yenc
         [EmbeddedResourceData(@"yenc.singlepart.testfile.txt", @"yenc.singlepart.00000005.ntx")]
         internal void SinglePartFileShouldBeDecoded(IFileInfo expected, IFileInfo actual)
         {
-            byte[] expectedData = expected.ReadAllBytes();
+            var expectedData = expected.ReadAllBytes();
 
-            YencStream actualStream = YencStreamDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default));
+            var actualStream = YencStreamDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default));
 
-            byte[] actualData = actualStream.ReadAllBytes();
+            var actualData = actualStream.ReadAllBytes();
 
             Assert.False(actualStream.Header.IsFilePart);
             Assert.Equal(128, actualStream.Header.LineLength);
@@ -33,8 +33,8 @@ namespace UsenetTests.Yenc
         internal void FilePartShouldBeDecoded(IFileInfo actual)
         {
             const int expectedDataLength = 11250;
-            YencStream actualStream = YencStreamDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default));
-            byte[] actualData = actualStream.ReadAllBytes();
+            var actualStream = YencStreamDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default));
+            var actualData = actualStream.ReadAllBytes();
 
             Assert.True(actualStream.Header.IsFilePart);
             Assert.Equal(expectedDataLength, actualData.Length);
@@ -45,10 +45,10 @@ namespace UsenetTests.Yenc
         internal void MultiPartFileShouldBeDecoded(IFileInfo expectedFile, IFileInfo part1File, IFileInfo partFile)
         {
             const string expectedFileName = "joystick.jpg";
-            byte[] expected = expectedFile.ReadAllBytes();
+            var expected = expectedFile.ReadAllBytes();
 
-            YencStream part1 = YencStreamDecoder.Decode(part1File.ReadAllLines(UsenetEncoding.Default));
-            YencStream part2 = YencStreamDecoder.Decode(partFile.ReadAllLines(UsenetEncoding.Default));
+            var part1 = YencStreamDecoder.Decode(part1File.ReadAllLines(UsenetEncoding.Default));
+            var part2 = YencStreamDecoder.Decode(partFile.ReadAllLines(UsenetEncoding.Default));
 
             using var actual = new MemoryStream();
 
@@ -58,7 +58,7 @@ namespace UsenetTests.Yenc
             actual.Seek(part2.Header.PartOffset, SeekOrigin.Begin);
             part2.CopyTo(actual);
 
-            string actualFileName = part1.Header.FileName;
+            var actualFileName = part1.Header.FileName;
 
             Assert.Equal(expectedFileName, actualFileName);
             Assert.Equal(expected, actual.ToArray());

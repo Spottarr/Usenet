@@ -19,7 +19,7 @@ namespace UsenetTests.Nntp.Parsers
             long expectedArticleNumber, 
             string expectedMessageId)
         {
-            NntpLastResponse lastResponse = new LastResponseParser().Parse(responseCode, responseMessage);
+            var lastResponse = new LastResponseParser().Parse(responseCode, responseMessage);
             Assert.Equal(expectedResponseType, lastResponse.ResponseType);
             Assert.Equal(expectedArticleNumber, lastResponse.Number);
             Assert.Equal(expectedMessageId, lastResponse.MessageId.Value);

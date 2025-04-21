@@ -23,7 +23,7 @@ namespace Usenet.Extensions
             Guard.ThrowIfNullOrEmpty(key, nameof(key));
             Guard.ThrowIfNull(converter, nameof(converter));
 
-            return dictionary.TryGetValue(key, out string stringValue) ? converter(stringValue) : default(TValue);
+            return dictionary.TryGetValue(key, out var stringValue) ? converter(stringValue) : default(TValue);
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Usenet.Extensions
             Guard.ThrowIfNull(dictionary, nameof(dictionary));
             Guard.ThrowIfNullOrEmpty(key, nameof(key));
 
-            return dictionary.TryGetValue(key, out TValue value) ? value : default(TValue);
+            return dictionary.TryGetValue(key, out var value) ? value : default(TValue);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Usenet.Extensions
             Guard.ThrowIfNull(target, nameof(target));
             Guard.ThrowIfNull(source, nameof(source));
 
-            foreach (KeyValuePair<TKey, TValue> item in source)
+            foreach (var item in source)
             {
                 if (!overwriteExistingKeys && target.ContainsKey(item.Key))
                 {

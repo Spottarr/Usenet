@@ -68,17 +68,17 @@
 
         private bool HaveMismatchedElement(IEnumerable<T> first, IEnumerable<T> second)
         {
-            Dictionary<T, int> firstElementCounts = GetElementCounts(first, out int firstNullCount);
-            Dictionary<T, int> secondElementCounts = GetElementCounts(second, out int secondNullCount);
+            var firstElementCounts = GetElementCounts(first, out var firstNullCount);
+            var secondElementCounts = GetElementCounts(second, out var secondNullCount);
 
             if (firstNullCount != secondNullCount || firstElementCounts.Count != secondElementCounts.Count)
             {
                 return true;
             }
-            foreach (KeyValuePair<T, int> pair in firstElementCounts)
+            foreach (var pair in firstElementCounts)
             {
-                int firstElementCount = pair.Value;
-                secondElementCounts.TryGetValue(pair.Key, out int secondElementCount);
+                var firstElementCount = pair.Value;
+                secondElementCounts.TryGetValue(pair.Key, out var secondElementCount);
                 if (firstElementCount != secondElementCount)
                 {
                     return true;
@@ -91,7 +91,7 @@
         {
             nullCount = 0;
             var dictionary = new Dictionary<T, int>(comparer);
-            foreach (T element in enumerable)
+            foreach (var element in enumerable)
             {
                 if (element == null)
                 {
@@ -99,7 +99,7 @@
                 }
                 else
                 {
-                    dictionary.TryGetValue(element, out int num);
+                    dictionary.TryGetValue(element, out var num);
                     num++;
                     dictionary[element] = num;
                 }

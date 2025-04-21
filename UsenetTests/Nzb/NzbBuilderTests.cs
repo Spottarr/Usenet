@@ -11,7 +11,7 @@ namespace UsenetTests.Nzb
         [EmbeddedResourceData(@"yenc.multipart.joystick.jpg")]
         internal void ShouldBuildDocumentFromFile(IFileInfo file)
         {
-            NzbDocument actualDocument = new NzbBuilder()
+            var actualDocument = new NzbBuilder()
                 .AddFile(file)
                 .AddGroups("alt.binaries.newzbin")
                 .AddGroups("alt.binaries.mojo")

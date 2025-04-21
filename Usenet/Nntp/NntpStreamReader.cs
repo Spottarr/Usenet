@@ -35,7 +35,7 @@ namespace Usenet.Nntp
         /// <returns>The next line from the input stream, or null if the end of the input stream is reached.</returns>
         public override string ReadLine()
         {
-            string line = base.ReadLine();
+            var line = base.ReadLine();
             if (line == null)
             {
                 return null;

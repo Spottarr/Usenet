@@ -19,7 +19,7 @@ namespace Usenet.Nntp
         public async Task<bool> ConnectAsync(string hostname, int port, bool useSsl)
         {
             Guard.ThrowIfNullOrWhiteSpace(hostname, nameof(hostname));
-            NntpResponse response = await connection.ConnectAsync(hostname, port, useSsl, new ResponseParser(200, 201)).ConfigureAwait(false);
+            var response = await connection.ConnectAsync(hostname, port, useSsl, new ResponseParser(200, 201)).ConfigureAwait(false);
             return response.Success;
         }
 
@@ -265,13 +265,13 @@ namespace Usenet.Nntp
         /// </summary>
         public bool Post(NntpArticle article)
         {
-            NntpResponse initialResponse = connection.Command("POST", new ResponseParser(340));
+            var initialResponse = connection.Command("POST", new ResponseParser(340));
             if (!initialResponse.Success)
             {
                 return false;
             }
             ArticleWriter.Write(connection, article);
-            NntpResponse subsequentResponse = connection.GetResponse(new ResponseParser(240));
+            var subsequentResponse = connection.GetResponse(new ResponseParser(240));
             return subsequentResponse.Success;
         }
 
@@ -281,13 +281,13 @@ namespace Usenet.Nntp
         /// </summary>
         public bool Ihave(NntpArticle article)
         {
-            NntpResponse initialResponse = connection.Command("IHAVE", new ResponseParser(335));
+            var initialResponse = connection.Command("IHAVE", new ResponseParser(335));
             if (!initialResponse.Success)
             {
                 return false;
             }
             ArticleWriter.Write(connection, article);
-            NntpResponse subsequentResponse = connection.GetResponse(new ResponseParser(235));
+            var subsequentResponse = connection.GetResponse(new ResponseParser(235));
             return subsequentResponse.Success;
         }
 

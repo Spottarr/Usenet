@@ -52,14 +52,14 @@ namespace Usenet.Nntp.Parsers
             }
 
             // get response line
-            string[] responseSplit = message.Split(' ');
+            var responseSplit = message.Split(' ');
             if (responseSplit.Length < 2)
             {
                 log.InvalidResponseMessage(message);
             }
 
-            _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out long number);
-            string messageId = responseSplit.Length > 1 ? responseSplit[1] : string.Empty;
+            _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out var number);
+            var messageId = responseSplit.Length > 1 ? responseSplit[1] : string.Empty;
 
             if (dataBlock == null)
             {
@@ -67,20 +67,20 @@ namespace Usenet.Nntp.Parsers
                 return new NntpArticleResponse(code, message, true, new NntpArticle(number, messageId, null, null, null));
             }
 
-            using (IEnumerator<string> enumerator = dataBlock.GetEnumerator())
+            using (var enumerator = dataBlock.GetEnumerator())
             {
                 // get headers if requested
-                MultiValueDictionary<string, string> headers = (requestType & ArticleRequestType.Head) == ArticleRequestType.Head
+                var headers = (requestType & ArticleRequestType.Head) == ArticleRequestType.Head
                     ? GetHeaders(enumerator)
                     : MultiValueDictionary<string, string>.Empty;
 
                 // get groups
-                NntpGroups groups = headers.TryGetValue(NntpHeaders.Newsgroups, out ICollection<string> values)
+                var groups = headers.TryGetValue(NntpHeaders.Newsgroups, out var values)
                     ? new NntpGroupsBuilder().Add(values).Build()
                     : null;
 
                 // get body if requested
-                IEnumerable<string> bodyLines = (requestType & ArticleRequestType.Body) == ArticleRequestType.Body
+                var bodyLines = (requestType & ArticleRequestType.Body) == ArticleRequestType.Body
                     ? EnumerateBodyLines(enumerator)
                     : [];
 
@@ -103,7 +103,7 @@ namespace Usenet.Nntp.Parsers
             Header prevHeader = null;
             while (enumerator.MoveNext())
             {
-                string line = enumerator.Current;
+                var line = enumerator.Current;
                 if (string.IsNullOrEmpty(line))
                 {
                     // no more headers (skip empty line)
@@ -115,7 +115,7 @@ namespace Usenet.Nntp.Parsers
                 }
                 else
                 {
-                    int splitPos = line.IndexOf(':', StringComparison.Ordinal);
+                    var splitPos = line.IndexOf(':', StringComparison.Ordinal);
                     if (splitPos < 0)
                     {
                         log.InvalidHeaderLine(line);
@@ -130,7 +130,7 @@ namespace Usenet.Nntp.Parsers
             }
 
             var dict = new MultiValueDictionary<string, string>();
-            foreach (Header header in headers)
+            foreach (var header in headers)
             {
                 dict.Add(header.Key, header.Value);
             }

@@ -14,7 +14,7 @@ namespace UsenetTests.Nzb
         [EmbeddedResourceData(@"nzb.sabnzbd-no-namespace.nzb")]
         internal void ShouldWriteDocumentToFile(IFileInfo file)
         {
-            NzbDocument expected = NzbParser.Parse(file.ReadAllText(UsenetEncoding.Default));
+            var expected = NzbParser.Parse(file.ReadAllText(UsenetEncoding.Default));
 
             using var stream = new MemoryStream();
             using var writer = new StreamWriter(stream, UsenetEncoding.Default);
@@ -23,7 +23,7 @@ namespace UsenetTests.Nzb
             // write to file and read back for comparison
             writer.WriteNzbDocument(expected);
             stream.Position = 0;
-            NzbDocument actual = NzbParser.Parse(reader.ReadToEnd());
+            var actual = NzbParser.Parse(reader.ReadToEnd());
 
             // compare
             Assert.Equal(expected, actual);

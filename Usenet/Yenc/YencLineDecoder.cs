@@ -11,11 +11,11 @@
 
         public static int Decode(byte[] encodedBytes, int encodedOffset, int encodedCount, byte[] decodedBytes, int decodedOffset)
         {
-            int saveOffset = decodedOffset;
+            var saveOffset = decodedOffset;
             var isEscaped = false;
-            for (int index = encodedOffset; index < encodedCount; index++)
+            for (var index = encodedOffset; index < encodedCount; index++)
             {
-                byte @byte = encodedBytes[index];
+                var @byte = encodedBytes[index];
                 if (@byte == 61 && !isEscaped)
                 {
                     isEscaped = true;

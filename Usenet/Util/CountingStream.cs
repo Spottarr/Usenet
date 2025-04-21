@@ -35,7 +35,7 @@
         /// <inheritdoc/>
         public override int Read(byte[] buffer, int offset, int count)
         {
-            int bytesRead = innerStream.Read(buffer, offset, count);
+            var bytesRead = innerStream.Read(buffer, offset, count);
             unchecked
             {
                 BytesRead += bytesRead;

@@ -17,8 +17,8 @@ namespace UsenetTests.Nzb
         [EmbeddedResourceData(@"nzb.sabnzbd-no-namespace.nzb")]
         internal void ValidNzbDataShouldBeParsed(IFileInfo file)
         {
-            string nzbData = file.ReadAllText(UsenetEncoding.Default);
-            NzbDocument actualDocument = NzbParser.Parse(nzbData);
+            var nzbData = file.ReadAllText(UsenetEncoding.Default);
+            var actualDocument = NzbParser.Parse(nzbData);
 
             Assert.Equal("Your File!", actualDocument.MetaData["title"].Single());
             Assert.Equal("secret", actualDocument.MetaData["password"].Single());
@@ -31,7 +31,7 @@ namespace UsenetTests.Nzb
         internal void MinimalNzbDataShouldBeParsed()
         {
             const string nzbText = @"<nzb xmlns=""http://www.newzbin.com/DTD/2003/nzb""></nzb>";
-            NzbDocument actualDocument = NzbParser.Parse(nzbText);
+            var actualDocument = NzbParser.Parse(nzbText);
 
             Assert.Empty(actualDocument.MetaData);
             Assert.Empty(actualDocument.Files);
@@ -47,7 +47,7 @@ namespace UsenetTests.Nzb
     <meta type=""tag"">avi</meta>
   </head>
 </nzb>";
-            NzbDocument actualDocument = NzbParser.Parse(nzbText);
+            var actualDocument = NzbParser.Parse(nzbText);
 
             Assert.Single(actualDocument.MetaData);
             Assert.Equal(2, actualDocument.MetaData["tag"].Count);
@@ -63,7 +63,7 @@ namespace UsenetTests.Nzb
   <file></file>
 </nzb>";
 
-            NzbDocument actualDocument = NzbParser.Parse(nzbText);
+            var actualDocument = NzbParser.Parse(nzbText);
 
             Assert.Empty(actualDocument.MetaData);
             Assert.Single(actualDocument.Files);
@@ -72,13 +72,13 @@ namespace UsenetTests.Nzb
         [Fact]
         internal void FileDateShouldBeParsed()
         {
-            DateTimeOffset expected = DateTimeOffset.Parse(@"2017-06-01T06:49:13+00:00", CultureInfo.InvariantCulture);
+            var expected = DateTimeOffset.Parse(@"2017-06-01T06:49:13+00:00", CultureInfo.InvariantCulture);
             const string nzbText = @"
 <nzb xmlns=""http://www.newzbin.com/DTD/2003/nzb"">
   <file date=""1496299753""></file>
 </nzb>";
 
-            NzbDocument actualDocument = NzbParser.Parse(nzbText);
+            var actualDocument = NzbParser.Parse(nzbText);
             Assert.Equal(expected, actualDocument.Files[0].Date);
         }
 
@@ -175,7 +175,7 @@ namespace UsenetTests.Nzb
   <file subject=""(TWD151 - 153)[2 / 9] - &quot;TWD151 - 153.rar&quot; yEnc (001 / 249)""></file>
 </nzb>";
 
-            NzbDocument actualDocument = NzbParser.Parse(nzbText);
+            var actualDocument = NzbParser.Parse(nzbText);
             Assert.Equal("TWD151 - 153.rar", actualDocument.Files.Single().FileName);
         }
 
@@ -187,7 +187,7 @@ namespace UsenetTests.Nzb
   <file subject=""(TWD151 - 153)[2 / 9] - TWD151 - 153.rar yEnc (001 / 249)""></file>
 </nzb>";
 
-            NzbDocument actualDocument = NzbParser.Parse(nzbText);
+            var actualDocument = NzbParser.Parse(nzbText);
             Assert.Equal("(TWD151 - 153)[2 / 9] - TWD151 - 153.rar", actualDocument.Files.Single().FileName);
         }
 
@@ -199,7 +199,7 @@ namespace UsenetTests.Nzb
   <file subject=""[2 / 9] - TWD151 - 153.rar yEnc""></file>
 </nzb>";
 
-            NzbDocument actualDocument = NzbParser.Parse(nzbText);
+            var actualDocument = NzbParser.Parse(nzbText);
             Assert.Equal("[2 / 9] - TWD151 - 153.rar", actualDocument.Files.Single().FileName);
         }
     }

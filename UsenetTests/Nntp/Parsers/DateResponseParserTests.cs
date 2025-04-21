@@ -21,7 +21,7 @@ namespace UsenetTests.Nntp.Parsers
             string responseMessage, 
             DateTimeOffset expectedDateTime)
         {
-            NntpDateResponse dateResponse = new DateResponseParser().Parse(responseCode, responseMessage);
+            var dateResponse = new DateResponseParser().Parse(responseCode, responseMessage);
             Assert.Equal(expectedDateTime, dateResponse.DateTime);
         }
     }

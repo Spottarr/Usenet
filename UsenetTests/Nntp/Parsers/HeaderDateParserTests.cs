@@ -66,7 +66,7 @@ namespace UsenetTests.Nntp.Parsers
         [MemberData(nameof(ParseData))]
         internal void HeaderDateShouldBeParsedCorrectly(string headerDate, DateTimeOffset expectedDateTime)
         {
-            DateTimeOffset? actualDateTime = HeaderDateParser.Parse(headerDate);
+            var actualDateTime = HeaderDateParser.Parse(headerDate);
             Assert.Equal(expectedDateTime, actualDateTime);
         }
 
@@ -81,9 +81,9 @@ namespace UsenetTests.Nntp.Parsers
         internal void ObsoleteTwoDigitYearBeforeCurrentDateShouldBeParsedCorrectly()
         {
             DateTimeOffset yesterday = new(DateTime.UtcNow.Date.AddDays(-1), TimeSpan.Zero);
-            DateTimeOffset expectedDate = yesterday;
-            string headerValue = yesterday.ToString("dd MMM yy HH:mm:ss", CultureInfo.InvariantCulture) + " +0000";
-            DateTimeOffset actualDate = HeaderDateParser.Parse(headerValue).GetValueOrDefault();
+            var expectedDate = yesterday;
+            var headerValue = yesterday.ToString("dd MMM yy HH:mm:ss", CultureInfo.InvariantCulture) + " +0000";
+            var actualDate = HeaderDateParser.Parse(headerValue).GetValueOrDefault();
             Assert.Equal(expectedDate, actualDate);
         }
 
@@ -91,9 +91,9 @@ namespace UsenetTests.Nntp.Parsers
         internal void ObsoleteTwoDigitYearAfterCurrentDateShouldBeParsedCorrectly()
         {
             DateTimeOffset tomorrow = new(DateTime.UtcNow.Date.AddDays(+1), TimeSpan.Zero);
-            DateTimeOffset expectedDate = tomorrow.AddYears(-100);
-            string headerValue = tomorrow.ToString("dd MMM yy HH:mm:ss", CultureInfo.InvariantCulture) + " +0000";
-            DateTimeOffset actualDate = HeaderDateParser.Parse(headerValue).GetValueOrDefault();
+            var expectedDate = tomorrow.AddYears(-100);
+            var headerValue = tomorrow.ToString("dd MMM yy HH:mm:ss", CultureInfo.InvariantCulture) + " +0000";
+            var actualDate = HeaderDateParser.Parse(headerValue).GetValueOrDefault();
             Assert.Equal(expectedDate, actualDate);
         }
 
@@ -101,9 +101,9 @@ namespace UsenetTests.Nntp.Parsers
         internal void ObsoleteTwoDigitYearOnCurrentDateShouldBeParsedCorrectly()
         {
             var today = new DateTimeOffset(DateTime.UtcNow.Date, TimeSpan.Zero);
-            DateTimeOffset expectedDate = today;
-            string headerValue = expectedDate.ToString("dd MMM yy HH:mm:ss", CultureInfo.InvariantCulture) + " +0000";
-            DateTimeOffset actualDate = HeaderDateParser.Parse(headerValue).GetValueOrDefault();
+            var expectedDate = today;
+            var headerValue = expectedDate.ToString("dd MMM yy HH:mm:ss", CultureInfo.InvariantCulture) + " +0000";
+            var actualDate = HeaderDateParser.Parse(headerValue).GetValueOrDefault();
             Assert.Equal(expectedDate, actualDate);
         }
 

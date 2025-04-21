@@ -16,7 +16,7 @@ namespace UsenetTests.Nntp.Parsers
             string responseMessage, 
             NntpModeReaderResponseType expectedResponseType)
         {
-            NntpModeReaderResponse modeReaderResponse = new ModeReaderResponseParser().Parse(responseCode, responseMessage);
+            var modeReaderResponse = new ModeReaderResponseParser().Parse(responseCode, responseMessage);
             Assert.Equal(expectedResponseType, modeReaderResponse.ResponseType);
         }
     }

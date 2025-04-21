@@ -35,10 +35,10 @@ namespace Usenet.Yenc
             Guard.ThrowIfNull(encodedLines, nameof(encodedLines));
             Guard.ThrowIfNull(encoding, nameof(encoding));
 
-            using (IEnumerator<string> enumerator = encodedLines.GetEnumerator())
+            using (var enumerator = encodedLines.GetEnumerator())
             {
-                IDictionary<string, string> headers = YencMeta.GetHeaders(enumerator);
-                int part = headers.GetAndConvert(YencKeywords.Part, int.Parse);
+                var headers = YencMeta.GetHeaders(enumerator);
+                var part = headers.GetAndConvert(YencKeywords.Part, int.Parse);
                 if (part > 0)
                 {
                     headers.Merge(YencMeta.GetPartHeaders(enumerator), false);
@@ -64,8 +64,8 @@ namespace Usenet.Yenc
                     yield break;
                 }
 
-                byte[] encodedBytes = encoding.GetBytes(enumerator.Current);
-                int decodedCount = YencLineDecoder.Decode(encodedBytes, buffer, 0);
+                var encodedBytes = encoding.GetBytes(enumerator.Current);
+                var decodedCount = YencLineDecoder.Decode(encodedBytes, buffer, 0);
                 var decodedBytes = new byte[decodedCount];
                 Buffer.BlockCopy(buffer, 0, decodedBytes, 0, decodedCount);
                 yield return decodedBytes;

@@ -22,7 +22,7 @@ namespace UsenetTests.Nntp.Parsers
         [InlineData(null, NntpPostingStatus.Unknown, "")]
         internal void InputShouldBeParsedCorrectly(string? input, NntpPostingStatus expectedStatus, string expectedOtherGroup)
         {
-            NntpPostingStatus status = PostingStatusParser.Parse(input, out string otherGroup);
+            var status = PostingStatusParser.Parse(input, out var otherGroup);
             Assert.Equal(expectedStatus, status);
             Assert.Equal(expectedOtherGroup, otherGroup);
         }

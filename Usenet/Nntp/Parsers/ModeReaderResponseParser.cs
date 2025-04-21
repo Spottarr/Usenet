@@ -12,8 +12,8 @@ namespace Usenet.Nntp.Parsers
 
         public NntpModeReaderResponse Parse(int code, string message)
         {
-            NntpModeReaderResponseType responseType = GetResponseType(code);
-            bool success = responseType != NntpModeReaderResponseType.Unknown;
+            var responseType = GetResponseType(code);
+            var success = responseType != NntpModeReaderResponseType.Unknown;
             if (!success)
             {
                 log.InvalidResponseCode(code);

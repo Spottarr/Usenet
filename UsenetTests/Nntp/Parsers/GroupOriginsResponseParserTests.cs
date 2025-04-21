@@ -34,7 +34,7 @@ namespace UsenetTests.Nntp.Parsers
             string[] lines,
             XSerializable<NntpGroupOrigin[]> expectedGroupOrigins)
         {
-            NntpGroupOriginsResponse response = new GroupOriginsResponseParser().Parse(
+            var response = new GroupOriginsResponseParser().Parse(
                 responseCode, responseMessage, lines.ToList());
             Assert.Equal(expectedGroupOrigins.Object, response.GroupOrigins);
         }

@@ -13,14 +13,14 @@ namespace Usenet.Nntp.Parsers
 
         public NntpDateResponse Parse(int code, string message)
         {
-            string[] responseSplit = message.Split(' ');
+            var responseSplit = message.Split(' ');
 
             if (IsSuccessResponse(code) && responseSplit.Length >= 1 && DateTimeOffset.TryParseExact(responseSplit[0], "yyyyMMddHHmmss",
-                CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset dateTime))
+                CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var dateTime))
             {
                 return new NntpDateResponse(code, message, true, dateTime);
             }
-            
+
             log.InvalidDateResponseMessage(message);
             return new NntpDateResponse(code, message, false, DateTimeOffset.MinValue);
         }

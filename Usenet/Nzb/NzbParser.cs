@@ -28,9 +28,9 @@ namespace Usenet.Nzb
         {
             Guard.ThrowIfNullOrEmpty(text, nameof(text));
 
-            XDocument doc = XDocument.Parse(text);
+            var doc = XDocument.Parse(text);
             XNamespace ns = NzbKeywords.Namespace;
-            XElement nzbElement = doc.Element(ns + NzbKeywords.Nzb);
+            var nzbElement = doc.Element(ns + NzbKeywords.Nzb);
 
             if (nzbElement == null)
             {
@@ -48,28 +48,28 @@ namespace Usenet.Nzb
                 Namespace = ns
             };
 
-            MultiValueDictionary<string, string> metaData = GetMetaData(context, nzbElement);
-            IEnumerable<NzbFile> files = GetFiles(context, nzbElement);
+            var metaData = GetMetaData(context, nzbElement);
+            var files = GetFiles(context, nzbElement);
 
             return new NzbDocument(metaData, files);
         }
 
         private static MultiValueDictionary<string, string> GetMetaData(NzbParserContext context, XContainer nzbElement)
         {
-            XElement headElement = nzbElement.Element(context.Namespace + NzbKeywords.Head);
+            var headElement = nzbElement.Element(context.Namespace + NzbKeywords.Head);
             if (headElement == null)
             {
                 return null;
             }
 
-            IEnumerable<Tuple<string, string>> headers = 
+            var headers = 
                 from metaElement in headElement.Elements(context.Namespace + NzbKeywords.Meta)
                 let typeAttribute = metaElement.Attribute(NzbKeywords.Type)
                 where typeAttribute != null
                 select new Tuple<string, string>(typeAttribute.Value, metaElement.Value);
 
             var dict = new MultiValueDictionary<string, string>();
-            foreach (Tuple<string, string> header in headers)
+            foreach (var header in headers)
             {
                 dict.Add(header.Item1, header.Item2);
             }
@@ -82,15 +82,15 @@ namespace Usenet.Nzb
 
         private static NzbFile GetFile(NzbParserContext context, XElement fileElement)
         {
-            string poster = (string) fileElement.Attribute(NzbKeywords.Poster) ?? string.Empty;
-            if (!long.TryParse((string)fileElement.Attribute(NzbKeywords.Date) ?? "0", out long unixTimestamp))
+            var poster = (string) fileElement.Attribute(NzbKeywords.Poster) ?? string.Empty;
+            if (!long.TryParse((string)fileElement.Attribute(NzbKeywords.Date) ?? "0", out var unixTimestamp))
             {
                 throw new InvalidNzbDataException(Resources.Nzb.InvalidDateAttriubute);
             }
-            DateTimeOffset date = DateTimeOffset.FromUnixTimeSeconds(unixTimestamp);
-            string subject = (string) fileElement.Attribute(NzbKeywords.Subject) ?? string.Empty;
-            string fileName = GetFileName(subject);
-            NntpGroups groups = GetGroups(context, fileElement.Element(context.Namespace + NzbKeywords.Groups));
+            var date = DateTimeOffset.FromUnixTimeSeconds(unixTimestamp);
+            var subject = (string) fileElement.Attribute(NzbKeywords.Subject) ?? string.Empty;
+            var fileName = GetFileName(subject);
+            var groups = GetGroups(context, fileElement.Element(context.Namespace + NzbKeywords.Groups));
             IEnumerable<NzbSegment> segments = GetSegments(context, fileElement.Element(context.Namespace + NzbKeywords.Segments));
 
             return new NzbFile(poster, subject, fileName, date, groups, segments);
@@ -103,20 +103,20 @@ namespace Usenet.Nzb
             {
                 return match.Groups[1].Value;
             }
-            int len = subject.LastIndexOf(" (", StringComparison.OrdinalIgnoreCase);
+            var len = subject.LastIndexOf(" (", StringComparison.OrdinalIgnoreCase);
             return RemoveTrailingYenc(len < 0 ? subject : subject.Substring(0, len));
         }
 
         private static string RemoveTrailingYenc(string subject)
         {
             subject = subject.Trim();
-            int yencPos = subject.LastIndexOf(" yenc", StringComparison.OrdinalIgnoreCase);
+            var yencPos = subject.LastIndexOf(" yenc", StringComparison.OrdinalIgnoreCase);
             return yencPos < 0 ? subject : subject.Substring(0, yencPos).Trim();
         }
 
         private static NntpGroups GetGroups(NzbParserContext context, XContainer groupsElement)
         {
-            IEnumerable<string> groups = groupsElement?
+            var groups = groupsElement?
                 .Elements(context.Namespace + NzbKeywords.Group)
                 .Select(g => g.Value);
             return new NntpGroups(groups);
@@ -124,7 +124,7 @@ namespace Usenet.Nzb
 
         private static List<NzbSegment> GetSegments(NzbParserContext context, XContainer segentsElement)
         {
-            IOrderedEnumerable<XElement> elements = segentsElement?
+            var elements = segentsElement?
                 .Elements(context.Namespace + NzbKeywords.Segment)
                 .OrderBy(element => ((string)element.Attribute(NzbKeywords.Number)).ToIntSafe());
 
@@ -135,9 +135,9 @@ namespace Usenet.Nzb
 
             long offset = 0;
             var segments = new List<NzbSegment>();
-            foreach (XElement element in elements)
+            foreach (var element in elements)
             {
-                NzbSegment segment = GetSegment(element, offset);
+                var segment = GetSegment(element, offset);
                 segments.Add(segment);
                 offset += segment.Size;
             }
@@ -146,11 +146,11 @@ namespace Usenet.Nzb
 
         private static NzbSegment GetSegment(XElement element, long offset)
         {
-            if (!int.TryParse((string)element.Attribute(NzbKeywords.Number), out int number))
+            if (!int.TryParse((string)element.Attribute(NzbKeywords.Number), out var number))
             {
                 throw new InvalidNzbDataException(Resources.Nzb.InvalidOrMissingNumberAttribute);
             }
-            if (!long.TryParse((string)element.Attribute(NzbKeywords.Bytes), out long size))
+            if (!long.TryParse((string)element.Attribute(NzbKeywords.Bytes), out var size))
             {
                 throw new InvalidNzbDataException(Resources.Nzb.InvalidOrMissingBytesAttribute);
             }

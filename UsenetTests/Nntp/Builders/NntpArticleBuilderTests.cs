@@ -114,7 +114,7 @@ namespace UsenetTests.Nntp.Builders
                 {"Header1", "Value2" },
             }, null);
 
-            NntpArticle actual = new NntpArticleBuilder()
+            var actual = new NntpArticleBuilder()
                 .SetMessageId("123@hhh.net")
                 .SetFrom("superuser")
                 .AddHeader("Header1", "Value2")
@@ -141,7 +141,7 @@ namespace UsenetTests.Nntp.Builders
                 {"Header1", "Value2" },
             }, null);
 
-            NntpArticle actual = new NntpArticleBuilder()
+            var actual = new NntpArticleBuilder()
                 .InitializeFrom(expected)
                 .Build();
 

@@ -32,7 +32,7 @@ namespace Usenet.Nntp.Parsers
                 return new NntpGroupsResponse(code, message, false, []);
             }
 
-            IEnumerable<NntpGroup> groups = EnumerateGroups(dataBlock);
+            var groups = EnumerateGroups(dataBlock);
             if (dataBlock is ICollection<string>)
             {
                 // no need to keep enumerator if input is not a stream
@@ -50,11 +50,11 @@ namespace Usenet.Nntp.Parsers
                 yield break;
             }
 
-            int checkParameterCount = requestType == GroupStatusRequestType.Basic ? 4 : 5;
+            var checkParameterCount = requestType == GroupStatusRequestType.Basic ? 4 : 5;
 
-            foreach (string line in dataBlock)
+            foreach (var line in dataBlock)
             {
-                string[] lineSplit = line.Split(' ');
+                var lineSplit = line.Split(' ');
                 if (lineSplit.Length < checkParameterCount)
                 {
                     if (requestType == GroupStatusRequestType.Basic)
@@ -65,13 +65,13 @@ namespace Usenet.Nntp.Parsers
                     {
                         log.InvalidGroupExtendedInformationLine(line);
                     }
-                    
+
                     continue;
                 }
 
                 var argCount = 1;
-                _ = long.TryParse(lineSplit[argCount++], out long highWaterMark);
-                _ = long.TryParse(lineSplit[argCount++], out long lowWaterMark);
+                _ = long.TryParse(lineSplit[argCount++], out var highWaterMark);
+                _ = long.TryParse(lineSplit[argCount++], out var lowWaterMark);
 
                 var articleCount = 0L;
                 if (requestType == GroupStatusRequestType.Extended)
@@ -79,7 +79,7 @@ namespace Usenet.Nntp.Parsers
                     _ = long.TryParse(lineSplit[argCount++], out articleCount);
                 }
 
-                NntpPostingStatus postingStatus = PostingStatusParser.Parse(lineSplit[argCount], out string otherGroup);
+                var postingStatus = PostingStatusParser.Parse(lineSplit[argCount], out var otherGroup);
                 if (postingStatus == NntpPostingStatus.Unknown)
                 {
                     log.InvalidPostingStatus(lineSplit[argCount], line);

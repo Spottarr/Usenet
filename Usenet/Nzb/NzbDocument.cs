@@ -113,7 +113,7 @@ namespace Usenet.Nzb
                 return false;
             }
 
-            bool equals =
+            var equals =
                 Size.Equals(other.Size) &&
                 Files.SequenceEqual(other.Files) &&
                 MetaData.Count == other.MetaData.Count;
@@ -124,9 +124,9 @@ namespace Usenet.Nzb
             }
 
             // compare metadata
-            foreach (KeyValuePair<string, ImmutableHashSet<string>> pair in MetaData)
+            foreach (var pair in MetaData)
             {
-                if (!other.MetaData.TryGetValue(pair.Key, out ImmutableHashSet<string> value) ||
+                if (!other.MetaData.TryGetValue(pair.Key, out var value) ||
                     !pair.Value.SetEquals(value))
                 {
                     return false;
@@ -148,7 +148,7 @@ namespace Usenet.Nzb
         /// <param name="first">The first <see cref="NzbDocument"/>.</param>
         /// <param name="second">The second <see cref="NzbDocument"/>.</param>
         /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-        public static bool operator ==(NzbDocument first, NzbDocument second) => 
+        public static bool operator ==(NzbDocument first, NzbDocument second) =>
             (object) first == null ? (object) second == null : first.Equals(second);
 
         /// <summary>

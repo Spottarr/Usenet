@@ -17,10 +17,10 @@ namespace UsenetTests.Yenc
         [EmbeddedResourceData(@"yenc.multipart.test (1.2).ntx")]
         internal void ArticleShouldBeValid(IFileInfo file)
         {
-            YencArticle article = YencArticleDecoder.Decode(file.ReadAllLines(UsenetEncoding.Default));
+            var article = YencArticleDecoder.Decode(file.ReadAllLines(UsenetEncoding.Default));
 
 
-            bool actual = YencValidator.Validate(article).IsValid;
+            var actual = YencValidator.Validate(article).IsValid;
             Assert.True(actual);
         }
 
@@ -34,9 +34,9 @@ namespace UsenetTests.Yenc
         [EmbeddedResourceData(@"yenc.multipart.00000021 (size mismatch).ntx", AdditionalData = [ YencValidationErrorCodes.SizeMismatch])]
         internal void ArticleShouldBeInvalid(IFileInfo file, string errorCode)
         {
-            YencArticle article = YencArticleDecoder.Decode(file.ReadAllLines(UsenetEncoding.Default));
+            var article = YencArticleDecoder.Decode(file.ReadAllLines(UsenetEncoding.Default));
 
-            ValidationResult result = YencValidator.Validate(article);
+            var result = YencValidator.Validate(article);
             Assert.False(result.IsValid);
             Assert.Equal(errorCode, result.Failures.Single().Code);
         }

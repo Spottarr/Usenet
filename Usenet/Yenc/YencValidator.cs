@@ -19,8 +19,8 @@ namespace Usenet.Yenc
             
             var failures = new List<ValidationFailure>();
 
-            YencHeader header = article.Header;
-            YencFooter footer = article.Footer;
+            var header = article.Header;
+            var footer = article.Footer;
 
             if (footer == null)
             {
@@ -48,7 +48,7 @@ namespace Usenet.Yenc
                 return new ValidationResult(failures);
             }
 
-            uint calculatedCrc32 = Crc32.CalculateChecksum(article.Data);
+            var calculatedCrc32 = Crc32.CalculateChecksum(article.Data);
             if (calculatedCrc32 != footer.Crc32.Value)
             {
                 failures.Add(new ValidationFailure(
@@ -60,8 +60,8 @@ namespace Usenet.Yenc
 
         private static void ValidatePart(YencArticle article, List<ValidationFailure> failures)
         {
-            YencHeader header = article.Header;
-            YencFooter footer = article.Footer;
+            var header = article.Header;
+            var footer = article.Footer;
 
             if (header.PartNumber != footer.PartNumber)
             {
@@ -84,7 +84,7 @@ namespace Usenet.Yenc
                 return;
             }
 
-            uint calculatedCrc32 = Crc32.CalculateChecksum(article.Data);
+            var calculatedCrc32 = Crc32.CalculateChecksum(article.Data);
             if (calculatedCrc32 != footer.PartCrc32.Value)
             {
                 failures.Add(new ValidationFailure(

@@ -62,9 +62,9 @@ namespace Usenet.Nntp.Builders
             dateTime = null;
             body = null;
 
-            foreach (KeyValuePair<string, ImmutableList<string>> header in article.Headers)
+            foreach (var header in article.Headers)
             {
-                foreach (string value in header.Value)
+                foreach (var value in header.Value)
                 {
                     switch (header.Key)
                     {
@@ -106,7 +106,7 @@ namespace Usenet.Nntp.Builders
                             {
 
                                 if (DateTimeOffset.TryParseExact(value, dateFormat, CultureInfo.InvariantCulture,
-                                    DateTimeStyles.None, out DateTimeOffset headerDateTime))
+                                    DateTimeStyles.None, out var headerDateTime))
                                 {
                                     dateTime = headerDateTime;
                                 }
@@ -202,7 +202,7 @@ namespace Usenet.Nntp.Builders
         public NntpArticleBuilder AddGroups(params NntpGroups[] values)
         {
             Guard.ThrowIfNull(values, nameof(values));
-            foreach (NntpGroups value in values)
+            foreach (var value in values)
             {
                 groupsBuilder.Add(value);
             }
@@ -217,7 +217,7 @@ namespace Usenet.Nntp.Builders
         public NntpArticleBuilder RemoveGroups(params NntpGroups[] values)
         {
             Guard.ThrowIfNull(values, nameof(values));
-            foreach (NntpGroups value in values)
+            foreach (var value in values)
             {
                 groupsBuilder.Remove(value);
             }
@@ -268,7 +268,7 @@ namespace Usenet.Nntp.Builders
         public NntpArticleBuilder AddLine(string line)
         {
             Guard.ThrowIfNull(line, nameof(line));
-            ICollection<string> bodyList = EnsureMemoizedBody();
+            var bodyList = EnsureMemoizedBody();
             bodyList.Add(line);
             return this;
         }
@@ -281,8 +281,8 @@ namespace Usenet.Nntp.Builders
         public NntpArticleBuilder AddLines(IEnumerable<string> lines)
         {
             Guard.ThrowIfNull(lines, nameof(lines));
-            ICollection<string> bodyList = EnsureMemoizedBody();
-            foreach (string line in lines)
+            var bodyList = EnsureMemoizedBody();
+            foreach (var line in lines)
             {
                 bodyList.Add(line);
             }
@@ -312,14 +312,14 @@ namespace Usenet.Nntp.Builders
                 throw new NntpException(Resources.Nntp.NewsgroupsHeaderNotSet);
             }
 
-            NntpGroups groups = groupsBuilder.Build();
+            var groups = groupsBuilder.Build();
 
             headers.Add(NntpHeaders.From, from);
             headers.Add(NntpHeaders.Subject, subject);            
 
             if (dateTime.HasValue)
             {
-                string formattedDate = dateTime.Value.ToUniversalTime().ToString(dateFormat, CultureInfo.InvariantCulture);
+                var formattedDate = dateTime.Value.ToUniversalTime().ToString(dateFormat, CultureInfo.InvariantCulture);
                 headers.Add(NntpHeaders.Date, $"{formattedDate} +0000");
             }
 

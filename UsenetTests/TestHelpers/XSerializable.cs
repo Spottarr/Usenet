@@ -24,7 +24,7 @@ namespace UsenetTests.TestHelpers
 
         public void Serialize(IXunitSerializationInfo info)
         {
-            string json = JsonConvert.SerializeObject(Object);
+            var json = JsonConvert.SerializeObject(Object);
             info.AddValue("objValue", json);
         }
     }

@@ -35,7 +35,7 @@
         /// <param name="value">The value of the element to add.</param>
         public virtual void Add(TKey key, TValue value)
         {
-            if (!TryGetValue(key, out ICollection<TValue> values) || values == null)
+            if (!TryGetValue(key, out var values) || values == null)
             {
                 values = collectionFactory();
                 Add(key, values);
@@ -51,7 +51,7 @@
         /// <returns>true if the element is successfully found and removed; otherwise, false.</returns>
         public virtual bool Remove(TKey key, TValue value)
         {
-            if (!TryGetValue(key, out ICollection<TValue> values) || values == null)
+            if (!TryGetValue(key, out var values) || values == null)
             {
                 return false;
             }
@@ -96,11 +96,11 @@
             {
                 return false;
             }
-            MultiSetComparer<TValue> comp = MultiSetComparer<TValue>.Instance;
-            foreach (KeyValuePair<TKey, ICollection<TValue>> pair in this)
+            var comp = MultiSetComparer<TValue>.Instance;
+            foreach (var pair in this)
             {
-                ICollection<TValue> thisValues = pair.Value;
-                if (!other.TryGetValue(pair.Key, out ICollection<TValue> otherValues) || 
+                var thisValues = pair.Value;
+                if (!other.TryGetValue(pair.Key, out var otherValues) || 
                     !comp.Equals(thisValues, otherValues))
                 {
                     return false;

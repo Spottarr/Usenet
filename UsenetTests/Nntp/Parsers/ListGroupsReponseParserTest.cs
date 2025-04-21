@@ -37,7 +37,7 @@ namespace UsenetTests.Nntp.Parsers
             string[] lines,
             XSerializable<NntpGroup> expectedGroup)
         {
-            NntpGroupResponse groupResponse = new ListGroupResponseParser().Parse(responseCode, responseMessage, lines.ToList());
+            var groupResponse = new ListGroupResponseParser().Parse(responseCode, responseMessage, lines.ToList());
             Assert.Equal(expectedGroup.Object, groupResponse.Group);
         }
     }

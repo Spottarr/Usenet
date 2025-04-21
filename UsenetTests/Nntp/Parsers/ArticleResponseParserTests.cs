@@ -91,10 +91,10 @@ namespace UsenetTests.Nntp.Parsers
             string[] lines, 
             XSerializable<NntpArticle> expected)
         {
-            NntpArticle expectedArticle = expected.Object;
-            NntpArticleResponse articleResponse = new ArticleResponseParser((ArticleRequestType)requestType)
+            var expectedArticle = expected.Object;
+            var articleResponse = new ArticleResponseParser((ArticleRequestType)requestType)
                 .Parse(responseCode, responseMessage, lines.ToList());
-            NntpArticle actualArticle = articleResponse.Article;
+            var actualArticle = articleResponse.Article;
             Assert.Equal(expectedArticle, actualArticle);
         }
 
@@ -122,7 +122,7 @@ namespace UsenetTests.Nntp.Parsers
             int requestType,
             string[] lines)
         {
-            NntpArticleResponse articleResponse = new ArticleResponseParser((ArticleRequestType)requestType).Parse(
+            var articleResponse = new ArticleResponseParser((ArticleRequestType)requestType).Parse(
                 responseCode, responseMessage, lines.ToList());
             Assert.Null(articleResponse.Article);
         }

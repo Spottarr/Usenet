@@ -16,7 +16,7 @@ namespace UsenetTests.Yenc
         {
             var expectedData = expected.ReadAllBytes().ToList();
 
-            YencArticle actualArticle = YencArticleDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default));
+            var actualArticle = YencArticleDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default));
 
             Assert.False(actualArticle.Header.IsFilePart);
             Assert.Equal(128, actualArticle.Header.LineLength);
@@ -33,7 +33,7 @@ namespace UsenetTests.Yenc
         {
             const int expectedDataLength = 11250;
 
-            YencArticle actualArticle = YencArticleDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default));
+            var actualArticle = YencArticleDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default));
 
             Assert.True(actualArticle.Header.IsFilePart);
             Assert.Equal(expectedDataLength, actualArticle.Data.Count);
@@ -44,10 +44,10 @@ namespace UsenetTests.Yenc
         internal void MultiPartFileShouldBeDecoded(IFileInfo expectedFile, IFileInfo part1File, IFileInfo part2File)
         {
             const string expectedFileName = "joystick.jpg";
-            byte[] expected = expectedFile.ReadAllBytes();
+            var expected = expectedFile.ReadAllBytes();
 
-            YencArticle part1 = YencArticleDecoder.Decode(part1File.ReadAllLines(UsenetEncoding.Default));
-            YencArticle part2 = YencArticleDecoder.Decode(part2File.ReadAllLines(UsenetEncoding.Default));
+            var part1 = YencArticleDecoder.Decode(part1File.ReadAllLines(UsenetEncoding.Default));
+            var part2 = YencArticleDecoder.Decode(part2File.ReadAllLines(UsenetEncoding.Default));
 
             using var actual = new MemoryStream();
 
@@ -57,7 +57,7 @@ namespace UsenetTests.Yenc
             actual.Seek(part2.Header.PartOffset, SeekOrigin.Begin);
             actual.Write(part2.Data.ToArray(), 0, (int)part2.Header.PartSize);
 
-            string actualFileName = part1.Header.FileName;
+            var actualFileName = part1.Header.FileName;
 
             Assert.Equal(expectedFileName, actualFileName);
             Assert.Equal(expected, actual.ToArray());
