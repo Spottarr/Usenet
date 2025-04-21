@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Usenet.Extensions;
 using Usenet.Nntp.Responses;

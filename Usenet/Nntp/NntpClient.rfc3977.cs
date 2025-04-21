@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Usenet.Extensions;
+﻿using Usenet.Extensions;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Responses;

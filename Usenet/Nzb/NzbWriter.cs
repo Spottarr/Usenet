@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Globalization;
-using System.IO;
-using System.Threading.Tasks;
 using System.Xml;
 using Usenet.Util;
 

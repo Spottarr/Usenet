@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Text;
+﻿using System.Text;
 using Usenet.Util;
 
 namespace Usenet.Nntp

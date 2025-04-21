@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Usenet.Util;
+﻿using Usenet.Util;
 
 namespace Usenet.Yenc
 {

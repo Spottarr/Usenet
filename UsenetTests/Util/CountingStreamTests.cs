@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Usenet.Util;
+﻿using Usenet.Util;
 using Xunit;
 
 namespace UsenetTests.Util

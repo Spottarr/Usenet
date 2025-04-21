@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Usenet.Util
+﻿namespace Usenet.Util
 {
     /// <summary>
     /// Represents an enumerable stream. Can be used to stream an enumerable collection of

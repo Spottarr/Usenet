@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace Usenet.Util
+﻿namespace Usenet.Util
 {
     /// <summary>
     /// Represents an abstract base stream that overrides all abstract methods of the <see cref="Stream"/> class.

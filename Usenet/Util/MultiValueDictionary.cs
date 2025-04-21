@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Usenet.Util
+﻿namespace Usenet.Util
 {
     /// <summary>
     /// Represents a collection of keys with multiple values.

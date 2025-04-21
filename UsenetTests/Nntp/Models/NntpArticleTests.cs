@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Usenet.Nntp.Models;
+﻿using Usenet.Nntp.Models;
 using Usenet.Util;
 using Xunit;
 

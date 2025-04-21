@@ -1,6 +1,4 @@
 ﻿using System.Globalization;
-using System.IO;
-using System.Linq;
 using Microsoft.Extensions.FileProviders;
 using Usenet.Util;
 using Usenet.Yenc;

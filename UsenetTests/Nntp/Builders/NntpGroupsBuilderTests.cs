@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Usenet.Nntp.Builders;
+﻿using Usenet.Nntp.Builders;
 using Xunit;
 
 namespace UsenetTests.Nntp.Builders

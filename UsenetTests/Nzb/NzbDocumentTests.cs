@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Usenet.Nzb;
+﻿using Usenet.Nzb;
 using UsenetTests.TestHelpers;
 using Xunit;
 

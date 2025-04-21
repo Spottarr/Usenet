@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Usenet.Nntp.Parsers;
+﻿using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Responses;
 using Xunit;
 

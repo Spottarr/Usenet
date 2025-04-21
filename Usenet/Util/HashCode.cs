@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Usenet.Util
+﻿namespace Usenet.Util
 {
     /// <summary>
     /// Represents a helper class for creating hash codes.

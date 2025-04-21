@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Usenet.Extensions;
+﻿using Usenet.Extensions;
 using Usenet.Nntp.Models;
 
 namespace Usenet.Nntp.Parsers

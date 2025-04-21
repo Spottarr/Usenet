@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+﻿using System.Globalization;
 using Microsoft.Extensions.FileProviders;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Models;

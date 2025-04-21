@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using Usenet.Nntp.Models;
+﻿using Usenet.Nntp.Models;
 using Usenet.Util;
 
 namespace Usenet.Extensions

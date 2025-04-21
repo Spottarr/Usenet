@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Microsoft.Extensions.FileProviders;
+﻿using Microsoft.Extensions.FileProviders;
 using Usenet.Nzb;
 using UsenetTests.TestHelpers;
 using Xunit;

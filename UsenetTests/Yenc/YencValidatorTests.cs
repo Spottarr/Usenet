@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Microsoft.Extensions.FileProviders;
+﻿using Microsoft.Extensions.FileProviders;
 using Usenet.Util;
 using Usenet.Yenc;
 using UsenetTests.Extensions;

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Usenet.Nntp.Responses
+﻿namespace Usenet.Nntp.Responses
 {
     /// <summary>
     /// Represents a generic multi-line response.

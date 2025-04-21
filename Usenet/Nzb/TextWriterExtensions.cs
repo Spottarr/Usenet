@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-
-namespace Usenet.Nzb
+﻿namespace Usenet.Nzb
 {
     /// <summary>
     /// TextWriter extension methods.

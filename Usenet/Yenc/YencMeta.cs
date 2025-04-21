@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Usenet.Exceptions;
+﻿using Usenet.Exceptions;
 using Usenet.Extensions;
 
 namespace Usenet.Yenc

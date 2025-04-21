@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Usenet.Nntp.Parsers
+﻿namespace Usenet.Nntp.Parsers
 {
     /// <summary>
     /// Represents a multi-line response parser.

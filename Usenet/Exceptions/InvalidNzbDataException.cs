@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Usenet.Exceptions
+﻿namespace Usenet.Exceptions
 {
     /// <inheritdoc />
     /// <summary>The exception that is thrown when a data stream or text is not in a valid nzb format.</summary>

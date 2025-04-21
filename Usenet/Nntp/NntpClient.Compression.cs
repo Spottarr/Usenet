@@ -1,5 +1,4 @@
-﻿using System;
-using Usenet.Nntp.Models;
+﻿using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
 
 namespace Usenet.Nntp

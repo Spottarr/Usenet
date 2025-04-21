@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Usenet.Extensions;
 using Usenet.Nntp.Responses;
 

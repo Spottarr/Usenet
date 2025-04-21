@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Microsoft.Extensions.FileProviders;
+﻿using Microsoft.Extensions.FileProviders;
 using Usenet.Extensions;
 using Usenet.Util;
 using Usenet.Yenc;

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Usenet.Nntp.Responses;
+﻿using Usenet.Nntp.Responses;
 
 namespace Usenet.Nntp.Parsers
 {

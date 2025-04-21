@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
 

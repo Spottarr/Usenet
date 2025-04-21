@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace Usenet.Util
+﻿namespace Usenet.Util
 {
     /// <summary>
     /// Represents a counting stream. It can be used to count the number of bytes read and written.

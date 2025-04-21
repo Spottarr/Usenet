@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Usenet.Nntp.Responses
+﻿namespace Usenet.Nntp.Responses
 {
     /// <summary>
     /// Represents a response to the 

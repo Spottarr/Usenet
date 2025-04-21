@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Usenet.Exceptions
+﻿namespace Usenet.Exceptions
 {
     /// <inheritdoc />
     /// <summary>The exception that is thrown when communicating using the Network News Transfer Protocol.</summary>

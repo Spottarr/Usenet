@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Usenet.Nntp.Models
+﻿namespace Usenet.Nntp.Models
 {
     /// <summary>
     /// Represents an NNTP datetime object.

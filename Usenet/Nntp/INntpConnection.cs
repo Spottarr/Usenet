@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Usenet.Nntp.Parsers;
+﻿using Usenet.Nntp.Parsers;
 using Usenet.Util;
 
 namespace Usenet.Nntp

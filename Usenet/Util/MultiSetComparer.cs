@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Usenet.Util
+﻿namespace Usenet.Util
 {
     /// <inheritdoc />
     /// <summary>

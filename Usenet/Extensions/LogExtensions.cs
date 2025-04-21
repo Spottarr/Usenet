@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Usenet.Nntp.Responses;
 
 namespace Usenet.Extensions;
 
