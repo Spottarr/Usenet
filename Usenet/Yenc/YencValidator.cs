@@ -16,6 +16,8 @@ namespace Usenet.Yenc
         /// <returns>A <see cref="ValidationResult"/> containing a list of 0 or more validation failures.</returns>
         public static ValidationResult Validate(YencArticle article)
         {
+            Guard.ThrowIfNull(article, nameof(article));
+            
             var failures = new List<ValidationFailure>();
 
             YencHeader header = article.Header;

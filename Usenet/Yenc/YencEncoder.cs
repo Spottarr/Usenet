@@ -31,6 +31,10 @@ namespace Usenet.Yenc
         /// <returns>The yEnc-encoded text.</returns>
         public static IEnumerable<string> Encode(YencHeader header, Stream stream, Encoding encoding)
         {
+            Guard.ThrowIfNull(header, nameof(header));
+            Guard.ThrowIfNull(stream, nameof(stream));
+            Guard.ThrowIfNull(encoding, nameof(encoding));
+            
             yield return GetHeaderLine(header);
             if (header.IsFilePart)
             {

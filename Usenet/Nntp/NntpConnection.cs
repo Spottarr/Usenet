@@ -57,6 +57,8 @@ namespace Usenet.Nntp
         /// <inheritdoc/>
         public TResponse MultiLineCommand<TResponse>(string command, IMultiLineResponseParser<TResponse> parser) //, bool decompress = false)
         {
+            Guard.ThrowIfNull(parser, nameof(parser));
+            
             NntpResponse response = Command(command, new ResponseParser());
 
             IEnumerable<string> dataBlock = parser.IsSuccessResponse(response.Code)
@@ -69,6 +71,8 @@ namespace Usenet.Nntp
         /// <inheritdoc/>
         public TResponse GetResponse<TResponse>(IResponseParser<TResponse> parser)
         {
+            Guard.ThrowIfNull(parser, nameof(parser));
+            
             string responseText = reader.ReadLine();
             log.ReceivedResponse(responseText);
 

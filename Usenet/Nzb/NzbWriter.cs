@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
+using Usenet.Util;
 
 namespace Usenet.Nzb
 {
@@ -31,6 +32,8 @@ namespace Usenet.Nzb
         /// <returns>A <see cref="Task"/> that can be awaited.</returns>
         public async Task WriteAsync(NzbDocument nzbDocument)
         {
+            Guard.ThrowIfNull(nzbDocument, nameof(nzbDocument));
+            
             using (XmlWriter writer = GetXmlWriter())
             {
                 await writer.WriteDocTypeAsync(
@@ -61,6 +64,8 @@ namespace Usenet.Nzb
         /// <returns>A <see cref="Task"/> that can be awaited.</returns>
         public void Write(NzbDocument nzbDocument)
         {
+            Guard.ThrowIfNull(nzbDocument, nameof(nzbDocument));
+            
             using (XmlWriter writer = GetXmlWriter())
             {
                 writer.WriteDocType(

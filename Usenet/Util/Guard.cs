@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Usenet.Util
 {
@@ -14,7 +15,7 @@ namespace Usenet.Util
         /// <param name="obj">The object to check</param>
         /// <param name="name">The name of the object</param>
         /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
-        public static void ThrowIfNull(object obj, string name)
+        public static void ThrowIfNull([NotNull] object obj, string name)
         {
 #if NET8_0_OR_GREATER
             ArgumentNullException.ThrowIfNull(obj, name);
@@ -32,7 +33,7 @@ namespace Usenet.Util
         /// <param name="name">The name of the string</param>
         /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
         /// <exception cref="ArgumentException">ArgumentException</exception>
-        public static void ThrowIfNullOrEmpty(string str, string name)
+        public static void ThrowIfNullOrEmpty([NotNull] string str, string name)
         {
 #if NET8_0_OR_GREATER
             ArgumentException.ThrowIfNullOrEmpty(str, name);
@@ -51,7 +52,7 @@ namespace Usenet.Util
         /// <param name="name">The name of the string</param>
         /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
         /// <exception cref="ArgumentException">ArgumentException</exception>
-        public static void ThrowIfNullOrWhiteSpace(string str, string name)
+        public static void ThrowIfNullOrWhiteSpace([NotNull] string str, string name)
         {
 #if NET8_0_OR_GREATER
             ArgumentException.ThrowIfNullOrWhiteSpace(str, name);
