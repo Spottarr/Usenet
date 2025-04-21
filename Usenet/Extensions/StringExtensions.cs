@@ -57,16 +57,6 @@ namespace Usenet.Extensions
             str != null && int.TryParse(str, out int value) ? value : defaultValue;
 
         /// <summary>
-        /// Checks if the source string contains the specified toCheck string using the specified <see cref="StringComparison"/>.
-        /// </summary>
-        /// <param name="source">The source string.</param>
-        /// <param name="toCheck">The string to search for in the source string.</param>
-        /// <param name="comp">The <see cref="StringComparison"/> to use.</param>
-        /// <returns>A value indicating whether the source string contains the toCheck string.</returns>
-        public static bool Contains(this string source, string toCheck, StringComparison comp) => 
-            source.Contains(toCheck, comp);
-
-        /// <summary>
         /// Removes all whitespace from a string.
         /// </summary>
         /// <param name="source"></param>
