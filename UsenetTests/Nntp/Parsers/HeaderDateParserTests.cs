@@ -8,6 +8,10 @@ public class HeaderDateParserTests
 {
     public static readonly IEnumerable<object[]> ParseData =
     [
+        ["Mon, 1 May 2017 1:55", new DateTimeOffset(2017, 5, 1, 1, 55, 0, TimeSpan.Zero)],
+        ["1 May 2017 1:55:33", new DateTimeOffset(2017, 5, 1, 1, 55, 33, TimeSpan.Zero)],
+        ["01 May 2017 13:55", new DateTimeOffset(2017, 5, 1, 13, 55, 0, TimeSpan.Zero)],
+        ["01 May 2017 13:55:33", new DateTimeOffset(2017, 5, 1, 13, 55, 33, TimeSpan.Zero)],
         ["01 May 2017 13:55:33 +0000", new DateTimeOffset(2017, 5, 1, 13, 55, 33, TimeSpan.Zero)],
         ["01 May 2017 13:55:33 -0000", new DateTimeOffset(2017, 5, 1, 13, 55, 33, TimeSpan.Zero)],
         ["01 May 2017 13:55:33 +0000 (UTC)", new DateTimeOffset(2017, 5, 1, 13, 55, 33, TimeSpan.Zero)],
@@ -17,6 +21,9 @@ public class HeaderDateParserTests
 
         ["01 May 2017 13:55 +1030", new DateTimeOffset(2017, 5, 1, 13, 55, 0, TimeSpan.FromMinutes(10 * 60 + 30))],
         ["01 May 2017 13:55 -1030", new DateTimeOffset(2017, 5, 1, 13, 55, 0, -TimeSpan.FromMinutes(10 * 60 + 30))],
+
+        ["01 May 2017 13:55+1030", new DateTimeOffset(2017, 5, 1, 13, 55, 0, TimeSpan.FromMinutes(10 * 60 + 30))],
+        ["01 May 2017 13:55-1030", new DateTimeOffset(2017, 5, 1, 13, 55, 0, -TimeSpan.FromMinutes(10 * 60 + 30))],
 
         ["1 Jan 2017 00:00:00 +0000", new DateTimeOffset(2017, 1, 1, 0, 0, 0, TimeSpan.Zero)],
         ["1 Feb 2017 00:00:00 +0000", new DateTimeOffset(2017, 2, 1, 0, 0, 0, TimeSpan.Zero)],
@@ -66,13 +73,13 @@ public class HeaderDateParserTests
     [MemberData(nameof(ParseData))]
     internal void HeaderDateShouldBeParsedCorrectly(string headerDate, DateTimeOffset expectedDateTime)
     {
-        var actualDateTime = HeaderDateParser.Parse(headerDate);
+        DateTimeOffset? actualDateTime = HeaderDateParser.Parse(headerDate);
         Assert.Equal(expectedDateTime, actualDateTime);
     }
 
     [Theory]
     [MemberData(nameof(TimezoneParseFailureData))]
-    internal void HeaderDateShouldBeNotBeParsedCorrectly(string headerDate, Type exceptionType)
+    internal void HeaderDateShouldNotBeParsedCorrectly(string headerDate, Type exceptionType)
     {
         Assert.Throws(exceptionType, () => HeaderDateParser.Parse(headerDate));
     }
@@ -81,9 +88,9 @@ public class HeaderDateParserTests
     internal void ObsoleteTwoDigitYearBeforeCurrentDateShouldBeParsedCorrectly()
     {
         DateTimeOffset yesterday = new(DateTime.UtcNow.Date.AddDays(-1), TimeSpan.Zero);
-        var expectedDate = yesterday;
-        var headerValue = yesterday.ToString("dd MMM yy HH:mm:ss", CultureInfo.InvariantCulture) + " +0000";
-        var actualDate = HeaderDateParser.Parse(headerValue).GetValueOrDefault();
+        DateTimeOffset expectedDate = yesterday;
+        string headerValue = yesterday.ToString("dd MMM yy HH:mm:ss", CultureInfo.InvariantCulture) + " +0000";
+        DateTimeOffset actualDate = HeaderDateParser.Parse(headerValue).GetValueOrDefault();
         Assert.Equal(expectedDate, actualDate);
     }
 
@@ -91,9 +98,9 @@ public class HeaderDateParserTests
     internal void ObsoleteTwoDigitYearAfterCurrentDateShouldBeParsedCorrectly()
     {
         DateTimeOffset tomorrow = new(DateTime.UtcNow.Date.AddDays(+1), TimeSpan.Zero);
-        var expectedDate = tomorrow.AddYears(-100);
-        var headerValue = tomorrow.ToString("dd MMM yy HH:mm:ss", CultureInfo.InvariantCulture) + " +0000";
-        var actualDate = HeaderDateParser.Parse(headerValue).GetValueOrDefault();
+        DateTimeOffset expectedDate = tomorrow.AddYears(-100);
+        string headerValue = tomorrow.ToString("dd MMM yy HH:mm:ss", CultureInfo.InvariantCulture) + " +0000";
+        DateTimeOffset actualDate = HeaderDateParser.Parse(headerValue).GetValueOrDefault();
         Assert.Equal(expectedDate, actualDate);
     }
 
@@ -101,9 +108,10 @@ public class HeaderDateParserTests
     internal void ObsoleteTwoDigitYearOnCurrentDateShouldBeParsedCorrectly()
     {
         var today = new DateTimeOffset(DateTime.UtcNow.Date, TimeSpan.Zero);
-        var expectedDate = today;
-        var headerValue = expectedDate.ToString("dd MMM yy HH:mm:ss", CultureInfo.InvariantCulture) + " +0000";
-        var actualDate = HeaderDateParser.Parse(headerValue).GetValueOrDefault();
+        DateTimeOffset expectedDate = today;
+        string headerValue = expectedDate.ToString("dd MMM yy HH:mm:ss", CultureInfo.InvariantCulture) + " +0000";
+        DateTimeOffset actualDate = HeaderDateParser.Parse(headerValue).GetValueOrDefault();
         Assert.Equal(expectedDate, actualDate);
     }
+
 }
