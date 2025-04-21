@@ -37,12 +37,12 @@ namespace Usenet.Nntp.Parsers
                 throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
             }
 
-            var day = int.Parse(matches.Groups["day"].Value);
+            var day = int.Parse(matches.Groups["day"].Value, CultureInfo.InvariantCulture);
             var month = matches.Groups["month"].Value;
-            var year = int.Parse(matches.Groups["year"].Value);
-            var hour = int.Parse(matches.Groups["hour"].Value);
-            var minute = int.Parse(matches.Groups["min"].Value);
-            int.TryParse(matches.Groups["sec"].Value, out var second);
+            var year = int.Parse(matches.Groups["year"].Value, CultureInfo.InvariantCulture);
+            var hour = int.Parse(matches.Groups["hour"].Value, CultureInfo.InvariantCulture);
+            var minute = int.Parse(matches.Groups["min"].Value, CultureInfo.InvariantCulture);
+            _ = int.TryParse(matches.Groups["sec"].Value, out var second);
             var tz = matches.Groups["tz"].Value;
             var zone = ParseZone(tz);
 
