@@ -82,8 +82,8 @@ namespace Usenet.Nntp.Parsers
                 : currentCentury;
         }
 
-        private const char ValuePartsSeparator = ',';
-        private const char TimePartsSeparator = ':';
+        private static readonly char[] ValuePartsSeparator = [','];
+        private static readonly char[] TimePartsSeparator = [':'];
         private static readonly char[] DatePartSeparators = [' ', '\n', '\r', '\t'];
 
         private static void ParseTime(string value, out int hour, out int minute, out int second)
