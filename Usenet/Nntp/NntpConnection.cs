@@ -80,7 +80,7 @@ namespace Usenet.Nntp
             {
                 throw new NntpException("Received no response.");
             }
-            if (responseText.Length < 3 || !int.TryParse(responseText.Substring(0, 3), out int code))
+            if (responseText.Length < 3 || !IntShims.TryParse(responseText.AsSpan(0, 3), out int code))
             {
                 throw new NntpException("Received invalid response.");
             }

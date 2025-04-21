@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using Usenet.Nntp.Models;
+using Usenet.Util;
 
 namespace Usenet.Nntp.Writers
 {
@@ -53,7 +54,7 @@ namespace Usenet.Nntp.Writers
             line = line.Substring(maxHeaderLength);
             while (line.Length > maxHeaderLength)
             {
-                connection.WriteLine("\t" + line.Substring(0, maxHeaderLength - 1));
+                connection.WriteLine(StringShims.Concat("\t".AsSpan(), line.AsSpan(0, maxHeaderLength - 1)));
                 line = line.Substring(maxHeaderLength - 1);
             }
             connection.WriteLine("\t" + line);
