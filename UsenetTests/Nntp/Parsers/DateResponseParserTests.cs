@@ -1,5 +1,4 @@
 ﻿using Usenet.Nntp.Parsers;
-using Usenet.Nntp.Responses;
 using Xunit;
 
 namespace UsenetTests.Nntp.Parsers

@@ -1,5 +1,4 @@
 ﻿using Usenet.Nntp.Parsers;
-using Usenet.Nntp.Responses;
 using Usenet.Util;
 
 namespace Usenet.Nntp
@@ -10,7 +9,7 @@ namespace Usenet.Nntp
     public partial class NntpClient
     {
         /// <summary>
-        /// The <a href="https://tools.ietf.org/html/rfc4643#section-2.3">AUTHINFO USER and AUTHINFO PASS</a> 
+        /// The <a href="https://tools.ietf.org/html/rfc4643#section-2.3">AUTHINFO USER and AUTHINFO PASS</a>
         /// (<a href="https://tools.ietf.org/html/rfc2980#section-3.1.1">ad 1</a>)
         /// commands are used to present clear text credentials to the server.
         /// </summary>

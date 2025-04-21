@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using Usenet.Nntp.Models;
+﻿using Usenet.Nntp.Models;
 using Usenet.Util;
 
 namespace Usenet.Nntp.Writers
