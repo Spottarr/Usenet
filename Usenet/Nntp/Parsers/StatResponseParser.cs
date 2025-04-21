@@ -6,7 +6,7 @@ namespace Usenet.Nntp.Parsers
 {
     internal class StatResponseParser : IResponseParser<NntpStatResponse>
     {
-        private readonly ILogger log = Logger.Create<StatResponseParser>();
+        private readonly ILogger _log = Logger.Create<StatResponseParser>();
 
         public bool IsSuccessResponse(int code) => code == (int) NntpStatResponseType.ArticleExists;
 
@@ -18,7 +18,7 @@ namespace Usenet.Nntp.Parsers
 
             if (responseType == NntpStatResponseType.Unknown)
             {
-                log.InvalidResponseCode(code);
+                _log.InvalidResponseCode(code);
             }
 
             if (!IsSuccessResponse(code))
@@ -30,7 +30,7 @@ namespace Usenet.Nntp.Parsers
             var responseSplit = message.Split(' ');
             if (responseSplit.Length < 2)
             {
-                log.InvalidResponseMessage(message);
+                _log.InvalidResponseMessage(message);
             }
 
             _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out var number);

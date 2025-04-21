@@ -14,7 +14,7 @@ namespace Usenet.Nzb
     /// </summary>
     public static class NzbParser
     {
-        private static readonly Regex fileNameRegex = new Regex("\"([^\"]*)\"");
+        private static readonly Regex _fileNameRegex = new Regex("\"([^\"]*)\"");
 
         /// <summary>
         /// Parses the xml input string into an instance of the <see cref="NzbDocument"/> class.
@@ -98,7 +98,7 @@ namespace Usenet.Nzb
 
         private static string GetFileName(string subject)
         {
-            var match = fileNameRegex.Match(subject);
+            var match = _fileNameRegex.Match(subject);
             if (match.Success)
             {
                 return match.Groups[1].Value;

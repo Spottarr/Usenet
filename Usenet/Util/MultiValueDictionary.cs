@@ -7,7 +7,7 @@
     /// <typeparam name="TValue">The type of values in the dictionary.</typeparam>
     internal class MultiValueDictionary<TKey, TValue> : Dictionary<TKey, ICollection<TValue>>, IEquatable<MultiValueDictionary<TKey, TValue>>
     {
-        private readonly Func<ICollection<TValue>> collectionFactory;
+        private readonly Func<ICollection<TValue>> _collectionFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiValueDictionary{TKey,TValue}"/>
@@ -25,7 +25,7 @@
         /// <param name="collectionFactory">The collection factory to use.</param>
         public MultiValueDictionary(Func<ICollection<TValue>> collectionFactory)
         {
-            this.collectionFactory = collectionFactory;
+            _collectionFactory = collectionFactory;
         }
 
         /// <summary>
@@ -37,7 +37,7 @@
         {
             if (!TryGetValue(key, out var values) || values == null)
             {
-                values = collectionFactory();
+                values = _collectionFactory();
                 Add(key, values);
             }
             values.Add(value);

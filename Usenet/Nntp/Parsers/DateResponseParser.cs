@@ -7,7 +7,7 @@ namespace Usenet.Nntp.Parsers
 {
     internal class DateResponseParser : IResponseParser<NntpDateResponse>
     {
-        private readonly ILogger log = Logger.Create<DateResponseParser>();
+        private readonly ILogger _log = Logger.Create<DateResponseParser>();
 
         public bool IsSuccessResponse(int code) => code == 111;
 
@@ -21,7 +21,7 @@ namespace Usenet.Nntp.Parsers
                 return new NntpDateResponse(code, message, true, dateTime);
             }
 
-            log.InvalidDateResponseMessage(message);
+            _log.InvalidDateResponseMessage(message);
             return new NntpDateResponse(code, message, false, DateTimeOffset.MinValue);
         }
     }

@@ -6,9 +6,9 @@
     /// </summary>
     public class EnumerableStream : AbstractBaseStream
     {
-        private readonly IEnumerator<byte[]> enumerator;
-        private byte[] currentChunk;
-        private int currentOffset;
+        private readonly IEnumerator<byte[]> _enumerator;
+        private byte[] _currentChunk;
+        private int _currentOffset;
 
         /// <summary>
         /// Creates a new instance of the <see cref="EnumerableStream"/> class.
@@ -17,7 +17,7 @@
         public EnumerableStream(IEnumerable<byte[]> input)
         {
             Guard.ThrowIfNull(input, nameof(input));
-            enumerator = input.GetEnumerator();
+            _enumerator = input.GetEnumerator();
         }
 
         /// <inheritdoc/>
@@ -27,7 +27,7 @@
             {
                 if (disposing)
                 {
-                    enumerator?.Dispose();
+                    _enumerator?.Dispose();
                 }
             }
             finally
@@ -51,26 +51,26 @@
             var total = 0;
             while (count > 0)
             {
-                if (currentChunk == null || currentOffset >= currentChunk.Length)
+                if (_currentChunk == null || _currentOffset >= _currentChunk.Length)
                 {
                     // need a new chunk
-                    if (!enumerator.MoveNext())
+                    if (!_enumerator.MoveNext())
                     {
                         // no more chunks available
                         return total;
                     }
-                    currentChunk = enumerator.Current;
-                    currentOffset = 0;
+                    _currentChunk = _enumerator.Current;
+                    _currentOffset = 0;
                 }
 
-                if (currentChunk == null)
+                if (_currentChunk == null)
                 {
                     continue;
                 }
 
-                var copyCount = Math.Min(count, currentChunk.Length - currentOffset);
-                Buffer.BlockCopy(currentChunk, currentOffset, buffer, offset, copyCount);
-                currentOffset += copyCount;
+                var copyCount = Math.Min(count, _currentChunk.Length - _currentOffset);
+                Buffer.BlockCopy(_currentChunk, _currentOffset, buffer, offset, copyCount);
+                _currentOffset += copyCount;
                 offset += copyCount;
                 total += copyCount;
                 count -= copyCount;

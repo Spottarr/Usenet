@@ -8,7 +8,7 @@
     /// <typeparam name="T"></typeparam>
     internal class MultiSetComparer<T> : IEqualityComparer<IEnumerable<T>>
     {
-        private readonly IEqualityComparer<T> comparer;
+        private readonly IEqualityComparer<T> _comparer;
 
         /// <summary>
         /// Creates a new instance of the <see cref="MultiSetComparer{T}"/> class
@@ -17,7 +17,7 @@
         /// <param name="comparer">The equality comparer to use.</param>
         public MultiSetComparer(IEqualityComparer<T> comparer)
         {
-            this.comparer = comparer ?? EqualityComparer<T>.Default;
+            _comparer = comparer ?? EqualityComparer<T>.Default;
         }
 
         /// <summary>
@@ -90,7 +90,7 @@
         private Dictionary<T, int> GetElementCounts(IEnumerable<T> enumerable, out int nullCount)
         {
             nullCount = 0;
-            var dictionary = new Dictionary<T, int>(comparer);
+            var dictionary = new Dictionary<T, int>(_comparer);
             foreach (var element in enumerable)
             {
                 if (element == null)

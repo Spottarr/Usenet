@@ -6,7 +6,7 @@ namespace Usenet.Nntp.Writers
 {
     internal class ArticleWriter
     {
-        private const int maxHeaderLength = 998;
+        private const int MaxHeaderLength = 998;
 
         public static void Write(INntpConnection connection, NntpArticle article)
         {
@@ -42,19 +42,19 @@ namespace Usenet.Nntp.Writers
                 val = new NntpMessageId(val);
             }
             var line = $"{key}: {val}";
-            if (line.Length <= maxHeaderLength)
+            if (line.Length <= MaxHeaderLength)
             {
                 connection.WriteLine(line);
                 return;
             }
 
             // header line is too long, fold it
-            connection.WriteLine(line.Substring(0, maxHeaderLength));
-            line = line.Substring(maxHeaderLength);
-            while (line.Length > maxHeaderLength)
+            connection.WriteLine(line.Substring(0, MaxHeaderLength));
+            line = line.Substring(MaxHeaderLength);
+            while (line.Length > MaxHeaderLength)
             {
-                connection.WriteLine(StringShims.Concat("\t".AsSpan(), line.AsSpan(0, maxHeaderLength - 1)));
-                line = line.Substring(maxHeaderLength - 1);
+                connection.WriteLine(StringShims.Concat("\t".AsSpan(), line.AsSpan(0, MaxHeaderLength - 1)));
+                line = line.Substring(MaxHeaderLength - 1);
             }
             connection.WriteLine("\t" + line);
         }

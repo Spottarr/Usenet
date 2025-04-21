@@ -13,7 +13,7 @@ namespace Usenet.Nntp
         /// </summary>
         /// <returns>A groups response containing a list of valid newsgroups.</returns>
         public NntpGroupsResponse ListCounts() =>
-            connection.MultiLineCommand("LIST COUNTS", new GroupsResponseParser(215, GroupStatusRequestType.Extended));
+            _connection.MultiLineCommand("LIST COUNTS", new GroupsResponseParser(215, GroupStatusRequestType.Extended));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc6048#section-2.2">LIST COUNTS</a> 
@@ -24,7 +24,7 @@ namespace Usenet.Nntp
         /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
         /// <returns>A groups response object containing a list of valid newsgroups.</returns>
         public NntpGroupsResponse ListCounts(string wildmat) =>
-            connection.MultiLineCommand($"LIST COUNTS {wildmat}", new GroupsResponseParser(215, GroupStatusRequestType.Extended));
+            _connection.MultiLineCommand($"LIST COUNTS {wildmat}", new GroupsResponseParser(215, GroupStatusRequestType.Extended));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc6048#section-2.3">LIST DISTRIBUTIONS</a> 
@@ -36,7 +36,7 @@ namespace Usenet.Nntp
         /// </summary>
         /// <returns>A multi-line response object containing the distributions list.</returns>
         public NntpMultiLineResponse ListDistributions() =>
-            connection.MultiLineCommand("LIST DISTRIBUTIONS", new MultiLineResponseParser(215));
+            _connection.MultiLineCommand("LIST DISTRIBUTIONS", new MultiLineResponseParser(215));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc6048#section-2.4">LIST MODERATORS</a> 
@@ -47,7 +47,7 @@ namespace Usenet.Nntp
         /// </summary>
         /// <returns>A multi-line response object containing the moderators list.</returns>
         public NntpMultiLineResponse ListModerators() =>
-            connection.MultiLineCommand("LIST MODERATORS", new MultiLineResponseParser(215));
+            _connection.MultiLineCommand("LIST MODERATORS", new MultiLineResponseParser(215));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc6048#section-2.5">LIST MOTD</a> 
@@ -55,7 +55,7 @@ namespace Usenet.Nntp
         /// </summary>
         /// <returns>A multi-line response object containing the message of the day.</returns>
         public NntpMultiLineResponse ListMotd() =>
-            connection.MultiLineCommand("LIST MOTD", new MultiLineResponseParser(215));
+            _connection.MultiLineCommand("LIST MOTD", new MultiLineResponseParser(215));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc6048#section-2.6">LIST SUBSCRIPTIONS</a> 
@@ -65,7 +65,7 @@ namespace Usenet.Nntp
         /// </summary>
         /// <returns>A multi-line response containing a list of recommended subscriptions.</returns>
         public NntpMultiLineResponse ListSubscriptions() =>
-            connection.MultiLineCommand("LIST SUBSCRIPTIONS", new MultiLineResponseParser(215));
+            _connection.MultiLineCommand("LIST SUBSCRIPTIONS", new MultiLineResponseParser(215));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc6048#section-3">LIST ACTIVE</a> 
@@ -76,7 +76,7 @@ namespace Usenet.Nntp
         /// </summary>
         /// <returns>A groups response object containing a list of valid newsgroups and associated information.</returns>
         public NntpGroupsResponse ListActive() =>
-            connection.MultiLineCommand("LIST ACTIVE", new GroupsResponseParser(215, GroupStatusRequestType.Basic));
+            _connection.MultiLineCommand("LIST ACTIVE", new GroupsResponseParser(215, GroupStatusRequestType.Basic));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc6048#section-3">LIST ACTIVE</a> 
@@ -88,6 +88,6 @@ namespace Usenet.Nntp
         /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
         /// <returns>A groups response object containing a list of valid newsgroups and associated information.</returns>
         public NntpGroupsResponse ListActive(string wildmat) =>
-            connection.MultiLineCommand($"LIST ACTIVE {wildmat}", new GroupsResponseParser(215, GroupStatusRequestType.Basic));
+            _connection.MultiLineCommand($"LIST ACTIVE {wildmat}", new GroupsResponseParser(215, GroupStatusRequestType.Basic));
     }
 }

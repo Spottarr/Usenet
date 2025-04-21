@@ -5,7 +5,7 @@
     /// </summary>
     public class CountingStream : AbstractBaseStream
     {
-        private readonly Stream innerStream;
+        private readonly Stream _innerStream;
 
         /// <summary>
         /// The number of bytes read.
@@ -23,19 +23,19 @@
         /// <param name="innerStream">The stream on which counting needs to be enabled.</param>
         public CountingStream(Stream innerStream)
         {
-            this.innerStream = innerStream;
+            _innerStream = innerStream;
         }
 
         /// <inheritdoc/>
         public override void Flush()
         {
-            innerStream.Flush();
+            _innerStream.Flush();
         }
 
         /// <inheritdoc/>
         public override int Read(byte[] buffer, int offset, int count)
         {
-            var bytesRead = innerStream.Read(buffer, offset, count);
+            var bytesRead = _innerStream.Read(buffer, offset, count);
             unchecked
             {
                 BytesRead += bytesRead;
@@ -50,7 +50,7 @@
         /// <inheritdoc/>
         public override void Write(byte[] buffer, int offset, int count)
         {
-            innerStream.Write(buffer, offset, count);
+            _innerStream.Write(buffer, offset, count);
             unchecked
             {
                 BytesWritten += count;
@@ -78,7 +78,7 @@
         
         protected override void Dispose(bool disposing)
         {
-            if(disposing) innerStream.Dispose();
+            if(disposing) _innerStream.Dispose();
             base.Dispose(disposing);
         }
     }

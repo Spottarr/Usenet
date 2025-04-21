@@ -20,7 +20,7 @@ namespace Usenet.Nntp
         public bool Authenticate(string username, string password = null)
         {
             Guard.ThrowIfNullOrWhiteSpace(username, nameof(username));
-            var userResponse = connection.Command($"AUTHINFO USER {username}", new ResponseParser(281));
+            var userResponse = _connection.Command($"AUTHINFO USER {username}", new ResponseParser(281));
             if (userResponse.Success)
             {
                 return true;
@@ -29,7 +29,7 @@ namespace Usenet.Nntp
             {
                 return false;
             }
-            var passResponse = connection.Command($"AUTHINFO PASS {password}", new ResponseParser(281));
+            var passResponse = _connection.Command($"AUTHINFO PASS {password}", new ResponseParser(281));
             return passResponse.Success;
         }
     }

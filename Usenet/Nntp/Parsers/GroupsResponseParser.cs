@@ -13,17 +13,17 @@ namespace Usenet.Nntp.Parsers
 
     internal class GroupsResponseParser : IMultiLineResponseParser<NntpGroupsResponse>
     {
-        private readonly int successCode;
-        private readonly GroupStatusRequestType requestType;
-        private readonly ILogger log = Logger.Create<GroupsResponseParser>();
+        private readonly int _successCode;
+        private readonly GroupStatusRequestType _requestType;
+        private readonly ILogger _log = Logger.Create<GroupsResponseParser>();
 
         public GroupsResponseParser(int successCode, GroupStatusRequestType requestType)
         {
-            this.successCode = successCode;
-            this.requestType = requestType;
+            _successCode = successCode;
+            _requestType = requestType;
         }
 
-        public bool IsSuccessResponse(int code) => code == successCode;
+        public bool IsSuccessResponse(int code) => code == _successCode;
 
         public NntpGroupsResponse Parse(int code, string message, IEnumerable<string> dataBlock)
         {
@@ -50,20 +50,20 @@ namespace Usenet.Nntp.Parsers
                 yield break;
             }
 
-            var checkParameterCount = requestType == GroupStatusRequestType.Basic ? 4 : 5;
+            var checkParameterCount = _requestType == GroupStatusRequestType.Basic ? 4 : 5;
 
             foreach (var line in dataBlock)
             {
                 var lineSplit = line.Split(' ');
                 if (lineSplit.Length < checkParameterCount)
                 {
-                    if (requestType == GroupStatusRequestType.Basic)
+                    if (_requestType == GroupStatusRequestType.Basic)
                     {
-                        log.InvalidGroupBasicInformationLine(line);
+                        _log.InvalidGroupBasicInformationLine(line);
                     }
                     else
                     {
-                        log.InvalidGroupExtendedInformationLine(line);
+                        _log.InvalidGroupExtendedInformationLine(line);
                     }
 
                     continue;
@@ -74,7 +74,7 @@ namespace Usenet.Nntp.Parsers
                 _ = long.TryParse(lineSplit[argCount++], out var lowWaterMark);
 
                 var articleCount = 0L;
-                if (requestType == GroupStatusRequestType.Extended)
+                if (_requestType == GroupStatusRequestType.Extended)
                 {
                     _ = long.TryParse(lineSplit[argCount++], out articleCount);
                 }
@@ -82,7 +82,7 @@ namespace Usenet.Nntp.Parsers
                 var postingStatus = PostingStatusParser.Parse(lineSplit[argCount], out var otherGroup);
                 if (postingStatus == NntpPostingStatus.Unknown)
                 {
-                    log.InvalidPostingStatus(lineSplit[argCount], line);
+                    _log.InvalidPostingStatus(lineSplit[argCount], line);
                 }
 
                 yield return new NntpGroup(

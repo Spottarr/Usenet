@@ -6,28 +6,28 @@
     /// </summary>
     internal static class Crc32
     {
-        private const uint polynomial = 0xEDB88320;
-        private const uint seed = 0xFFFFFFFF;
-        private static readonly uint[] lookupTable = CreateLookupTable();
+        private const uint Polynomial = 0xEDB88320;
+        private const uint Seed = 0xFFFFFFFF;
+        private static readonly uint[] _lookupTable = CreateLookupTable();
 
         public static uint CalculateChecksum(IEnumerable<byte> buffer)
         {
             Guard.ThrowIfNull(buffer, nameof(buffer));
             
-            var value = seed;
+            var value = Seed;
             foreach (var b in buffer)
             {
-                value = (value >> 8) ^ lookupTable[(value & 0xFF) ^ b];
+                value = (value >> 8) ^ _lookupTable[(value & 0xFF) ^ b];
             }
-            return value ^ seed;
+            return value ^ Seed;
         }
 
-        public static uint Initialize() => seed;
+        public static uint Initialize() => Seed;
 
         public static uint Calculate(uint value, int @byte) => 
-            (value >> 8) ^ lookupTable[(value & 0xFF) ^ @byte];
+            (value >> 8) ^ _lookupTable[(value & 0xFF) ^ @byte];
 
-        public static uint Finalize(uint value) => value ^ seed;
+        public static uint Finalize(uint value) => value ^ Seed;
 
         private static uint[] CreateLookupTable()
         {
@@ -37,7 +37,7 @@
                 var entry = i;
                 for (var j = 0; j < 8; j++)
                 {
-                    entry = (entry & 1) == 1 ? (entry >> 1) ^ polynomial : entry >> 1;
+                    entry = (entry & 1) == 1 ? (entry >> 1) ^ Polynomial : entry >> 1;
                 }
                 table[i] = entry;
             }

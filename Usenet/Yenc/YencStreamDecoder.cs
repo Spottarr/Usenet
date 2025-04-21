@@ -11,8 +11,8 @@ namespace Usenet.Yenc
     /// </summary>
     public static class YencStreamDecoder
     {
-        private const string yEnd = YencKeywords.YEnd + " ";
-        private const int bufferSize = 4096;
+        private const string YEnd = YencKeywords.YEnd + " ";
+        private const int BufferSize = 4096;
 
         /// <summary>
         /// Decodes yEnc-encoded text into a <see cref="YencStream"/>
@@ -49,7 +49,7 @@ namespace Usenet.Yenc
 
         private static IEnumerable<byte[]> EnumerateData(IEnumerator<string> enumerator, Encoding encoding)
         {
-            var buffer = new byte[bufferSize];
+            var buffer = new byte[BufferSize];
             while (enumerator.MoveNext())
             {
                 if (enumerator.Current == null)
@@ -57,7 +57,7 @@ namespace Usenet.Yenc
                     continue;
                 }
 
-                if (enumerator.Current.StartsWith(yEnd, StringComparison.Ordinal))
+                if (enumerator.Current.StartsWith(YEnd, StringComparison.Ordinal))
                 {
                     // skip rest if there is some
                     while (enumerator.MoveNext()) { }

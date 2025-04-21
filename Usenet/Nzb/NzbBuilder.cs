@@ -11,21 +11,21 @@ namespace Usenet.Nzb
     /// </summary>
     public class NzbBuilder
     {
-        private readonly List<File> files;
-        private readonly NntpGroupsBuilder groupsBuilder;
-        private readonly MultiValueDictionary<string, string> metaData;
-        private string messageBase = "unknown.com";
-        private string documentPoster = "Anonymous <anonymous@unknown.com>";
-        private long partSize = 384_000;
+        private readonly List<File> _files;
+        private readonly NntpGroupsBuilder _groupsBuilder;
+        private readonly MultiValueDictionary<string, string> _metaData;
+        private string _messageBase = "unknown.com";
+        private string _documentPoster = "Anonymous <anonymous@unknown.com>";
+        private long _partSize = 384_000;
 
         /// <summary>
         /// Creates a new instance of the <see cref="NzbBuilder"/> class.
         /// </summary>
         public NzbBuilder()
         {
-            files = new List<File>();
-            groupsBuilder = new NntpGroupsBuilder();
-            metaData = new MultiValueDictionary<string, string>();
+            _files = new List<File>();
+            _groupsBuilder = new NntpGroupsBuilder();
+            _metaData = new MultiValueDictionary<string, string>();
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Usenet.Nzb
         public NzbBuilder SetPoster(string value)
         {
             Guard.ThrowIfNullOrWhiteSpace(value, nameof(value));
-            documentPoster = value;
+            _documentPoster = value;
             return this;
         }
 
@@ -48,7 +48,7 @@ namespace Usenet.Nzb
         public NzbBuilder SetPartSize(long value)
         {
             Guard.ThrowIfNegativeOrZero(value, nameof(value));
-            partSize = value;
+            _partSize = value;
             return this;
         }
 
@@ -62,7 +62,7 @@ namespace Usenet.Nzb
         public NzbBuilder SetMessageBase(string value)
         {
             Guard.ThrowIfNullOrWhiteSpace(value, nameof(value));
-            messageBase = value;
+            _messageBase = value;
             return this;
         }
 
@@ -77,7 +77,7 @@ namespace Usenet.Nzb
         public NzbBuilder AddFile(IFileInfo fileInfo, NntpGroups groups = null, string poster = null)
         {
             Guard.ThrowIfNull(fileInfo, nameof(fileInfo));
-            files.Add(new File(fileInfo, groups ?? NntpGroups.Empty, poster));
+            _files.Add(new File(fileInfo, groups ?? NntpGroups.Empty, poster));
             return this;
         }
 
@@ -91,7 +91,7 @@ namespace Usenet.Nzb
             Guard.ThrowIfNull(groups, nameof(groups));
             foreach (var group in groups)
             {
-                groupsBuilder.Add(group);
+                _groupsBuilder.Add(group);
             }
             return this;
         }
@@ -104,7 +104,7 @@ namespace Usenet.Nzb
         /// <returns>The <see cref="NzbBuilder"/> so that additional calls can be chained.</returns>
         public NzbBuilder AddMetaData(string key, string value)
         {
-            metaData.Add(key, value);
+            _metaData.Add(key, value);
             return this;
         }
 
@@ -117,7 +117,7 @@ namespace Usenet.Nzb
         private MultiValueDictionary<string, string> GetMetaData()
         {
             var headers = 
-                from pair in metaData
+                from pair in _metaData
                 from val in pair.Value
                 select new Tuple<string, string>(pair.Key, val);
 
@@ -132,13 +132,13 @@ namespace Usenet.Nzb
         private List<NzbFile> GetFiles()
         {
             var date = DateTimeOffset.UtcNow;
-            return files
+            return _files
                 .Select(f => new NzbFile(
-                    f.Poster ?? documentPoster, 
+                    f.Poster ?? _documentPoster, 
                     GetSubject(f.FileInfo), 
                     f.FileInfo.Name, 
                     date, 
-                    new NntpGroupsBuilder().Add(f.Groups).Add(groupsBuilder.Groups).Build(), 
+                    new NntpGroupsBuilder().Add(f.Groups).Add(_groupsBuilder.Groups).Build(), 
                     GetSegments(f.FileInfo)))
                 .ToList();
         }
@@ -158,8 +158,8 @@ namespace Usenet.Nzb
             var offset = 0L;
             for (var number = 1; number <= segmentCount; number++)
             {
-                var messageId = $"part{number}of{segmentCount}.{fileGuid:n}@{messageBase}";
-                var size = number < segmentCount ? partSize : fileInfo.Length - offset;
+                var messageId = $"part{number}of{segmentCount}.{fileGuid:n}@{_messageBase}";
+                var size = number < segmentCount ? _partSize : fileInfo.Length - offset;
                 segments.Add(new NzbSegment(number, offset, size, messageId));
                 offset += size;
             }
@@ -168,8 +168,8 @@ namespace Usenet.Nzb
 
         private int GetSegmentCount(IFileInfo fileInfo)
         {
-            var count = (int)(fileInfo.Length / partSize);
-            if (count * partSize < fileInfo.Length)
+            var count = (int)(fileInfo.Length / _partSize);
+            if (count * _partSize < fileInfo.Length)
             {
                 count++;
             }

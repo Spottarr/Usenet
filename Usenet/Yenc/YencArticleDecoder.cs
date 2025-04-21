@@ -11,7 +11,7 @@ namespace Usenet.Yenc
     /// </summary>
     public static class YencArticleDecoder
     {
-        private const string yEnd = YencKeywords.YEnd + " ";
+        private const string YEnd = YencKeywords.YEnd + " ";
 
         /// <summary>
         /// Decodes yEnc-encoded text into a <see cref="YencArticle"/>
@@ -57,7 +57,7 @@ namespace Usenet.Yenc
                         continue;
                     }
 
-                    if (enumerator.Current.StartsWith(yEnd, StringComparison.Ordinal))
+                    if (enumerator.Current.StartsWith(YEnd, StringComparison.Ordinal))
                     {
                         footer = YencMeta.ParseFooter(YencMeta.ParseLine(enumerator.Current));
 

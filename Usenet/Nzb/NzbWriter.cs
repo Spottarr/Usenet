@@ -10,7 +10,7 @@ namespace Usenet.Nzb
     /// </summary>
     public class NzbWriter
     {
-        private readonly TextWriter textWriter;
+        private readonly TextWriter _textWriter;
 
         /// <summary>
         /// Creates a new instance of the <see cref="NzbWriter"/> class that will use
@@ -19,7 +19,7 @@ namespace Usenet.Nzb
         /// <param name="textWriter">The <see cref="TextWriter"/> to use for writing.</param>
         public NzbWriter(TextWriter textWriter)
         {
-            this.textWriter = textWriter;
+            _textWriter = textWriter;
         }
 
         /// <summary>
@@ -83,9 +83,9 @@ namespace Usenet.Nzb
             }
         }
 
-        private XmlWriter GetXmlWriter() => XmlWriter.Create(textWriter, new XmlWriterSettings
+        private XmlWriter GetXmlWriter() => XmlWriter.Create(_textWriter, new XmlWriterSettings
         {
-            Encoding = textWriter.Encoding,
+            Encoding = _textWriter.Encoding,
             Async = true,
             Indent = true
         });

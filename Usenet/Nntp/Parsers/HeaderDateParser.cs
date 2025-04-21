@@ -17,7 +17,7 @@ namespace Usenet.Nntp.Parsers
             {
                 return null;
             }
-            var valueParts = value.Split(ValuePartsSeparator, StringSplitOptions.RemoveEmptyEntries);
+            var valueParts = value.Split(_valuePartsSeparator, StringSplitOptions.RemoveEmptyEntries);
             if (valueParts.Length > 2)
             {
                 throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
@@ -31,7 +31,7 @@ namespace Usenet.Nntp.Parsers
             // remove obsolete whitespace from time part
             dateTime = Regex.Replace(dateTime, @"\s+:\s+", ":");
 
-            var dateTimeParts = dateTime.Split(DatePartSeparators, StringSplitOptions.RemoveEmptyEntries);
+            var dateTimeParts = dateTime.Split(_datePartSeparators, StringSplitOptions.RemoveEmptyEntries);
             if (dateTimeParts.Length != 5 && (dateTimeParts.Length != 6 || dateTimeParts[5] != "(UTC)"))
             {
                 throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
@@ -81,13 +81,13 @@ namespace Usenet.Nntp.Parsers
                 : currentCentury;
         }
 
-        private static readonly char[] ValuePartsSeparator = [','];
-        private static readonly char[] TimePartsSeparator = [':'];
-        private static readonly char[] DatePartSeparators = [' ', '\n', '\r', '\t'];
+        private static readonly char[] _valuePartsSeparator = [','];
+        private static readonly char[] _timePartsSeparator = [':'];
+        private static readonly char[] _datePartSeparators = [' ', '\n', '\r', '\t'];
 
         private static void ParseTime(string value, out int hour, out int minute, out int second)
         {
-            var timeParts = value.Split(TimePartsSeparator, StringSplitOptions.RemoveEmptyEntries);
+            var timeParts = value.Split(_timePartsSeparator, StringSplitOptions.RemoveEmptyEntries);
             if (timeParts.Length < 2 || timeParts.Length > 3)
             {
                 throw new FormatException(Resources.Nntp.BadHeaderDateFormat);

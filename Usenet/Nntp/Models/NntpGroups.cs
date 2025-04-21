@@ -17,7 +17,7 @@ namespace Usenet.Nntp.Models
         /// </summary>
         public const string GroupSeperator = ";";
 
-        private readonly ImmutableList<string> groups;
+        private readonly ImmutableList<string> _groups;
 
         /// <summary>
         /// Creates a new <see cref="NntpGroups"/> object.
@@ -37,17 +37,17 @@ namespace Usenet.Nntp.Models
         {
             if (groups == null)
             {
-                this.groups = ImmutableList<string>.Empty;
+                _groups = ImmutableList<string>.Empty;
                 return;
             }
             var parsedGroups = doParse ? GroupsParser.Parse(groups) : groups;
-            this.groups = parsedGroups.OrderBy(g => g).ToImmutableList();
+            _groups = parsedGroups.OrderBy(g => g).ToImmutableList();
         }
 
         /// <summary>
         /// Gets a value that indicates whether this list is empty.
         /// </summary>
-        public bool IsEmpty => groups.IsEmpty;
+        public bool IsEmpty => _groups.IsEmpty;
 
         /// <summary>
         /// Gets an empty <see cref="NntpGroups"/> object.
@@ -56,7 +56,7 @@ namespace Usenet.Nntp.Models
 
         /// <summary>Returns an enumerator that iterates through the <see cref="NntpGroups" /> values.</summary>
         /// <returns>An enumerator that iterates through the <see cref="NntpGroups" /> values.</returns>
-        public IEnumerator<string> GetEnumerator() => groups.GetEnumerator();
+        public IEnumerator<string> GetEnumerator() => _groups.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -65,7 +65,7 @@ namespace Usenet.Nntp.Models
         /// This is the format used in the NNTP Newsgroups header.
         /// </summary>
         /// <returns>All NNTP newsgroup names in a single string seperated by the ';' character.</returns>
-        public override string ToString() => string.Join(GroupSeperator, groups);
+        public override string ToString() => string.Join(GroupSeperator, _groups);
 
         /// <summary>
         /// Converts a string implicitly to a <see cref="NntpGroups"/>.
@@ -83,14 +83,14 @@ namespace Usenet.Nntp.Models
         /// Returns the hash code for this instance.
         /// </summary>
         /// <returns>A 32-bit signed integer hash code.</returns>
-        public override int GetHashCode() => HashCode.Start.Hash(groups);
+        public override int GetHashCode() => HashCode.Start.Hash(_groups);
 
         /// <summary>
         /// Returns a value indicating whether this instance is equal to the specified <see cref="NntpGroups"/> value.
         /// </summary>
         /// <param name="other">A <see cref="NntpGroups"/> object to compare to this instance.</param>
         /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-        public bool Equals(NntpGroups other) => (object)other != null && groups.SequenceEqual(other.groups);
+        public bool Equals(NntpGroups other) => (object)other != null && _groups.SequenceEqual(other._groups);
 
         /// <summary>
         /// Returns a value indicating whether this instance is equal to the specified <see cref="NntpGroups"/> value.

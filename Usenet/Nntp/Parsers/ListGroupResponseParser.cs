@@ -7,7 +7,7 @@ namespace Usenet.Nntp.Parsers
 {
     internal class ListGroupResponseParser : IMultiLineResponseParser<NntpGroupResponse>
     {
-        private readonly ILogger log = Logger.Create<ListGroupResponseParser>();
+        private readonly ILogger _log = Logger.Create<ListGroupResponseParser>();
 
         public bool IsSuccessResponse(int code) => code == 211;
 
@@ -24,7 +24,7 @@ namespace Usenet.Nntp.Parsers
             var responseSplit = message.Split(' ');
             if (responseSplit.Length < 4)
             {
-                log.InvalidGroupResponseMessage(message);
+                _log.InvalidGroupResponseMessage(message);
             }
 
             _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out var articleCount);

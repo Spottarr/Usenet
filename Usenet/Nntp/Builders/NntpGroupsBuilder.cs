@@ -8,25 +8,25 @@ namespace Usenet.Nntp.Builders
     /// </summary>
     public class NntpGroupsBuilder
     {
-        private readonly List<string> groups;
+        private readonly List<string> _groups;
 
         /// <summary>
         /// The raw groups collection.
         /// </summary>
-        public IEnumerable<string> Groups => groups;
+        public IEnumerable<string> Groups => _groups;
 
         /// <summary>
         /// Creates a new instance of the <see cref="NntpGroupsBuilder"/> class.
         /// </summary>
         public NntpGroupsBuilder()
         {
-            groups = new List<string>();
+            _groups = new List<string>();
         }
 
         /// <summary>
         /// Gets a value that indicates whether this list is empty.
         /// </summary>
-        public bool IsEmpty => groups.Count == 0;
+        public bool IsEmpty => _groups.Count == 0;
 
         /// <summary>
         /// Adds a new value to the <see cref="NntpGroups"/> object.
@@ -76,7 +76,7 @@ namespace Usenet.Nntp.Builders
         /// Creates a <see cref="NntpGroups"/> with al the properties from the <see cref="NntpGroupsBuilder"/>.
         /// </summary>
         /// <returns>The <see cref="NntpGroups"/>.</returns>
-        public NntpGroups Build() => new NntpGroups(groups, false);
+        public NntpGroups Build() => new NntpGroups(_groups, false);
 
         private void AddGroups(IEnumerable<string> values)
         {
@@ -86,9 +86,9 @@ namespace Usenet.Nntp.Builders
             }
             foreach (var group in values)
             {
-                if (!groups.Contains(group))
+                if (!_groups.Contains(group))
                 {
-                    groups.Add(group);
+                    _groups.Add(group);
                 }
             }
         }
@@ -101,7 +101,7 @@ namespace Usenet.Nntp.Builders
             }
             foreach (var group in values)
             {
-                groups.RemoveAll(g => g == group);
+                _groups.RemoveAll(g => g == group);
             }
         }
     }

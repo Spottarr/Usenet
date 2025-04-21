@@ -17,24 +17,24 @@ namespace Usenet.Nntp.Parsers
 
     internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleResponse>
     {
-        private readonly ILogger log = Logger.Create<ArticleResponseParser>();
-        private readonly ArticleRequestType requestType;
-        private readonly int successCode;
+        private readonly ILogger _log = Logger.Create<ArticleResponseParser>();
+        private readonly ArticleRequestType _requestType;
+        private readonly int _successCode;
 
         public ArticleResponseParser(ArticleRequestType requestType)
         {
-            switch (this.requestType = requestType)
+            switch (_requestType = requestType)
             {
                 case ArticleRequestType.Head:
-                    successCode = 221;
+                    _successCode = 221;
                     break;
 
                 case ArticleRequestType.Body:
-                    successCode = 222;
+                    _successCode = 222;
                     break;
 
                 case ArticleRequestType.Article:
-                    successCode = 220;
+                    _successCode = 220;
                     break;
 
                 default:
@@ -42,7 +42,7 @@ namespace Usenet.Nntp.Parsers
             }
         }
 
-        public bool IsSuccessResponse(int code) => code == successCode;
+        public bool IsSuccessResponse(int code) => code == _successCode;
 
         public NntpArticleResponse Parse(int code, string message, IEnumerable<string> dataBlock)
         {
@@ -55,7 +55,7 @@ namespace Usenet.Nntp.Parsers
             var responseSplit = message.Split(' ');
             if (responseSplit.Length < 2)
             {
-                log.InvalidResponseMessage(message);
+                _log.InvalidResponseMessage(message);
             }
 
             _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out var number);
@@ -70,7 +70,7 @@ namespace Usenet.Nntp.Parsers
             using (var enumerator = dataBlock.GetEnumerator())
             {
                 // get headers if requested
-                var headers = (requestType & ArticleRequestType.Head) == ArticleRequestType.Head
+                var headers = (_requestType & ArticleRequestType.Head) == ArticleRequestType.Head
                     ? GetHeaders(enumerator)
                     : MultiValueDictionary<string, string>.Empty;
 
@@ -80,7 +80,7 @@ namespace Usenet.Nntp.Parsers
                     : null;
 
                 // get body if requested
-                var bodyLines = (requestType & ArticleRequestType.Body) == ArticleRequestType.Body
+                var bodyLines = (_requestType & ArticleRequestType.Body) == ArticleRequestType.Body
                     ? EnumerateBodyLines(enumerator)
                     : [];
 
@@ -118,7 +118,7 @@ namespace Usenet.Nntp.Parsers
                     var splitPos = line.IndexOf(':', StringComparison.Ordinal);
                     if (splitPos < 0)
                     {
-                        log.InvalidHeaderLine(line);
+                        _log.InvalidHeaderLine(line);
                     }
                     else
                     {

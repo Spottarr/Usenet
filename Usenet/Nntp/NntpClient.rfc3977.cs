@@ -19,7 +19,7 @@ namespace Usenet.Nntp
         public async Task<bool> ConnectAsync(string hostname, int port, bool useSsl)
         {
             Guard.ThrowIfNullOrWhiteSpace(hostname, nameof(hostname));
-            var response = await connection.ConnectAsync(hostname, port, useSsl, new ResponseParser(200, 201)).ConfigureAwait(false);
+            var response = await _connection.ConnectAsync(hostname, port, useSsl, new ResponseParser(200, 201)).ConfigureAwait(false);
             return response.Success;
         }
 
@@ -28,7 +28,7 @@ namespace Usenet.Nntp
         /// command allows a client to determine the capabilities of the server at any given time.
         /// </summary>
         /// <returns>A multi-line response containing the capabilities.</returns>
-        public NntpMultiLineResponse Capabilities() => connection.MultiLineCommand("CAPABILITIES", new MultiLineResponseParser(101));
+        public NntpMultiLineResponse Capabilities() => _connection.MultiLineCommand("CAPABILITIES", new MultiLineResponseParser(101));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-5.2">CAPABILITIES</a> 
@@ -37,7 +37,7 @@ namespace Usenet.Nntp
         /// <param name="keyword">Can be provided for additional features if supported by the server.</param>
         /// <returns>A multi-line response containing the capabilities.</returns>
         public NntpMultiLineResponse Capabilities(string keyword) =>
-            connection.MultiLineCommand($"CAPABILITIES {keyword.ThrowIfNullOrWhiteSpace(nameof(keyword))}", new MultiLineResponseParser(101));
+            _connection.MultiLineCommand($"CAPABILITIES {keyword.ThrowIfNullOrWhiteSpace(nameof(keyword))}", new MultiLineResponseParser(101));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-5.3">MODE READER</a> 
@@ -45,7 +45,7 @@ namespace Usenet.Nntp
         /// instructs a mode-switching server to switch modes, as described in Section 3.4.2.
         /// </summary>
         /// <returns>A mode reader response object.</returns>
-        public NntpModeReaderResponse ModeReader() => connection.Command("MODE READER", new ModeReaderResponseParser());
+        public NntpModeReaderResponse ModeReader() => _connection.Command("MODE READER", new ModeReaderResponseParser());
 
         /// <summary>
         /// The client uses the 
@@ -53,7 +53,7 @@ namespace Usenet.Nntp
         /// command to terminate the session.
         /// </summary>
         /// <returns>A response object.</returns>
-        public NntpResponse Quit() => connection.Command("QUIT", new ResponseParser(205));
+        public NntpResponse Quit() => _connection.Command("QUIT", new ResponseParser(205));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.1">GROUP</a> 
@@ -62,7 +62,7 @@ namespace Usenet.Nntp
         /// <param name="group">The name of the group to select.</param>
         /// <returns>A group response object.</returns>
         public NntpGroupResponse Group(string group) =>
-            connection.Command($"GROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))}", new GroupResponseParser());
+            _connection.Command($"GROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))}", new GroupResponseParser());
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a> 
@@ -74,7 +74,7 @@ namespace Usenet.Nntp
         /// <param name="range">Only include article numbers within this range in the list.</param>
         /// <returns>A group response object.</returns>
         public NntpGroupResponse ListGroup(string group, NntpArticleRange range) =>
-            connection.MultiLineCommand($"LISTGROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))} {range}", new ListGroupResponseParser());
+            _connection.MultiLineCommand($"LISTGROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))} {range}", new ListGroupResponseParser());
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a> 
@@ -85,7 +85,7 @@ namespace Usenet.Nntp
         /// <param name="group">The name of the group to select.</param>
         /// <returns>A group response object.</returns>
         public NntpGroupResponse ListGroup(string group) =>
-            connection.MultiLineCommand($"LISTGROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))}", new ListGroupResponseParser());
+            _connection.MultiLineCommand($"LISTGROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))}", new ListGroupResponseParser());
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a> 
@@ -94,7 +94,7 @@ namespace Usenet.Nntp
         /// </summary>
         /// <returns>A group response object.</returns>
         public NntpGroupResponse ListGroup() =>
-            connection.MultiLineCommand("LISTGROUP", new ListGroupResponseParser());
+            _connection.MultiLineCommand("LISTGROUP", new ListGroupResponseParser());
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.3">LAST</a> command.
@@ -104,7 +104,7 @@ namespace Usenet.Nntp
         /// number).
         /// </summary>
         /// <returns>A last response object.</returns>
-        public NntpLastResponse Last() => connection.Command("LAST", new LastResponseParser());
+        public NntpLastResponse Last() => _connection.Command("LAST", new LastResponseParser());
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.4">NEXT</a> command.
@@ -114,7 +114,7 @@ namespace Usenet.Nntp
         /// number).
         /// </summary>
         /// <returns>A next response object.</returns>
-        public NntpNextResponse Next() => connection.Command("NEXT", new NextResponseParser());
+        public NntpNextResponse Next() => _connection.Command("NEXT", new NextResponseParser());
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.1">ARTICLE</a> command 
@@ -125,7 +125,7 @@ namespace Usenet.Nntp
         /// <param name="messageId">The message-id of the article to received from the server.</param>
         /// <returns>An article response object.</returns>
         public NntpArticleResponse Article(NntpMessageId messageId) =>
-            connection.MultiLineCommand(
+            _connection.MultiLineCommand(
                 $"ARTICLE {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}", 
                 new ArticleResponseParser(ArticleRequestType.Article));
 
@@ -138,7 +138,7 @@ namespace Usenet.Nntp
         /// <param name="number">The number of the article to receive from the server.</param>
         /// <returns>An article response object.</returns>
         public NntpArticleResponse Article(long number) =>
-            connection.MultiLineCommand($"ARTICLE {number}", new ArticleResponseParser(ArticleRequestType.Article));
+            _connection.MultiLineCommand($"ARTICLE {number}", new ArticleResponseParser(ArticleRequestType.Article));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.1">ARTICLE</a> command 
@@ -148,7 +148,7 @@ namespace Usenet.Nntp
         /// </summary>
         /// <returns>An article response object.</returns>
         public NntpArticleResponse Article() =>
-            connection.MultiLineCommand("ARTICLE", new ArticleResponseParser(ArticleRequestType.Article));
+            _connection.MultiLineCommand("ARTICLE", new ArticleResponseParser(ArticleRequestType.Article));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.2">HEAD</a> 
@@ -160,7 +160,7 @@ namespace Usenet.Nntp
         /// <param name="messageId">The message-id of the article to received from the server.</param>
         /// <returns>An article response object.</returns>
         public NntpArticleResponse Head(NntpMessageId messageId) =>
-            connection.MultiLineCommand(
+            _connection.MultiLineCommand(
                 $"HEAD {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}", 
                 new ArticleResponseParser(ArticleRequestType.Head));
 
@@ -174,7 +174,7 @@ namespace Usenet.Nntp
         /// <param name="number">The number of the article to receive from the server.</param>
         /// <returns>An article response object.</returns>
         public NntpArticleResponse Head(long number) =>
-            connection.MultiLineCommand($"HEAD {number}", new ArticleResponseParser(ArticleRequestType.Head));
+            _connection.MultiLineCommand($"HEAD {number}", new ArticleResponseParser(ArticleRequestType.Head));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.2">HEAD</a> 
@@ -185,7 +185,7 @@ namespace Usenet.Nntp
         /// </summary>
         /// <returns>An article response object.</returns>
         public NntpArticleResponse Head() =>
-            connection.MultiLineCommand("HEAD", new ArticleResponseParser(ArticleRequestType.Head));
+            _connection.MultiLineCommand("HEAD", new ArticleResponseParser(ArticleRequestType.Head));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.3">BODY</a> 
@@ -197,7 +197,7 @@ namespace Usenet.Nntp
         /// <param name="messageId">The message-id of the article to received from the server.</param>
         /// <returns>An article response object.</returns>
         public NntpArticleResponse Body(NntpMessageId messageId) =>
-            connection.MultiLineCommand(
+            _connection.MultiLineCommand(
                 $"BODY {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}", 
                 new ArticleResponseParser(ArticleRequestType.Body));
 
@@ -212,7 +212,7 @@ namespace Usenet.Nntp
         /// <param name="number">The number of the article to receive from the server.</param>
         /// <returns>An article response object.</returns>
         public NntpArticleResponse Body(long number) =>
-            connection.MultiLineCommand($"BODY {number}", new ArticleResponseParser(ArticleRequestType.Body));
+            _connection.MultiLineCommand($"BODY {number}", new ArticleResponseParser(ArticleRequestType.Body));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.3">BODY</a> 
@@ -224,7 +224,7 @@ namespace Usenet.Nntp
         /// </summary>
         /// <returns>An article response object.</returns>
         public NntpArticleResponse Body() =>
-            connection.MultiLineCommand("BODY", new ArticleResponseParser(ArticleRequestType.Body));
+            _connection.MultiLineCommand("BODY", new ArticleResponseParser(ArticleRequestType.Body));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.4">STAT</a> 
@@ -236,7 +236,7 @@ namespace Usenet.Nntp
         /// <param name="messageId">The message-id of the article to received from the server.</param>
         /// <returns>A stat response object.</returns>
         public NntpStatResponse Stat(NntpMessageId messageId) =>
-            connection.Command($"STAT {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}", new StatResponseParser());
+            _connection.Command($"STAT {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}", new StatResponseParser());
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.4">STAT</a> 
@@ -247,7 +247,7 @@ namespace Usenet.Nntp
         /// </summary>
         /// <param name="number">The number of the article to receive from the server.</param>
         /// <returns>A stat response object.</returns>
-        public NntpStatResponse Stat(long number) => connection.Command($"STAT {number}", new StatResponseParser());
+        public NntpStatResponse Stat(long number) => _connection.Command($"STAT {number}", new StatResponseParser());
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.4">STAT</a> 
@@ -257,7 +257,7 @@ namespace Usenet.Nntp
         /// NOT multi-line.
         /// </summary>
         /// <returns>A stat response object.</returns>
-        public NntpStatResponse Stat() => connection.Command("STAT", new StatResponseParser());
+        public NntpStatResponse Stat() => _connection.Command("STAT", new StatResponseParser());
 
         /// <summary>
         /// Post an article.
@@ -265,13 +265,13 @@ namespace Usenet.Nntp
         /// </summary>
         public bool Post(NntpArticle article)
         {
-            var initialResponse = connection.Command("POST", new ResponseParser(340));
+            var initialResponse = _connection.Command("POST", new ResponseParser(340));
             if (!initialResponse.Success)
             {
                 return false;
             }
-            ArticleWriter.Write(connection, article);
-            var subsequentResponse = connection.GetResponse(new ResponseParser(240));
+            ArticleWriter.Write(_connection, article);
+            var subsequentResponse = _connection.GetResponse(new ResponseParser(240));
             return subsequentResponse.Success;
         }
 
@@ -281,13 +281,13 @@ namespace Usenet.Nntp
         /// </summary>
         public bool Ihave(NntpArticle article)
         {
-            var initialResponse = connection.Command("IHAVE", new ResponseParser(335));
+            var initialResponse = _connection.Command("IHAVE", new ResponseParser(335));
             if (!initialResponse.Success)
             {
                 return false;
             }
-            ArticleWriter.Write(connection, article);
-            var subsequentResponse = connection.GetResponse(new ResponseParser(235));
+            ArticleWriter.Write(_connection, article);
+            var subsequentResponse = _connection.GetResponse(new ResponseParser(235));
             return subsequentResponse.Success;
         }
 
@@ -297,7 +297,7 @@ namespace Usenet.Nntp
         /// Universal Time [TF.686-1] from the server's perspective.
         /// </summary>
         /// <returns>A date response object.</returns>
-        public NntpDateResponse Date() => connection.Command("DATE", new DateResponseParser());
+        public NntpDateResponse Date() => _connection.Command("DATE", new DateResponseParser());
 
         /// <summary>
         /// The <a herf="https://tools.ietf.org/html/rfc3977#section-7.2">HELP</a> 
@@ -306,7 +306,7 @@ namespace Usenet.Nntp
         /// </summary>
         /// <returns>A multi-line response with a short summary of the available commands.</returns>
         public NntpMultiLineResponse Help() =>
-            connection.MultiLineCommand("HELP", new MultiLineResponseParser(100));
+            _connection.MultiLineCommand("HELP", new MultiLineResponseParser(100));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.3">NEWGROUPS</a> 
@@ -316,7 +316,7 @@ namespace Usenet.Nntp
         /// <param name="sinceDateTime">List all newsgroups created since this date and time.</param>
         /// <returns>A groups response object.</returns>
         public NntpGroupsResponse NewGroups(NntpDateTime sinceDateTime) =>
-            connection.MultiLineCommand($"NEWGROUPS {sinceDateTime}", new GroupsResponseParser(231, GroupStatusRequestType.Basic));
+            _connection.MultiLineCommand($"NEWGROUPS {sinceDateTime}", new GroupsResponseParser(231, GroupStatusRequestType.Basic));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.4">NEWNEWS</a> 
@@ -329,7 +329,7 @@ namespace Usenet.Nntp
         /// posted or received since this date and time.</param>
         /// <returns>A multi-line response containing a list of message-ids.</returns>
         public NntpMultiLineResponse NewNews(string wildmat, NntpDateTime sinceDateTime) =>
-            connection.MultiLineCommand($"NEWNEWS {wildmat} {sinceDateTime}", new MultiLineResponseParser(230));
+            _connection.MultiLineCommand($"NEWNEWS {wildmat} {sinceDateTime}", new MultiLineResponseParser(230));
 
 
         /// <summary>
@@ -340,7 +340,7 @@ namespace Usenet.Nntp
         /// </summary>
         /// <returns>A group origins response.</returns>
         public NntpGroupOriginsResponse ListActiveTimes() =>
-            connection.MultiLineCommand("LIST ACTIVE.TIMES", new GroupOriginsResponseParser());
+            _connection.MultiLineCommand("LIST ACTIVE.TIMES", new GroupOriginsResponseParser());
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.4">active.times list</a> 
@@ -351,7 +351,7 @@ namespace Usenet.Nntp
         /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
         /// <returns>A group origins response.</returns>
         public NntpGroupOriginsResponse ListActiveTimes(string wildmat) =>
-            connection.MultiLineCommand($"LIST ACTIVE.TIMES {wildmat}", new GroupOriginsResponseParser());
+            _connection.MultiLineCommand($"LIST ACTIVE.TIMES {wildmat}", new GroupOriginsResponseParser());
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.5">distrib.pats list</a> 
@@ -362,7 +362,7 @@ namespace Usenet.Nntp
         /// </summary>
         /// <returns>A multi-line response object containing newsgroup distribution information.</returns>
         public NntpMultiLineResponse ListDistribPats() =>
-            connection.MultiLineCommand("LIST DISTRIB.PATS", new MultiLineResponseParser(215));
+            _connection.MultiLineCommand("LIST DISTRIB.PATS", new MultiLineResponseParser(215));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.6">newsgroups list</a> 
@@ -373,7 +373,7 @@ namespace Usenet.Nntp
         /// </summary>
         /// <returns>A multi-line response containing a list of newsgroups available on the server.</returns>
         public NntpMultiLineResponse ListNewsgroups() =>
-            connection.MultiLineCommand("LIST NEWSGROUPS", new MultiLineResponseParser(215));
+            _connection.MultiLineCommand("LIST NEWSGROUPS", new MultiLineResponseParser(215));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.6">newsgroups list</a> 
@@ -385,7 +385,7 @@ namespace Usenet.Nntp
         /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
         /// <returns>A multi-line response containing a list of newsgroups available on the server.</returns>
         public NntpMultiLineResponse ListNewsgroups(string wildmat) =>
-            connection.MultiLineCommand($"LIST NEWSGROUPS {wildmat}", new MultiLineResponseParser(215));
+            _connection.MultiLineCommand($"LIST NEWSGROUPS {wildmat}", new MultiLineResponseParser(215));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.3">OVER</a> 
@@ -396,7 +396,7 @@ namespace Usenet.Nntp
         /// <param name="messageId">The message-id of the article to received from the server.</param>
         /// <returns>A multi-line response containing header fields.</returns>
         public NntpMultiLineResponse Over(NntpMessageId messageId) =>
-            connection.MultiLineCommand($"OVER {messageId}", new MultiLineResponseParser(224));
+            _connection.MultiLineCommand($"OVER {messageId}", new MultiLineResponseParser(224));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.3">OVER</a> 
@@ -407,7 +407,7 @@ namespace Usenet.Nntp
         /// <param name="range">Only include article numbers within this range in the list.</param>
         /// <returns>A multi-line response containing header fields.</returns>
         public NntpMultiLineResponse Over(NntpArticleRange range) =>
-            connection.MultiLineCommand($"OVER {range}", new MultiLineResponseParser(224));
+            _connection.MultiLineCommand($"OVER {range}", new MultiLineResponseParser(224));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.3">OVER</a> 
@@ -416,7 +416,7 @@ namespace Usenet.Nntp
         /// article or range of articles in the currently selected newsgroup.
         /// </summary>
         /// <returns>A multi-line response containing header fields.</returns>
-        public NntpMultiLineResponse Over() => connection.MultiLineCommand("OVER", new MultiLineResponseParser(224));
+        public NntpMultiLineResponse Over() => _connection.MultiLineCommand("OVER", new MultiLineResponseParser(224));
 
 
         /// <summary>
@@ -428,7 +428,7 @@ namespace Usenet.Nntp
         /// <returns>A multi-line response containing a description of the fields 
         /// in the overview database for which it is consistent.</returns>
         public NntpMultiLineResponse ListOverviewFormat() =>
-            connection.MultiLineCommand("LIST OVERVIEW.FMT", new MultiLineResponseParser(215));
+            _connection.MultiLineCommand("LIST OVERVIEW.FMT", new MultiLineResponseParser(215));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a> 
@@ -440,7 +440,7 @@ namespace Usenet.Nntp
         /// <param name="messageId">The message-id of the article to received from the server.</param>
         /// <returns>A multi-line response containing the specfied header fields.</returns>
         public NntpMultiLineResponse Hdr(string field, NntpMessageId messageId) =>
-            connection.MultiLineCommand($"HDR {field} {messageId}", new MultiLineResponseParser(225));
+            _connection.MultiLineCommand($"HDR {field} {messageId}", new MultiLineResponseParser(225));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a> 
@@ -452,7 +452,7 @@ namespace Usenet.Nntp
         /// <param name="range">Only include article numbers within this range in the list.</param>
         /// <returns>A multi-line response containing the specfied header fields.</returns>
         public NntpMultiLineResponse Hdr(string field, NntpArticleRange range) =>
-            connection.MultiLineCommand($"HDR {field} {range}", new MultiLineResponseParser(225));
+            _connection.MultiLineCommand($"HDR {field} {range}", new MultiLineResponseParser(225));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a> 
@@ -463,7 +463,7 @@ namespace Usenet.Nntp
         /// <param name="field">The header field to retrieve.</param>
         /// <returns>A multi-line response containing the specfied header fields.</returns>
         public NntpMultiLineResponse Hdr(string field) =>
-            connection.MultiLineCommand($"HDR {field}", new MultiLineResponseParser(225));
+            _connection.MultiLineCommand($"HDR {field}", new MultiLineResponseParser(225));
 
 
         /// <summary>
@@ -475,7 +475,7 @@ namespace Usenet.Nntp
         /// <returns>A multi-line response containg a list of header 
         /// fields that may be retrieved using the HDR command.</returns>
         public NntpMultiLineResponse ListHeaders(NntpMessageId messageId) =>
-            connection.MultiLineCommand($"LIST HEADERS {messageId}", new MultiLineResponseParser(215));
+            _connection.MultiLineCommand($"LIST HEADERS {messageId}", new MultiLineResponseParser(215));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.6">LIST HEADERS</a> 
@@ -486,7 +486,7 @@ namespace Usenet.Nntp
         /// <returns>A multi-line response containg a list of header 
         /// fields that may be retrieved using the HDR command.</returns>
         public NntpMultiLineResponse ListHeaders(NntpArticleRange range) =>
-            connection.MultiLineCommand($"LIST HEADERS {range}", new MultiLineResponseParser(215));
+            _connection.MultiLineCommand($"LIST HEADERS {range}", new MultiLineResponseParser(215));
 
         /// <summary>
         /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.6">LIST HEADERS</a> 
@@ -496,6 +496,6 @@ namespace Usenet.Nntp
         /// <returns>A multi-line response containg a list of header 
         /// fields that may be retrieved using the HDR command.</returns>
         public NntpMultiLineResponse ListHeaders() =>
-            connection.MultiLineCommand("LIST HEADERS", new MultiLineResponseParser(215));
+            _connection.MultiLineCommand("LIST HEADERS", new MultiLineResponseParser(215));
     }
 }

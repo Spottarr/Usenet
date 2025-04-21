@@ -9,15 +9,15 @@ namespace Usenet
     /// </summary>
     public static class Logger
     {
-        private static ILoggerFactory factoryInstance;
+        private static ILoggerFactory _factoryInstance;
 
         /// <summary>
         /// The singleton <see cref="ILoggerFactory"/> to use throughout the entire library.
         /// </summary>
         public static ILoggerFactory Factory
         {
-            get => factoryInstance ?? (factoryInstance = new NullLoggerFactory());
-            set => factoryInstance = value;
+            get => _factoryInstance ?? (_factoryInstance = new NullLoggerFactory());
+            set => _factoryInstance = value;
         }
 
         /// <summary>
