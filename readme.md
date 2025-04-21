@@ -10,8 +10,6 @@ Binary messages will be encoded to yEnc format streaming and yEnc-encoded data w
 
 The NNTP client is compliant with [RFC 2980](https://tools.ietf.org/html/rfc2980), [RFC 3977](https://tools.ietf.org/html/rfc3977), [RFC 4643](https://tools.ietf.org/html/rfc4643) and [RFC 6048](https://tools.ietf.org/html/rfc6048).
 
-[![Build status](https://ci.appveyor.com/api/projects/status/5kp5xbcr03xwpb6t?svg=true)](https://ci.appveyor.com/project/keimpema/usenet)
-
 ## Getting Started ##
 Install [Nuget](https://www.nuget.org/packages/Usenet) package:
 ```
