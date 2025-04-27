@@ -23,7 +23,7 @@ public static class HeaderDateParser
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    internal static DateTimeOffset? Parse(string value)
+    public static DateTimeOffset? Parse(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
             return null;
