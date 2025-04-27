@@ -26,15 +26,11 @@ public static class HeaderDateParser
     internal static DateTimeOffset? Parse(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-        {
             return null;
-        }
 
         var matches = _dateTimeRegex.Match(value);
         if (!matches.Success)
-        {
             throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
-        }
 
         var day = int.Parse(matches.Groups["day"].Value, CultureInfo.InvariantCulture);
         var month = matches.Groups["month"].Value;
@@ -69,68 +65,36 @@ public static class HeaderDateParser
     {
         // The time zone must be as specified in RFC822, https://tools.ietf.org/html/rfc822#section-5
 
-        if (!short.TryParse(value, out var zone))
-        {
-            switch (value)
-            {
-                // UTC and empty are not specified in RFC822, but allowing them since they are commonly used
-                case "UTC":
-                case "UT":
-                case "GMT":
-                case "Z":
-                case "":
-                    break;
-
-                case "EDT":
-                    zone = -0400;
-                    break;
-
-                case "EST":
-                case "CDT":
-                    zone = -0500;
-                    break;
-
-                case "CST":
-                case "MDT":
-                    zone = -0600;
-                    break;
-
-                case "MST":
-                case "PDT":
-                    zone = -0700;
-                    break;
-
-                case "PST":
-                    zone = -0800;
-                    break;
-
-                case "A":
-                    zone = -0100;
-                    break;
-
-                case "N":
-                    zone = +0100;
-                    break;
-
-                case "M":
-                    zone = -1200;
-                    break;
-
-                case "Y":
-                    zone = +1200;
-                    break;
-
-                default:
-                    throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
-            }
-        }
-        else if (-9999 > zone || zone > 9999)
-        {
+        if (!short.TryParse(value, out var zone) && !TryParseZoneText(value, out zone))
             throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
-        }
+
+        if (zone is < -9999 or > 9999)
+            throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
 
         var minute = zone % 100;
         var hour = zone / 100;
+
         return TimeSpan.FromMinutes(hour * 60 + minute);
+    }
+
+    private static bool TryParseZoneText(string value, out short zone)
+    {
+        zone = value switch
+        {
+            // UTC and empty are not specified in RFC822, but allowing them since they are commonly used
+            "UTC" or "UT" or "GMT" or "Z" or "" => 0000,
+            "EDT" => -0400,
+            "EST" or "CDT" => -0500,
+            "CST" or "MDT" => -0600,
+            "MST" or "PDT" => -0700,
+            "PST" => -0800,
+            "A" => -0100,
+            "N" => +0100,
+            "M" => -1200,
+            "Y" => +1200,
+            _ => 9999
+        };
+
+        return zone != 9999;
     }
 }
