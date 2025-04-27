@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace Usenet.Nntp.Parsers;
 
-internal static class HeaderDateParser
+public static class HeaderDateParser
 {
     private const string DateTimeRegexString =
         @"(?:\s*"
