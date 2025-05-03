@@ -1,4 +1,5 @@
-﻿using Usenet.Nntp.Models;
+﻿using System.Text;
+using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
 using Usenet.Util;
 using UsenetTests.TestHelpers;
@@ -93,5 +94,49 @@ public class ArticleResponseParserTests
         var articleResponse = new ArticleResponseParser((ArticleRequestType)requestType).Parse(
             responseCode, responseMessage, lines.ToList());
         Assert.Null(articleResponse.Article);
+    }
+
+    /// <summary>
+    /// While headers are being read eagerly, the body is lazily enumerated.
+    /// This means that the body is not read from the stream until it is actually needed.
+    /// Previously, the IEnumerator reading the response data was disposed.
+    /// This causes the IEnumerable to return no data while the underlying stream still contains it.
+    /// Any subsequent command would then receive this data that was still in the stream, causing them to fail.
+    /// </summary>
+    [Fact]
+    public void LazyEnumerationOfBodyShouldReadFromSourceStream()
+    {
+        var response = """
+                       FirstHeader: FirstValue
+                       SecondHeader: SecondValue
+
+                       This is an
+                        example of some
+                        body text
+                        as returned by
+                        the server.
+                       """;
+
+        using var stream = new MemoryStream(Encoding.ASCII.GetBytes(response));
+        using var reader = new StreamReader(stream, Encoding.ASCII);
+
+        var data = ReadMultiLineDataBlock(reader);
+        var parser = new ArticleResponseParser(ArticleRequestType.Article);
+        var articleResponse = parser.Parse(220, "", data);
+
+        var body = string.Concat(articleResponse.Article.Body);
+
+        Assert.NotEmpty(body);
+    }
+
+    /// <summary>
+    /// Mimics <see cref="Usenet.Nntp.NntpConnection.ReadMultiLineDataBlock"/>
+    /// </summary>
+    private static IEnumerable<string> ReadMultiLineDataBlock(StreamReader reader)
+    {
+        while (reader.ReadLine() is { } line)
+        {
+            yield return line;
+        }
     }
 }
