@@ -67,34 +67,33 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
             return new NntpArticleResponse(code, message, true, new NntpArticle(number, messageId, null, null, null));
         }
 
-        using (var enumerator = dataBlock.GetEnumerator())
+        var enumerator = dataBlock.GetEnumerator();
+
+        // get headers if requested
+        var headers = (_requestType & ArticleRequestType.Head) == ArticleRequestType.Head
+            ? GetHeaders(enumerator)
+            : MultiValueDictionary<string, string>.Empty;
+
+        // get groups
+        var groups = headers.TryGetValue(NntpHeaders.Newsgroups, out var values)
+            ? new NntpGroupsBuilder().Add(values).Build()
+            : null;
+
+        // get body if requested
+        var bodyLines = (_requestType & ArticleRequestType.Body) == ArticleRequestType.Body
+            ? EnumerateBodyLines(enumerator)
+            : [];
+
+        if (dataBlock is ICollection<string>)
         {
-            // get headers if requested
-            var headers = (_requestType & ArticleRequestType.Head) == ArticleRequestType.Head
-                ? GetHeaders(enumerator)
-                : MultiValueDictionary<string, string>.Empty;
-
-            // get groups
-            var groups = headers.TryGetValue(NntpHeaders.Newsgroups, out var values)
-                ? new NntpGroupsBuilder().Add(values).Build()
-                : null;
-
-            // get body if requested
-            var bodyLines = (_requestType & ArticleRequestType.Body) == ArticleRequestType.Body
-                ? EnumerateBodyLines(enumerator)
-                : [];
-
-            if (dataBlock is ICollection<string>)
-            {
-                // no need to keep enumerator if input is not a stream
-                // memoize the body lines
-                bodyLines = bodyLines.ToList();
-            }
-
-            return new NntpArticleResponse(
-                code, message, true,
-                new NntpArticle(number, messageId, groups, headers, bodyLines));
+            // no need to keep enumerator if input is not a stream
+            // memoize the body lines
+            bodyLines = bodyLines.ToList();
         }
+
+        return new NntpArticleResponse(
+            code, message, true,
+            new NntpArticle(number, messageId, groups, headers, bodyLines));
     }
 
     private MultiValueDictionary<string, string> GetHeaders(IEnumerator<string> enumerator)
