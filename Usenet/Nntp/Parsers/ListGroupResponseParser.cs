@@ -32,13 +32,7 @@ internal class ListGroupResponseParser : IMultiLineResponseParser<NntpGroupRespo
         _ = long.TryParse(responseSplit.Length > 2 ? responseSplit[2] : null, out var highWaterMark);
         var name = responseSplit.Length > 3 ? responseSplit[3] : string.Empty;
 
-        var articleNumbers = EnumerateArticleNumbers(dataBlock);
-        if (dataBlock is ICollection<string>)
-        {
-            // no need to keep enumerator if input is not a stream
-            // memoize the article numbers (https://en.wikipedia.org/wiki/Memoization)
-            articleNumbers = articleNumbers.ToList();
-        }
+        var articleNumbers = EnumerateArticleNumbers(dataBlock).ToList();
 
         return new NntpGroupResponse(code, message, true,
             new NntpGroup(

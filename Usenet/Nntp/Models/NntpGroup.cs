@@ -44,7 +44,7 @@ public class NntpGroup : IEquatable<NntpGroup>
     /// <summary>
     /// A list of <see cref="NntpArticle"/> numbers in the <see cref="NntpGroup"/>.
     /// </summary>
-    public IEnumerable<long> ArticleNumbers { get; private set; }
+    public IImmutableList<long> ArticleNumbers { get; }
 
     /// <summary>
     /// Creates a new instance of the <see cref="NntpGroup"/> class.
@@ -64,7 +64,7 @@ public class NntpGroup : IEquatable<NntpGroup>
         long highWaterMark,
         NntpPostingStatus postingStatus,
         string otherGroup,
-        IEnumerable<long> articleNumbers)
+        IList<long> articleNumbers)
     {
         Name = name ?? string.Empty;
         ArticleCount = articleCount;
@@ -72,25 +72,7 @@ public class NntpGroup : IEquatable<NntpGroup>
         HighWaterMark = highWaterMark;
         PostingStatus = EnumShim.IsDefined(postingStatus) ? postingStatus : NntpPostingStatus.Unknown;
         OtherGroup = otherGroup ?? string.Empty;
-
-        switch (articleNumbers)
-        {
-            case null:
-                // create empty immutable list
-                ArticleNumbers = new List<long>(0).ToImmutableList();
-                break;
-
-            case ICollection<long> collection:
-                // make immutable
-                ArticleNumbers = collection.OrderBy(n => n).ToImmutableList();
-                break;
-
-            default:
-                // not a collection but a stream of numbers, keep enumerator
-                // this is immutable already
-                ArticleNumbers = articleNumbers;
-                break;
-        }
+        ArticleNumbers = (articleNumbers ?? []).OrderBy(n => n).ToImmutableList();
     }
 
     /// <summary>
@@ -125,24 +107,7 @@ public class NntpGroup : IEquatable<NntpGroup>
             PostingStatus.Equals(other.PostingStatus) &&
             OtherGroup.Equals(other.OtherGroup, StringComparison.Ordinal);
 
-        if (!equals)
-        {
-            return false;
-        }
-
-        // need to memoize the enumerables for comparison
-        // otherwise they can not be used anymore after this call to equals
-        if (!(ArticleNumbers is ICollection<long>))
-        {
-            ArticleNumbers = ArticleNumbers.ToList();
-        }
-
-        if (!(other.ArticleNumbers is ICollection<long>))
-        {
-            other.ArticleNumbers = other.ArticleNumbers.ToList();
-        }
-
-        return ArticleNumbers.SequenceEqual(other.ArticleNumbers);
+        return equals && ArticleNumbers.SequenceEqual(other.ArticleNumbers);
     }
 
     /// <summary>

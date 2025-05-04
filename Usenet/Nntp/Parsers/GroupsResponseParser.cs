@@ -32,13 +32,7 @@ internal class GroupsResponseParser : IMultiLineResponseParser<NntpGroupsRespons
             return new NntpGroupsResponse(code, message, false, []);
         }
 
-        var groups = EnumerateGroups(dataBlock);
-        if (dataBlock is ICollection<string>)
-        {
-            // no need to keep enumerator if input is not a stream
-            // memoize the items (https://en.wikipedia.org/wiki/Memoization)
-            groups = groups.ToList();
-        }
+        var groups = EnumerateGroups(dataBlock).ToList();
 
         return new NntpGroupsResponse(code, message, true, groups);
     }
