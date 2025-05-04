@@ -34,46 +34,44 @@ public static class YencArticleDecoder
         Guard.ThrowIfNull(encodedLines, nameof(encodedLines));
         Guard.ThrowIfNull(encoding, nameof(encoding));
 
-        using (var enumerator = encodedLines.GetEnumerator())
+        using var enumerator = encodedLines.GetEnumerator();
+        var headers = YencMeta.GetHeaders(enumerator);
+        var part = headers.GetAndConvert(YencKeywords.Part, int.Parse);
+        if (part > 0)
         {
-            var headers = YencMeta.GetHeaders(enumerator);
-            var part = headers.GetAndConvert(YencKeywords.Part, int.Parse);
-            if (part > 0)
-            {
-                headers.Merge(YencMeta.GetPartHeaders(enumerator), false);
-            }
-
-            var header = YencMeta.ParseHeader(headers);
-            YencFooter footer = null;
-
-            // create buffer for part or entire file if single part
-            var decodedBytes = new byte[header.PartSize];
-            var decodedBytesIndex = 0;
-
-            while (enumerator.MoveNext())
-            {
-                if (enumerator.Current == null)
-                {
-                    continue;
-                }
-
-                if (enumerator.Current.StartsWith(YEnd, StringComparison.Ordinal))
-                {
-                    footer = YencMeta.ParseFooter(YencMeta.ParseLine(enumerator.Current));
-
-                    // skip remainder if there is some
-                    while (enumerator.MoveNext())
-                    {
-                    }
-
-                    break;
-                }
-
-                var encodedBytes = encoding.GetBytes(enumerator.Current);
-                decodedBytesIndex += YencLineDecoder.Decode(encodedBytes, decodedBytes, decodedBytesIndex);
-            }
-
-            return new YencArticle(header, footer, decodedBytes);
+            headers.Merge(YencMeta.GetPartHeaders(enumerator), false);
         }
+
+        var header = YencMeta.ParseHeader(headers);
+        YencFooter footer = null;
+
+        // create buffer for part or entire file if single part
+        var decodedBytes = new byte[header.PartSize];
+        var decodedBytesIndex = 0;
+
+        while (enumerator.MoveNext())
+        {
+            if (enumerator.Current == null)
+            {
+                continue;
+            }
+
+            if (enumerator.Current.StartsWith(YEnd, StringComparison.Ordinal))
+            {
+                footer = YencMeta.ParseFooter(YencMeta.ParseLine(enumerator.Current));
+
+                // skip remainder if there is some
+                while (enumerator.MoveNext())
+                {
+                }
+
+                break;
+            }
+
+            var encodedBytes = encoding.GetBytes(enumerator.Current);
+            decodedBytesIndex += YencLineDecoder.Decode(encodedBytes, decodedBytes, decodedBytesIndex);
+        }
+
+        return new YencArticle(header, footer, decodedBytes);
     }
 }

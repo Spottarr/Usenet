@@ -18,10 +18,8 @@ internal static class StreamExtensions
             return memoryStream.ToArray();
         }
 
-        using (var ms = new MemoryStream())
-        {
-            stream.CopyTo(ms);
-            return ms.ToArray();
-        }
+        using var ms = new MemoryStream();
+        stream.CopyTo(ms);
+        return ms.ToArray();
     }
 }

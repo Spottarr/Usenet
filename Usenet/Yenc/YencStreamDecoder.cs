@@ -35,17 +35,15 @@ public static class YencStreamDecoder
         Guard.ThrowIfNull(encodedLines, nameof(encodedLines));
         Guard.ThrowIfNull(encoding, nameof(encoding));
 
-        using (var enumerator = encodedLines.GetEnumerator())
+        using var enumerator = encodedLines.GetEnumerator();
+        var headers = YencMeta.GetHeaders(enumerator);
+        var part = headers.GetAndConvert(YencKeywords.Part, int.Parse);
+        if (part > 0)
         {
-            var headers = YencMeta.GetHeaders(enumerator);
-            var part = headers.GetAndConvert(YencKeywords.Part, int.Parse);
-            if (part > 0)
-            {
-                headers.Merge(YencMeta.GetPartHeaders(enumerator), false);
-            }
-
-            return new YencStream(YencMeta.ParseHeader(headers), EnumerateData(enumerator, encoding));
+            headers.Merge(YencMeta.GetPartHeaders(enumerator), false);
         }
+
+        return new YencStream(YencMeta.ParseHeader(headers), EnumerateData(enumerator, encoding));
     }
 
     private static IEnumerable<byte[]> EnumerateData(IEnumerator<string> enumerator, Encoding encoding)
