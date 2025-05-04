@@ -15,9 +15,6 @@ public sealed class NntpClientPool : INntpClientPool
 #endif
 
     private readonly Queue<PooledNntpClient> _availableClients = [];
-    private readonly TimeSpan _monitorInterval = TimeSpan.FromSeconds(10);
-    private readonly TimeSpan _idleTimeout = TimeSpan.FromSeconds(30);
-    private readonly TimeSpan _waitTimeout = TimeSpan.FromSeconds(60);
     private readonly CancellationTokenSource _cts = new();
 
     private readonly ILogger _logger = Logger.Create<NntpConnection>();
@@ -32,6 +29,10 @@ public sealed class NntpClientPool : INntpClientPool
 
     private int _currentPoolSize;
     private bool _disposed;
+
+    public TimeSpan MonitorInterval { get; init; } = TimeSpan.FromSeconds(10);
+    public TimeSpan IdleTimeout { get; init; } = TimeSpan.FromSeconds(30);
+    public TimeSpan WaitTimeout { get; init; } = TimeSpan.FromSeconds(60);
 
     public NntpClientPool(int maxPoolSize, string hostname, int port, bool useSsl, string username, string password)
     {
@@ -54,7 +55,7 @@ public sealed class NntpClientPool : INntpClientPool
     {
         ObjectDisposedExceptionShims.ThrowIf(_disposed, this);
 
-        var success = await _semaphore.WaitAsync(_waitTimeout).ConfigureAwait(false);
+        var success = await _semaphore.WaitAsync(WaitTimeout).ConfigureAwait(false);
         if (!success) throw new InvalidOperationException("Timed out waiting for NNTP (usenet) client");
 
         _logger.BorrowingNntpClient();
@@ -107,7 +108,7 @@ public sealed class NntpClientPool : INntpClientPool
     {
         while (!ct.IsCancellationRequested)
         {
-            await Task.Delay(_monitorInterval, ct).ConfigureAwait(false);
+            await Task.Delay(MonitorInterval, ct).ConfigureAwait(false);
             var now = DateTimeOffset.Now;
 
             lock (_lock)
@@ -116,7 +117,7 @@ public sealed class NntpClientPool : INntpClientPool
                 for (var i = 0; i < count; i++)
                 {
                     var client = _availableClients.Dequeue();
-                    if (now - client.LastActivity > _idleTimeout)
+                    if (now - client.LastActivity > IdleTimeout)
                     {
                         client.Dispose();
                         _currentPoolSize--;
