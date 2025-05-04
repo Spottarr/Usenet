@@ -34,6 +34,11 @@ public partial class NntpClient
     public long BytesWritten => _connection.Stream?.BytesWritten ?? 0;
 
     /// <summary>
+    /// The time of the last activity on the connection.
+    /// </summary>
+    public DateTimeOffset LastActivity => _connection.LastActivity;
+
+    /// <summary>
     /// Resets the counters.
     /// </summary>
     public void ResetCounters()

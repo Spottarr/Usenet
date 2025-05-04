@@ -56,4 +56,9 @@ public interface INntpConnection : IDisposable
     /// The stream used by the connection.
     /// </summary>
     CountingStream Stream { get; }
+
+    /// <summary>
+    /// The time of the last activity on the connection.
+    /// </summary>
+    DateTimeOffset LastActivity { get; }
 }

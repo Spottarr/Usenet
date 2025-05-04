@@ -17,7 +17,7 @@ namespace Usenet.Nntp;
 public sealed class NntpConnection : INntpConnection
 {
     private readonly ILogger _log = Logger.Create<NntpConnection>();
-    private readonly TcpClient _client = new TcpClient();
+    private readonly TcpClient _client = new();
     private StreamWriter _writer;
     private NntpStreamReader _reader;
     private const string AuthInfoPass = "AUTHINFO PASS";
@@ -26,11 +26,15 @@ public sealed class NntpConnection : INntpConnection
     public CountingStream Stream { get; private set; }
 
     /// <inheritdoc/>
+    public DateTimeOffset LastActivity { get; private set; }
+
+    /// <inheritdoc/>
     public async Task<TResponse> ConnectAsync<TResponse>(string hostname, int port, bool useSsl, IResponseParser<TResponse> parser)
     {
         _log.Connecting(hostname, port, useSsl);
         await _client.ConnectAsync(hostname, port).ConfigureAwait(false);
         Stream = await GetStreamAsync(hostname, useSsl).ConfigureAwait(false);
+        LastActivity = DateTimeOffset.Now;
         _writer = new StreamWriter(Stream, UsenetEncoding.Default) { AutoFlush = true };
         _reader = new NntpStreamReader(Stream, UsenetEncoding.Default);
         return GetResponse(parser);
@@ -41,6 +45,8 @@ public sealed class NntpConnection : INntpConnection
     {
         ThrowIfNotConnected();
         Guard.ThrowIfNull(command, nameof(command));
+
+        LastActivity = DateTimeOffset.Now;
 
         var logCommand = command.StartsWith(AuthInfoPass, StringComparison.Ordinal)
             ? $"{AuthInfoPass} [REDACTED]"
@@ -70,7 +76,7 @@ public sealed class NntpConnection : INntpConnection
         Guard.ThrowIfNull(parser, nameof(parser));
 
         var responseText = _reader.ReadLine();
-        _log.ReceivedResponse(responseText);
+        _log.ReceivedResponse(responseText ?? "");
 
         if (responseText == null)
         {
@@ -87,6 +93,7 @@ public sealed class NntpConnection : INntpConnection
     public void WriteLine(string line)
     {
         ThrowIfNotConnected();
+        LastActivity = DateTimeOffset.Now;
         _writer.WriteLine(line);
     }
 
