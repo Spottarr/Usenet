@@ -35,6 +35,8 @@ public sealed class NntpClientPool : INntpClientPool
 
     public NntpClientPool(int maxPoolSize, string hostname, int port, bool useSsl, string username, string password)
     {
+        Guard.ThrowIfNegativeOrZero(maxPoolSize, nameof(maxPoolSize));
+
         _semaphore = new SemaphoreSlim(maxPoolSize, maxPoolSize);
 
         _maxPoolSize = maxPoolSize;
