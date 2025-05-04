@@ -66,7 +66,7 @@ internal static class StringExtensions
     public static int IndexOf(this string source, char value, StringComparison comparisonType)
     {
 #if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
-            return source.IndexOf(value, comparisonType);
+        return source.IndexOf(value, comparisonType);
 #else
         return source.IndexOf(value);
 #endif
