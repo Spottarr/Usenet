@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using System.Reflection;
+using NSubstitute;
 using UsenetTests.TestHelpers;
 using Xunit;
 
@@ -22,12 +22,10 @@ public class LoggerTests
     [Fact]
     public void ShouldUseSetLogger()
     {
-        var loggerFactoryMock = new Mock<ILoggerFactory>();
-        loggerFactoryMock
-            .Setup(m => m.CreateLogger(It.IsAny<string>()))
-            .Returns(new InMemoryLogger());
+        var loggerFactory = Substitute.For<ILoggerFactory>();
+        loggerFactory.CreateLogger(Arg.Any<string>()).Returns(new InMemoryLogger());
 
-        Usenet.Logger.Factory = loggerFactoryMock.Object;
+        Usenet.Logger.Factory = loggerFactory;
         var logger = Usenet.Logger.Create<LoggerTests>();
         var actualLogger = GetActualLogger(logger);
 
