@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using Usenet.Exceptions;
 using Microsoft.Extensions.Logging;
 using Usenet.Extensions;
+using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Parsers;
 using Usenet.Util;
 
@@ -17,7 +18,7 @@ namespace Usenet.Nntp;
 public sealed class NntpConnection : INntpConnection
 {
     private readonly ILogger _log = Logger.Create<NntpConnection>();
-    private readonly TcpClient _client = new TcpClient();
+    private readonly TcpClient _client = new();
     private StreamWriter _writer;
     private NntpStreamReader _reader;
     private const string AuthInfoPass = "AUTHINFO PASS";
@@ -70,7 +71,7 @@ public sealed class NntpConnection : INntpConnection
         Guard.ThrowIfNull(parser, nameof(parser));
 
         var responseText = _reader.ReadLine();
-        _log.ReceivedResponse(responseText);
+        _log.ReceivedResponse(responseText ?? "");
 
         if (responseText == null)
         {
@@ -112,8 +113,7 @@ public sealed class NntpConnection : INntpConnection
 
     private IEnumerable<string> ReadMultiLineDataBlock()
     {
-        string line;
-        while ((line = _reader.ReadLine()) != null)
+        while (_reader.ReadLine() is { } line)
         {
             yield return line;
         }

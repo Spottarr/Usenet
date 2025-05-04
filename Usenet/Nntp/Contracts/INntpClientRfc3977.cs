@@ -1,71 +1,45 @@
-﻿using Usenet.Extensions;
+using System.Diagnostics.CodeAnalysis;
 using Usenet.Nntp.Models;
-using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Responses;
-using Usenet.Nntp.Writers;
-using Usenet.Util;
 
-namespace Usenet.Nntp;
+namespace Usenet.Nntp.Contracts;
 
-public partial class NntpClient
+[SuppressMessage("Naming", "CA1716:Identifiers should not match keywords")]
+public interface INntpClientRfc3977
 {
     /// <summary>
-    /// Attempts to establish a <a href="https://tools.ietf.org/html/rfc3977#section-5.1">connection</a> with a usenet server.
-    /// </summary>
-    /// <param name="hostname">The hostname of the usenet server.</param>
-    /// <param name="port">The port to use.</param>
-    /// <param name="useSsl">A value to indicate whether or not to use SSL encryption.</param>
-    /// <returns>true if a connection was made; otherwise false</returns>
-    public async Task<bool> ConnectAsync(string hostname, int port, bool useSsl)
-    {
-        Guard.ThrowIfNullOrWhiteSpace(hostname, nameof(hostname));
-        var response = await _connection.ConnectAsync(hostname, port, useSsl, new ResponseParser(200, 201)).ConfigureAwait(false);
-        return response.Success;
-    }
-
-    /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-5.2">CAPABILITIES</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-5.2">CAPABILITIES</a>
     /// command allows a client to determine the capabilities of the server at any given time.
     /// </summary>
     /// <returns>A multi-line response containing the capabilities.</returns>
-    public NntpMultiLineResponse Capabilities() => _connection.MultiLineCommand("CAPABILITIES", new MultiLineResponseParser(101));
+    NntpMultiLineResponse Capabilities();
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-5.2">CAPABILITIES</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-5.2">CAPABILITIES</a>
     /// command allows a client to determine the capabilities of the server at any given time.
     /// </summary>
     /// <param name="keyword">Can be provided for additional features if supported by the server.</param>
     /// <returns>A multi-line response containing the capabilities.</returns>
-    public NntpMultiLineResponse Capabilities(string keyword) =>
-        _connection.MultiLineCommand($"CAPABILITIES {keyword.ThrowIfNullOrWhiteSpace(nameof(keyword))}", new MultiLineResponseParser(101));
+    NntpMultiLineResponse Capabilities(string keyword);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-5.3">MODE READER</a> 
-    /// (<a href="https://tools.ietf.org/html/rfc2980#section-2.3">ad 1</a>) command 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-5.3">MODE READER</a>
+    /// (<a href="https://tools.ietf.org/html/rfc2980#section-2.3">ad 1</a>) command
     /// instructs a mode-switching server to switch modes, as described in Section 3.4.2.
     /// </summary>
     /// <returns>A mode reader response object.</returns>
-    public NntpModeReaderResponse ModeReader() => _connection.Command("MODE READER", new ModeReaderResponseParser());
+    NntpModeReaderResponse ModeReader();
 
     /// <summary>
-    /// The client uses the 
-    /// <a href="https://tools.ietf.org/html/rfc3977#section-5.4">QUIT</a>
-    /// command to terminate the session.
-    /// </summary>
-    /// <returns>A response object.</returns>
-    public NntpResponse Quit() => _connection.Command("QUIT", new ResponseParser(205));
-
-    /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.1">GROUP</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.1">GROUP</a>
     /// command selects a newsgroup as the currently selected newsgroup and returns summary information about it.
     /// </summary>
     /// <param name="group">The name of the group to select.</param>
     /// <returns>A group response object.</returns>
-    public NntpGroupResponse Group(string group) =>
-        _connection.Command($"GROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))}", new GroupResponseParser());
+    NntpGroupResponse Group(string group);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a>
     /// command selects a newsgroup in the same manner as the
     /// GROUP command (see Section 6.1.1) but also provides a list of article
     /// numbers in the newsgroup. Only article numbers in the specified range are included in the list.
@@ -73,28 +47,25 @@ public partial class NntpClient
     /// <param name="group">The name of the group to select.</param>
     /// <param name="range">Only include article numbers within this range in the list.</param>
     /// <returns>A group response object.</returns>
-    public NntpGroupResponse ListGroup(string group, NntpArticleRange range) =>
-        _connection.MultiLineCommand($"LISTGROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))} {range}", new ListGroupResponseParser());
+    NntpGroupResponse ListGroup(string group, NntpArticleRange range);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a>
     /// command selects a newsgroup in the same manner as the
     /// GROUP command (see Section 6.1.1) but also provides a list of article
     /// numbers in the newsgroup.
     /// </summary>
     /// <param name="group">The name of the group to select.</param>
     /// <returns>A group response object.</returns>
-    public NntpGroupResponse ListGroup(string group) =>
-        _connection.MultiLineCommand($"LISTGROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))}", new ListGroupResponseParser());
+    NntpGroupResponse ListGroup(string group);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a>
     /// command without no group specified provides a list of article
     /// numbers in the newsgroup.
     /// </summary>
     /// <returns>A group response object.</returns>
-    public NntpGroupResponse ListGroup() =>
-        _connection.MultiLineCommand("LISTGROUP", new ListGroupResponseParser());
+    NntpGroupResponse ListGroup();
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.3">LAST</a> command.
@@ -104,7 +75,7 @@ public partial class NntpClient
     /// number).
     /// </summary>
     /// <returns>A last response object.</returns>
-    public NntpLastResponse Last() => _connection.Command("LAST", new LastResponseParser());
+    NntpLastResponse Last();
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.4">NEXT</a> command.
@@ -114,44 +85,39 @@ public partial class NntpClient
     /// number).
     /// </summary>
     /// <returns>A next response object.</returns>
-    public NntpNextResponse Next() => _connection.Command("NEXT", new NextResponseParser());
+    NntpNextResponse Next();
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.1">ARTICLE</a> command 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.1">ARTICLE</a> command
     /// selects an article according to the arguments and
     /// presents the entire article (that is, the headers, an empty line, and
     /// the body, in that order) to the client.
     /// </summary>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
     /// <returns>An article response object.</returns>
-    public NntpArticleResponse Article(NntpMessageId messageId) =>
-        _connection.MultiLineCommand(
-            $"ARTICLE {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}",
-            new ArticleResponseParser(ArticleRequestType.Article));
+    NntpArticleResponse Article(NntpMessageId messageId);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.1">ARTICLE</a> command 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.1">ARTICLE</a> command
     /// selects an article according to the arguments and
     /// presents the entire article (that is, the headers, an empty line, and
     /// the body, in that order) to the client.
     /// </summary>
     /// <param name="number">The number of the article to receive from the server.</param>
     /// <returns>An article response object.</returns>
-    public NntpArticleResponse Article(long number) =>
-        _connection.MultiLineCommand($"ARTICLE {number}", new ArticleResponseParser(ArticleRequestType.Article));
+    NntpArticleResponse Article(long number);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.1">ARTICLE</a> command 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.1">ARTICLE</a> command
     /// selects an article according to the arguments and
     /// presents the entire article (that is, the headers, an empty line, and
     /// the body, in that order) to the client.
     /// </summary>
     /// <returns>An article response object.</returns>
-    public NntpArticleResponse Article() =>
-        _connection.MultiLineCommand("ARTICLE", new ArticleResponseParser(ArticleRequestType.Article));
+    NntpArticleResponse Article();
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.2">HEAD</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.2">HEAD</a>
     /// command behaves identically to the ARTICLE command except
     /// that, if the article exists, the response code is 221 instead of 220
     /// and only the headers are presented (the empty line separating the
@@ -159,13 +125,10 @@ public partial class NntpClient
     /// </summary>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
     /// <returns>An article response object.</returns>
-    public NntpArticleResponse Head(NntpMessageId messageId) =>
-        _connection.MultiLineCommand(
-            $"HEAD {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}",
-            new ArticleResponseParser(ArticleRequestType.Head));
+    NntpArticleResponse Head(NntpMessageId messageId);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.2">HEAD</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.2">HEAD</a>
     /// command behaves identically to the ARTICLE command except
     /// that, if the article exists, the response code is 221 instead of 220
     /// and only the headers are presented (the empty line separating the
@@ -173,22 +136,20 @@ public partial class NntpClient
     /// </summary>
     /// <param name="number">The number of the article to receive from the server.</param>
     /// <returns>An article response object.</returns>
-    public NntpArticleResponse Head(long number) =>
-        _connection.MultiLineCommand($"HEAD {number}", new ArticleResponseParser(ArticleRequestType.Head));
+    NntpArticleResponse Head(long number);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.2">HEAD</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.2">HEAD</a>
     /// command behaves identically to the ARTICLE command except
     /// that, if the article exists, the response code is 221 instead of 220
     /// and only the headers are presented (the empty line separating the
     /// headers and body MUST NOT be included).
     /// </summary>
     /// <returns>An article response object.</returns>
-    public NntpArticleResponse Head() =>
-        _connection.MultiLineCommand("HEAD", new ArticleResponseParser(ArticleRequestType.Head));
+    NntpArticleResponse Head();
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.3">BODY</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.3">BODY</a>
     /// command behaves identically to the ARTICLE command except
     /// that, if the article exists, the response code is 222 instead of 220
     /// and only the body is presented (the empty line separating the headers
@@ -196,13 +157,10 @@ public partial class NntpClient
     /// </summary>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
     /// <returns>An article response object.</returns>
-    public NntpArticleResponse Body(NntpMessageId messageId) =>
-        _connection.MultiLineCommand(
-            $"BODY {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}",
-            new ArticleResponseParser(ArticleRequestType.Body));
+    NntpArticleResponse Body(NntpMessageId messageId);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.3">BODY</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.3">BODY</a>
     /// command behaves identically to the ARTICLE command except
     /// that, if the article exists, the response code is 222 instead of 220
     /// and only the body is presented (the empty line separating the headers
@@ -211,11 +169,10 @@ public partial class NntpClient
     /// </summary>
     /// <param name="number">The number of the article to receive from the server.</param>
     /// <returns>An article response object.</returns>
-    public NntpArticleResponse Body(long number) =>
-        _connection.MultiLineCommand($"BODY {number}", new ArticleResponseParser(ArticleRequestType.Body));
+    NntpArticleResponse Body(long number);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.3">BODY</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.3">BODY</a>
     /// command behaves identically to the ARTICLE command except
     /// that, if the article exists, the response code is 222 instead of 220
     /// and only the body is presented (the empty line separating the headers
@@ -223,11 +180,10 @@ public partial class NntpClient
     /// See <a href="https://tools.ietf.org/html/rfc3977#section-6.2.3">RFC 3977</a> for more information.
     /// </summary>
     /// <returns>An article response object.</returns>
-    public NntpArticleResponse Body() =>
-        _connection.MultiLineCommand("BODY", new ArticleResponseParser(ArticleRequestType.Body));
+    NntpArticleResponse Body();
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.4">STAT</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.4">STAT</a>
     /// command behaves identically to the ARTICLE command except
     /// that, if the article exists, it is NOT presented to the client and
     /// the response code is 223 instead of 220.  Note that the response is
@@ -235,11 +191,10 @@ public partial class NntpClient
     /// </summary>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
     /// <returns>A stat response object.</returns>
-    public NntpStatResponse Stat(NntpMessageId messageId) =>
-        _connection.Command($"STAT {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}", new StatResponseParser());
+    NntpStatResponse Stat(NntpMessageId messageId);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.4">STAT</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.4">STAT</a>
     /// command behaves identically to the ARTICLE command except
     /// that, if the article exists, it is NOT presented to the client and
     /// the response code is 223 instead of 220.  Note that the response is
@@ -247,138 +202,108 @@ public partial class NntpClient
     /// </summary>
     /// <param name="number">The number of the article to receive from the server.</param>
     /// <returns>A stat response object.</returns>
-    public NntpStatResponse Stat(long number) => _connection.Command($"STAT {number}", new StatResponseParser());
+    NntpStatResponse Stat(long number);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.4">STAT</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.4">STAT</a>
     /// command behaves identically to the ARTICLE command except
     /// that, if the article exists, it is NOT presented to the client and
     /// the response code is 223 instead of 220.  Note that the response is
     /// NOT multi-line.
     /// </summary>
     /// <returns>A stat response object.</returns>
-    public NntpStatResponse Stat() => _connection.Command("STAT", new StatResponseParser());
+    NntpStatResponse Stat();
 
     /// <summary>
     /// Post an article.
     /// <a href="https://tools.ietf.org/html/rfc3977#section-6.3.1">POST</a> an article.
     /// </summary>
-    public bool Post(NntpArticle article)
-    {
-        var initialResponse = _connection.Command("POST", new ResponseParser(340));
-        if (!initialResponse.Success)
-        {
-            return false;
-        }
-
-        ArticleWriter.Write(_connection, article);
-        var subsequentResponse = _connection.GetResponse(new ResponseParser(240));
-        return subsequentResponse.Success;
-    }
+    bool Post(NntpArticle article);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.3.2">IHAVE</a> command 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.3.2">IHAVE</a> command
     /// informs the server that the client has an article with the specified message-id.
     /// </summary>
-    public bool Ihave(NntpArticle article)
-    {
-        var initialResponse = _connection.Command("IHAVE", new ResponseParser(335));
-        if (!initialResponse.Success)
-        {
-            return false;
-        }
-
-        ArticleWriter.Write(_connection, article);
-        var subsequentResponse = _connection.GetResponse(new ResponseParser(235));
-        return subsequentResponse.Success;
-    }
+    bool Ihave(NntpArticle article);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.1">DATE</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.1">DATE</a>
     /// command exists to help clients find out the current Coordinated
     /// Universal Time [TF.686-1] from the server's perspective.
     /// </summary>
     /// <returns>A date response object.</returns>
-    public NntpDateResponse Date() => _connection.Command("DATE", new DateResponseParser());
+    NntpDateResponse Date();
 
     /// <summary>
-    /// The <a herf="https://tools.ietf.org/html/rfc3977#section-7.2">HELP</a> 
+    /// The <a herf="https://tools.ietf.org/html/rfc3977#section-7.2">HELP</a>
     /// command provides a short summary of the commands that are
     /// understood by this implementation of the server.
     /// </summary>
     /// <returns>A multi-line response with a short summary of the available commands.</returns>
-    public NntpMultiLineResponse Help() =>
-        _connection.MultiLineCommand("HELP", new MultiLineResponseParser(100));
+    NntpMultiLineResponse Help();
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.3">NEWGROUPS</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.3">NEWGROUPS</a>
     /// command returns a list of newsgroups created on the server since
     /// the specified date and time.
     /// </summary>
     /// <param name="sinceDateTime">List all newsgroups created since this date and time.</param>
     /// <returns>A groups response object.</returns>
-    public NntpGroupsResponse NewGroups(NntpDateTime sinceDateTime) =>
-        _connection.MultiLineCommand($"NEWGROUPS {sinceDateTime}", new GroupsResponseParser(231, GroupStatusRequestType.Basic));
+    NntpGroupsResponse NewGroups(NntpDateTime sinceDateTime);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.4">NEWNEWS</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.4">NEWNEWS</a>
     /// command returns a list of message-ids of articles posted or
     /// received on the server, in the newsgroups whose names match the
     /// wildmat, since the specified date and time.
     /// </summary>
     /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
-    /// <param name="sinceDateTime">List all newsgroups that have new articles 
+    /// <param name="sinceDateTime">List all newsgroups that have new articles
     /// posted or received since this date and time.</param>
     /// <returns>A multi-line response containing a list of message-ids.</returns>
-    public NntpMultiLineResponse NewNews(string wildmat, NntpDateTime sinceDateTime) =>
-        _connection.MultiLineCommand($"NEWNEWS {wildmat} {sinceDateTime}", new MultiLineResponseParser(230));
-
+    NntpMultiLineResponse NewNews(string wildmat, NntpDateTime sinceDateTime);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.4">active.times list</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.4">active.times list</a>
     /// (<a href="https://tools.ietf.org/html/rfc2980#section-2.1.3">ad 1</a>)
     /// is maintained by some NNTP servers to contain
     /// information about who created a particular newsgroup and when.
     /// </summary>
     /// <returns>A group origins response.</returns>
-    public NntpGroupOriginsResponse ListActiveTimes() =>
-        _connection.MultiLineCommand("LIST ACTIVE.TIMES", new GroupOriginsResponseParser());
+    NntpGroupOriginsResponse ListActiveTimes();
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.4">active.times list</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.4">active.times list</a>
     /// (<a href="https://tools.ietf.org/html/rfc2980#section-2.1.3">ad 1</a>)
     /// is maintained by some NNTP servers to contain
     /// information about who created a particular newsgroup and when.
     /// </summary>
     /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
     /// <returns>A group origins response.</returns>
-    public NntpGroupOriginsResponse ListActiveTimes(string wildmat) =>
-        _connection.MultiLineCommand($"LIST ACTIVE.TIMES {wildmat}", new GroupOriginsResponseParser());
+    NntpGroupOriginsResponse ListActiveTimes(string wildmat);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.5">distrib.pats list</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.5">distrib.pats list</a>
     /// (<a href="https://tools.ietf.org/html/rfc2980#section-2.1.5">ad 1</a>)
     /// is maintained by some NNTP servers to assist
     /// clients to choose a value for the content of the Distribution header
     /// of a news article being posted.
     /// </summary>
     /// <returns>A multi-line response object containing newsgroup distribution information.</returns>
-    public NntpMultiLineResponse ListDistribPats() =>
-        _connection.MultiLineCommand("LIST DISTRIB.PATS", new MultiLineResponseParser(215));
+    NntpMultiLineResponse ListDistribPats();
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.6">newsgroups list</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.6">newsgroups list</a>
     /// (<a href="https://tools.ietf.org/html/rfc2980#section-2.1.6">ad 1</a>)
     /// is maintained by NNTP servers to contain the name
     /// of each newsgroup that is available on the server and a short
     /// description about the purpose of the group.
     /// </summary>
     /// <returns>A multi-line response containing a list of newsgroups available on the server.</returns>
-    public NntpMultiLineResponse ListNewsgroups() =>
-        _connection.MultiLineCommand("LIST NEWSGROUPS", new MultiLineResponseParser(215));
+    NntpMultiLineResponse ListNewsgroups();
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.6">newsgroups list</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.6">newsgroups list</a>
     /// (<a href="https://tools.ietf.org/html/rfc2980#section-2.1.6">ad 1</a>)
     /// is maintained by NNTP servers to contain the name
     /// of each newsgroup that is available on the server and a short
@@ -386,54 +311,49 @@ public partial class NntpClient
     /// </summary>
     /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
     /// <returns>A multi-line response containing a list of newsgroups available on the server.</returns>
-    public NntpMultiLineResponse ListNewsgroups(string wildmat) =>
-        _connection.MultiLineCommand($"LIST NEWSGROUPS {wildmat}", new MultiLineResponseParser(215));
+    NntpMultiLineResponse ListNewsgroups(string wildmat);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.3">OVER</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.3">OVER</a>
     /// command returns the contents of all the fields in the
     /// database for an article specified by message-id, or from a specified
     /// article or range of articles in the currently selected newsgroup.
     /// </summary>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
     /// <returns>A multi-line response containing header fields.</returns>
-    public NntpMultiLineResponse Over(NntpMessageId messageId) =>
-        _connection.MultiLineCommand($"OVER {messageId}", new MultiLineResponseParser(224));
+    NntpMultiLineResponse Over(NntpMessageId messageId);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.3">OVER</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.3">OVER</a>
     /// command returns the contents of all the fields in the
     /// database for an article specified by message-id, or from a specified
     /// article or range of articles in the currently selected newsgroup.
     /// </summary>
     /// <param name="range">Only include article numbers within this range in the list.</param>
     /// <returns>A multi-line response containing header fields.</returns>
-    public NntpMultiLineResponse Over(NntpArticleRange range) =>
-        _connection.MultiLineCommand($"OVER {range}", new MultiLineResponseParser(224));
+    NntpMultiLineResponse Over(NntpArticleRange range);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.3">OVER</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.3">OVER</a>
     /// command returns the contents of all the fields in the
     /// database for an article specified by message-id, or from a specified
     /// article or range of articles in the currently selected newsgroup.
     /// </summary>
     /// <returns>A multi-line response containing header fields.</returns>
-    public NntpMultiLineResponse Over() => _connection.MultiLineCommand("OVER", new MultiLineResponseParser(224));
-
+    NntpMultiLineResponse Over();
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.4">LIST OVERVIEW.FMT</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.4">LIST OVERVIEW.FMT</a>
     /// (<a href="https://tools.ietf.org/html/rfc2980#section-2.1.7">ad 1</a>)
     /// command returns a description of the fields in
     /// the database for which it is consistent (as described above).
     /// </summary>
-    /// <returns>A multi-line response containing a description of the fields 
+    /// <returns>A multi-line response containing a description of the fields
     /// in the overview database for which it is consistent.</returns>
-    public NntpMultiLineResponse ListOverviewFormat() =>
-        _connection.MultiLineCommand("LIST OVERVIEW.FMT", new MultiLineResponseParser(215));
+    NntpMultiLineResponse ListOverviewFormat();
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a>
     /// command provides access to specific fields from an article
     /// specified by message-id, or from a specified article or range of
     /// articles in the currently selected newsgroup.
@@ -441,11 +361,10 @@ public partial class NntpClient
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    public NntpMultiLineResponse Hdr(string field, NntpMessageId messageId) =>
-        _connection.MultiLineCommand($"HDR {field} {messageId}", new MultiLineResponseParser(225));
+    NntpMultiLineResponse Hdr(string field, NntpMessageId messageId);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a>
     /// command provides access to specific fields from an article
     /// specified by message-id, or from a specified article or range of
     /// articles in the currently selected newsgroup.
@@ -453,50 +372,44 @@ public partial class NntpClient
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="range">Only include article numbers within this range in the list.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    public NntpMultiLineResponse Hdr(string field, NntpArticleRange range) =>
-        _connection.MultiLineCommand($"HDR {field} {range}", new MultiLineResponseParser(225));
+    NntpMultiLineResponse Hdr(string field, NntpArticleRange range);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a>
     /// command provides access to specific fields from an article
     /// specified by message-id, or from a specified article or range of
     /// articles in the currently selected newsgroup.
     /// </summary>
     /// <param name="field">The header field to retrieve.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    public NntpMultiLineResponse Hdr(string field) =>
-        _connection.MultiLineCommand($"HDR {field}", new MultiLineResponseParser(225));
-
+    NntpMultiLineResponse Hdr(string field);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.6">LIST HEADERS</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.6">LIST HEADERS</a>
     /// command returns a list of fields that may be
     /// retrieved using the HDR command.
     /// </summary>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
-    /// <returns>A multi-line response containg a list of header 
+    /// <returns>A multi-line response containg a list of header
     /// fields that may be retrieved using the HDR command.</returns>
-    public NntpMultiLineResponse ListHeaders(NntpMessageId messageId) =>
-        _connection.MultiLineCommand($"LIST HEADERS {messageId}", new MultiLineResponseParser(215));
+    NntpMultiLineResponse ListHeaders(NntpMessageId messageId);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.6">LIST HEADERS</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.6">LIST HEADERS</a>
     /// command returns a list of fields that may be
     /// retrieved using the HDR command.
     /// </summary>
     /// <param name="range">Only include article numbers within this range in the list.</param>
-    /// <returns>A multi-line response containg a list of header 
+    /// <returns>A multi-line response containg a list of header
     /// fields that may be retrieved using the HDR command.</returns>
-    public NntpMultiLineResponse ListHeaders(NntpArticleRange range) =>
-        _connection.MultiLineCommand($"LIST HEADERS {range}", new MultiLineResponseParser(215));
+    NntpMultiLineResponse ListHeaders(NntpArticleRange range);
 
     /// <summary>
-    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.6">LIST HEADERS</a> 
+    /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.6">LIST HEADERS</a>
     /// command returns a list of fields that may be
     /// retrieved using the HDR command.
     /// </summary>
-    /// <returns>A multi-line response containg a list of header 
+    /// <returns>A multi-line response containg a list of header
     /// fields that may be retrieved using the HDR command.</returns>
-    public NntpMultiLineResponse ListHeaders() =>
-        _connection.MultiLineCommand("LIST HEADERS", new MultiLineResponseParser(215));
+    NntpMultiLineResponse ListHeaders();
 }

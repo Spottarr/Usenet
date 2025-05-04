@@ -1,4 +1,5 @@
-﻿using Usenet.Nntp.Models;
+﻿using Usenet.Nntp.Contracts;
+using Usenet.Nntp.Models;
 using Usenet.Util;
 
 namespace Usenet.Nntp.Writers;

@@ -1,7 +1,7 @@
 ﻿using Usenet.Nntp.Parsers;
 using Usenet.Util;
 
-namespace Usenet.Nntp;
+namespace Usenet.Nntp.Contracts;
 
 /// <summary>
 /// Represents an NNTP connection.
