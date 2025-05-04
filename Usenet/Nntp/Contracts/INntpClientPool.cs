@@ -25,6 +25,6 @@ internal interface INntpClientPool : IDisposable
     /// If no clients are available, it will wait until one becomes available or the wait times out.
     /// </summary>
     /// <returns></returns>
-    Task<PooledNntpClient> BorrowClient();
-    void ReturnClient(PooledNntpClient client);
+    Task<IPooledNntpClient> BorrowClient();
+    void ReturnClient(IPooledNntpClient client);
 }

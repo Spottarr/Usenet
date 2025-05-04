@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using Usenet.Util;
 
 namespace Usenet.Extensions;
@@ -82,4 +83,16 @@ internal static class DictionaryExtensions
     public static ImmutableDictionary<TKey, ImmutableList<TValue>> ToImmutableDictionaryWithLists<TKey, TValue>(
         this IDictionary<TKey, ICollection<TValue>> multiValueDictionary) =>
         multiValueDictionary.ToImmutableDictionary(x => x.Key, x => x.Value.ToImmutableList());
+
+
+    public static bool Remove<TKey, TValue>(this Dictionary<TKey, TValue> source, TKey key, [MaybeNullWhen(false)] out TValue value)
+    {
+#if NETSTANDARD_2_1 || NET5_0_OR_GREATER
+        return source.Remove(key, out value);
+#else
+        var result = source.TryGetValue(key, out value);
+        if (result) source.Remove(key);
+        return result;
+#endif
+    }
 }

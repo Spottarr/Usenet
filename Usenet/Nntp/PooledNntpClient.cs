@@ -6,14 +6,14 @@ using Usenet.Util;
 namespace Usenet.Nntp;
 
 /// <inheritdoc />
-public sealed class PooledNntpClient : IPooledNntpClient
+internal class PooledNntpClient : IPooledNntpClient
 {
     private readonly NntpConnection _connection;
     private readonly NntpClient _client;
     private bool _disposed;
-    public bool Connected { get; private set; }
-    public bool Authenticated { get; private set; }
-    public DateTimeOffset LastActivity { get; private set; }
+    internal bool Connected { get; set; }
+    internal bool Authenticated { get; set; }
+    internal DateTimeOffset LastActivity { get; set; }
 
     public PooledNntpClient()
     {
@@ -40,7 +40,7 @@ public sealed class PooledNntpClient : IPooledNntpClient
     /// Reads any unprocessed data from the underlying connection
     /// This prevents consecutive commands on this pooled client from failing due to partially unprocessed data.
     /// </summary>
-    internal void Flush() => _connection.Flush();
+    internal virtual void Flush() => _connection.Flush();
 
     internal async Task<bool> ConnectAsync(string hostname, int port, bool useSsl)
     {
@@ -73,19 +73,12 @@ public sealed class PooledNntpClient : IPooledNntpClient
     public void ResetCounters() => Client.ResetCounters();
 
     public NntpMultiLineResponse Xhdr(string field, NntpMessageId messageId) => Client.Xhdr(field, messageId);
-
     public NntpMultiLineResponse Xhdr(string field, NntpArticleRange range) => Client.Xhdr(field, range);
-
     public NntpMultiLineResponse Xhdr(string field) => Client.Xhdr(field);
-
     public NntpMultiLineResponse Xover(NntpArticleRange range) => Client.Xover(range);
-
     public NntpMultiLineResponse Xover() => Client.Xover();
-
     public NntpMultiLineResponse Capabilities() => Client.Capabilities();
-
     public NntpMultiLineResponse Capabilities(string keyword) => Client.Capabilities(keyword);
-
     public NntpModeReaderResponse ModeReader() => Client.ModeReader();
     public NntpResponse Quit() => Client.Quit();
     public NntpGroupResponse Group(string group) => Client.Group(group);
@@ -104,67 +97,36 @@ public sealed class PooledNntpClient : IPooledNntpClient
     public NntpArticleResponse Body(long number) => Client.Body(number);
     public NntpArticleResponse Body() => Client.Body();
     public NntpStatResponse Stat(NntpMessageId messageId) => Client.Stat(messageId);
-
     public NntpStatResponse Stat(long number) => Client.Stat(number);
-
     public NntpStatResponse Stat() => Client.Stat();
-
     public bool Post(NntpArticle article) => Client.Post(article);
-
     public bool Ihave(NntpArticle article) => Client.Ihave(article);
-
     public NntpDateResponse Date() => Client.Date();
-
     public NntpMultiLineResponse Help() => Client.Help();
-
     public NntpGroupsResponse NewGroups(NntpDateTime sinceDateTime) => Client.NewGroups(sinceDateTime);
-
     public NntpMultiLineResponse NewNews(string wildmat, NntpDateTime sinceDateTime) => Client.NewNews(wildmat, sinceDateTime);
-
     public NntpGroupOriginsResponse ListActiveTimes() => Client.ListActiveTimes();
-
     public NntpGroupOriginsResponse ListActiveTimes(string wildmat) => Client.ListActiveTimes(wildmat);
-
     public NntpMultiLineResponse ListDistribPats() => Client.ListDistribPats();
-
     public NntpMultiLineResponse ListNewsgroups() => Client.ListNewsgroups();
-
     public NntpMultiLineResponse ListNewsgroups(string wildmat) => Client.ListNewsgroups(wildmat);
-
     public NntpMultiLineResponse Over(NntpMessageId messageId) => Client.Over(messageId);
-
     public NntpMultiLineResponse Over(NntpArticleRange range) => Client.Over(range);
-
     public NntpMultiLineResponse Over() => Client.Over();
-
     public NntpMultiLineResponse ListOverviewFormat() => Client.ListOverviewFormat();
-
     public NntpMultiLineResponse Hdr(string field, NntpMessageId messageId) => Client.Hdr(field, messageId);
-
     public NntpMultiLineResponse Hdr(string field, NntpArticleRange range) => Client.Hdr(field, range);
-
     public NntpMultiLineResponse Hdr(string field) => Client.Hdr(field);
-
     public NntpMultiLineResponse ListHeaders(NntpMessageId messageId) => Client.ListHeaders(messageId);
-
     public NntpMultiLineResponse ListHeaders(NntpArticleRange range) => Client.ListHeaders(range);
-
     public NntpMultiLineResponse ListHeaders() => Client.ListHeaders();
-
     public NntpGroupsResponse ListCounts() => Client.ListCounts();
-
     public NntpGroupsResponse ListCounts(string wildmat) => Client.ListCounts(wildmat);
-
     public NntpMultiLineResponse ListDistributions() => Client.ListDistributions();
-
     public NntpMultiLineResponse ListModerators() => Client.ListModerators();
-
     public NntpMultiLineResponse ListMotd() => Client.ListMotd();
-
     public NntpMultiLineResponse ListSubscriptions() => Client.ListSubscriptions();
-
     public NntpGroupsResponse ListActive() => Client.ListActive();
-
     public NntpGroupsResponse ListActive(string wildmat) => Client.ListActive(wildmat);
 
     #endregion
