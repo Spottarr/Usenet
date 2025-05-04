@@ -45,4 +45,16 @@ public static partial class LogExtensions
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Response received: {Response}")]
     public static partial void ReceivedResponse(this ILogger logger, string response);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Borrowing NNTP client from pool")]
+    public static partial void BorrowingNntpClient(this ILogger logger);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Returning NNTP client to pool")]
+    public static partial void ReturningNntpClient(this ILogger logger);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Creating new NNTP client ({CurrentPoolSize}/{MaxPoolSize})")]
+    public static partial void CreatingNewNntpClient(this ILogger logger, int currentPoolSize, int maxPoolSize);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Disposing idle NNTP client ({CurrentPoolSize}/{MaxPoolSize})")]
+    public static partial void DisposingIdleNntpClient(this ILogger logger, int currentPoolSize, int maxPoolSize);
 }

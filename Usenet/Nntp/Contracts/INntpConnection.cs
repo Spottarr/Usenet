@@ -1,7 +1,7 @@
 ﻿using Usenet.Nntp.Parsers;
 using Usenet.Util;
 
-namespace Usenet.Nntp;
+namespace Usenet.Nntp.Contracts;
 
 /// <summary>
 /// Represents an NNTP connection.
@@ -56,9 +56,4 @@ public interface INntpConnection : IDisposable
     /// The stream used by the connection.
     /// </summary>
     CountingStream Stream { get; }
-
-    /// <summary>
-    /// The time of the last activity on the connection.
-    /// </summary>
-    DateTimeOffset LastActivity { get; }
 }

@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using Usenet.Exceptions;
 using Microsoft.Extensions.Logging;
 using Usenet.Extensions;
+using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Parsers;
 using Usenet.Util;
 
@@ -26,15 +27,11 @@ public sealed class NntpConnection : INntpConnection
     public CountingStream Stream { get; private set; }
 
     /// <inheritdoc/>
-    public DateTimeOffset LastActivity { get; private set; }
-
-    /// <inheritdoc/>
     public async Task<TResponse> ConnectAsync<TResponse>(string hostname, int port, bool useSsl, IResponseParser<TResponse> parser)
     {
         _log.Connecting(hostname, port, useSsl);
         await _client.ConnectAsync(hostname, port).ConfigureAwait(false);
         Stream = await GetStreamAsync(hostname, useSsl).ConfigureAwait(false);
-        LastActivity = DateTimeOffset.Now;
         _writer = new StreamWriter(Stream, UsenetEncoding.Default) { AutoFlush = true };
         _reader = new NntpStreamReader(Stream, UsenetEncoding.Default);
         return GetResponse(parser);
@@ -45,8 +42,6 @@ public sealed class NntpConnection : INntpConnection
     {
         ThrowIfNotConnected();
         Guard.ThrowIfNull(command, nameof(command));
-
-        LastActivity = DateTimeOffset.Now;
 
         var logCommand = command.StartsWith(AuthInfoPass, StringComparison.Ordinal)
             ? $"{AuthInfoPass} [REDACTED]"
@@ -93,8 +88,17 @@ public sealed class NntpConnection : INntpConnection
     public void WriteLine(string line)
     {
         ThrowIfNotConnected();
-        LastActivity = DateTimeOffset.Now;
         _writer.WriteLine(line);
+    }
+
+    /// <summary>
+    /// Reads any unprocessed data from the underlying TCP stream.
+    /// This prevents consecutive commands from failing due to partially unprocessed data.
+    /// </summary>
+    internal void Flush()
+    {
+        ThrowIfNotConnected();
+        _reader.ReadToEnd();
     }
 
     private void ThrowIfNotConnected()

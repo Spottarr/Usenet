@@ -1,4 +1,4 @@
-﻿using Usenet.Nntp;
+﻿using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Writers;

@@ -1,10 +1,9 @@
-﻿using Usenet.Nntp.Models;
-using Usenet.Nntp.Parsers;
+using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
 
-namespace Usenet.Nntp;
+namespace Usenet.Nntp.Contracts;
 
-public partial class NntpClient
+public interface INntpClientRfc2980
 {
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc2980#section-2.6">XHDR</a>
@@ -13,8 +12,7 @@ public partial class NntpClient
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="messageId">The message-id of the article to retrieve the header for.</param>
     /// <returns>A multi-line response object containing the header.</returns>
-    public NntpMultiLineResponse Xhdr(string field, NntpMessageId messageId) =>
-        _connection.MultiLineCommand($"XHDR {field} {messageId}", new MultiLineResponseParser(221));
+    NntpMultiLineResponse Xhdr(string field, NntpMessageId messageId);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc2980#section-2.6">XHDR</a>
@@ -23,8 +21,7 @@ public partial class NntpClient
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="range">The range of articles to retrieve the header for.</param>
     /// <returns>A multi-line response object containing the headers.</returns>
-    public NntpMultiLineResponse Xhdr(string field, NntpArticleRange range) =>
-        _connection.MultiLineCommand($"XHDR {field} {range}", new MultiLineResponseParser(221));
+    NntpMultiLineResponse Xhdr(string field, NntpArticleRange range);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc2980#section-2.6">XHDR</a>
@@ -32,8 +29,7 @@ public partial class NntpClient
     /// </summary>
     /// <param name="field">The header field to retrieve.</param>
     /// <returns>A multi-line response object containing the headers.</returns>
-    public NntpMultiLineResponse Xhdr(string field) =>
-        _connection.MultiLineCommand($"XHDR {field}", new MultiLineResponseParser(221));
+    NntpMultiLineResponse Xhdr(string field);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc2980#section-2.8">XOVER</a>
@@ -41,13 +37,12 @@ public partial class NntpClient
     /// </summary>
     /// <param name="range">The range of articles to retrieve the overview information for.</param>
     /// <returns>A multi-line response object containing the overview database information.</returns>
-    public NntpMultiLineResponse Xover(NntpArticleRange range) =>
-        _connection.MultiLineCommand($"XOVER {range}", new MultiLineResponseParser(224));
+    NntpMultiLineResponse Xover(NntpArticleRange range);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc2980#section-2.8">XOVER</a>
     /// command returns information from the overview database for the current article.
     /// </summary>
     /// <returns>A multi-line response object containing the overview database information.</returns>
-    public NntpMultiLineResponse Xover() => _connection.MultiLineCommand("XOVER", new MultiLineResponseParser(224));
+    NntpMultiLineResponse Xover();
 }
