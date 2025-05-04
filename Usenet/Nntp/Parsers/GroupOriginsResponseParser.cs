@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Collections.Immutable;
+using Microsoft.Extensions.Logging;
 using Usenet.Extensions;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
@@ -18,13 +19,7 @@ internal class GroupOriginsResponseParser : IMultiLineResponseParser<NntpGroupOr
             return new NntpGroupOriginsResponse(code, message, false, []);
         }
 
-        var groupOrigins = EnumerateGroupOrigins(dataBlock);
-        if (dataBlock is ICollection<string>)
-        {
-            // no need to keep enumerator if input is not a stream
-            // memoize the items (https://en.wikipedia.org/wiki/Memoization)
-            groupOrigins = groupOrigins.ToList();
-        }
+        var groupOrigins = EnumerateGroupOrigins(dataBlock).ToImmutableList();
 
         return new NntpGroupOriginsResponse(code, message, true, groupOrigins);
     }

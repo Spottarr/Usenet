@@ -33,7 +33,7 @@ public class NntpArticle : IEquatable<NntpArticle>
     /// <summary>
     /// The body of the <see cref="NntpArticle"/>.
     /// </summary>
-    public IEnumerable<string> Body { get; private set; }
+    public IImmutableList<string> Body { get; }
 
     /// <summary>
     /// Creates a new <see cref="NntpArticle"/> object.
@@ -48,31 +48,13 @@ public class NntpArticle : IEquatable<NntpArticle>
         NntpMessageId messageId,
         NntpGroups groups,
         IDictionary<string, ICollection<string>> headers,
-        IEnumerable<string> body)
+        IList<string> body)
     {
         Number = number;
         MessageId = messageId ?? NntpMessageId.Empty;
         Groups = groups ?? NntpGroups.Empty;
         Headers = (headers ?? MultiValueDictionary<string, string>.Empty).ToImmutableDictionaryWithLists();
-
-        switch (body)
-        {
-            case null:
-                // create empty immutable list
-                Body = new List<string>(0).ToImmutableList();
-                break;
-
-            case ICollection<string> collection:
-                // make immutable
-                Body = collection.ToImmutableList();
-                break;
-
-            default:
-                // not a collection but a stream of lines, keep enumerator
-                // this is immutable already
-                Body = body;
-                break;
-        }
+        Body = (body ?? []).ToImmutableList();
     }
 
     /// <summary>
@@ -114,18 +96,6 @@ public class NntpArticle : IEquatable<NntpArticle>
             {
                 return false;
             }
-        }
-
-        // need to memoize the enumerables for comparison
-        // otherwise they can not be used anymore after this call to equals
-        if (!(Body is ICollection<string>))
-        {
-            Body = Body.ToList();
-        }
-
-        if (!(other.Body is ICollection<string>))
-        {
-            other.Body = other.Body.ToList();
         }
 
         // compare body

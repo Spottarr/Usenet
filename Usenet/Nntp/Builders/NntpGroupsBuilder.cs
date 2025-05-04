@@ -8,19 +8,18 @@ namespace Usenet.Nntp.Builders;
 /// </summary>
 public class NntpGroupsBuilder
 {
-    private readonly List<string> _groups;
+    private readonly List<string> _groups = [];
 
     /// <summary>
     /// The raw groups collection.
     /// </summary>
-    public IEnumerable<string> Groups => _groups;
+    public IList<string> Groups => _groups;
 
     /// <summary>
     /// Creates a new instance of the <see cref="NntpGroupsBuilder"/> class.
     /// </summary>
     public NntpGroupsBuilder()
     {
-        _groups = new List<string>();
     }
 
     /// <summary>

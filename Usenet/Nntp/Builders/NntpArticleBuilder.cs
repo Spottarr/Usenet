@@ -21,23 +21,19 @@ public class NntpArticleBuilder
         NntpHeaders.Date, NntpHeaders.From, NntpHeaders.Subject, NntpHeaders.MessageId, NntpHeaders.Newsgroups
     };
 
-    private MultiValueDictionary<string, string> _headers;
-    private NntpGroupsBuilder _groupsBuilder;
-    private NntpMessageId _messageId;
+    private MultiValueDictionary<string, string> _headers = new();
+    private NntpGroupsBuilder _groupsBuilder = new();
+    private NntpMessageId _messageId = NntpMessageId.Empty;
     private string _from;
     private string _subject;
     private DateTimeOffset? _dateTime;
-    private IEnumerable<string> _body;
+    private List<string> _body = [];
 
     /// <summary>
     /// Creates a new instance of the <see cref="NntpArticleBuilder"/> class.
     /// </summary>
     public NntpArticleBuilder()
     {
-        _headers = new MultiValueDictionary<string, string>();
-        _body = new List<string>();
-        _groupsBuilder = new NntpGroupsBuilder();
-        _messageId = NntpMessageId.Empty;
     }
 
     /// <summary>
@@ -189,7 +185,7 @@ public class NntpArticleBuilder
     /// <returns>The <see cref="NntpArticleBuilder"/> so that additional calls can be chained.</returns>
     public NntpArticleBuilder SetBody(IEnumerable<string> lines)
     {
-        _body = lines.ThrowIfNull(nameof(lines));
+        _body = lines.ThrowIfNull(nameof(lines)).ToList();
         return this;
     }
 
@@ -264,31 +260,27 @@ public class NntpArticleBuilder
     }
 
     /// <summary>
-    /// Adds a line to the body of the article. This will memoize the internal body collection if needed.
+    /// Adds a line to the body of the article.
     /// </summary>
     /// <param name="line">The text line to add to the body.</param>
     /// <returns>The <see cref="NntpArticleBuilder"/> so that additional calls can be chained.</returns>
     public NntpArticleBuilder AddLine(string line)
     {
         Guard.ThrowIfNull(line, nameof(line));
-        var bodyList = EnsureMemoizedBody();
-        bodyList.Add(line);
+        _body.Add(line);
         return this;
     }
 
     /// <summary>
-    /// Adds multiple lines to the body of the article. This will memoize the internal body collection if needed.
+    /// Adds multiple lines to the body of the article.
     /// </summary>
     /// <param name="lines">The text lines to add to the body.</param>
     /// <returns>The <see cref="NntpArticleBuilder"/> so that additional calls can be chained.</returns>
     public NntpArticleBuilder AddLines(IEnumerable<string> lines)
     {
         Guard.ThrowIfNull(lines, nameof(lines));
-        var bodyList = EnsureMemoizedBody();
-        foreach (var line in lines)
-        {
-            bodyList.Add(line);
-        }
+
+        _body.AddRange(lines);
 
         return this;
     }
@@ -331,16 +323,5 @@ public class NntpArticleBuilder
         }
 
         return new NntpArticle(0, _messageId, groups, _headers, _body);
-    }
-
-    private ICollection<string> EnsureMemoizedBody()
-    {
-        if (!(_body is ICollection<string>))
-        {
-            // memoize the body lines
-            _body = _body.ToList();
-        }
-
-        return (ICollection<string>)_body;
     }
 }
