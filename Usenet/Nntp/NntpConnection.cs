@@ -91,16 +91,6 @@ public sealed class NntpConnection : INntpConnection
         _writer.WriteLine(line);
     }
 
-    /// <summary>
-    /// Reads any unprocessed data from the underlying TCP stream.
-    /// This prevents consecutive commands from failing due to partially unprocessed data.
-    /// </summary>
-    internal void Flush()
-    {
-        ThrowIfNotConnected();
-        _reader.ReadToEnd();
-    }
-
     private void ThrowIfNotConnected()
     {
         if (!_client.Connected)

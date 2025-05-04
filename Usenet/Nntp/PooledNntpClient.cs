@@ -36,12 +36,6 @@ internal class PooledNntpClient : IPooledNntpClient
         }
     }
 
-    /// <summary>
-    /// Reads any unprocessed data from the underlying connection
-    /// This prevents consecutive commands on this pooled client from failing due to partially unprocessed data.
-    /// </summary>
-    internal virtual void Flush() => _connection.Flush();
-
     internal async Task<bool> ConnectAsync(string hostname, int port, bool useSsl)
     {
         var res = await _client.ConnectAsync(hostname, port, useSsl).ConfigureAwait(false);

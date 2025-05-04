@@ -53,7 +53,6 @@ public class NntpClientPoolTests
         var client = Substitute.For<PooledNntpClient>();
         client.Connected = true;
         client.Authenticated = true;
-        client.When(x => x.Flush()).Do(_ => { });
         return client;
     }
 }

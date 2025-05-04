@@ -89,7 +89,6 @@ public sealed class NntpClientPool : INntpClientPool
 #pragma warning restore CA2000
                 throw new InvalidOperationException("Client not borrowed from this pool.");
 
-            impl.Flush();
             _availableClients.Enqueue(impl);
             _semaphore.Release();
         }
