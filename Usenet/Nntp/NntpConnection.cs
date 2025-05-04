@@ -123,8 +123,7 @@ public sealed class NntpConnection : INntpConnection
 
     private IEnumerable<string> ReadMultiLineDataBlock()
     {
-        string line;
-        while ((line = _reader.ReadLine()) != null)
+        while (_reader.ReadLine() is { } line)
         {
             yield return line;
         }
