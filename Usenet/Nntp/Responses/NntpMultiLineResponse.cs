@@ -1,4 +1,6 @@
-﻿namespace Usenet.Nntp.Responses;
+﻿using System.Collections.Immutable;
+
+namespace Usenet.Nntp.Responses;
 
 /// <summary>
 /// Represents a generic multi-line response.
@@ -9,7 +11,7 @@ public class NntpMultiLineResponse : NntpResponse
     /// <summary>
     /// The lines received from the server.
     /// </summary>
-    public IEnumerable<string> Lines { get; }
+    public IImmutableList<string> Lines { get; }
 
     /// <summary>
     /// Creates a new instance of the <see cref="NntpMultiLineResponse"/> class.
@@ -24,6 +26,6 @@ public class NntpMultiLineResponse : NntpResponse
         bool success,
         IEnumerable<string> lines) : base(code, message, success)
     {
-        Lines = lines ?? [];
+        Lines = (lines ?? []).ToImmutableList();
     }
 }

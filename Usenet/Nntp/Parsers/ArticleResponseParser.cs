@@ -67,7 +67,7 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
             return new NntpArticleResponse(code, message, true, new NntpArticle(number, messageId, null, null, null));
         }
 
-        var enumerator = dataBlock.GetEnumerator();
+        using var enumerator = dataBlock.GetEnumerator();
 
         // get headers if requested
         var headers = (_requestType & ArticleRequestType.Head) == ArticleRequestType.Head
@@ -81,15 +81,8 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
 
         // get body if requested
         var bodyLines = (_requestType & ArticleRequestType.Body) == ArticleRequestType.Body
-            ? EnumerateBodyLines(enumerator)
+            ? GetBody(enumerator).ToList()
             : [];
-
-        if (dataBlock is ICollection<string>)
-        {
-            // no need to keep enumerator if input is not a stream
-            // memoize the body lines
-            bodyLines = bodyLines.ToList();
-        }
 
         return new NntpArticleResponse(
             code, message, true,
@@ -137,17 +130,10 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
         return dict;
     }
 
-    private static IEnumerable<string> EnumerateBodyLines(IEnumerator<string> enumerator)
+    private static IEnumerable<string> GetBody(IEnumerator<string> enumerator)
     {
-        if (enumerator == null)
-        {
-            yield break;
-        }
-
         while (enumerator.MoveNext())
-        {
             yield return enumerator.Current;
-        }
     }
 
     private class Header
