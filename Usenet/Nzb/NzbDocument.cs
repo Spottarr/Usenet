@@ -61,10 +61,8 @@ public class NzbDocument : IEquatable<NzbDocument>
         Guard.ThrowIfNull(stream, nameof(stream));
         Guard.ThrowIfNull(encoding, nameof(encoding));
 
-        using (var reader = new StreamReader(stream, encoding))
-        {
-            return NzbParser.Parse(await reader.ReadToEndAsync().ConfigureAwait(false));
-        }
+        using var reader = new StreamReader(stream, encoding);
+        return NzbParser.Parse(await reader.ReadToEndAsync().ConfigureAwait(false));
     }
 
     /// <summary>
@@ -87,10 +85,8 @@ public class NzbDocument : IEquatable<NzbDocument>
         Guard.ThrowIfNull(stream, nameof(stream));
         Guard.ThrowIfNull(encoding, nameof(encoding));
 
-        using (var reader = new StreamReader(stream, encoding))
-        {
-            return NzbParser.Parse(reader.ReadToEnd());
-        }
+        using var reader = new StreamReader(stream, encoding);
+        return NzbParser.Parse(reader.ReadToEnd());
     }
 
     /// <summary>

@@ -30,27 +30,25 @@ public class NzbWriter
     {
         Guard.ThrowIfNull(nzbDocument, nameof(nzbDocument));
 
-        using (var writer = GetXmlWriter())
-        {
-            await writer.WriteDocTypeAsync(
-                    NzbKeywords.Nzb,
-                    NzbKeywords.PubId,
-                    NzbKeywords.SysId,
-                    null)
-                .ConfigureAwait(false);
+        using var writer = GetXmlWriter();
+        await writer.WriteDocTypeAsync(
+                NzbKeywords.Nzb,
+                NzbKeywords.PubId,
+                NzbKeywords.SysId,
+                null)
+            .ConfigureAwait(false);
 
-            await writer.WriteStartElementAsync(
-                    null,
-                    NzbKeywords.Nzb,
-                    NzbKeywords.Namespace)
-                .ConfigureAwait(false);
+        await writer.WriteStartElementAsync(
+                null,
+                NzbKeywords.Nzb,
+                NzbKeywords.Namespace)
+            .ConfigureAwait(false);
 
-            await WriteHeadAsync(writer, nzbDocument).ConfigureAwait(false);
-            await WriteFilesAsync(writer, nzbDocument).ConfigureAwait(false);
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
-            await writer.WriteEndDocumentAsync().ConfigureAwait(false);
-            await writer.FlushAsync().ConfigureAwait(false);
-        }
+        await WriteHeadAsync(writer, nzbDocument).ConfigureAwait(false);
+        await WriteFilesAsync(writer, nzbDocument).ConfigureAwait(false);
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+        await writer.WriteEndDocumentAsync().ConfigureAwait(false);
+        await writer.FlushAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -62,24 +60,22 @@ public class NzbWriter
     {
         Guard.ThrowIfNull(nzbDocument, nameof(nzbDocument));
 
-        using (var writer = GetXmlWriter())
-        {
-            writer.WriteDocType(
-                NzbKeywords.Nzb,
-                NzbKeywords.PubId,
-                NzbKeywords.SysId,
-                null);
+        using var writer = GetXmlWriter();
+        writer.WriteDocType(
+            NzbKeywords.Nzb,
+            NzbKeywords.PubId,
+            NzbKeywords.SysId,
+            null);
 
-            writer.WriteStartElement(
-                NzbKeywords.Nzb,
-                NzbKeywords.Namespace);
+        writer.WriteStartElement(
+            NzbKeywords.Nzb,
+            NzbKeywords.Namespace);
 
-            WriteHead(writer, nzbDocument);
-            WriteFiles(writer, nzbDocument);
-            writer.WriteEndElement();
-            writer.WriteEndDocument();
-            writer.Flush();
-        }
+        WriteHead(writer, nzbDocument);
+        WriteFiles(writer, nzbDocument);
+        writer.WriteEndElement();
+        writer.WriteEndDocument();
+        writer.Flush();
     }
 
     private XmlWriter GetXmlWriter() =>
