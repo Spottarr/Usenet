@@ -3,7 +3,7 @@ namespace Usenet.Nntp.Contracts;
 /// <summary>
 /// Represents a pool of authenticated NNTP clients.
 /// </summary>
-internal interface INntpClientPool : IDisposable
+public interface INntpClientPool : IDisposable
 {
     /// <summary>
     /// Time between checks for idle clients
