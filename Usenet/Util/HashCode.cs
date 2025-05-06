@@ -4,7 +4,7 @@
 /// Represents a helper class for creating hash codes.
 /// <a href="https://stackoverflow.com/questions/263400/what-is-the-best-algorithm-for-an-overridden-system-object-gethashcode">Source</a>.
 /// </summary>
-public static class HashCode
+internal static class HashCode
 {
     /// <summary>
     /// Starting value.
