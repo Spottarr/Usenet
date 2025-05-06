@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace Usenet.Util;
+namespace Usenet.Util.Compatibility;
 
 internal static class EnumShim
 {

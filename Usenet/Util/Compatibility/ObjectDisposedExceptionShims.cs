@@ -1,4 +1,4 @@
-namespace Usenet.Util;
+namespace Usenet.Util.Compatibility;
 
 internal static class ObjectDisposedExceptionShims
 {

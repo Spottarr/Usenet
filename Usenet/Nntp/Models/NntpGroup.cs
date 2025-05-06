@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using Usenet.Util;
+using Usenet.Util.Compatibility;
 using HashCode = Usenet.Util.HashCode;
 
 namespace Usenet.Nntp.Models;
