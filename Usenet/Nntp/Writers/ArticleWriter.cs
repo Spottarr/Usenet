@@ -1,6 +1,6 @@
 ﻿using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
-using Usenet.Util;
+using Usenet.Util.Compatibility;
 
 namespace Usenet.Nntp.Writers;
 

@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Usenet.Extensions;
 
-public static partial class LogExtensions
+internal static partial class LogExtensions
 {
     [LoggerMessage(Level = LogLevel.Warning, Message = "Found more than 1 {Header} header. Skipping it.")]
     public static partial void HeaderOccursMoreThanOnce(this ILogger logger, string header);

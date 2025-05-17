@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Usenet.Extensions;
 using Usenet.Nntp.Contracts;
 using Usenet.Util;
+using Usenet.Util.Compatibility;
 
 namespace Usenet.Nntp;
 

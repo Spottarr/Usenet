@@ -1,7 +1,7 @@
 using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
-using Usenet.Util;
+using Usenet.Util.Compatibility;
 
 namespace Usenet.Nntp;
 
@@ -53,19 +53,12 @@ internal class PooledNntpClient : IPooledNntpClient
     #region INntpClient
 
     public NntpResponse XfeatureCompressGzip(bool withTerminator) => Client.XfeatureCompressGzip(withTerminator);
-
     public NntpMultiLineResponse Xzhdr(string field, NntpMessageId messageId) => Client.Xzhdr(field, messageId);
-
     public NntpMultiLineResponse Xzhdr(string field, NntpArticleRange range) => Client.Xzhdr(field, range);
-
     public NntpMultiLineResponse Xzhdr(string field) => Client.Xzhdr(field);
-
     public NntpMultiLineResponse Xzver(NntpArticleRange range) => Client.Xzver(range);
-
     public NntpMultiLineResponse Xzver() => Client.Xzver();
-
     public void ResetCounters() => Client.ResetCounters();
-
     public NntpMultiLineResponse Xhdr(string field, NntpMessageId messageId) => Client.Xhdr(field, messageId);
     public NntpMultiLineResponse Xhdr(string field, NntpArticleRange range) => Client.Xhdr(field, range);
     public NntpMultiLineResponse Xhdr(string field) => Client.Xhdr(field);
