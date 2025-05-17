@@ -1,6 +1,9 @@
 using System.Reflection;
 using Microsoft.Extensions.FileProviders;
+using Xunit;
+using Xunit.Internal;
 using Xunit.Sdk;
+using Xunit.v3;
 
 namespace UsenetTests.TestHelpers;
 
@@ -15,7 +18,7 @@ internal sealed class EmbeddedResourceDataAttribute : DataAttribute
     public object[] AdditionalData { get; init; } = [];
     public string[] FileNames => _fileNames;
 
-    public override IEnumerable<object[]> GetData(MethodInfo testMethod)
+    public override ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(MethodInfo testMethod, DisposalTracker disposalTracker)
     {
         var result = new List<object>(_fileNames.Length + AdditionalData.Length);
 
@@ -25,6 +28,9 @@ internal sealed class EmbeddedResourceDataAttribute : DataAttribute
         foreach (var additionalData in AdditionalData)
             result.Add(additionalData);
 
-        return [result.ToArray()];
+        List<ITheoryDataRow> rows = [ConvertDataRow(result.ToArray())];
+        return ValueTask.FromResult(rows.CastOrToReadOnlyCollection());
     }
+
+    public override bool SupportsDiscoveryEnumeration() => true;
 }

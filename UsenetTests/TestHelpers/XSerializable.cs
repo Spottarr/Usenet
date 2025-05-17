@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace UsenetTests.TestHelpers;
 
@@ -19,7 +19,7 @@ internal sealed class XSerializable<T> : IXunitSerializable
 
     public void Deserialize(IXunitSerializationInfo info)
     {
-        Object = JsonConvert.DeserializeObject<T>(info.GetValue<string>("objValue"))!;
+        Object = JsonConvert.DeserializeObject<T>(info.GetValue<string>("objValue")!)!;
     }
 
     public void Serialize(IXunitSerializationInfo info)
