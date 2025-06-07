@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Usenet\Usenet.csproj" />
+    <ProjectReference Include="..\..\src\Usenet\Usenet.csproj" />
   </ItemGroup>
 
 </Project>
