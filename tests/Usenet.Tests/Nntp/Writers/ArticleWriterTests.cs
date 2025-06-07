@@ -2,11 +2,11 @@
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Writers;
+using Usenet.Tests.TestHelpers;
 using Usenet.Util;
-using UsenetTests.TestHelpers;
 using Xunit;
 
-namespace UsenetTests.Nntp.Writers;
+namespace Usenet.Tests.Nntp.Writers;
 
 public class ArticleWriterTests
 {

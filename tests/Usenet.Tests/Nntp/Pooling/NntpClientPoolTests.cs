@@ -2,7 +2,7 @@ using NSubstitute;
 using Usenet.Nntp;
 using Xunit;
 
-namespace UsenetTests.Nntp.Pooling;
+namespace Usenet.Tests.Nntp.Pooling;
 
 public class NntpClientPoolTests
 {

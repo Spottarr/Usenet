@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Reflection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using System.Reflection;
 using NSubstitute;
-using UsenetTests.TestHelpers;
+using Usenet.Tests.TestHelpers;
 using Xunit;
 
-namespace UsenetTests;
+namespace Usenet.Tests;
 
 public class LoggerTests
 {

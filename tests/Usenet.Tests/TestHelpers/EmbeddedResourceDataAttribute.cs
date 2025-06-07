@@ -5,13 +5,13 @@ using Xunit.Internal;
 using Xunit.Sdk;
 using Xunit.v3;
 
-namespace UsenetTests.TestHelpers;
+namespace Usenet.Tests.TestHelpers;
 
 internal sealed class EmbeddedResourceDataAttribute : DataAttribute
 {
     private readonly string[] _fileNames;
 
-    private readonly EmbeddedFileProvider _fileProvider = new(typeof(EmbeddedResourceDataAttribute).Assembly, "UsenetTests.testdata");
+    private readonly EmbeddedFileProvider _fileProvider = new(typeof(EmbeddedResourceDataAttribute).Assembly, "Usenet.Tests.testdata");
 
     public EmbeddedResourceDataAttribute(params string[] fileNames) => _fileNames = fileNames;
 

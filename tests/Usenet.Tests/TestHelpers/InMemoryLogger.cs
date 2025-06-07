@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace UsenetTests.TestHelpers;
+namespace Usenet.Tests.TestHelpers;
 
 internal sealed class InMemoryLogger : ILogger
 {

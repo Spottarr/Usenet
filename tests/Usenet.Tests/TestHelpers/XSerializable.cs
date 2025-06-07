@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Xunit.Sdk;
 
-namespace UsenetTests.TestHelpers;
+namespace Usenet.Tests.TestHelpers;
 
 internal sealed class XSerializable<T> : IXunitSerializable
 {

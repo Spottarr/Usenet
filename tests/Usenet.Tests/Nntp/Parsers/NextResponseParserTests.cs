@@ -2,7 +2,7 @@
 using Usenet.Nntp.Responses;
 using Xunit;
 
-namespace UsenetTests.Nntp.Parsers;
+namespace Usenet.Tests.Nntp.Parsers;
 
 public class NextResponseParserTests
 {

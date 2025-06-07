@@ -1,8 +1,8 @@
 ﻿using Usenet.Nntp.Models;
-using UsenetTests.TestHelpers;
+using Usenet.Tests.TestHelpers;
 using Xunit;
 
-namespace UsenetTests.Nntp.Models;
+namespace Usenet.Tests.Nntp.Models;
 
 public class NntpArticleRangeTests
 {

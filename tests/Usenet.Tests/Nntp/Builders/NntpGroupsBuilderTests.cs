@@ -1,7 +1,7 @@
 ﻿using Usenet.Nntp.Builders;
 using Xunit;
 
-namespace UsenetTests.Nntp.Builders;
+namespace Usenet.Tests.Nntp.Builders;
 
 public class NntpGroupsBuilderTests
 {

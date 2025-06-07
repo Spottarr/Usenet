@@ -22,7 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="UsenetTests" />
+    <InternalsVisibleTo Include="Usenet.Tests" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2"/>
   </ItemGroup>
 

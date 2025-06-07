@@ -1,7 +1,7 @@
 ﻿using Usenet.Nzb;
 using Xunit;
 
-namespace UsenetTests.Nzb;
+namespace Usenet.Tests.Nzb;
 
 public class NzbSegmentTests
 {

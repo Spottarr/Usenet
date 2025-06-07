@@ -1,11 +1,11 @@
 ﻿using System.Text;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
+using Usenet.Tests.TestHelpers;
 using Usenet.Util;
-using UsenetTests.TestHelpers;
 using Xunit;
 
-namespace UsenetTests.Nntp.Parsers;
+namespace Usenet.Tests.Nntp.Parsers;
 
 public class ArticleResponseParserTests
 {

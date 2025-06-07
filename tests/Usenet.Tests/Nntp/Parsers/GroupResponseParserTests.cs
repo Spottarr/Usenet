@@ -1,9 +1,9 @@
 ﻿using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
-using UsenetTests.TestHelpers;
+using Usenet.Tests.TestHelpers;
 using Xunit;
 
-namespace UsenetTests.Nntp.Parsers;
+namespace Usenet.Tests.Nntp.Parsers;
 
 public class GroupResponseParserTests
 {

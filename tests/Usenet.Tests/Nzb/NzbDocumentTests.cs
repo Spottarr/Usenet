@@ -1,8 +1,8 @@
 ﻿using Usenet.Nzb;
-using UsenetTests.TestHelpers;
+using Usenet.Tests.TestHelpers;
 using Xunit;
 
-namespace UsenetTests.Nzb;
+namespace Usenet.Tests.Nzb;
 
 public class NzbDocumentTests
 {

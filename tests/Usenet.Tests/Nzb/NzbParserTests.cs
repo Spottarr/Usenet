@@ -3,12 +3,12 @@ using System.Xml;
 using Microsoft.Extensions.FileProviders;
 using Usenet.Exceptions;
 using Usenet.Nzb;
+using Usenet.Tests.Extensions;
+using Usenet.Tests.TestHelpers;
 using Usenet.Util;
-using UsenetTests.Extensions;
-using UsenetTests.TestHelpers;
 using Xunit;
 
-namespace UsenetTests.Nzb;
+namespace Usenet.Tests.Nzb;
 
 public class NzbParserTests
 {

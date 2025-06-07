@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Microsoft.Extensions.FileProviders;
 
-namespace UsenetTests.Extensions;
+namespace Usenet.Tests.Extensions;
 
 internal static class FileInfoExtensions
 {

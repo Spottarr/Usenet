@@ -2,7 +2,7 @@
 using Usenet.Util;
 using Xunit;
 
-namespace UsenetTests.Util;
+namespace Usenet.Tests.Util;
 
 public class MultiValueDictionaryTests
 {

@@ -2,7 +2,7 @@
 using Usenet.Util;
 using Xunit;
 
-namespace UsenetTests.Nntp.Models;
+namespace Usenet.Tests.Nntp.Models;
 
 public class NntpArticleTests
 {

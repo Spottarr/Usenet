@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.FileProviders;
 using Usenet.Extensions;
+using Usenet.Tests.Extensions;
+using Usenet.Tests.TestHelpers;
 using Usenet.Util;
 using Usenet.Yenc;
-using UsenetTests.Extensions;
-using UsenetTests.TestHelpers;
 using Xunit;
 
-namespace UsenetTests.Yenc;
+namespace Usenet.Tests.Yenc;
 
 public class YencStreamDecoderTests
 {

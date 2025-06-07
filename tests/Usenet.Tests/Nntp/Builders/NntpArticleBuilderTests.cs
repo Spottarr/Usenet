@@ -5,7 +5,7 @@ using Usenet.Nntp.Models;
 using Usenet.Util;
 using Xunit;
 
-namespace UsenetTests.Nntp.Builders;
+namespace Usenet.Tests.Nntp.Builders;
 
 public class NntpArticleBuilderTests
 {
