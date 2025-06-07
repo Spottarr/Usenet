@@ -18,7 +18,7 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PackageOutputPath>../package</PackageOutputPath>
+    <PackageOutputPath>../../package</PackageOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
