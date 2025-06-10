@@ -20,10 +20,22 @@ internal class MultiValueDictionary<TKey, TValue> : Dictionary<TKey, ICollection
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MultiValueDictionary{TKey,TValue}"/>
+    /// that is empty and uses a <see cref="HashSet{TValue}"/> factor to create the internal collections.
+    /// </summary>
+    /// <param name="keyComparer"></param>
+    public MultiValueDictionary(IEqualityComparer<TKey> keyComparer)
+        : this(() => new HashSet<TValue>(), keyComparer)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MultiValueDictionary{TKey,TValue}"/>
     /// that is empty and uses the specified <paramref name="collectionFactory"/> to create the internal collections.
     /// </summary>
     /// <param name="collectionFactory">The collection factory to use.</param>
-    public MultiValueDictionary(Func<ICollection<TValue>> collectionFactory)
+    /// <param name="keyComparer"></param>
+    public MultiValueDictionary(Func<ICollection<TValue>> collectionFactory, IEqualityComparer<TKey> keyComparer = null)
+        : base(keyComparer)
     {
         _collectionFactory = collectionFactory;
     }
@@ -79,9 +91,16 @@ internal class MultiValueDictionary<TKey, TValue> : Dictionary<TKey, ICollection
     /// <summary>
     /// Represents an empty <see cref="MultiValueDictionary{TKey,TValue}"/>.
     /// </summary>
-    /// <returns>A new empty instance on every call of the <see cref="MultiValueDictionary{TKey,TValue}"/> 
+    /// <returns>A new empty instance on every call of the <see cref="MultiValueDictionary{TKey,TValue}"/>
     /// that uses a <see cref="HashSet{TValue}"/> factory internally.</returns>
-    public static MultiValueDictionary<TKey, TValue> Empty => new MultiValueDictionary<TKey, TValue>();
+    public static MultiValueDictionary<TKey, TValue> Empty => new();
+
+    /// <summary>
+    /// Represents an empty, case-insensitive, <see cref="MultiValueDictionary{TKey,TValue}"/>.
+    /// </summary>
+    /// <returns>A new empty instance on every call of the <see cref="MultiValueDictionary{TKey,TValue}"/>
+    /// that uses a <see cref="HashSet{TValue}"/> factory internally.</returns>
+    public static MultiValueDictionary<string, TValue> EmptyIgnoreCase => new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Returns the hash code for this instance.
@@ -123,7 +142,7 @@ internal class MultiValueDictionary<TKey, TValue> : Dictionary<TKey, ICollection
     public override bool Equals(object obj) => Equals(obj as MultiValueDictionary<TKey, TValue>);
 
     /// <summary>
-    /// Returns a value indicating whether the frst <see cref="MultiValueDictionary{TKey,TValue}"/> 
+    /// Returns a value indicating whether the frst <see cref="MultiValueDictionary{TKey,TValue}"/>
     /// value is equal to the second <see cref="MultiValueDictionary{TKey,TValue}"/> value.
     /// </summary>
     /// <param name="first">The first <see cref="MultiValueDictionary{TKey,TValue}"/>.</param>
@@ -133,7 +152,7 @@ internal class MultiValueDictionary<TKey, TValue> : Dictionary<TKey, ICollection
         (object)first == null ? (object)second == null : first.Equals(second);
 
     /// <summary>
-    /// Returns a value indicating whether the frst <see cref="MultiValueDictionary{TKey,TValue}"/> 
+    /// Returns a value indicating whether the frst <see cref="MultiValueDictionary{TKey,TValue}"/>
     /// value is unequal to the second <see cref="MultiValueDictionary{TKey,TValue}"/> value.
     /// </summary>
     /// <param name="first">The first <see cref="MultiValueDictionary{TKey,TValue}"/>.</param>

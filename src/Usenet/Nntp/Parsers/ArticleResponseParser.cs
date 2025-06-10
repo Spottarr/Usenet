@@ -72,7 +72,7 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
         // get headers if requested
         var headers = (_requestType & ArticleRequestType.Head) == ArticleRequestType.Head
             ? GetHeaders(enumerator)
-            : MultiValueDictionary<string, string>.Empty;
+            : MultiValueDictionary<string, string>.EmptyIgnoreCase;
 
         // get groups
         var groups = headers.TryGetValue(NntpHeaders.Newsgroups, out var values)
@@ -121,7 +121,7 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
             }
         }
 
-        var dict = new MultiValueDictionary<string, string>();
+        var dict = MultiValueDictionary<string, string>.EmptyIgnoreCase;
         foreach (var header in headers)
         {
             dict.Add(header.Key, header.Value);
