@@ -76,14 +76,6 @@ internal static class DictionaryExtensions
         this IDictionary<TKey, ICollection<TValue>> multiValueDictionary) =>
         multiValueDictionary.ToImmutableDictionary(x => x.Key, x => x.Value.ToImmutableHashSet());
 
-    /// <summary>
-    /// Produces an immutable multi-value dictionary with immutable lists containing the values.
-    /// </summary>
-    /// <returns>An immutable multi-value dictionary with immutable lists containing the values.</returns>
-    public static ImmutableDictionary<TKey, ImmutableList<TValue>> ToImmutableDictionaryWithLists<TKey, TValue>(
-        this IDictionary<TKey, ICollection<TValue>> multiValueDictionary) =>
-        multiValueDictionary.ToImmutableDictionary(x => x.Key, x => x.Value.ToImmutableList());
-
 
     public static bool Remove<TKey, TValue>(this Dictionary<TKey, TValue> source, TKey key, [MaybeNullWhen(false)] out TValue value)
     {

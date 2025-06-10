@@ -53,7 +53,8 @@ public class NntpArticle : IEquatable<NntpArticle>
         Number = number;
         MessageId = messageId ?? NntpMessageId.Empty;
         Groups = groups ?? NntpGroups.Empty;
-        Headers = (headers ?? MultiValueDictionary<string, string>.Empty).ToImmutableDictionaryWithLists();
+        Headers = (headers ?? MultiValueDictionary<string, string>.EmptyIgnoreCase)
+            .ToImmutableDictionary(x => x.Key, x => x.Value.ToImmutableList(), keyComparer: StringComparer.OrdinalIgnoreCase);
         Body = (body ?? []).ToImmutableList();
     }
 

@@ -27,6 +27,26 @@ public class MultiValueDictionaryTests
     }
 
     [Fact]
+    public void MultipleValuesWithSameKeyShouldBeAddedIgnoreCase()
+    {
+        var dict = new MultiValueDictionary<string, string>(() => new HashSet<string>(), StringComparer.OrdinalIgnoreCase)
+        {
+            { "A", "one" },
+            { "a", "een" },
+            { "B", "two" },
+            { "b", "twee" },
+            { "b", "deux" }
+        };
+
+        Assert.Equal(5, dict.Count);
+        Assert.Equal(2, dict["a"].Count);
+        Assert.Equal(3, dict["b"].Count);
+
+        Assert.True(new HashSet<string> { "one", "een" }.SetEquals(dict["a"]));
+        Assert.True(new HashSet<string> { "two", "twee", "deux" }.SetEquals(dict["b"]));
+    }
+
+    [Fact]
     public void SameValueWithSameKeyShouldNotBeAddedWhenUsingHashSet()
     {
         var dict = new MultiValueDictionary<int, string>(() => new HashSet<string>()) { { 1, "one" }, { 1, "one" }, };
