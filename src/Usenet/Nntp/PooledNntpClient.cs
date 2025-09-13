@@ -5,15 +5,15 @@ using Usenet.Util.Compatibility;
 
 namespace Usenet.Nntp;
 
-/// <inheritdoc />
-internal class PooledNntpClient : IPooledNntpClient
+/// <inheritdoc cref="IPooledNntpClient" />
+internal sealed class PooledNntpClient : IInternalPooledNntpClient
 {
     private readonly NntpConnection _connection;
     private readonly NntpClient _client;
     private bool _disposed;
-    internal bool Connected { get; set; }
-    internal bool Authenticated { get; set; }
-    internal DateTimeOffset LastActivity { get; set; }
+    public DateTimeOffset LastActivity { get; set; }
+    public bool Connected { get; set; }
+    public bool Authenticated { get; set; }
 
     public PooledNntpClient()
     {
@@ -36,21 +36,21 @@ internal class PooledNntpClient : IPooledNntpClient
         }
     }
 
-    internal async Task<bool> ConnectAsync(string hostname, int port, bool useSsl)
+    #region INntpClient
+
+    public async Task<bool> ConnectAsync(string hostname, int port, bool useSsl)
     {
         var res = await _client.ConnectAsync(hostname, port, useSsl).ConfigureAwait(false);
         Connected = res;
         return res;
     }
 
-    internal bool Authenticate(string username, string password = null)
+    public bool Authenticate(string username, string password = null)
     {
         var res = _client.Authenticate(username, password);
         Authenticated = res;
         return res;
     }
-
-    #region INntpClient
 
     public NntpResponse XfeatureCompressGzip(bool withTerminator) => Client.XfeatureCompressGzip(withTerminator);
     public NntpMultiLineResponse Xzhdr(string field, NntpMessageId messageId) => Client.Xzhdr(field, messageId);
