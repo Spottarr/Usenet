@@ -153,12 +153,19 @@ public sealed class NntpClientPool : INntpClientPool
 
         lock (_lock)
         {
+            // Clean up any clients available in the pool
             foreach (var client in _availableClients)
             {
                 client.Dispose();
             }
-
             _availableClients.Clear();
+
+            // Clean up any clients borrowed from the pool but not yet returned
+            foreach (var client in _usedClients.Values)
+            {
+                client.Dispose();
+            }
+            _usedClients.Clear();
         }
 
         _semaphore.Dispose();
