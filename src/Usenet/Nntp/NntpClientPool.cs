@@ -15,8 +15,8 @@ public sealed class NntpClientPool : INntpClientPool
     private readonly object _lock = new();
 #endif
 
-    private readonly Queue<PooledNntpClient> _availableClients = [];
-    private readonly Dictionary<IPooledNntpClient, PooledNntpClient> _usedClients = [];
+    private readonly Queue<IInternalPooledNntpClient> _availableClients = [];
+    private readonly HashSet<IInternalPooledNntpClient> _usedClients = [];
     private readonly CancellationTokenSource _cts = new();
 
     private readonly ILogger _logger = Logger.Create<NntpConnection>();
@@ -36,7 +36,7 @@ public sealed class NntpClientPool : INntpClientPool
     public TimeSpan IdleTimeout { get; init; } = TimeSpan.FromSeconds(30);
     public TimeSpan WaitTimeout { get; init; } = TimeSpan.FromSeconds(60);
 
-    internal Func<PooledNntpClient> ClientFactory { get; init; } = () => new PooledNntpClient();
+    internal Func<IInternalPooledNntpClient> ClientFactory { get; init; } = () => new PooledNntpClient();
 
     public NntpClientPool(int maxPoolSize, string hostname, int port, bool useSsl, string username, string password)
     {
@@ -55,7 +55,13 @@ public sealed class NntpClientPool : INntpClientPool
         Task.Run(() => MonitorIdleClients(_cts.Token));
     }
 
-    public async Task<IPooledNntpClient> BorrowClient()
+    public async Task<IPooledNntpClientLease> GetLease()
+    {
+        var client = await BorrowClient().ConfigureAwait(false);
+        return new PooledNntpClientLease(this, client);
+    }
+
+    private async Task<IInternalPooledNntpClient> BorrowClient()
     {
         ObjectDisposedExceptionShims.ThrowIf(_disposed, this);
 
@@ -76,7 +82,7 @@ public sealed class NntpClientPool : INntpClientPool
         return client;
     }
 
-    public void ReturnClient(IPooledNntpClient client)
+    internal void ReturnClient(IInternalPooledNntpClient client)
     {
         Guard.ThrowIfNull(client, nameof(client));
         ObjectDisposedExceptionShims.ThrowIf(_disposed, this);
@@ -85,23 +91,21 @@ public sealed class NntpClientPool : INntpClientPool
 
         lock (_lock)
         {
-#pragma warning disable CA2000
-            if(!_usedClients.Remove(client, out var impl))
-#pragma warning restore CA2000
+            if(!_usedClients.Remove(client))
                 throw new InvalidOperationException("Client not borrowed from this pool.");
 
-            _availableClients.Enqueue(impl);
+            _availableClients.Enqueue(client);
             _semaphore.Release();
         }
     }
 
-    private PooledNntpClient BorrowClientInternal()
+    private IInternalPooledNntpClient BorrowClientInternal()
     {
         lock (_lock)
         {
             if (_availableClients.TryDequeue(out var existingClient))
             {
-                _usedClients.Add(existingClient, existingClient);
+                _usedClients.Add(existingClient);
                 return existingClient;
             }
 
@@ -113,7 +117,7 @@ public sealed class NntpClientPool : INntpClientPool
 
             var newClient = ClientFactory.Invoke();
 
-            _usedClients.Add(newClient, newClient);
+            _usedClients.Add(newClient);
             return newClient;
         }
     }
@@ -161,7 +165,7 @@ public sealed class NntpClientPool : INntpClientPool
             _availableClients.Clear();
 
             // Clean up any clients borrowed from the pool but not yet returned
-            foreach (var client in _usedClients.Values)
+            foreach (var client in _usedClients)
             {
                 client.Dispose();
             }

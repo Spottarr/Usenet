@@ -1,5 +1,6 @@
 using NSubstitute;
 using Usenet.Nntp;
+using Usenet.Nntp.Contracts;
 using Xunit;
 
 namespace Usenet.Tests.Nntp.Pooling;
@@ -23,11 +24,11 @@ public class NntpClientPoolTests
             ClientFactory = GetClientMock
         };
 
-        // Get first client, should succeed
-        await pool.BorrowClient();
+        // Get the first lease, this should succeed
+        await pool.GetLease();
 
-        // Get second client, should throw because the client does not become available again in time
-        await Assert.ThrowsAsync<InvalidOperationException>(async () => await pool.BorrowClient().ConfigureAwait(false));
+        // Get the second lease, should throw because the client does not become available again in time
+        await Assert.ThrowsAsync<InvalidOperationException>(async () => await pool.GetLease().ConfigureAwait(false));
     }
 
     [Fact]
@@ -39,20 +40,20 @@ public class NntpClientPoolTests
             ClientFactory = GetClientMock
         };
 
-        // Get first client, should succeed
-        var client = await pool.BorrowClient();
+        // Get the first lease, this should succeed
+        var lease1 = await pool.GetLease();
+        lease1.Dispose();
 
-        pool.ReturnClient(client);
-
-        // Get second client, should succeed because the first client was returned to the pool
-        await pool.BorrowClient();
+        // Get the second lease, this should succeed because the first client was returned to the pool
+        var lease2 = await pool.GetLease();
+        lease2.Dispose();
     }
 
-    private static PooledNntpClient GetClientMock()
+    private static IInternalPooledNntpClient GetClientMock()
     {
-        var client = Substitute.For<PooledNntpClient>();
-        client.Connected = true;
-        client.Authenticated = true;
+        var client = Substitute.For<IInternalPooledNntpClient>();
+        client.Connected.Returns(true);
+        client.Authenticated.Returns(true);
         return client;
     }
 }
