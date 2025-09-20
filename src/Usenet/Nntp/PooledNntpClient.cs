@@ -11,8 +11,10 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
     private readonly NntpConnection _connection;
     private readonly NntpClient _client;
     private bool _disposed;
+    private bool TcpConnected => _connection.Connected;
+    private bool NntpConnected { get; set; }
     public DateTimeOffset LastActivity { get; set; }
-    public bool Connected { get; set; }
+    public bool Connected => TcpConnected && NntpConnected;
     public bool Authenticated { get; set; }
 
     public PooledNntpClient()
@@ -41,7 +43,7 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
     public async Task<bool> ConnectAsync(string hostname, int port, bool useSsl)
     {
         var res = await _client.ConnectAsync(hostname, port, useSsl).ConfigureAwait(false);
-        Connected = res;
+        NntpConnected = res;
         return res;
     }
 
@@ -123,7 +125,7 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
         if (_disposed) return;
 
         _client.Quit();
-        Connected = false;
+        NntpConnected = false;
         Authenticated = false;
         _connection.Dispose();
 
