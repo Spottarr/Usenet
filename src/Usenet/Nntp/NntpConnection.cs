@@ -92,6 +92,8 @@ public sealed class NntpConnection : INntpConnection
         _writer.WriteLine(line);
     }
 
+    internal bool Connected => _client.Connected;
+
     private void ThrowIfNotConnected()
     {
         if (!_client.Connected)
