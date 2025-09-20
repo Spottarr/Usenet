@@ -77,7 +77,7 @@ public sealed class NntpClientPool : INntpClientPool
         if (!client.Authenticated) client.Authenticate(_username, _password);
 
         if (!client.Connected || !client.Authenticated)
-            throw new InvalidOperationException($"Failed to connect to '{_hostname}:{_port}' SSL={_useSsl} C={client.Connected} A={client.Connected}.'");
+            throw new InvalidOperationException($"Failed to connect to '{_hostname}:{_port}' SSL={_useSsl} C={client.Connected} A={client.Authenticated}.'");
 
         return client;
     }
