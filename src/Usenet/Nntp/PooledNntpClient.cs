@@ -24,21 +24,6 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
         _client = new NntpClient(_connection);
     }
 
-    private NntpClient Client
-    {
-        get
-        {
-            ObjectDisposedExceptionShims.ThrowIf(_disposed, _client);
-
-            if (!Connected || !Authenticated)
-                throw new InvalidOperationException("Client not connected or authenticated");
-
-            LastActivity = DateTimeOffset.Now;
-
-            return _client;
-        }
-    }
-
     #region INntpClient
 
     public async Task<bool> ConnectAsync(string hostname, int port, bool useSsl)
@@ -143,6 +128,21 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
         _connection.Dispose();
 
         _disposed = true;
+    }
+
+    private NntpClient Client
+    {
+        get
+        {
+            ObjectDisposedExceptionShims.ThrowIf(_disposed, _client);
+
+            if (!Connected || !Authenticated)
+                throw new InvalidOperationException("Client not connected or authenticated");
+
+            LastActivity = DateTimeOffset.Now;
+
+            return _client;
+        }
     }
 
     private T ExecuteCommand<T>(Func<NntpClient, T> command)
