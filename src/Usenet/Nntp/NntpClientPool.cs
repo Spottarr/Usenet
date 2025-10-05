@@ -97,8 +97,9 @@ public sealed class NntpClientPool : INntpClientPool
             // If the client has encountered an error (e.g. broken pipe) during the most recent operation, dispose it instead of returning it to the pool
             if (client.HasError)
             {
-                _currentPoolSize--;
                 client.Dispose();
+                _currentPoolSize--;
+                _logger.DisposingErroredNntpClient(_currentPoolSize, _maxPoolSize);
             }
             else
             {
