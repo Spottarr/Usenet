@@ -124,7 +124,19 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
     {
         if (_disposed) return;
 
-        _client.Quit();
+#pragma warning disable CA1031
+        try
+        {
+            // Try to gracefully QUIT the NNTP session
+            if (NntpConnected) _client.Quit();
+        }
+        catch
+        {
+            // It's possible that the connection is already closed or broken.
+            // We can ignore any exceptions here as we're disposing anyway.
+        }
+#pragma warning restore CA1031
+
         NntpConnected = false;
         Authenticated = false;
         _connection.Dispose();
