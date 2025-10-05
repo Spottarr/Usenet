@@ -109,7 +109,7 @@ public sealed class NntpClientPool : INntpClientPool
                 return existingClient;
             }
 
-            if (_currentPoolSize > _maxPoolSize)
+            if (_currentPoolSize >= _maxPoolSize)
                 throw new InvalidOperationException("No available clients in the pool.");
 
             _currentPoolSize++;
