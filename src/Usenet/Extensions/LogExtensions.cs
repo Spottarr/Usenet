@@ -57,4 +57,7 @@ internal static partial class LogExtensions
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Disposing idle NNTP client ({CurrentPoolSize}/{MaxPoolSize})")]
     public static partial void DisposingIdleNntpClient(this ILogger logger, int currentPoolSize, int maxPoolSize);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Disposing NNTP client left in an errored state after a previous operation ({CurrentPoolSize}/{MaxPoolSize})")]
+    public static partial void DisposingErroredNntpClient(this ILogger logger, int currentPoolSize, int maxPoolSize);
 }

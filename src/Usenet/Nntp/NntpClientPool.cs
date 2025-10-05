@@ -94,7 +94,18 @@ public sealed class NntpClientPool : INntpClientPool
             if(!_usedClients.Remove(client))
                 throw new InvalidOperationException("Client not borrowed from this pool.");
 
-            _availableClients.Enqueue(client);
+            // If the client has encountered an error (e.g. broken pipe) during the most recent operation, dispose it instead of returning it to the pool
+            if (client.HasError)
+            {
+                client.Dispose();
+                _currentPoolSize--;
+                _logger.DisposingErroredNntpClient(_currentPoolSize, _maxPoolSize);
+            }
+            else
+            {
+                _availableClients.Enqueue(client);
+            }
+
             _semaphore.Release();
         }
     }
@@ -109,7 +120,7 @@ public sealed class NntpClientPool : INntpClientPool
                 return existingClient;
             }
 
-            if (_currentPoolSize > _maxPoolSize)
+            if (_currentPoolSize >= _maxPoolSize)
                 throw new InvalidOperationException("No available clients in the pool.");
 
             _currentPoolSize++;

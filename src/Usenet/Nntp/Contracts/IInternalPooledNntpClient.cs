@@ -4,5 +4,6 @@ internal interface IInternalPooledNntpClient : IPooledNntpClient, INntpClient, I
 {
     bool Connected { get; }
     bool Authenticated { get; }
+    bool HasError { get; }
     DateTimeOffset LastActivity { get; }
 }
