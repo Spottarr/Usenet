@@ -68,7 +68,7 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
     public NntpArticleResponse Head(NntpMessageId messageId) => ExecuteCommand(c => c.Head(messageId));
     public NntpArticleResponse Head(long number) => ExecuteCommand(c => c.Head(number));
     public NntpArticleResponse Head() => ExecuteCommand(c => c.Head());
-    public NntpArticleResponse Body(NntpMessageId messageId) => ExecuteCommand(c => c.Body());
+    public NntpArticleResponse Body(NntpMessageId messageId) => ExecuteCommand(c => c.Body(messageId));
     public NntpArticleResponse Body(long number) => ExecuteCommand(c => c.Body(number));
     public NntpArticleResponse Body() => ExecuteCommand(c => c.Body());
     public NntpStatResponse Stat(NntpMessageId messageId) => ExecuteCommand(c => c.Stat(messageId));
