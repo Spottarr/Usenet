@@ -7,6 +7,7 @@ internal static class StreamReaderExtensions
 #if NET7_0_OR_GREATER
         return reader.ReadToEndAsync(cancellationToken);
 #else
+        cancellationToken.ThrowIfCancellationRequested();
         return reader.ReadToEndAsync();
 #endif
     }
