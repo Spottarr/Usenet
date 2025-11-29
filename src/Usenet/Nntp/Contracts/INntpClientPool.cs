@@ -21,10 +21,9 @@ public interface INntpClientPool : IDisposable
     TimeSpan WaitTimeout { get; init; }
 
     /// <summary>
-    /// Retrieves an authenticated and connected NNTP client from the pool.
+    /// Gets a lease on an authenticated and connected NNTP client from the pool.
     /// If no clients are available, it will wait until one becomes available or the wait times out.
     /// </summary>
     /// <returns></returns>
-    Task<IPooledNntpClient> BorrowClient();
-    void ReturnClient(IPooledNntpClient client);
+    Task<IPooledNntpClientLease> GetLease();
 }

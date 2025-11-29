@@ -1,5 +1,8 @@
 using NSubstitute;
+using Usenet.Exceptions;
 using Usenet.Nntp;
+using Usenet.Nntp.Contracts;
+using Usenet.Tests.TestHelpers;
 using Xunit;
 
 namespace Usenet.Tests.Nntp.Pooling;
@@ -23,11 +26,11 @@ public class NntpClientPoolTests
             ClientFactory = GetClientMock
         };
 
-        // Get first client, should succeed
-        await pool.BorrowClient();
+        // Get the first lease, this should succeed
+        await pool.GetLease();
 
-        // Get second client, should throw because the client does not become available again in time
-        await Assert.ThrowsAsync<InvalidOperationException>(async () => await pool.BorrowClient().ConfigureAwait(false));
+        // Get the second lease, should throw because the client does not become available again in time
+        await Assert.ThrowsAsync<InvalidOperationException>(async () => await pool.GetLease().ConfigureAwait(false));
     }
 
     [Fact]
@@ -39,20 +42,52 @@ public class NntpClientPoolTests
             ClientFactory = GetClientMock
         };
 
-        // Get first client, should succeed
-        var client = await pool.BorrowClient();
+        // Get the first lease, this should succeed
+        var lease1 = await pool.GetLease();
+        lease1.Dispose();
 
-        pool.ReturnClient(client);
-
-        // Get second client, should succeed because the first client was returned to the pool
-        await pool.BorrowClient();
+        // Get the second lease, this should succeed because the first client was returned to the pool
+        var lease2 = await pool.GetLease();
+        lease2.Dispose();
     }
 
-    private static PooledNntpClient GetClientMock()
+    [Fact]
+    public async Task DisposeClientAfterError()
     {
-        var client = Substitute.For<PooledNntpClient>();
-        client.Connected = true;
-        client.Authenticated = true;
+        using var server = new TestNntpServer();
+        using var pool = new NntpClientPool(1, "127.0.0.1", server.Port, false, "example.user", "example.pass") { WaitTimeout = TimeSpan.Zero };
+
+        // Get the first lease
+        var lease1 = await pool.GetLease();
+        var client1 = lease1.Client;
+        try
+        {
+            // Group command triggers disconnect on server side
+            Assert.Throws<NntpException>(() => lease1.Client.Group("some.group"));
+        }
+        finally
+        {
+            lease1.Dispose();
+        }
+
+        // The client should be disposed after the disconnect
+        Assert.Throws<ObjectDisposedException>(() => client1.Article("123"));
+
+        // Get the second lease
+        // This should return a new client
+        var lease2 = await pool.GetLease();
+        var client2 = lease2.Client;
+        lease2.Client.Article("123");
+        lease2.Dispose();
+
+        Assert.NotEqual(client1, client2);
+    }
+
+    private static IInternalPooledNntpClient GetClientMock()
+    {
+        var client = Substitute.For<IInternalPooledNntpClient>();
+        client.Connected.Returns(true);
+        client.Authenticated.Returns(true);
         return client;
     }
 }
