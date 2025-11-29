@@ -17,7 +17,7 @@ public interface INntpConnection : IDisposable
     /// <param name="port">The port to use.</param>
     /// <param name="useSsl">A value to indicate whether or not to use SSL encryption.</param>
     /// <param name="parser">The response parser to use.</param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A response object of type <typeparamref name="TResponse"/>.</returns>
     Task<TResponse> ConnectAsync<TResponse>(string hostname, int port, bool useSsl, IResponseParser<TResponse> parser, CancellationToken cancellationToken = default);
 
