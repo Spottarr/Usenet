@@ -26,9 +26,9 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
 
     #region INntpClient
 
-    public async Task<bool> ConnectAsync(string hostname, int port, bool useSsl)
+    public async Task<bool> ConnectAsync(string hostname, int port, bool useSsl, CancellationToken cancellationToken)
     {
-        var res = await _client.ConnectAsync(hostname, port, useSsl).ConfigureAwait(false);
+        var res = await _client.ConnectAsync(hostname, port, useSsl, cancellationToken).ConfigureAwait(false);
         NntpConnected = res;
         return res;
     }

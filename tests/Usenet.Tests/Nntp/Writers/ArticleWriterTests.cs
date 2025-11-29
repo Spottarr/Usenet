@@ -63,7 +63,7 @@ internal sealed class MockConnection : INntpConnection
     {
     }
 
-    public Task<TResponse> ConnectAsync<TResponse>(string hostname, int port, bool useSsl, IResponseParser<TResponse> parser)
+    public Task<TResponse> ConnectAsync<TResponse>(string hostname, int port, bool useSsl, IResponseParser<TResponse> parser, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

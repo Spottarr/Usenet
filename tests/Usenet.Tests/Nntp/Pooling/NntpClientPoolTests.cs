@@ -27,10 +27,10 @@ public class NntpClientPoolTests
         };
 
         // Get the first lease, this should succeed
-        await pool.GetLease();
+        await pool.GetLease(TestContext.Current.CancellationToken);
 
         // Get the second lease, should throw because the client does not become available again in time
-        await Assert.ThrowsAsync<InvalidOperationException>(async () => await pool.GetLease().ConfigureAwait(false));
+        await Assert.ThrowsAsync<InvalidOperationException>(async () => await pool.GetLease(TestContext.Current.CancellationToken).ConfigureAwait(false));
     }
 
     [Fact]
@@ -43,11 +43,11 @@ public class NntpClientPoolTests
         };
 
         // Get the first lease, this should succeed
-        var lease1 = await pool.GetLease();
+        var lease1 = await pool.GetLease(TestContext.Current.CancellationToken);
         lease1.Dispose();
 
         // Get the second lease, this should succeed because the first client was returned to the pool
-        var lease2 = await pool.GetLease();
+        var lease2 = await pool.GetLease(TestContext.Current.CancellationToken);
         lease2.Dispose();
     }
 
@@ -58,7 +58,7 @@ public class NntpClientPoolTests
         using var pool = new NntpClientPool(1, "127.0.0.1", server.Port, false, "example.user", "example.pass") { WaitTimeout = TimeSpan.Zero };
 
         // Get the first lease
-        var lease1 = await pool.GetLease();
+        var lease1 = await pool.GetLease(TestContext.Current.CancellationToken);
         var client1 = lease1.Client;
         try
         {
@@ -75,7 +75,7 @@ public class NntpClientPoolTests
 
         // Get the second lease
         // This should return a new client
-        var lease2 = await pool.GetLease();
+        var lease2 = await pool.GetLease(TestContext.Current.CancellationToken);
         var client2 = lease2.Client;
         lease2.Client.Article("123");
         lease2.Dispose();
