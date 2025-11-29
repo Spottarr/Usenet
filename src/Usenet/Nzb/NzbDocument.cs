@@ -46,7 +46,8 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <returns>A task that represents the asynchronous load operation.
     /// The value of the task's result property contains the resulting <see cref="NzbDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
-    public static Task<NzbDocument> LoadAsync(Stream stream) => LoadAsync(stream, UsenetEncoding.Default);
+    public static Task<NzbDocument> LoadAsync(Stream stream, CancellationToken cancellationToken = default) =>
+        LoadAsync(stream, UsenetEncoding.Default, cancellationToken);
 
     /// <summary>
     /// Loads a <see cref="NzbDocument"/> from the specified stream asynchronously using the specified character encoding.
@@ -56,13 +57,13 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <returns>A task that represents the asynchronous load operation.
     /// The value of the task's result property contains the resulting <see cref="NzbDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
-    public static async Task<NzbDocument> LoadAsync(Stream stream, Encoding encoding)
+    public static async Task<NzbDocument> LoadAsync(Stream stream, Encoding encoding, CancellationToken cancellationToken = default)
     {
         Guard.ThrowIfNull(stream, nameof(stream));
         Guard.ThrowIfNull(encoding, nameof(encoding));
 
         using var reader = new StreamReader(stream, encoding);
-        return NzbParser.Parse(await reader.ReadToEndAsync().ConfigureAwait(false));
+        return NzbParser.Parse(await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false));
     }
 
     /// <summary>

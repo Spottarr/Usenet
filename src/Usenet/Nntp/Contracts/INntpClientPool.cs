@@ -25,5 +25,5 @@ public interface INntpClientPool : IDisposable
     /// If no clients are available, it will wait until one becomes available or the wait times out.
     /// </summary>
     /// <returns></returns>
-    Task<IPooledNntpClientLease> GetLease();
+    Task<IPooledNntpClientLease> GetLease(CancellationToken cancellationToken = default);
 }

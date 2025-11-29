@@ -55,17 +55,17 @@ public sealed class NntpClientPool : INntpClientPool
         Task.Run(() => MonitorIdleClients(_cts.Token));
     }
 
-    public async Task<IPooledNntpClientLease> GetLease()
+    public async Task<IPooledNntpClientLease> GetLease(CancellationToken cancellationToken = default)
     {
-        var client = await BorrowClient().ConfigureAwait(false);
+        var client = await BorrowClient(cancellationToken).ConfigureAwait(false);
         return new PooledNntpClientLease(this, client);
     }
 
-    private async Task<IInternalPooledNntpClient> BorrowClient()
+    private async Task<IInternalPooledNntpClient> BorrowClient(CancellationToken cancellationToken)
     {
         ObjectDisposedExceptionShims.ThrowIf(_disposed, this);
 
-        var success = await _semaphore.WaitAsync(WaitTimeout).ConfigureAwait(false);
+        var success = await _semaphore.WaitAsync(WaitTimeout, cancellationToken).ConfigureAwait(false);
         if (!success) throw new InvalidOperationException("Timed out waiting for NNTP (usenet) client");
 
         _logger.BorrowingNntpClient();
@@ -73,7 +73,7 @@ public sealed class NntpClientPool : INntpClientPool
 
         if (client.Connected && client.Authenticated) return client;
 
-        if (!client.Connected) await client.ConnectAsync(_hostname, _port, _useSsl).ConfigureAwait(false);
+        if (!client.Connected) await client.ConnectAsync(_hostname, _port, _useSsl, cancellationToken).ConfigureAwait(false);
         if (!client.Authenticated) client.Authenticate(_username, _password);
 
         if (!client.Connected || !client.Authenticated)

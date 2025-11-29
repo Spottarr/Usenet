@@ -28,10 +28,11 @@ public sealed class NntpConnection : INntpConnection
     public CountingStream Stream { get; private set; }
 
     /// <inheritdoc/>
-    public async Task<TResponse> ConnectAsync<TResponse>(string hostname, int port, bool useSsl, IResponseParser<TResponse> parser)
+    public async Task<TResponse> ConnectAsync<TResponse>(string hostname, int port, bool useSsl, IResponseParser<TResponse> parser,
+        CancellationToken cancellationToken = default)
     {
         _log.Connecting(hostname, port, useSsl);
-        await _client.ConnectAsync(hostname, port).ConfigureAwait(false);
+        await _client.ConnectAsync(hostname, port, cancellationToken).ConfigureAwait(false);
         Stream = await GetStreamAsync(hostname, useSsl).ConfigureAwait(false);
         _writer = new StreamWriter(Stream, UsenetEncoding.Default) { AutoFlush = true };
         _reader = new NntpStreamReader(Stream, UsenetEncoding.Default);
@@ -78,10 +79,12 @@ public sealed class NntpConnection : INntpConnection
         {
             throw new NntpException("Received no response.");
         }
+
         if (responseText.Length < 3 || !IntShims.TryParse(responseText.AsSpan(0, 3), out var code))
         {
             throw new NntpException("Received invalid response.");
         }
+
         return parser.Parse(code, responseText.Substring(3).Trim());
     }
 
@@ -109,6 +112,7 @@ public sealed class NntpConnection : INntpConnection
         {
             return new CountingStream(stream);
         }
+
         var sslStream = new SslStream(stream);
         await sslStream.AuthenticateAsClientAsync(hostname).ConfigureAwait(false);
         return new CountingStream(sslStream);
