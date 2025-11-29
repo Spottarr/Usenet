@@ -9,6 +9,7 @@ internal static class TcpClientExtensions
 #if NET5_0_OR_GREATER
         return client.ConnectAsync(host, port, cancellationToken);
 #else
+        cancellationToken.ThrowIfCancellationRequested();
         return new ValueTask(client.ConnectAsync(host, port));
 #endif
     }
