@@ -24,8 +24,8 @@ public sealed class NntpConnection : INntpConnection
     private NntpStreamReader _reader;
     private const string AuthInfoPass = "AUTHINFO PASS";
 
-    /// <inheritdoc/>
-    public CountingStream Stream { get; private set; }
+    private bool _disposed;
+    private bool _connected;
 
     /// <inheritdoc/>
     public async Task<TResponse> ConnectAsync<TResponse>(string hostname, int port, bool useSsl, IResponseParser<TResponse> parser,
@@ -36,6 +36,8 @@ public sealed class NntpConnection : INntpConnection
         Stream = await GetStreamAsync(hostname, useSsl).ConfigureAwait(false);
         _writer = new StreamWriter(Stream, UsenetEncoding.Default) { AutoFlush = true };
         _reader = new NntpStreamReader(Stream, UsenetEncoding.Default);
+        _connected = true;
+
         return GetResponse(parser);
     }
 
@@ -100,18 +102,13 @@ public sealed class NntpConnection : INntpConnection
     private void ThrowIfNotConnected()
     {
         if (!_client.Connected)
-        {
             throw new NntpException("Client not connected.");
-        }
     }
 
     private async Task<CountingStream> GetStreamAsync(string hostname, bool useSsl)
     {
         var stream = _client.GetStream();
-        if (!useSsl)
-        {
-            return new CountingStream(stream);
-        }
+        if (!useSsl) return new CountingStream(stream);
 
         var sslStream = new SslStream(stream);
         await sslStream.AuthenticateAsClientAsync(hostname).ConfigureAwait(false);
@@ -129,8 +126,15 @@ public sealed class NntpConnection : INntpConnection
     /// <inheritdoc/>
     public void Dispose()
     {
+        if (_disposed) return;
+
+        _connected = false;
+
         _client?.Dispose();
         _writer?.Dispose();
         _reader?.Dispose();
+        _stream?.Dispose();
+
+        _disposed = true;
     }
 }
