@@ -33,20 +33,17 @@ public class NntpClient : INntpClient
     /// <summary>
     /// The number of bytes read.
     /// </summary>
-    public long BytesRead => _connection.Stream?.BytesRead ?? 0;
+    public long BytesRead => _connection.BytesRead;
 
     /// <summary>
     /// The number of bytes written.
     /// </summary>
-    public long BytesWritten => _connection.Stream?.BytesWritten ?? 0;
+    public long BytesWritten => _connection.BytesWritten;
 
     /// <summary>
     /// Resets the counters.
     /// </summary>
-    public void ResetCounters()
-    {
-        _connection.Stream?.ResetCounters();
-    }
+    public void ResetCounters() => _connection.ResetCounters();
 
     /// <inheritdoc />
     public async Task<bool> ConnectAsync(string hostname, int port, bool useSsl, CancellationToken cancellationToken = default)

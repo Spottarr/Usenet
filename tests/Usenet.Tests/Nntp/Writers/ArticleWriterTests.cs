@@ -83,7 +83,10 @@ internal sealed class MockConnection : INntpConnection
         _lines.Add(line);
     }
 
-    public CountingStream Stream => throw new NotImplementedException();
+    public long BytesRead => 0;
+    public long BytesWritten => 0;
+    public void ResetCounters() => throw new NotImplementedException();
+
 
     public TResponse GetResponse<TResponse>(IResponseParser<TResponse> parser)
     {

@@ -20,6 +20,7 @@ public sealed class NntpConnection : INntpConnection
 {
     private readonly ILogger _log = Logger.Create<NntpConnection>();
     private readonly TcpClient _client = new();
+    private CountingStream _stream;
     private StreamWriter _writer;
     private NntpStreamReader _reader;
     private const string AuthInfoPass = "AUTHINFO PASS";
@@ -33,9 +34,9 @@ public sealed class NntpConnection : INntpConnection
     {
         _log.Connecting(hostname, port, useSsl);
         await _client.ConnectAsync(hostname, port, cancellationToken).ConfigureAwait(false);
-        Stream = await GetStreamAsync(hostname, useSsl).ConfigureAwait(false);
-        _writer = new StreamWriter(Stream, UsenetEncoding.Default) { AutoFlush = true };
-        _reader = new NntpStreamReader(Stream, UsenetEncoding.Default);
+        _stream = await GetStreamAsync(hostname, useSsl).ConfigureAwait(false);
+        _writer = new StreamWriter(_stream, UsenetEncoding.Default) { AutoFlush = true };
+        _reader = new NntpStreamReader(_stream, UsenetEncoding.Default);
         _connected = true;
 
         return GetResponse(parser);
@@ -51,7 +52,7 @@ public sealed class NntpConnection : INntpConnection
             ? $"{AuthInfoPass} [REDACTED]"
             : command;
         _log.SendingCommand(logCommand);
-        _writer.WriteLine(command);
+        WriteLine(command);
         return GetResponse(parser);
     }
 
@@ -97,7 +98,11 @@ public sealed class NntpConnection : INntpConnection
         _writer.WriteLine(line);
     }
 
-    internal bool Connected => _client.Connected;
+    public long BytesRead => _stream?.BytesRead ?? 0;
+    public long BytesWritten => _stream?.BytesWritten ?? 0;
+    public void ResetCounters() => _stream.ResetCounters();
+
+    internal bool Connected => !_disposed && _connected && _client.Connected;
 
     private void ThrowIfNotConnected()
     {

@@ -54,7 +54,17 @@ public interface INntpConnection : IDisposable
     void WriteLine(string line);
 
     /// <summary>
-    /// The stream used by the connection.
+    /// The number of bytes read.
     /// </summary>
-    CountingStream Stream { get; }
+    public long BytesRead { get; }
+
+    /// <summary>
+    /// The number of bytes written.
+    /// </summary>
+    public long BytesWritten { get; }
+
+    /// <summary>
+    /// Resets the counters.
+    /// </summary>
+    public void ResetCounters();
 }
