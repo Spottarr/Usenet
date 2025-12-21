@@ -1,5 +1,6 @@
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using Usenet.Exceptions;
 using Microsoft.Extensions.Logging;
 using Usenet.Extensions;
@@ -61,7 +62,7 @@ public sealed class NntpConnection : INntpConnection
         var response = await CommandAsync(command, new ResponseParser(), cancellationToken).ConfigureAwait(false);
 
         var dataBlock = parser.IsSuccessResponse(response.Code)
-            ? await ReadMultiLineDataBlockAsync(cancellationToken).ConfigureAwait(false)
+            ? await ReadMultiLineDataBlockAsync(cancellationToken).ToListAsync(cancellationToken).ConfigureAwait(false)
             : [];
 
         return parser.Parse(response.Code, response.Message, dataBlock);
@@ -120,14 +121,12 @@ public sealed class NntpConnection : INntpConnection
         return new CountingStream(sslStream);
     }
 
-    private async Task<List<string>> ReadMultiLineDataBlockAsync(CancellationToken cancellationToken = default)
+    private async IAsyncEnumerable<string> ReadMultiLineDataBlockAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var lines = new List<string>();
         while (await _reader.ReadLineAsync(cancellationToken).ConfigureAwait(false) is { } line)
         {
-            lines.Add(line);
+            yield return line;
         }
-        return lines;
     }
 
     /// <inheritdoc/>
