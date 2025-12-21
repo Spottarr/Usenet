@@ -68,7 +68,6 @@ public sealed class NntpClientPool : INntpClientPool
         var success = await _semaphore.WaitAsync(WaitTimeout, cancellationToken).ConfigureAwait(false);
         if (!success) throw new InvalidOperationException("Timed out waiting for NNTP (usenet) client");
 
-        _logger.BorrowingNntpClient();
         var client = BorrowClientInternal();
 
         if (client.Connected && client.Authenticated) return client;
@@ -87,10 +86,10 @@ public sealed class NntpClientPool : INntpClientPool
         Guard.ThrowIfNull(client, nameof(client));
         ObjectDisposedExceptionShims.ThrowIf(_disposed, this);
 
-        _logger.ReturningNntpClient();
-
         lock (_lock)
         {
+            _logger.ReturningNntpClient();
+
             if(!_usedClients.Remove(client))
                 throw new InvalidOperationException("Client not borrowed from this pool.");
 
@@ -114,6 +113,8 @@ public sealed class NntpClientPool : INntpClientPool
     {
         lock (_lock)
         {
+            _logger.BorrowingNntpClient();
+
             if (_availableClients.TryDequeue(out var existingClient))
             {
                 _usedClients.Add(existingClient);
