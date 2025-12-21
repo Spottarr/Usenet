@@ -74,7 +74,7 @@ public sealed class NntpClientPool : INntpClientPool
         if (client.Connected && client.Authenticated) return client;
 
         if (!client.Connected) await client.ConnectAsync(_hostname, _port, _useSsl, cancellationToken).ConfigureAwait(false);
-        if (!client.Authenticated) client.Authenticate(_username, _password);
+        if (!client.Authenticated) await client.AuthenticateAsync(_username, _password, cancellationToken).ConfigureAwait(false);
 
         if (!client.Connected || !client.Authenticated)
             throw new InvalidOperationException($"Failed to connect to '{_hostname}:{_port}' SSL={_useSsl} C={client.Connected} A={client.Authenticated}.'");

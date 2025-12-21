@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Usenet.Exceptions;
 using Usenet.Extensions;
@@ -29,6 +29,45 @@ public static class NzbParser
         Guard.ThrowIfNullOrEmpty(text, nameof(text));
 
         var doc = XDocument.Parse(text);
+        return ParseDocument(doc);
+    }
+
+#if !NETSTANDARD2_0
+    /// <summary>
+    /// Asynchronously parses the xml input from a stream into an instance of the <see cref="NzbDocument"/> class.
+    /// </summary>
+    /// <param name="stream">A stream containing the xml NZB document.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task containing a parsed <see cref="NzbDocument"/>.</returns>
+    /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
+    /// <exception cref="InvalidNzbDataException">InvalidNzbDataException</exception>
+    public static async Task<NzbDocument> ParseAsync(Stream stream, CancellationToken cancellationToken = default)
+    {
+        Guard.ThrowIfNull(stream, nameof(stream));
+
+        var doc = await XDocument.LoadAsync(stream, LoadOptions.None, cancellationToken).ConfigureAwait(false);
+        return ParseDocument(doc);
+    }
+
+    /// <summary>
+    /// Asynchronously parses the xml input from a text reader into an instance of the <see cref="NzbDocument"/> class.
+    /// </summary>
+    /// <param name="reader">A text reader containing the xml NZB document.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task containing a parsed <see cref="NzbDocument"/>.</returns>
+    /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
+    /// <exception cref="InvalidNzbDataException">InvalidNzbDataException</exception>
+    public static async Task<NzbDocument> ParseAsync(TextReader reader, CancellationToken cancellationToken = default)
+    {
+        Guard.ThrowIfNull(reader, nameof(reader));
+
+        var doc = await XDocument.LoadAsync(reader, LoadOptions.None, cancellationToken).ConfigureAwait(false);
+        return ParseDocument(doc);
+    }
+#endif
+
+    private static NzbDocument ParseDocument(XDocument doc)
+    {
         XNamespace ns = NzbKeywords.Namespace;
         var nzbElement = doc.Element(ns + NzbKeywords.Nzb);
 

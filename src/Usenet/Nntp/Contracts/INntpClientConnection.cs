@@ -19,6 +19,7 @@ public interface INntpClientConnection
     /// <a href="https://tools.ietf.org/html/rfc3977#section-5.4">QUIT</a>
     /// command to terminate the session.
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A response object.</returns>
-    NntpResponse Quit();
+    Task<NntpResponse> QuitAsync(CancellationToken cancellationToken = default);
 }

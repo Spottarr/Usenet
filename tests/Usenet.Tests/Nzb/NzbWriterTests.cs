@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders;
 using Usenet.Nzb;
 using Usenet.Tests.Extensions;
 using Usenet.Tests.TestHelpers;
@@ -12,7 +12,7 @@ public class NzbWriterTests
     [Theory]
     [EmbeddedResourceData(@"nzb.sabnzbd.nzb")]
     [EmbeddedResourceData(@"nzb.sabnzbd-no-namespace.nzb")]
-    internal void ShouldWriteDocumentToFile(IFileInfo file)
+    internal async Task ShouldWriteDocumentToFile(IFileInfo file)
     {
         var expected = NzbParser.Parse(file.ReadAllText(UsenetEncoding.Default));
 
@@ -21,9 +21,9 @@ public class NzbWriterTests
         using var reader = new StreamReader(stream, UsenetEncoding.Default);
 
         // write to file and read back for comparison
-        writer.WriteNzbDocument(expected);
+        await writer.WriteNzbDocumentAsync(expected, TestContext.Current.CancellationToken);
         stream.Position = 0;
-        var actual = NzbParser.Parse(reader.ReadToEnd());
+        var actual = NzbParser.Parse(await reader.ReadToEndAsync(TestContext.Current.CancellationToken));
 
         // compare
         Assert.Equal(expected, actual);

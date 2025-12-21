@@ -11,32 +11,36 @@ public interface INntpClientRfc3977
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-5.2">CAPABILITIES</a>
     /// command allows a client to determine the capabilities of the server at any given time.
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing the capabilities.</returns>
-    NntpMultiLineResponse Capabilities();
+    Task<NntpMultiLineResponse> CapabilitiesAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-5.2">CAPABILITIES</a>
     /// command allows a client to determine the capabilities of the server at any given time.
     /// </summary>
     /// <param name="keyword">Can be provided for additional features if supported by the server.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing the capabilities.</returns>
-    NntpMultiLineResponse Capabilities(string keyword);
+    Task<NntpMultiLineResponse> CapabilitiesAsync(string keyword, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-5.3">MODE READER</a>
     /// (<a href="https://tools.ietf.org/html/rfc2980#section-2.3">ad 1</a>) command
     /// instructs a mode-switching server to switch modes, as described in Section 3.4.2.
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A mode reader response object.</returns>
-    NntpModeReaderResponse ModeReader();
+    Task<NntpModeReaderResponse> ModeReaderAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.1">GROUP</a>
     /// command selects a newsgroup as the currently selected newsgroup and returns summary information about it.
     /// </summary>
     /// <param name="group">The name of the group to select.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A group response object.</returns>
-    NntpGroupResponse Group(string group);
+    Task<NntpGroupResponse> GroupAsync(string group, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a>
@@ -46,8 +50,9 @@ public interface INntpClientRfc3977
     /// </summary>
     /// <param name="group">The name of the group to select.</param>
     /// <param name="range">Only include article numbers within this range in the list.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A group response object.</returns>
-    NntpGroupResponse ListGroup(string group, NntpArticleRange range);
+    Task<NntpGroupResponse> ListGroupAsync(string group, NntpArticleRange range, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a>
@@ -56,16 +61,18 @@ public interface INntpClientRfc3977
     /// numbers in the newsgroup.
     /// </summary>
     /// <param name="group">The name of the group to select.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A group response object.</returns>
-    NntpGroupResponse ListGroup(string group);
+    Task<NntpGroupResponse> ListGroupAsync(string group, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a>
     /// command without no group specified provides a list of article
     /// numbers in the newsgroup.
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A group response object.</returns>
-    NntpGroupResponse ListGroup();
+    Task<NntpGroupResponse> ListGroupAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.3">LAST</a> command.
@@ -74,8 +81,9 @@ public interface INntpClientRfc3977
     /// is, the highest existing article number less than the current article
     /// number).
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A last response object.</returns>
-    NntpLastResponse Last();
+    Task<NntpLastResponse> LastAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.4">NEXT</a> command.
@@ -84,8 +92,9 @@ public interface INntpClientRfc3977
     /// the lowest existing article number greater than the current article
     /// number).
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A next response object.</returns>
-    NntpNextResponse Next();
+    Task<NntpNextResponse> NextAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.1">ARTICLE</a> command
@@ -94,8 +103,9 @@ public interface INntpClientRfc3977
     /// the body, in that order) to the client.
     /// </summary>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An article response object.</returns>
-    NntpArticleResponse Article(NntpMessageId messageId);
+    Task<NntpArticleResponse> ArticleAsync(NntpMessageId messageId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.1">ARTICLE</a> command
@@ -104,8 +114,9 @@ public interface INntpClientRfc3977
     /// the body, in that order) to the client.
     /// </summary>
     /// <param name="number">The number of the article to receive from the server.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An article response object.</returns>
-    NntpArticleResponse Article(long number);
+    Task<NntpArticleResponse> ArticleAsync(long number, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.1">ARTICLE</a> command
@@ -113,8 +124,9 @@ public interface INntpClientRfc3977
     /// presents the entire article (that is, the headers, an empty line, and
     /// the body, in that order) to the client.
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An article response object.</returns>
-    NntpArticleResponse Article();
+    Task<NntpArticleResponse> ArticleAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.2">HEAD</a>
@@ -124,8 +136,9 @@ public interface INntpClientRfc3977
     /// headers and body MUST NOT be included).
     /// </summary>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An article response object.</returns>
-    NntpArticleResponse Head(NntpMessageId messageId);
+    Task<NntpArticleResponse> HeadAsync(NntpMessageId messageId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.2">HEAD</a>
@@ -135,8 +148,9 @@ public interface INntpClientRfc3977
     /// headers and body MUST NOT be included).
     /// </summary>
     /// <param name="number">The number of the article to receive from the server.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An article response object.</returns>
-    NntpArticleResponse Head(long number);
+    Task<NntpArticleResponse> HeadAsync(long number, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.2">HEAD</a>
@@ -145,8 +159,9 @@ public interface INntpClientRfc3977
     /// and only the headers are presented (the empty line separating the
     /// headers and body MUST NOT be included).
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An article response object.</returns>
-    NntpArticleResponse Head();
+    Task<NntpArticleResponse> HeadAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.3">BODY</a>
@@ -156,8 +171,9 @@ public interface INntpClientRfc3977
     /// and body MUST NOT be included).
     /// </summary>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An article response object.</returns>
-    NntpArticleResponse Body(NntpMessageId messageId);
+    Task<NntpArticleResponse> BodyAsync(NntpMessageId messageId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.3">BODY</a>
@@ -168,8 +184,9 @@ public interface INntpClientRfc3977
     /// See <a href="https://tools.ietf.org/html/rfc3977#section-6.2.3">RFC 3977</a> for more information.
     /// </summary>
     /// <param name="number">The number of the article to receive from the server.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An article response object.</returns>
-    NntpArticleResponse Body(long number);
+    Task<NntpArticleResponse> BodyAsync(long number, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.3">BODY</a>
@@ -179,8 +196,9 @@ public interface INntpClientRfc3977
     /// and body MUST NOT be included).
     /// See <a href="https://tools.ietf.org/html/rfc3977#section-6.2.3">RFC 3977</a> for more information.
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An article response object.</returns>
-    NntpArticleResponse Body();
+    Task<NntpArticleResponse> BodyAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.4">STAT</a>
@@ -190,8 +208,9 @@ public interface INntpClientRfc3977
     /// NOT multi-line.
     /// </summary>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A stat response object.</returns>
-    NntpStatResponse Stat(NntpMessageId messageId);
+    Task<NntpStatResponse> StatAsync(NntpMessageId messageId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.4">STAT</a>
@@ -201,8 +220,9 @@ public interface INntpClientRfc3977
     /// NOT multi-line.
     /// </summary>
     /// <param name="number">The number of the article to receive from the server.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A stat response object.</returns>
-    NntpStatResponse Stat(long number);
+    Task<NntpStatResponse> StatAsync(long number, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.2.4">STAT</a>
@@ -211,36 +231,45 @@ public interface INntpClientRfc3977
     /// the response code is 223 instead of 220.  Note that the response is
     /// NOT multi-line.
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A stat response object.</returns>
-    NntpStatResponse Stat();
+    Task<NntpStatResponse> StatAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Post an article.
     /// <a href="https://tools.ietf.org/html/rfc3977#section-6.3.1">POST</a> an article.
     /// </summary>
-    bool Post(NntpArticle article);
+    /// <param name="article">The article to post.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>true if the article was posted successfully; otherwise false.</returns>
+    Task<bool> PostAsync(NntpArticle article, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.3.2">IHAVE</a> command
     /// informs the server that the client has an article with the specified message-id.
     /// </summary>
-    bool Ihave(NntpArticle article);
+    /// <param name="article">The article to send.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>true if the article was accepted; otherwise false.</returns>
+    Task<bool> IhaveAsync(NntpArticle article, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.1">DATE</a>
     /// command exists to help clients find out the current Coordinated
     /// Universal Time [TF.686-1] from the server's perspective.
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A date response object.</returns>
-    NntpDateResponse Date();
+    Task<NntpDateResponse> DateAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a herf="https://tools.ietf.org/html/rfc3977#section-7.2">HELP</a>
     /// command provides a short summary of the commands that are
     /// understood by this implementation of the server.
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response with a short summary of the available commands.</returns>
-    NntpMultiLineResponse Help();
+    Task<NntpMultiLineResponse> HelpAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.3">NEWGROUPS</a>
@@ -248,8 +277,9 @@ public interface INntpClientRfc3977
     /// the specified date and time.
     /// </summary>
     /// <param name="sinceDateTime">List all newsgroups created since this date and time.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A groups response object.</returns>
-    NntpGroupsResponse NewGroups(NntpDateTime sinceDateTime);
+    Task<NntpGroupsResponse> NewGroupsAsync(NntpDateTime sinceDateTime, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.4">NEWNEWS</a>
@@ -260,8 +290,9 @@ public interface INntpClientRfc3977
     /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
     /// <param name="sinceDateTime">List all newsgroups that have new articles
     /// posted or received since this date and time.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing a list of message-ids.</returns>
-    NntpMultiLineResponse NewNews(string wildmat, NntpDateTime sinceDateTime);
+    Task<NntpMultiLineResponse> NewNewsAsync(string wildmat, NntpDateTime sinceDateTime, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.4">active.times list</a>
@@ -269,8 +300,9 @@ public interface INntpClientRfc3977
     /// is maintained by some NNTP servers to contain
     /// information about who created a particular newsgroup and when.
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A group origins response.</returns>
-    NntpGroupOriginsResponse ListActiveTimes();
+    Task<NntpGroupOriginsResponse> ListActiveTimesAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.4">active.times list</a>
@@ -279,8 +311,9 @@ public interface INntpClientRfc3977
     /// information about who created a particular newsgroup and when.
     /// </summary>
     /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A group origins response.</returns>
-    NntpGroupOriginsResponse ListActiveTimes(string wildmat);
+    Task<NntpGroupOriginsResponse> ListActiveTimesAsync(string wildmat, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.5">distrib.pats list</a>
@@ -289,8 +322,9 @@ public interface INntpClientRfc3977
     /// clients to choose a value for the content of the Distribution header
     /// of a news article being posted.
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response object containing newsgroup distribution information.</returns>
-    NntpMultiLineResponse ListDistribPats();
+    Task<NntpMultiLineResponse> ListDistribPatsAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.6">newsgroups list</a>
@@ -299,8 +333,9 @@ public interface INntpClientRfc3977
     /// of each newsgroup that is available on the server and a short
     /// description about the purpose of the group.
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing a list of newsgroups available on the server.</returns>
-    NntpMultiLineResponse ListNewsgroups();
+    Task<NntpMultiLineResponse> ListNewsgroupsAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.6">newsgroups list</a>
@@ -310,8 +345,9 @@ public interface INntpClientRfc3977
     /// description about the purpose of the group.
     /// </summary>
     /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing a list of newsgroups available on the server.</returns>
-    NntpMultiLineResponse ListNewsgroups(string wildmat);
+    Task<NntpMultiLineResponse> ListNewsgroupsAsync(string wildmat, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.3">OVER</a>
@@ -320,8 +356,9 @@ public interface INntpClientRfc3977
     /// article or range of articles in the currently selected newsgroup.
     /// </summary>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing header fields.</returns>
-    NntpMultiLineResponse Over(NntpMessageId messageId);
+    Task<NntpMultiLineResponse> OverAsync(NntpMessageId messageId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.3">OVER</a>
@@ -330,8 +367,9 @@ public interface INntpClientRfc3977
     /// article or range of articles in the currently selected newsgroup.
     /// </summary>
     /// <param name="range">Only include article numbers within this range in the list.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing header fields.</returns>
-    NntpMultiLineResponse Over(NntpArticleRange range);
+    Task<NntpMultiLineResponse> OverAsync(NntpArticleRange range, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.3">OVER</a>
@@ -339,8 +377,9 @@ public interface INntpClientRfc3977
     /// database for an article specified by message-id, or from a specified
     /// article or range of articles in the currently selected newsgroup.
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing header fields.</returns>
-    NntpMultiLineResponse Over();
+    Task<NntpMultiLineResponse> OverAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.4">LIST OVERVIEW.FMT</a>
@@ -348,9 +387,10 @@ public interface INntpClientRfc3977
     /// command returns a description of the fields in
     /// the database for which it is consistent (as described above).
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing a description of the fields
     /// in the overview database for which it is consistent.</returns>
-    NntpMultiLineResponse ListOverviewFormat();
+    Task<NntpMultiLineResponse> ListOverviewFormatAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a>
@@ -360,8 +400,9 @@ public interface INntpClientRfc3977
     /// </summary>
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    NntpMultiLineResponse Hdr(string field, NntpMessageId messageId);
+    Task<NntpMultiLineResponse> HdrAsync(string field, NntpMessageId messageId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a>
@@ -371,8 +412,9 @@ public interface INntpClientRfc3977
     /// </summary>
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="range">Only include article numbers within this range in the list.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    NntpMultiLineResponse Hdr(string field, NntpArticleRange range);
+    Task<NntpMultiLineResponse> HdrAsync(string field, NntpArticleRange range, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a>
@@ -381,8 +423,9 @@ public interface INntpClientRfc3977
     /// articles in the currently selected newsgroup.
     /// </summary>
     /// <param name="field">The header field to retrieve.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    NntpMultiLineResponse Hdr(string field);
+    Task<NntpMultiLineResponse> HdrAsync(string field, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.6">LIST HEADERS</a>
@@ -390,9 +433,10 @@ public interface INntpClientRfc3977
     /// retrieved using the HDR command.
     /// </summary>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containg a list of header
     /// fields that may be retrieved using the HDR command.</returns>
-    NntpMultiLineResponse ListHeaders(NntpMessageId messageId);
+    Task<NntpMultiLineResponse> ListHeadersAsync(NntpMessageId messageId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.6">LIST HEADERS</a>
@@ -400,16 +444,18 @@ public interface INntpClientRfc3977
     /// retrieved using the HDR command.
     /// </summary>
     /// <param name="range">Only include article numbers within this range in the list.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containg a list of header
     /// fields that may be retrieved using the HDR command.</returns>
-    NntpMultiLineResponse ListHeaders(NntpArticleRange range);
+    Task<NntpMultiLineResponse> ListHeadersAsync(NntpArticleRange range, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.6">LIST HEADERS</a>
     /// command returns a list of fields that may be
     /// retrieved using the HDR command.
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containg a list of header
     /// fields that may be retrieved using the HDR command.</returns>
-    NntpMultiLineResponse ListHeaders();
+    Task<NntpMultiLineResponse> ListHeadersAsync(CancellationToken cancellationToken = default);
 }

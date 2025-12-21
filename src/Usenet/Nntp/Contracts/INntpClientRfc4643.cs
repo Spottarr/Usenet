@@ -9,6 +9,7 @@ public interface INntpClientRfc4643
     /// </summary>
     /// <param name="username">The username to use.</param>
     /// <param name="password">The password to use.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>true if the user was authenticated successfully; otherwise false.</returns>
-    bool Authenticate(string username, string password = null);
+    Task<bool> AuthenticateAsync(string username, string password = null, CancellationToken cancellationToken = default);
 }
