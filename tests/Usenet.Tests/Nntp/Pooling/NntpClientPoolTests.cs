@@ -29,7 +29,7 @@ public class NntpClientPoolTests
         await pool.GetLease(TestContext.Current.CancellationToken);
 
         // Get the second lease, should throw because the client does not become available again in time
-        await Assert.ThrowsAsync<InvalidOperationException>(async () => await pool.GetLease(TestContext.Current.CancellationToken).ConfigureAwait(false));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => pool.GetLease(TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class NntpClientPoolTests
         {
             // Group command triggers disconnect on server side - throws IOException when connection is reset
             // or NntpException when no response is received
-            await Assert.ThrowsAnyAsync<Exception>(async () => await lease1.Client.GroupAsync("some.group", TestContext.Current.CancellationToken).ConfigureAwait(false));
+            await Assert.ThrowsAnyAsync<Exception>(() => lease1.Client.GroupAsync("some.group", TestContext.Current.CancellationToken));
         }
         finally
         {
@@ -71,7 +71,7 @@ public class NntpClientPoolTests
         }
 
         // The client should be disposed after the disconnect
-        await Assert.ThrowsAsync<ObjectDisposedException>(async () => await client1.ArticleAsync("123", TestContext.Current.CancellationToken).ConfigureAwait(false));
+        await Assert.ThrowsAsync<ObjectDisposedException>(() => client1.ArticleAsync("123", TestContext.Current.CancellationToken));
 
         // Get the second lease
         // This should return a new client
