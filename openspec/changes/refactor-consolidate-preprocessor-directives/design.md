@@ -25,33 +25,38 @@ The codebase already has established patterns for handling this:
 
 **Why**: Extension methods provide a natural calling syntax and follow the pattern established by `QueueExtensions.TryDequeue` and `StreamReaderExtensions.ReadToEndAsync`.
 
-**Examples**:
-- `StreamWriterExtensions.WriteLineAsync(this StreamWriter, string, CancellationToken)`
-- `StreamExtensions.ReadAsync(this Stream, byte[], CancellationToken)` 
-- `XDocumentExtensions.LoadAsync(Stream, CancellationToken)`
+**Implemented**:
+- `StreamWriterExtensions.WriteLineAsync(this StreamWriter, string, CancellationToken)` - used by `NntpConnection`
+- `StreamExtensions.ReadByteAsync(this Stream, byte[], CancellationToken)` - used by `YencEncoder`
 
-### Decision 2: Shim classes for static/type compatibility
-**What**: Use static shim classes in `Usenet.Util.Compatibility` for type aliases or static method wrappers.
+### Decision 2: NntpStreamReader - Acceptable Exception
+**What**: The `NntpStreamReader.ReadLineAsync(CancellationToken)` `#if` directive cannot be moved.
 
-**Why**: Follows the pattern of `ObjectDisposedExceptionShims`, `IntShims`, etc.
+**Why**: 
+- On .NET 8+, `StreamReader.ReadLineAsync(CancellationToken)` exists and must be overridden
+- On older frameworks, it's a new method (not an override)
+- The implementation must call `base.ReadLineAsync()` directly, which cannot be delegated to an extension method without causing infinite recursion
 
-**Example**: `LockShims` to provide a cross-platform lock type alias.
+**Solution**: Keep the `#if` in `NntpStreamReader` - it controls both method signature AND implementation because they are intrinsically coupled. This is an acceptable exception documented in the spec.
 
-### Decision 3: NntpStreamReader special case
-**What**: The `NntpStreamReader.ReadLineAsync(CancellationToken)` cannot be moved to an extension method because it overrides a base class method on .NET 8+.
+### Decision 3: NntpClientPool Lock - Simplified
+**What**: The `#if NET9_0_OR_GREATER` for `Lock` vs `object` was removed.
 
-**Why**: On .NET 8+, `StreamReader.ReadLineAsync(CancellationToken)` exists and must be overridden. On older frameworks, we add a new method.
+**Why**: 
+- The .NET 9 `Lock` type is an optimization, not a requirement
+- Using `object` with `lock()` works on all platforms
+- Creating a type alias shim isn't possible because the return type would differ
+- Simplifying to `object` everywhere reduces complexity without functional impact
 
-**Solution**: Keep the `#if` in `NntpStreamReader` but wrap the actual async call in `StreamReaderExtensions.ReadLineWithCancellationAsync` so the directive only controls the method signature, not the implementation.
+### Decision 4: NzbParser.ParseAsync - Acceptable Exception  
+**What**: The `#if !NETSTANDARD2_0` around `ParseAsync` methods is kept.
 
-### Decision 4: NzbParser.ParseAsync conditional compilation
-**What**: The `NzbParser.ParseAsync` methods are wrapped in `#if !NETSTANDARD2_0` because `XDocument.LoadAsync` doesn't exist on .NET Standard 2.0.
+**Why**: 
+- `XDocument.LoadAsync` doesn't exist on .NET Standard 2.0
+- This is API availability, not implementation compatibility
+- A sync-over-async polyfill would be an anti-pattern
 
-**Why**: This is an API availability issue, not an implementation compatibility issue.
-
-**Solution**: Create `XDocumentExtensions` that provides a polyfill `LoadAsync` on .NET Standard 2.0 (using sync fallback with Task.Run), allowing the methods to exist on all platforms. Alternatively, keep the conditional compilation on the public API but document this clearly.
-
-**Trade-off**: Adding a sync-over-async fallback could cause performance issues. The cleaner solution is to accept that these methods are only available on .NET Standard 2.1+. Keep the `#if` but move it to wrap only the method declaration, not inline in implementation code.
+**Solution**: Keep the `#if` and document that `ParseAsync` is only available on .NET Standard 2.1+. Added XML documentation with `<remarks>` to explain this limitation.
 
 ## Risks / Trade-offs
 
@@ -63,12 +68,18 @@ The codebase already has established patterns for handling this:
 ### Risk: Extension method discovery
 **Mitigation**: All extension classes are in `Usenet.Extensions` namespace, which is already commonly imported in the codebase.
 
-## Summary of Changes
+## Summary of Implemented Changes
 
-| Location | Pattern | New File |
-|----------|---------|----------|
-| `NntpConnection.WriteLineInternalAsync` | Extension method | `StreamWriterExtensions.cs` |
-| `NntpStreamReader.ReadLineAsync` | Keep `#if` for signature, move impl to extension | `StreamReaderExtensions.cs` (modify) |
-| `NntpClientPool._lock` | Type alias shim | `LockShims.cs` |
-| `YencEncoder.EncodeAsync` | Extension method | `StreamExtensions.cs` |
-| `NzbParser.ParseAsync` | Keep as-is (API availability) | N/A |
+| Location | Before | After |
+|----------|--------|-------|
+| `NntpConnection.cs` | `#if` in `WriteLineInternalAsync` | Uses `StreamWriterExtensions.WriteLineAsync` |
+| `YencEncoder.cs` | `#if` in `EncodeAsync` | Uses `StreamExtensions.ReadByteAsync` |
+| `NntpClientPool.cs` | `#if NET9_0_OR_GREATER` for Lock | Simplified to `object` on all platforms |
+| `NntpStreamReader.cs` | `#if` for method signature | Kept (acceptable exception) |
+| `NzbParser.cs` | `#if` for API availability | Kept (acceptable exception) + added docs |
+
+## New Files
+- `src/Usenet/Extensions/StreamWriterExtensions.cs`
+
+## Modified Files
+- `src/Usenet/Extensions/StreamExtensions.cs` (added `ReadByteAsync`)

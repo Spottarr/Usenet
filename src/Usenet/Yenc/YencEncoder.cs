@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using Usenet.Extensions;
 using Usenet.Util;
 
 namespace Usenet.Yenc;
@@ -51,11 +52,7 @@ public static class YencEncoder
 
         for (var offset = 0; offset < header.PartSize; offset++)
         {
-#if NETSTANDARD2_0
-            var bytesRead = await stream.ReadAsync(readBuffer, 0, 1, cancellationToken).ConfigureAwait(false);
-#else
-            var bytesRead = await stream.ReadAsync(readBuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
-#endif
+            var bytesRead = await stream.ReadByteAsync(readBuffer, cancellationToken).ConfigureAwait(false);
             if (bytesRead == 0)
             {
                 // end of stream

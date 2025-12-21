@@ -6,9 +6,7 @@ internal static class QueueExtensions
 {
     public static bool TryDequeue<T>(this Queue<T> queue, [MaybeNullWhen(false)] out T result)
     {
-#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
-        return queue.TryDequeue(out result);
-#else
+#if NETSTANDARD2_0
         try
         {
             result = queue.Dequeue();
@@ -19,6 +17,8 @@ internal static class QueueExtensions
             result = default;
             return false;
         }
+#else
+        return queue.TryDequeue(out result);
 #endif
     }
 }

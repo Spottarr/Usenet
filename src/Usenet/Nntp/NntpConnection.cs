@@ -49,7 +49,7 @@ public sealed class NntpConnection : INntpConnection
             ? $"{AuthInfoPass} [REDACTED]"
             : command;
         _log.SendingCommand(logCommand);
-        await WriteLineInternalAsync(command, cancellationToken).ConfigureAwait(false);
+        await _writer.WriteLineAsync(command, cancellationToken).ConfigureAwait(false);
         return await GetResponseAsync(parser, cancellationToken).ConfigureAwait(false);
     }
 
@@ -92,20 +92,10 @@ public sealed class NntpConnection : INntpConnection
     public async Task WriteLineAsync(string line, CancellationToken cancellationToken = default)
     {
         ThrowIfNotConnected();
-        await WriteLineInternalAsync(line, cancellationToken).ConfigureAwait(false);
+        await _writer.WriteLineAsync(line, cancellationToken).ConfigureAwait(false);
     }
 
     internal bool Connected => _client.Connected;
-
-    private async Task WriteLineInternalAsync(string line, CancellationToken cancellationToken)
-    {
-#if NETSTANDARD2_0
-        cancellationToken.ThrowIfCancellationRequested();
-        await _writer.WriteLineAsync(line).ConfigureAwait(false);
-#else
-        await _writer.WriteLineAsync(line.AsMemory(), cancellationToken).ConfigureAwait(false);
-#endif
-    }
 
     private void ThrowIfNotConnected()
     {
