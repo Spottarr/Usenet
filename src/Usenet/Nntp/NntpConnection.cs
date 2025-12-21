@@ -107,6 +107,8 @@ public sealed class NntpConnection : INntpConnection
 
     private async Task<CountingStream> GetStreamAsync(string hostname, bool useSsl, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var stream = _client.GetStream();
         if (!useSsl)
         {
