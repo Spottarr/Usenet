@@ -15,7 +15,7 @@ public interface INntpConnection : IDisposable
     /// <typeparam name="TResponse">The type of the parsed response.</typeparam>
     /// <param name="hostname">The hostname of the usenet server.</param>
     /// <param name="port">The port to use.</param>
-    /// <param name="useSsl">A value to indicate whether or not to use SSL encryption.</param>
+    /// <param name="useSsl">A value to indicate whether to use SSL encryption.</param>
     /// <param name="parser">The response parser to use.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A response object of type <typeparamref name="TResponse"/>.</returns>
