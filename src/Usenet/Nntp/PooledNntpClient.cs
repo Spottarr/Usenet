@@ -26,83 +26,207 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
 
     #region INntpClient
 
-    public async Task<bool> ConnectAsync(string hostname, int port, bool useSsl, CancellationToken cancellationToken)
+    public async Task<bool> ConnectAsync(string hostname, int port, bool useSsl, CancellationToken cancellationToken = default)
     {
         var res = await _client.ConnectAsync(hostname, port, useSsl, cancellationToken).ConfigureAwait(false);
         NntpConnected = res;
         return res;
     }
 
-    public bool Authenticate(string username, string password = null)
+    public async Task<bool> AuthenticateAsync(string username, string password = null, CancellationToken cancellationToken = default)
     {
-        var res = _client.Authenticate(username, password);
+        var res = await _client.AuthenticateAsync(username, password, cancellationToken).ConfigureAwait(false);
         Authenticated = res;
         return res;
     }
 
-    public NntpResponse XfeatureCompressGzip(bool withTerminator) => ExecuteCommand(c => c.XfeatureCompressGzip(withTerminator));
-    public NntpMultiLineResponse Xzhdr(string field, NntpMessageId messageId) => ExecuteCommand(c => c.Xzhdr(field, messageId));
-    public NntpMultiLineResponse Xzhdr(string field, NntpArticleRange range) => ExecuteCommand(c => c.Xzhdr(field, range));
-    public NntpMultiLineResponse Xzhdr(string field) => ExecuteCommand(c => c.Xzhdr(field));
-    public NntpMultiLineResponse Xzver(NntpArticleRange range) => ExecuteCommand(c => c.Xzver(range));
-    public NntpMultiLineResponse Xzver() => ExecuteCommand(c => c.Xzver());
-    public void ResetCounters() => ExecuteCommand(c => c.ResetCounters());
-    public NntpMultiLineResponse Xhdr(string field, NntpMessageId messageId) => ExecuteCommand(c => c.Xhdr(field, messageId));
-    public NntpMultiLineResponse Xhdr(string field, NntpArticleRange range) => ExecuteCommand(c => c.Xhdr(field, range));
-    public NntpMultiLineResponse Xhdr(string field) => ExecuteCommand(c => c.Xhdr(field));
-    public NntpMultiLineResponse Xover(NntpArticleRange range) => ExecuteCommand(c => c.Xover(range));
-    public NntpMultiLineResponse Xover() => ExecuteCommand(c => c.Xover());
-    public NntpMultiLineResponse Capabilities() => ExecuteCommand(c => c.Capabilities());
-    public NntpMultiLineResponse Capabilities(string keyword) => ExecuteCommand(c => c.Capabilities(keyword));
-    public NntpModeReaderResponse ModeReader() => ExecuteCommand(c => c.ModeReader());
-    public NntpResponse Quit() => ExecuteCommand(c => c.Quit());
-    public NntpGroupResponse Group(string group) => ExecuteCommand(c => c.Group(group));
-    public NntpGroupResponse ListGroup(string group, NntpArticleRange range) => ExecuteCommand(c => c.ListGroup(group, range));
-    public NntpGroupResponse ListGroup(string group) => ExecuteCommand(c => c.ListGroup(group));
-    public NntpGroupResponse ListGroup() => ExecuteCommand(c => c.ListGroup());
-    public NntpLastResponse Last() => ExecuteCommand(c => c.Last());
-    public NntpNextResponse Next() => ExecuteCommand(c => c.Next());
-    public NntpArticleResponse Article(NntpMessageId messageId) => ExecuteCommand(c => c.Article(messageId));
-    public NntpArticleResponse Article(long number) => ExecuteCommand(c => c.Article(number));
-    public NntpArticleResponse Article() => ExecuteCommand(c => c.Article());
-    public NntpArticleResponse Head(NntpMessageId messageId) => ExecuteCommand(c => c.Head(messageId));
-    public NntpArticleResponse Head(long number) => ExecuteCommand(c => c.Head(number));
-    public NntpArticleResponse Head() => ExecuteCommand(c => c.Head());
-    public NntpArticleResponse Body(NntpMessageId messageId) => ExecuteCommand(c => c.Body(messageId));
-    public NntpArticleResponse Body(long number) => ExecuteCommand(c => c.Body(number));
-    public NntpArticleResponse Body() => ExecuteCommand(c => c.Body());
-    public NntpStatResponse Stat(NntpMessageId messageId) => ExecuteCommand(c => c.Stat(messageId));
-    public NntpStatResponse Stat(long number) => ExecuteCommand(c => c.Stat(number));
-    public NntpStatResponse Stat() => ExecuteCommand(c => c.Stat());
-    public bool Post(NntpArticle article) => ExecuteCommand(c => c.Post(article));
-    public bool Ihave(NntpArticle article) => ExecuteCommand(c => c.Ihave(article));
-    public NntpDateResponse Date() => ExecuteCommand(c => c.Date());
-    public NntpMultiLineResponse Help() => ExecuteCommand(c => c.Help());
-    public NntpGroupsResponse NewGroups(NntpDateTime sinceDateTime) => ExecuteCommand(c => c.NewGroups(sinceDateTime));
-    public NntpMultiLineResponse NewNews(string wildmat, NntpDateTime sinceDateTime) => ExecuteCommand(c => c.NewNews(wildmat, sinceDateTime));
-    public NntpGroupOriginsResponse ListActiveTimes() => ExecuteCommand(c => c.ListActiveTimes());
-    public NntpGroupOriginsResponse ListActiveTimes(string wildmat) => ExecuteCommand(c => c.ListActiveTimes(wildmat));
-    public NntpMultiLineResponse ListDistribPats() => ExecuteCommand(c => c.ListDistribPats());
-    public NntpMultiLineResponse ListNewsgroups() => ExecuteCommand(c => c.ListNewsgroups());
-    public NntpMultiLineResponse ListNewsgroups(string wildmat) => ExecuteCommand(c => c.ListNewsgroups(wildmat));
-    public NntpMultiLineResponse Over(NntpMessageId messageId) => ExecuteCommand(c => c.Over(messageId));
-    public NntpMultiLineResponse Over(NntpArticleRange range) => ExecuteCommand(c => c.Over(range));
-    public NntpMultiLineResponse Over() => ExecuteCommand(c => c.Over());
-    public NntpMultiLineResponse ListOverviewFormat() => ExecuteCommand(c => c.ListOverviewFormat());
-    public NntpMultiLineResponse Hdr(string field, NntpMessageId messageId) => ExecuteCommand(c => c.Hdr(field, messageId));
-    public NntpMultiLineResponse Hdr(string field, NntpArticleRange range) => ExecuteCommand(c => c.Hdr(field, range));
-    public NntpMultiLineResponse Hdr(string field) => ExecuteCommand(c => c.Hdr(field));
-    public NntpMultiLineResponse ListHeaders(NntpMessageId messageId) => ExecuteCommand(c => c.ListHeaders(messageId));
-    public NntpMultiLineResponse ListHeaders(NntpArticleRange range) => ExecuteCommand(c => c.ListHeaders(range));
-    public NntpMultiLineResponse ListHeaders() => ExecuteCommand(c => c.ListHeaders());
-    public NntpGroupsResponse ListCounts() => ExecuteCommand(c => c.ListCounts());
-    public NntpGroupsResponse ListCounts(string wildmat) => ExecuteCommand(c => c.ListCounts(wildmat));
-    public NntpMultiLineResponse ListDistributions() => ExecuteCommand(c => c.ListDistributions());
-    public NntpMultiLineResponse ListModerators() => ExecuteCommand(c => c.ListModerators());
-    public NntpMultiLineResponse ListMotd() => ExecuteCommand(c => c.ListMotd());
-    public NntpMultiLineResponse ListSubscriptions() => ExecuteCommand(c => c.ListSubscriptions());
-    public NntpGroupsResponse ListActive() => ExecuteCommand(c => c.ListActive());
-    public NntpGroupsResponse ListActive(string wildmat) => ExecuteCommand(c => c.ListActive(wildmat));
+    public Task<NntpResponse> XfeatureCompressGzipAsync(bool withTerminator, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.XfeatureCompressGzipAsync(withTerminator, cancellationToken));
+
+    public Task<NntpMultiLineResponse> XzhdrAsync(string field, NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.XzhdrAsync(field, messageId, cancellationToken));
+
+    public Task<NntpMultiLineResponse> XzhdrAsync(string field, NntpArticleRange range, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.XzhdrAsync(field, range, cancellationToken));
+
+    public Task<NntpMultiLineResponse> XzhdrAsync(string field, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.XzhdrAsync(field, cancellationToken));
+
+    public Task<NntpMultiLineResponse> XzverAsync(NntpArticleRange range, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.XzverAsync(range, cancellationToken));
+
+    public Task<NntpMultiLineResponse> XzverAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.XzverAsync(cancellationToken));
+
+    public void ResetCounters() => _client.ResetCounters();
+
+    public Task<NntpMultiLineResponse> XhdrAsync(string field, NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.XhdrAsync(field, messageId, cancellationToken));
+
+    public Task<NntpMultiLineResponse> XhdrAsync(string field, NntpArticleRange range, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.XhdrAsync(field, range, cancellationToken));
+
+    public Task<NntpMultiLineResponse> XhdrAsync(string field, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.XhdrAsync(field, cancellationToken));
+
+    public Task<NntpMultiLineResponse> XoverAsync(NntpArticleRange range, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.XoverAsync(range, cancellationToken));
+
+    public Task<NntpMultiLineResponse> XoverAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.XoverAsync(cancellationToken));
+
+    public Task<NntpMultiLineResponse> CapabilitiesAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.CapabilitiesAsync(cancellationToken));
+
+    public Task<NntpMultiLineResponse> CapabilitiesAsync(string keyword, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.CapabilitiesAsync(keyword, cancellationToken));
+
+    public Task<NntpModeReaderResponse> ModeReaderAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ModeReaderAsync(cancellationToken));
+
+    public Task<NntpResponse> QuitAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.QuitAsync(cancellationToken));
+
+    public Task<NntpGroupResponse> GroupAsync(string group, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.GroupAsync(group, cancellationToken));
+
+    public Task<NntpGroupResponse> ListGroupAsync(string group, NntpArticleRange range, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListGroupAsync(group, range, cancellationToken));
+
+    public Task<NntpGroupResponse> ListGroupAsync(string group, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListGroupAsync(group, cancellationToken));
+
+    public Task<NntpGroupResponse> ListGroupAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListGroupAsync(cancellationToken));
+
+    public Task<NntpLastResponse> LastAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.LastAsync(cancellationToken));
+
+    public Task<NntpNextResponse> NextAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.NextAsync(cancellationToken));
+
+    public Task<NntpArticleResponse> ArticleAsync(NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ArticleAsync(messageId, cancellationToken));
+
+    public Task<NntpArticleResponse> ArticleAsync(long number, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ArticleAsync(number, cancellationToken));
+
+    public Task<NntpArticleResponse> ArticleAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ArticleAsync(cancellationToken));
+
+    public Task<NntpArticleResponse> HeadAsync(NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.HeadAsync(messageId, cancellationToken));
+
+    public Task<NntpArticleResponse> HeadAsync(long number, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.HeadAsync(number, cancellationToken));
+
+    public Task<NntpArticleResponse> HeadAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.HeadAsync(cancellationToken));
+
+    public Task<NntpArticleResponse> BodyAsync(NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.BodyAsync(messageId, cancellationToken));
+
+    public Task<NntpArticleResponse> BodyAsync(long number, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.BodyAsync(number, cancellationToken));
+
+    public Task<NntpArticleResponse> BodyAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.BodyAsync(cancellationToken));
+
+    public Task<NntpStatResponse> StatAsync(NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.StatAsync(messageId, cancellationToken));
+
+    public Task<NntpStatResponse> StatAsync(long number, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.StatAsync(number, cancellationToken));
+
+    public Task<NntpStatResponse> StatAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.StatAsync(cancellationToken));
+
+    public Task<bool> PostAsync(NntpArticle article, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.PostAsync(article, cancellationToken));
+
+    public Task<bool> IhaveAsync(NntpArticle article, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.IhaveAsync(article, cancellationToken));
+
+    public Task<NntpDateResponse> DateAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.DateAsync(cancellationToken));
+
+    public Task<NntpMultiLineResponse> HelpAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.HelpAsync(cancellationToken));
+
+    public Task<NntpGroupsResponse> NewGroupsAsync(NntpDateTime sinceDateTime, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.NewGroupsAsync(sinceDateTime, cancellationToken));
+
+    public Task<NntpMultiLineResponse> NewNewsAsync(string wildmat, NntpDateTime sinceDateTime, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.NewNewsAsync(wildmat, sinceDateTime, cancellationToken));
+
+    public Task<NntpGroupOriginsResponse> ListActiveTimesAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListActiveTimesAsync(cancellationToken));
+
+    public Task<NntpGroupOriginsResponse> ListActiveTimesAsync(string wildmat, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListActiveTimesAsync(wildmat, cancellationToken));
+
+    public Task<NntpMultiLineResponse> ListDistribPatsAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListDistribPatsAsync(cancellationToken));
+
+    public Task<NntpMultiLineResponse> ListNewsgroupsAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListNewsgroupsAsync(cancellationToken));
+
+    public Task<NntpMultiLineResponse> ListNewsgroupsAsync(string wildmat, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListNewsgroupsAsync(wildmat, cancellationToken));
+
+    public Task<NntpMultiLineResponse> OverAsync(NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.OverAsync(messageId, cancellationToken));
+
+    public Task<NntpMultiLineResponse> OverAsync(NntpArticleRange range, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.OverAsync(range, cancellationToken));
+
+    public Task<NntpMultiLineResponse> OverAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.OverAsync(cancellationToken));
+
+    public Task<NntpMultiLineResponse> ListOverviewFormatAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListOverviewFormatAsync(cancellationToken));
+
+    public Task<NntpMultiLineResponse> HdrAsync(string field, NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.HdrAsync(field, messageId, cancellationToken));
+
+    public Task<NntpMultiLineResponse> HdrAsync(string field, NntpArticleRange range, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.HdrAsync(field, range, cancellationToken));
+
+    public Task<NntpMultiLineResponse> HdrAsync(string field, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.HdrAsync(field, cancellationToken));
+
+    public Task<NntpMultiLineResponse> ListHeadersAsync(NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListHeadersAsync(messageId, cancellationToken));
+
+    public Task<NntpMultiLineResponse> ListHeadersAsync(NntpArticleRange range, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListHeadersAsync(range, cancellationToken));
+
+    public Task<NntpMultiLineResponse> ListHeadersAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListHeadersAsync(cancellationToken));
+
+    public Task<NntpGroupsResponse> ListCountsAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListCountsAsync(cancellationToken));
+
+    public Task<NntpGroupsResponse> ListCountsAsync(string wildmat, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListCountsAsync(wildmat, cancellationToken));
+
+    public Task<NntpMultiLineResponse> ListDistributionsAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListDistributionsAsync(cancellationToken));
+
+    public Task<NntpMultiLineResponse> ListModeratorsAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListModeratorsAsync(cancellationToken));
+
+    public Task<NntpMultiLineResponse> ListMotdAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListMotdAsync(cancellationToken));
+
+    public Task<NntpMultiLineResponse> ListSubscriptionsAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListSubscriptionsAsync(cancellationToken));
+
+    public Task<NntpGroupsResponse> ListActiveAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListActiveAsync(cancellationToken));
+
+    public Task<NntpGroupsResponse> ListActiveAsync(string wildmat, CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListActiveAsync(wildmat, cancellationToken));
 
     #endregion
 
@@ -114,7 +238,7 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
         try
         {
             // Try to gracefully QUIT the NNTP session
-            if (NntpConnected) _client.Quit();
+            if (NntpConnected) _ = _client.QuitAsync().GetAwaiter().GetResult();
         }
         catch
         {
@@ -145,24 +269,11 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
         }
     }
 
-    private T ExecuteCommand<T>(Func<NntpClient, T> command)
+    private async Task<T> ExecuteCommandAsync<T>(Func<NntpClient, Task<T>> command)
     {
         try
         {
-            return command(Client);
-        }
-        catch (Exception)
-        {
-            HasError = true;
-            throw;
-        }
-    }
-
-    private void ExecuteCommand(Action<NntpClient> command)
-    {
-        try
-        {
-            command(Client);
+            return await command(Client).ConfigureAwait(false);
         }
         catch (Exception)
         {

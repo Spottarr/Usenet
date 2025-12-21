@@ -1,4 +1,4 @@
-﻿using Usenet.Nntp.Contracts;
+using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
 using Usenet.Util.Compatibility;
 
@@ -8,18 +8,18 @@ internal class ArticleWriter
 {
     private const int MaxHeaderLength = 998;
 
-    public static void Write(INntpConnection connection, NntpArticle article)
+    public static async Task WriteAsync(INntpConnection connection, NntpArticle article, CancellationToken cancellationToken = default)
     {
-        WriteHeaders(connection, article);
-        connection.WriteLine(string.Empty);
-        WriteBody(connection, article);
-        connection.WriteLine(".");
+        await WriteHeadersAsync(connection, article, cancellationToken).ConfigureAwait(false);
+        await connection.WriteLineAsync(string.Empty, cancellationToken).ConfigureAwait(false);
+        await WriteBodyAsync(connection, article, cancellationToken).ConfigureAwait(false);
+        await connection.WriteLineAsync(".", cancellationToken).ConfigureAwait(false);
     }
 
-    private static void WriteHeaders(INntpConnection connection, NntpArticle article)
+    private static async Task WriteHeadersAsync(INntpConnection connection, NntpArticle article, CancellationToken cancellationToken)
     {
-        WriteHeader(connection, NntpHeaders.MessageId, article.MessageId);
-        WriteHeader(connection, NntpHeaders.Newsgroups, article.Groups.ToString());
+        await WriteHeaderAsync(connection, NntpHeaders.MessageId, article.MessageId, cancellationToken).ConfigureAwait(false);
+        await WriteHeaderAsync(connection, NntpHeaders.Newsgroups, article.Groups.ToString(), cancellationToken).ConfigureAwait(false);
         foreach (var header in article.Headers)
         {
             if (header.Key == NntpHeaders.MessageId ||
@@ -31,12 +31,12 @@ internal class ArticleWriter
 
             foreach (var value in header.Value)
             {
-                WriteHeader(connection, header.Key, value);
+                await WriteHeaderAsync(connection, header.Key, value, cancellationToken).ConfigureAwait(false);
             }
         }
     }
 
-    private static void WriteHeader(INntpConnection connection, string key, string val)
+    private static async Task WriteHeaderAsync(INntpConnection connection, string key, string val, CancellationToken cancellationToken)
     {
         if (key == NntpHeaders.MessageId)
         {
@@ -46,33 +46,33 @@ internal class ArticleWriter
         var line = $"{key}: {val}";
         if (line.Length <= MaxHeaderLength)
         {
-            connection.WriteLine(line);
+            await connection.WriteLineAsync(line, cancellationToken).ConfigureAwait(false);
             return;
         }
 
         // header line is too long, fold it
-        connection.WriteLine(line.Substring(0, MaxHeaderLength));
+        await connection.WriteLineAsync(line.Substring(0, MaxHeaderLength), cancellationToken).ConfigureAwait(false);
         line = line.Substring(MaxHeaderLength);
         while (line.Length > MaxHeaderLength)
         {
-            connection.WriteLine(StringShims.Concat("\t".AsSpan(), line.AsSpan(0, MaxHeaderLength - 1)));
+            await connection.WriteLineAsync(StringShims.Concat("\t".AsSpan(), line.AsSpan(0, MaxHeaderLength - 1)), cancellationToken).ConfigureAwait(false);
             line = line.Substring(MaxHeaderLength - 1);
         }
 
-        connection.WriteLine("\t" + line);
+        await connection.WriteLineAsync("\t" + line, cancellationToken).ConfigureAwait(false);
     }
 
-    private static void WriteBody(INntpConnection connection, NntpArticle article)
+    private static async Task WriteBodyAsync(INntpConnection connection, NntpArticle article, CancellationToken cancellationToken)
     {
         foreach (var line in article.Body)
         {
             if (line.Length > 0 && line[0] == '.')
             {
-                connection.WriteLine("." + line);
+                await connection.WriteLineAsync("." + line, cancellationToken).ConfigureAwait(false);
                 continue;
             }
 
-            connection.WriteLine(line);
+            await connection.WriteLineAsync(line, cancellationToken).ConfigureAwait(false);
         }
     }
 }

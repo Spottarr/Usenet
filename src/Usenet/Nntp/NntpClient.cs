@@ -1,4 +1,4 @@
-﻿using Usenet.Extensions;
+using Usenet.Extensions;
 using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
@@ -57,10 +57,10 @@ public class NntpClient : INntpClient
     }
 
     /// <inheritdoc />
-    public bool Authenticate(string username, string password = null)
+    public async Task<bool> AuthenticateAsync(string username, string password = null, CancellationToken cancellationToken = default)
     {
         Guard.ThrowIfNullOrWhiteSpace(username, nameof(username));
-        var userResponse = _connection.Command($"AUTHINFO USER {username}", new ResponseParser(281));
+        var userResponse = await _connection.CommandAsync($"AUTHINFO USER {username}", new ResponseParser(281), cancellationToken).ConfigureAwait(false);
         if (userResponse.Success)
         {
             return true;
@@ -71,272 +71,281 @@ public class NntpClient : INntpClient
             return false;
         }
 
-        var passResponse = _connection.Command($"AUTHINFO PASS {password}", new ResponseParser(281));
+        var passResponse = await _connection.CommandAsync($"AUTHINFO PASS {password}", new ResponseParser(281), cancellationToken).ConfigureAwait(false);
         return passResponse.Success;
     }
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Capabilities() => _connection.MultiLineCommand("CAPABILITIES", new MultiLineResponseParser(101));
+    public Task<NntpMultiLineResponse> CapabilitiesAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("CAPABILITIES", new MultiLineResponseParser(101), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Capabilities(string keyword) =>
-        _connection.MultiLineCommand($"CAPABILITIES {keyword.ThrowIfNullOrWhiteSpace(nameof(keyword))}", new MultiLineResponseParser(101));
+    public Task<NntpMultiLineResponse> CapabilitiesAsync(string keyword, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"CAPABILITIES {keyword.ThrowIfNullOrWhiteSpace(nameof(keyword))}", new MultiLineResponseParser(101), cancellationToken);
 
     /// <inheritdoc />
-    public NntpModeReaderResponse ModeReader() => _connection.Command("MODE READER", new ModeReaderResponseParser());
+    public Task<NntpModeReaderResponse> ModeReaderAsync(CancellationToken cancellationToken = default) =>
+        _connection.CommandAsync("MODE READER", new ModeReaderResponseParser(), cancellationToken);
 
     /// <inheritdoc />
-    public NntpResponse Quit() => _connection.Command("QUIT", new ResponseParser(205));
+    public Task<NntpResponse> QuitAsync(CancellationToken cancellationToken = default) =>
+        _connection.CommandAsync("QUIT", new ResponseParser(205), cancellationToken);
 
     /// <inheritdoc />
-    public NntpGroupResponse Group(string group) =>
-        _connection.Command($"GROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))}", new GroupResponseParser());
+    public Task<NntpGroupResponse> GroupAsync(string group, CancellationToken cancellationToken = default) =>
+        _connection.CommandAsync($"GROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))}", new GroupResponseParser(), cancellationToken);
 
     /// <inheritdoc />
-    public NntpGroupResponse ListGroup(string group, NntpArticleRange range) =>
-        _connection.MultiLineCommand($"LISTGROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))} {range}", new ListGroupResponseParser());
+    public Task<NntpGroupResponse> ListGroupAsync(string group, NntpArticleRange range, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"LISTGROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))} {range}", new ListGroupResponseParser(), cancellationToken);
 
     /// <inheritdoc />
-    public NntpGroupResponse ListGroup(string group) =>
-        _connection.MultiLineCommand($"LISTGROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))}", new ListGroupResponseParser());
+    public Task<NntpGroupResponse> ListGroupAsync(string group, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"LISTGROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))}", new ListGroupResponseParser(), cancellationToken);
 
     /// <inheritdoc />
-    public NntpGroupResponse ListGroup() =>
-        _connection.MultiLineCommand("LISTGROUP", new ListGroupResponseParser());
+    public Task<NntpGroupResponse> ListGroupAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("LISTGROUP", new ListGroupResponseParser(), cancellationToken);
 
     /// <inheritdoc />
-    public NntpLastResponse Last() => _connection.Command("LAST", new LastResponseParser());
+    public Task<NntpLastResponse> LastAsync(CancellationToken cancellationToken = default) =>
+        _connection.CommandAsync("LAST", new LastResponseParser(), cancellationToken);
 
     /// <inheritdoc />
-    public NntpNextResponse Next() => _connection.Command("NEXT", new NextResponseParser());
+    public Task<NntpNextResponse> NextAsync(CancellationToken cancellationToken = default) =>
+        _connection.CommandAsync("NEXT", new NextResponseParser(), cancellationToken);
 
     /// <inheritdoc />
-    public NntpArticleResponse Article(NntpMessageId messageId) =>
-        _connection.MultiLineCommand(
+    public Task<NntpArticleResponse> ArticleAsync(NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync(
             $"ARTICLE {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}",
-            new ArticleResponseParser(ArticleRequestType.Article));
+            new ArticleResponseParser(ArticleRequestType.Article), cancellationToken);
 
     /// <inheritdoc />
-    public NntpArticleResponse Article(long number) =>
-        _connection.MultiLineCommand($"ARTICLE {number}", new ArticleResponseParser(ArticleRequestType.Article));
+    public Task<NntpArticleResponse> ArticleAsync(long number, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"ARTICLE {number}", new ArticleResponseParser(ArticleRequestType.Article), cancellationToken);
 
     /// <inheritdoc />
-    public NntpArticleResponse Article() =>
-        _connection.MultiLineCommand("ARTICLE", new ArticleResponseParser(ArticleRequestType.Article));
+    public Task<NntpArticleResponse> ArticleAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("ARTICLE", new ArticleResponseParser(ArticleRequestType.Article), cancellationToken);
 
     /// <inheritdoc />
-    public NntpArticleResponse Head(NntpMessageId messageId) =>
-        _connection.MultiLineCommand(
+    public Task<NntpArticleResponse> HeadAsync(NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync(
             $"HEAD {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}",
-            new ArticleResponseParser(ArticleRequestType.Head));
+            new ArticleResponseParser(ArticleRequestType.Head), cancellationToken);
 
     /// <inheritdoc />
-    public NntpArticleResponse Head(long number) =>
-        _connection.MultiLineCommand($"HEAD {number}", new ArticleResponseParser(ArticleRequestType.Head));
+    public Task<NntpArticleResponse> HeadAsync(long number, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"HEAD {number}", new ArticleResponseParser(ArticleRequestType.Head), cancellationToken);
 
     /// <inheritdoc />
-    public NntpArticleResponse Head() =>
-        _connection.MultiLineCommand("HEAD", new ArticleResponseParser(ArticleRequestType.Head));
+    public Task<NntpArticleResponse> HeadAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("HEAD", new ArticleResponseParser(ArticleRequestType.Head), cancellationToken);
 
     /// <inheritdoc />
-    public NntpArticleResponse Body(NntpMessageId messageId) =>
-        _connection.MultiLineCommand(
+    public Task<NntpArticleResponse> BodyAsync(NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync(
             $"BODY {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}",
-            new ArticleResponseParser(ArticleRequestType.Body));
+            new ArticleResponseParser(ArticleRequestType.Body), cancellationToken);
 
     /// <inheritdoc />
-    public NntpArticleResponse Body(long number) =>
-        _connection.MultiLineCommand($"BODY {number}", new ArticleResponseParser(ArticleRequestType.Body));
+    public Task<NntpArticleResponse> BodyAsync(long number, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"BODY {number}", new ArticleResponseParser(ArticleRequestType.Body), cancellationToken);
 
     /// <inheritdoc />
-    public NntpArticleResponse Body() =>
-        _connection.MultiLineCommand("BODY", new ArticleResponseParser(ArticleRequestType.Body));
+    public Task<NntpArticleResponse> BodyAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("BODY", new ArticleResponseParser(ArticleRequestType.Body), cancellationToken);
 
     /// <inheritdoc />
-    public NntpStatResponse Stat(NntpMessageId messageId) =>
-        _connection.Command($"STAT {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}", new StatResponseParser());
+    public Task<NntpStatResponse> StatAsync(NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        _connection.CommandAsync($"STAT {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}", new StatResponseParser(), cancellationToken);
 
     /// <inheritdoc />
-    public NntpStatResponse Stat(long number) => _connection.Command($"STAT {number}", new StatResponseParser());
+    public Task<NntpStatResponse> StatAsync(long number, CancellationToken cancellationToken = default) =>
+        _connection.CommandAsync($"STAT {number}", new StatResponseParser(), cancellationToken);
 
     /// <inheritdoc />
-    public NntpStatResponse Stat() => _connection.Command("STAT", new StatResponseParser());
+    public Task<NntpStatResponse> StatAsync(CancellationToken cancellationToken = default) =>
+        _connection.CommandAsync("STAT", new StatResponseParser(), cancellationToken);
 
     /// <inheritdoc />
-    public bool Post(NntpArticle article)
+    public async Task<bool> PostAsync(NntpArticle article, CancellationToken cancellationToken = default)
     {
-        var initialResponse = _connection.Command("POST", new ResponseParser(340));
+        var initialResponse = await _connection.CommandAsync("POST", new ResponseParser(340), cancellationToken).ConfigureAwait(false);
         if (!initialResponse.Success)
         {
             return false;
         }
 
-        ArticleWriter.Write(_connection, article);
-        var subsequentResponse = _connection.GetResponse(new ResponseParser(240));
+        await ArticleWriter.WriteAsync(_connection, article, cancellationToken).ConfigureAwait(false);
+        var subsequentResponse = await _connection.GetResponseAsync(new ResponseParser(240), cancellationToken).ConfigureAwait(false);
         return subsequentResponse.Success;
     }
 
     /// <inheritdoc />
-    public bool Ihave(NntpArticle article)
+    public async Task<bool> IhaveAsync(NntpArticle article, CancellationToken cancellationToken = default)
     {
-        var initialResponse = _connection.Command("IHAVE", new ResponseParser(335));
+        var initialResponse = await _connection.CommandAsync("IHAVE", new ResponseParser(335), cancellationToken).ConfigureAwait(false);
         if (!initialResponse.Success)
         {
             return false;
         }
 
-        ArticleWriter.Write(_connection, article);
-        var subsequentResponse = _connection.GetResponse(new ResponseParser(235));
+        await ArticleWriter.WriteAsync(_connection, article, cancellationToken).ConfigureAwait(false);
+        var subsequentResponse = await _connection.GetResponseAsync(new ResponseParser(235), cancellationToken).ConfigureAwait(false);
         return subsequentResponse.Success;
     }
 
     /// <inheritdoc />
-    public NntpDateResponse Date() => _connection.Command("DATE", new DateResponseParser());
+    public Task<NntpDateResponse> DateAsync(CancellationToken cancellationToken = default) =>
+        _connection.CommandAsync("DATE", new DateResponseParser(), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Help() =>
-        _connection.MultiLineCommand("HELP", new MultiLineResponseParser(100));
+    public Task<NntpMultiLineResponse> HelpAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("HELP", new MultiLineResponseParser(100), cancellationToken);
 
     /// <inheritdoc />
-    public NntpGroupsResponse NewGroups(NntpDateTime sinceDateTime) =>
-        _connection.MultiLineCommand($"NEWGROUPS {sinceDateTime}", new GroupsResponseParser(231, GroupStatusRequestType.Basic));
+    public Task<NntpGroupsResponse> NewGroupsAsync(NntpDateTime sinceDateTime, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"NEWGROUPS {sinceDateTime}", new GroupsResponseParser(231, GroupStatusRequestType.Basic), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse NewNews(string wildmat, NntpDateTime sinceDateTime) =>
-        _connection.MultiLineCommand($"NEWNEWS {wildmat} {sinceDateTime}", new MultiLineResponseParser(230));
+    public Task<NntpMultiLineResponse> NewNewsAsync(string wildmat, NntpDateTime sinceDateTime, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"NEWNEWS {wildmat} {sinceDateTime}", new MultiLineResponseParser(230), cancellationToken);
 
     /// <inheritdoc />
-    public NntpGroupOriginsResponse ListActiveTimes() =>
-        _connection.MultiLineCommand("LIST ACTIVE.TIMES", new GroupOriginsResponseParser());
+    public Task<NntpGroupOriginsResponse> ListActiveTimesAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("LIST ACTIVE.TIMES", new GroupOriginsResponseParser(), cancellationToken);
 
     /// <inheritdoc />
-    public NntpGroupOriginsResponse ListActiveTimes(string wildmat) =>
-        _connection.MultiLineCommand($"LIST ACTIVE.TIMES {wildmat}", new GroupOriginsResponseParser());
+    public Task<NntpGroupOriginsResponse> ListActiveTimesAsync(string wildmat, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"LIST ACTIVE.TIMES {wildmat}", new GroupOriginsResponseParser(), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse ListDistribPats() =>
-        _connection.MultiLineCommand("LIST DISTRIB.PATS", new MultiLineResponseParser(215));
+    public Task<NntpMultiLineResponse> ListDistribPatsAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("LIST DISTRIB.PATS", new MultiLineResponseParser(215), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse ListNewsgroups() =>
-        _connection.MultiLineCommand("LIST NEWSGROUPS", new MultiLineResponseParser(215));
+    public Task<NntpMultiLineResponse> ListNewsgroupsAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("LIST NEWSGROUPS", new MultiLineResponseParser(215), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse ListNewsgroups(string wildmat) =>
-        _connection.MultiLineCommand($"LIST NEWSGROUPS {wildmat}", new MultiLineResponseParser(215));
+    public Task<NntpMultiLineResponse> ListNewsgroupsAsync(string wildmat, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"LIST NEWSGROUPS {wildmat}", new MultiLineResponseParser(215), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Over(NntpMessageId messageId) =>
-        _connection.MultiLineCommand($"OVER {messageId}", new MultiLineResponseParser(224));
+    public Task<NntpMultiLineResponse> OverAsync(NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"OVER {messageId}", new MultiLineResponseParser(224), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Over(NntpArticleRange range) =>
-        _connection.MultiLineCommand($"OVER {range}", new MultiLineResponseParser(224));
+    public Task<NntpMultiLineResponse> OverAsync(NntpArticleRange range, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"OVER {range}", new MultiLineResponseParser(224), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Over() => _connection.MultiLineCommand("OVER", new MultiLineResponseParser(224));
-
-
-    /// <inheritdoc />
-    public NntpMultiLineResponse ListOverviewFormat() =>
-        _connection.MultiLineCommand("LIST OVERVIEW.FMT", new MultiLineResponseParser(215));
+    public Task<NntpMultiLineResponse> OverAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("OVER", new MultiLineResponseParser(224), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Hdr(string field, NntpMessageId messageId) =>
-        _connection.MultiLineCommand($"HDR {field} {messageId}", new MultiLineResponseParser(225));
+    public Task<NntpMultiLineResponse> ListOverviewFormatAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("LIST OVERVIEW.FMT", new MultiLineResponseParser(215), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Hdr(string field, NntpArticleRange range) =>
-        _connection.MultiLineCommand($"HDR {field} {range}", new MultiLineResponseParser(225));
+    public Task<NntpMultiLineResponse> HdrAsync(string field, NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"HDR {field} {messageId}", new MultiLineResponseParser(225), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Hdr(string field) =>
-        _connection.MultiLineCommand($"HDR {field}", new MultiLineResponseParser(225));
+    public Task<NntpMultiLineResponse> HdrAsync(string field, NntpArticleRange range, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"HDR {field} {range}", new MultiLineResponseParser(225), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse ListHeaders(NntpMessageId messageId) =>
-        _connection.MultiLineCommand($"LIST HEADERS {messageId}", new MultiLineResponseParser(215));
+    public Task<NntpMultiLineResponse> HdrAsync(string field, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"HDR {field}", new MultiLineResponseParser(225), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse ListHeaders(NntpArticleRange range) =>
-        _connection.MultiLineCommand($"LIST HEADERS {range}", new MultiLineResponseParser(215));
+    public Task<NntpMultiLineResponse> ListHeadersAsync(NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"LIST HEADERS {messageId}", new MultiLineResponseParser(215), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse ListHeaders() =>
-        _connection.MultiLineCommand("LIST HEADERS", new MultiLineResponseParser(215));
+    public Task<NntpMultiLineResponse> ListHeadersAsync(NntpArticleRange range, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"LIST HEADERS {range}", new MultiLineResponseParser(215), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Xhdr(string field, NntpMessageId messageId) =>
-        _connection.MultiLineCommand($"XHDR {field} {messageId}", new MultiLineResponseParser(221));
+    public Task<NntpMultiLineResponse> ListHeadersAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("LIST HEADERS", new MultiLineResponseParser(215), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Xhdr(string field, NntpArticleRange range) =>
-        _connection.MultiLineCommand($"XHDR {field} {range}", new MultiLineResponseParser(221));
+    public Task<NntpMultiLineResponse> XhdrAsync(string field, NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"XHDR {field} {messageId}", new MultiLineResponseParser(221), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Xhdr(string field) =>
-        _connection.MultiLineCommand($"XHDR {field}", new MultiLineResponseParser(221));
+    public Task<NntpMultiLineResponse> XhdrAsync(string field, NntpArticleRange range, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"XHDR {field} {range}", new MultiLineResponseParser(221), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Xover(NntpArticleRange range) =>
-        _connection.MultiLineCommand($"XOVER {range}", new MultiLineResponseParser(224));
+    public Task<NntpMultiLineResponse> XhdrAsync(string field, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"XHDR {field}", new MultiLineResponseParser(221), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Xover() => _connection.MultiLineCommand("XOVER", new MultiLineResponseParser(224));
+    public Task<NntpMultiLineResponse> XoverAsync(NntpArticleRange range, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"XOVER {range}", new MultiLineResponseParser(224), cancellationToken);
 
     /// <inheritdoc />
-    public NntpGroupsResponse ListCounts() =>
-        _connection.MultiLineCommand("LIST COUNTS", new GroupsResponseParser(215, GroupStatusRequestType.Extended));
+    public Task<NntpMultiLineResponse> XoverAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("XOVER", new MultiLineResponseParser(224), cancellationToken);
 
     /// <inheritdoc />
-    public NntpGroupsResponse ListCounts(string wildmat) =>
-        _connection.MultiLineCommand($"LIST COUNTS {wildmat}", new GroupsResponseParser(215, GroupStatusRequestType.Extended));
+    public Task<NntpGroupsResponse> ListCountsAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("LIST COUNTS", new GroupsResponseParser(215, GroupStatusRequestType.Extended), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse ListDistributions() =>
-        _connection.MultiLineCommand("LIST DISTRIBUTIONS", new MultiLineResponseParser(215));
+    public Task<NntpGroupsResponse> ListCountsAsync(string wildmat, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"LIST COUNTS {wildmat}", new GroupsResponseParser(215, GroupStatusRequestType.Extended), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse ListModerators() =>
-        _connection.MultiLineCommand("LIST MODERATORS", new MultiLineResponseParser(215));
+    public Task<NntpMultiLineResponse> ListDistributionsAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("LIST DISTRIBUTIONS", new MultiLineResponseParser(215), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse ListMotd() =>
-        _connection.MultiLineCommand("LIST MOTD", new MultiLineResponseParser(215));
+    public Task<NntpMultiLineResponse> ListModeratorsAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("LIST MODERATORS", new MultiLineResponseParser(215), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse ListSubscriptions() =>
-        _connection.MultiLineCommand("LIST SUBSCRIPTIONS", new MultiLineResponseParser(215));
+    public Task<NntpMultiLineResponse> ListMotdAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("LIST MOTD", new MultiLineResponseParser(215), cancellationToken);
 
     /// <inheritdoc />
-    public NntpGroupsResponse ListActive() =>
-        _connection.MultiLineCommand("LIST ACTIVE", new GroupsResponseParser(215, GroupStatusRequestType.Basic));
+    public Task<NntpMultiLineResponse> ListSubscriptionsAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("LIST SUBSCRIPTIONS", new MultiLineResponseParser(215), cancellationToken);
 
     /// <inheritdoc />
-    public NntpGroupsResponse ListActive(string wildmat) =>
-        _connection.MultiLineCommand($"LIST ACTIVE {wildmat}", new GroupsResponseParser(215, GroupStatusRequestType.Basic));
+    public Task<NntpGroupsResponse> ListActiveAsync(CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync("LIST ACTIVE", new GroupsResponseParser(215, GroupStatusRequestType.Basic), cancellationToken);
 
     /// <inheritdoc />
-    public NntpResponse XfeatureCompressGzip(bool withTerminator) => throw new NotImplementedException();
-    //connection.Command($"XFEATURE COMPRESS GZIP{(withTerminator ? " TERMINATOR" : string.Empty)}", new ResponseParser(290));
+    public Task<NntpGroupsResponse> ListActiveAsync(string wildmat, CancellationToken cancellationToken = default) =>
+        _connection.MultiLineCommandAsync($"LIST ACTIVE {wildmat}", new GroupsResponseParser(215, GroupStatusRequestType.Basic), cancellationToken);
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Xzhdr(string field, NntpMessageId messageId) => throw new NotImplementedException();
-    //connection.MultiLineCommand($"XZHDR {field} {messageId}", new MultiLineResponseParser(221), true);
+    public Task<NntpResponse> XfeatureCompressGzipAsync(bool withTerminator, CancellationToken cancellationToken = default) =>
+        throw new NotImplementedException();
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Xzhdr(string field, NntpArticleRange range) => throw new NotImplementedException();
-    //connection.MultiLineCommand($"XZHDR {field} {RangeFormatter.Format(from, to)}", new MultiLineResponseParser(221), true);
+    public Task<NntpMultiLineResponse> XzhdrAsync(string field, NntpMessageId messageId, CancellationToken cancellationToken = default) =>
+        throw new NotImplementedException();
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Xzhdr(string field) => throw new NotImplementedException();
-    //connection.MultiLineCommand($"XZHDR {field}", new MultiLineResponseParser(221), true);
+    public Task<NntpMultiLineResponse> XzhdrAsync(string field, NntpArticleRange range, CancellationToken cancellationToken = default) =>
+        throw new NotImplementedException();
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Xzver(NntpArticleRange range) => throw new NotImplementedException();
-    //connection.MultiLineCommand($"XZVER {RangeFormatter.Format(from, to)}", new MultiLineResponseParser(224), true);
+    public Task<NntpMultiLineResponse> XzhdrAsync(string field, CancellationToken cancellationToken = default) =>
+        throw new NotImplementedException();
 
     /// <inheritdoc />
-    public NntpMultiLineResponse Xzver() => throw new NotImplementedException();
-    //connection.MultiLineCommand("XZVER", new MultiLineResponseParser(224), true);
+    public Task<NntpMultiLineResponse> XzverAsync(NntpArticleRange range, CancellationToken cancellationToken = default) =>
+        throw new NotImplementedException();
+
+    /// <inheritdoc />
+    public Task<NntpMultiLineResponse> XzverAsync(CancellationToken cancellationToken = default) =>
+        throw new NotImplementedException();
 }

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Usenet.Extensions;
 using Usenet.Util;
 
@@ -19,9 +19,10 @@ public static class YencStreamDecoder
     /// using the default Usenet character encoding.
     /// </summary>
     /// <param name="encodedLines">The yEnc-encoded lines to decode.</param>
-    /// <returns>A <see cref="YencStream"/> containing a stream of decoded binary data and meta-data.</returns>
-    public static YencStream Decode(IEnumerable<string> encodedLines) =>
-        Decode(encodedLines, UsenetEncoding.Default);
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task containing a <see cref="YencStream"/> with decoded binary data and meta-data.</returns>
+    public static Task<YencStream> DecodeAsync(IEnumerable<string> encodedLines, CancellationToken cancellationToken = default) =>
+        DecodeAsync(encodedLines, UsenetEncoding.Default, cancellationToken);
 
     /// <summary>
     /// Decodes yEnc-encoded text into a <see cref="YencStream"/>
@@ -29,11 +30,14 @@ public static class YencStreamDecoder
     /// </summary>
     /// <param name="encodedLines">The yEnc-encoded lines to decode.</param>
     /// <param name="encoding">The character encoding to use.</param>
-    /// <returns>A <see cref="YencStream"/> containing a stream of decoded binary data and meta-data.</returns>
-    public static YencStream Decode(IEnumerable<string> encodedLines, Encoding encoding)
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task containing a <see cref="YencStream"/> with decoded binary data and meta-data.</returns>
+    public static Task<YencStream> DecodeAsync(IEnumerable<string> encodedLines, Encoding encoding, CancellationToken cancellationToken = default)
     {
         Guard.ThrowIfNull(encodedLines, nameof(encodedLines));
         Guard.ThrowIfNull(encoding, nameof(encoding));
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         using var enumerator = encodedLines.GetEnumerator();
         var headers = YencMeta.GetHeaders(enumerator);
@@ -43,7 +47,8 @@ public static class YencStreamDecoder
             headers.Merge(YencMeta.GetPartHeaders(enumerator), false);
         }
 
-        return new YencStream(YencMeta.ParseHeader(headers), EnumerateData(enumerator, encoding));
+        var result = new YencStream(YencMeta.ParseHeader(headers), EnumerateData(enumerator, encoding));
+        return Task.FromResult(result);
     }
 
     private static IEnumerable<byte[]> EnumerateData(IEnumerator<string> enumerator, Encoding encoding)

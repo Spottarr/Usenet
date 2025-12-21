@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Usenet.Util;
 
 namespace Usenet.Nntp;
@@ -36,6 +36,45 @@ public class NntpStreamReader : StreamReader
     public override string ReadLine()
     {
         var line = base.ReadLine();
+        return ProcessLine(line);
+    }
+
+    /// <summary>
+    /// Asynchronously reads a line of characters from the current stream and returns the data as a string.
+    /// Dot-stuffing will be undone and the terminating line (".") will result in a null value
+    /// indicating end of input.
+    /// </summary>
+    /// <returns>The next line from the input stream, or null if the end of the input stream is reached.</returns>
+    public override async Task<string> ReadLineAsync()
+    {
+        var line = await base.ReadLineAsync().ConfigureAwait(false);
+        return ProcessLine(line);
+    }
+
+    /// <summary>
+    /// Asynchronously reads a line of characters from the current stream and returns the data as a string.
+    /// Dot-stuffing will be undone and the terminating line (".") will result in a null value
+    /// indicating end of input.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>The next line from the input stream, or null if the end of the input stream is reached.</returns>
+#if NET8_0_OR_GREATER
+    public override async ValueTask<string> ReadLineAsync(CancellationToken cancellationToken)
+    {
+        var line = await base.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+        return ProcessLine(line);
+    }
+#else
+    public async Task<string> ReadLineAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var line = await base.ReadLineAsync().ConfigureAwait(false);
+        return ProcessLine(line);
+    }
+#endif
+
+    private static string ProcessLine(string line)
+    {
         if (line == null)
         {
             return null;

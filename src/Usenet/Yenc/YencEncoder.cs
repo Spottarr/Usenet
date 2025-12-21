@@ -1,5 +1,6 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
+using Usenet.Extensions;
 using Usenet.Util;
 
 namespace Usenet.Yenc;
@@ -15,9 +16,10 @@ public static class YencEncoder
     /// </summary>
     /// <param name="header">The yEnc header.</param>
     /// <param name="stream">The stream containing the binary data to encode.</param>
-    /// <returns>The yEnc-encoded text.</returns>
-    public static IEnumerable<string> Encode(YencHeader header, Stream stream) =>
-        Encode(header, stream, UsenetEncoding.Default);
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task containing the yEnc-encoded text lines.</returns>
+    public static Task<IReadOnlyList<string>> EncodeAsync(YencHeader header, Stream stream, CancellationToken cancellationToken = default) =>
+        EncodeAsync(header, stream, UsenetEncoding.Default, cancellationToken);
 
     /// <summary>
     /// Encodes the binary data in the specified stream into yEnc-encoded text
@@ -26,32 +28,38 @@ public static class YencEncoder
     /// <param name="header">The yEnc header.</param>
     /// <param name="stream">The stream containing the binary data to encode.</param>
     /// <param name="encoding">The character encoding to use.</param>
-    /// <returns>The yEnc-encoded text.</returns>
-    public static IEnumerable<string> Encode(YencHeader header, Stream stream, Encoding encoding)
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task containing the yEnc-encoded text lines.</returns>
+    public static async Task<IReadOnlyList<string>> EncodeAsync(YencHeader header, Stream stream, Encoding encoding, CancellationToken cancellationToken = default)
     {
         Guard.ThrowIfNull(header, nameof(header));
         Guard.ThrowIfNull(stream, nameof(stream));
         Guard.ThrowIfNull(encoding, nameof(encoding));
 
-        yield return GetHeaderLine(header);
+        var lines = new List<string>();
+
+        lines.Add(GetHeaderLine(header));
         if (header.IsFilePart)
         {
-            yield return GetPartHeaderLine(header);
+            lines.Add(GetPartHeaderLine(header));
         }
 
         var encodedBytes = new byte[1024];
         var encodedOffset = 0;
         var lastCol = header.LineLength - 1;
         var checksum = Crc32.Initialize();
+        var readBuffer = new byte[1];
+
         for (var offset = 0; offset < header.PartSize; offset++)
         {
-            var @byte = stream.ReadByte();
-            if (@byte == -1)
+            var bytesRead = await stream.ReadByteAsync(readBuffer, cancellationToken).ConfigureAwait(false);
+            if (bytesRead == 0)
             {
                 // end of stream
                 break;
             }
 
+            var @byte = readBuffer[0];
             checksum = Crc32.Calculate(checksum, @byte);
             var val = (@byte + 42) % 256;
 
@@ -81,7 +89,7 @@ public static class YencEncoder
             }
 
             // return encoded line
-            yield return encoding.GetString(encodedBytes, 0, encodedOffset);
+            lines.Add(encoding.GetString(encodedBytes, 0, encodedOffset));
 
             // reset offset
             encodedOffset = 0;
@@ -90,11 +98,13 @@ public static class YencEncoder
         if (encodedOffset > 0)
         {
             // return remainder
-            yield return encoding.GetString(encodedBytes, 0, encodedOffset);
+            lines.Add(encoding.GetString(encodedBytes, 0, encodedOffset));
         }
 
         checksum = Crc32.Finalize(checksum);
-        yield return GetFooterLine(header, checksum);
+        lines.Add(GetFooterLine(header, checksum));
+
+        return lines;
     }
 
     private static string GetHeaderLine(YencHeader header)

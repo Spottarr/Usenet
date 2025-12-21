@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using Usenet.Extensions;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
 
