@@ -79,12 +79,12 @@ internal static class DictionaryExtensions
 
     public static bool Remove<TKey, TValue>(this Dictionary<TKey, TValue> source, TKey key, [MaybeNullWhen(false)] out TValue value)
     {
-#if NETSTANDARD_2_1 || NET5_0_OR_GREATER
-        return source.Remove(key, out value);
-#else
+#if NETSTANDARD2_0
         var result = source.TryGetValue(key, out value);
         if (result) source.Remove(key);
         return result;
+#else
+        return source.Remove(key, out value);
 #endif
     }
 }

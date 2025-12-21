@@ -1,4 +1,4 @@
-﻿using Usenet.Nntp.Contracts;
+using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Writers;
@@ -47,10 +47,10 @@ public class ArticleWriterTests
 
     [Theory]
     [MemberData(nameof(ArticleWriteData))]
-    internal void ArticleShouldBeWrittenCorrectly(XSerializable<NntpArticle> article, string[] expectedLines)
+    internal async Task ArticleShouldBeWrittenCorrectly(XSerializable<NntpArticle> article, string[] expectedLines)
     {
         using var connection = new MockConnection();
-        ArticleWriter.Write(connection, article.Object);
+        await ArticleWriter.WriteAsync(connection, article.Object, TestContext.Current.CancellationToken);
         Assert.Equal(expectedLines, connection.GetLines());
     }
 }
@@ -63,29 +63,30 @@ internal sealed class MockConnection : INntpConnection
     {
     }
 
-    public Task<TResponse> ConnectAsync<TResponse>(string hostname, int port, bool useSsl, IResponseParser<TResponse> parser, CancellationToken cancellationToken)
+    public Task<TResponse> ConnectAsync<TResponse>(string hostname, int port, bool useSsl, IResponseParser<TResponse> parser, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public TResponse Command<TResponse>(string command, IResponseParser<TResponse> parser)
+    public Task<TResponse> CommandAsync<TResponse>(string command, IResponseParser<TResponse> parser, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public TResponse MultiLineCommand<TResponse>(string command, IMultiLineResponseParser<TResponse> parser)
+    public Task<TResponse> MultiLineCommandAsync<TResponse>(string command, IMultiLineResponseParser<TResponse> parser, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public void WriteLine(string line)
+    public Task WriteLineAsync(string line, CancellationToken cancellationToken = default)
     {
         _lines.Add(line);
+        return Task.CompletedTask;
     }
 
     public CountingStream Stream => throw new NotImplementedException();
 
-    public TResponse GetResponse<TResponse>(IResponseParser<TResponse> parser)
+    public Task<TResponse> GetResponseAsync<TResponse>(IResponseParser<TResponse> parser, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

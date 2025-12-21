@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders;
 using Usenet.Tests.Extensions;
 using Usenet.Tests.TestHelpers;
 using Usenet.Util;
@@ -11,7 +11,7 @@ public class YencEncoderTests
 {
     [Theory]
     [EmbeddedResourceData(@"yenc.singlepart.test (1.2).ntx", @"yenc.singlepart.test (1.2).dat")]
-    internal void ShouldBeEncodedAsSinglePartFile(IFileInfo expected, IFileInfo actual)
+    internal async Task ShouldBeEncodedAsSinglePartFile(IFileInfo expected, IFileInfo actual)
     {
         var expectedText = expected
             .ReadAllLines(UsenetEncoding.Default)
@@ -24,14 +24,14 @@ public class YencEncoderTests
         using var stream = new MemoryStream(data);
 
         var header = new YencHeader("test (1.2).txt", data.Length, 10, 0, 1, data.Length, 0);
-        var actualText = YencEncoder.Encode(header, stream).ToList();
+        var actualText = await YencEncoder.EncodeAsync(header, stream, TestContext.Current.CancellationToken);
 
         Assert.Equal(expectedText, actualText);
     }
 
     [Theory]
     [EmbeddedResourceData(@"yenc.multipart.test (1.2).ntx", @"yenc.multipart.test (1.2).dat")]
-    internal void ShouldBeEncodedAsPartOfMultiPartFile(IFileInfo expected, IFileInfo actual)
+    internal async Task ShouldBeEncodedAsPartOfMultiPartFile(IFileInfo expected, IFileInfo actual)
     {
         var expectedText = expected
             .ReadAllLines(UsenetEncoding.Default)
@@ -44,7 +44,7 @@ public class YencEncoderTests
         using var stream = new MemoryStream(data);
 
         var header = new YencHeader("test (1.2).txt", 120, 10, 1, 2, data.Length, 0);
-        var actualText = YencEncoder.Encode(header, stream).ToList();
+        var actualText = await YencEncoder.EncodeAsync(header, stream, TestContext.Current.CancellationToken);
 
         Assert.Equal(expectedText, actualText);
     }

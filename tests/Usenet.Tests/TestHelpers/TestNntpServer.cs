@@ -55,7 +55,7 @@ internal sealed class TestNntpServer : IDisposable
                 var line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
                 if (line == null) break;
 
-                var (command, subCommand, arguments) = ParseCommand(line);
+                var (command, _, _) = ParseCommand(line);
                 if (command == null) continue;
 
                 switch (command)
