@@ -49,7 +49,11 @@ internal sealed class InMemoryLogger : ILogger
     {
         foreach (var entry in Buffer)
         {
-            //logger.Log(entry.LogLevel, entry.EventId, entry.Message);
+#pragma warning disable CA1848
+#pragma warning disable CA2254
+            logger.Log(entry.LogLevel, entry.EventId, entry.Message);
+#pragma warning restore CA2254
+#pragma warning restore CA1848
         }
 
         Buffer.Clear();
