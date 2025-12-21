@@ -65,7 +65,7 @@ public class NzbDocument : IEquatable<NzbDocument>
         Guard.ThrowIfNull(encoding, nameof(encoding));
 
         using var reader = new StreamReader(stream, encoding);
-        return NzbParser.ParseAsync(stream, cancellationToken);
+        return NzbParser.ParseAsync(reader, cancellationToken);
     }
 
     /// <summary>
