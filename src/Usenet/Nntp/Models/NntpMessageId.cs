@@ -1,4 +1,4 @@
-﻿using Usenet.Extensions;
+using Usenet.Extensions;
 
 namespace Usenet.Nntp.Models;
 
@@ -72,7 +72,7 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// </summary>
     /// <param name="other">A <see cref="NntpMessageId"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-    public bool Equals(NntpMessageId other) => (object)other != null && Value == other.Value;
+    public bool Equals(NntpMessageId other) => other is not null && Value == other.Value;
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="object"/> value.
@@ -88,7 +88,7 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// <param name="second">The second <see cref="NntpMessageId"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
     public static bool operator ==(NntpMessageId first, NntpMessageId second) =>
-        (object)first == null ? (object)second == null : first.Equals(second);
+        first?.Equals(second) ?? second is null;
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NntpMessageId"/> value is unequal to the second <see cref="NntpMessageId"/> value.
