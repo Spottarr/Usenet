@@ -15,7 +15,7 @@ public class NntpGroups : IEnumerable<string>, IEquatable<NntpGroups>
     /// <summary>
     /// The seperator used in the NNTP Newsgroups header.
     /// </summary>
-    public const string GroupSeperator = ";";
+    public const string GroupSeparator = ";";
 
     private readonly ImmutableList<string> _groups;
 
@@ -66,7 +66,7 @@ public class NntpGroups : IEnumerable<string>, IEquatable<NntpGroups>
     /// This is the format used in the NNTP Newsgroups header.
     /// </summary>
     /// <returns>All NNTP newsgroup names in a single string seperated by the ';' character.</returns>
-    public override string ToString() => string.Join(GroupSeperator, _groups);
+    public override string ToString() => string.Join(GroupSeparator, _groups);
 
     /// <summary>
     /// Converts a string implicitly to a <see cref="NntpGroups"/>.
