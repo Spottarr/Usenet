@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Microsoft.Extensions.FileProviders;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Models;
@@ -23,9 +23,9 @@ public class NzbBuilder
     /// </summary>
     public NzbBuilder()
     {
-        _files = new List<File>();
-        _groupsBuilder = new NntpGroupsBuilder();
-        _metaData = new MultiValueDictionary<string, string>();
+        _files = [];
+        _groupsBuilder = new();
+        _metaData = new();
     }
 
     /// <summary>
@@ -155,8 +155,8 @@ public class NzbBuilder
     private List<NzbSegment> GetSegments(IFileInfo fileInfo)
     {
         var fileGuid = Guid.NewGuid();
-        var segments = new List<NzbSegment>();
         var segmentCount = GetSegmentCount(fileInfo);
+        var segments = new List<NzbSegment>(segmentCount);
         var offset = 0L;
         for (var number = 1; number <= segmentCount; number++)
         {
