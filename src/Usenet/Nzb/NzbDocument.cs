@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Text;
 using Usenet.Extensions;
 using Usenet.Util;
@@ -83,7 +83,7 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
     public bool Equals(NzbDocument other)
     {
-        if ((object)other == null)
+        if (other is null)
         {
             return false;
         }
@@ -125,7 +125,7 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <param name="second">The second <see cref="NzbDocument"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
     public static bool operator ==(NzbDocument first, NzbDocument second) =>
-        (object)first == null ? (object)second == null : first.Equals(second);
+        first?.Equals(second) ?? second is null;
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NzbDocument"/> value is unequal to the second <see cref="NzbDocument"/> value.

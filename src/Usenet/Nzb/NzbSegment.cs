@@ -1,4 +1,4 @@
-﻿using Usenet.Nntp.Models;
+using Usenet.Nntp.Models;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
 
@@ -67,10 +67,7 @@ public class NzbSegment : IEquatable<NzbSegment>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
     public bool Equals(NzbSegment other)
     {
-        if ((object)other == null)
-        {
-            return false;
-        }
+        if (other is null) return false;
 
         return
             Number.Equals(other.Number) &&
@@ -93,7 +90,7 @@ public class NzbSegment : IEquatable<NzbSegment>
     /// <param name="second">The second <see cref="NzbSegment"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
     public static bool operator ==(NzbSegment first, NzbSegment second) =>
-        (object)first == null ? (object)second == null : first.Equals(second);
+        first?.Equals(second) ?? second is null;
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NzbSegment"/> value is unequal to the second <see cref="NzbSegment"/> value.
