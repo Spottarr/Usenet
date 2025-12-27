@@ -22,8 +22,7 @@ internal class ArticleWriter
         await WriteHeaderAsync(connection, NntpHeaders.Newsgroups, article.Groups.ToString(), cancellationToken).ConfigureAwait(false);
         foreach (var header in article.Headers)
         {
-            if (header.Key == NntpHeaders.MessageId ||
-                header.Key == NntpHeaders.Newsgroups)
+            if (header.Key is NntpHeaders.MessageId or NntpHeaders.Newsgroups)
             {
                 // skip message-id and newsgroups, they are already written
                 continue;
