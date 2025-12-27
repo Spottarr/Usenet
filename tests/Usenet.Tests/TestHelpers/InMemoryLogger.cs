@@ -11,15 +11,9 @@ internal sealed class InMemoryLogger : ILogger
         public string? Message;
     }
 
-    public LogLevel MinLogLevel { get; set; }
+    public LogLevel MinLogLevel { get; set; } = LogLevel.Trace;
 
-    public List<Entry> Buffer { get; }
-
-    public InMemoryLogger()
-    {
-        MinLogLevel = LogLevel.Trace;
-        Buffer = new List<Entry>();
-    }
+    public List<Entry> Buffer { get; } = [];
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull
     {
