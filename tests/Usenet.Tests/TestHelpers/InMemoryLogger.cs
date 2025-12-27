@@ -32,11 +32,10 @@ internal sealed class InMemoryLogger : ILogger
         Exception? exception,
         Func<TState, Exception?, string> formatter)
     {
-        if (IsEnabled(logLevel))
-        {
-            var str = formatter(state, exception);
-            Buffer.Add(new Entry { LogLevel = logLevel, EventId = eventId, Message = str });
-        }
+        if (!IsEnabled(logLevel)) return;
+
+        var str = formatter(state, exception);
+        Buffer.Add(new Entry { LogLevel = logLevel, EventId = eventId, Message = str });
     }
 
     public void FlushTo(ILogger logger)
