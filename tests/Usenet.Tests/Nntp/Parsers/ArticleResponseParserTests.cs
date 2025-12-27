@@ -130,7 +130,7 @@ public class ArticleResponseParserTests
     }
 
     /// <summary>
-    /// Mimics <see cref="Usenet.Nntp.NntpConnection.ReadMultiLineDataBlock"/>
+    /// Mimics <see cref="Usenet.Nntp.NntpConnection.ReadMultiLineDataBlockAsync"/>
     /// </summary>
     private static IEnumerable<string> ReadMultiLineDataBlock(StreamReader reader)
     {
