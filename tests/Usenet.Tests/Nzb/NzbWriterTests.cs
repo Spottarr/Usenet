@@ -17,7 +17,7 @@ public class NzbWriterTests
         var expected = await NzbParser.ParseAsync(file.ReadAllText(UsenetEncoding.Default), TestContext.Current.CancellationToken);
 
         using var stream = new MemoryStream();
-        using var writer = new StreamWriter(stream, UsenetEncoding.Default);
+        await using var writer = new StreamWriter(stream, UsenetEncoding.Default);
         using var reader = new StreamReader(stream, UsenetEncoding.Default);
 
         // write to file and read back for comparison
