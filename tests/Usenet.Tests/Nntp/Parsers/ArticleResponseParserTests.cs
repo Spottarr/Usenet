@@ -106,16 +106,16 @@ public class ArticleResponseParserTests
     [Fact]
     public void LazyEnumerationOfBodyShouldReadFromSourceStream()
     {
-        var response = """
-                       FirstHeader: FirstValue
-                       SecondHeader: SecondValue
+        const string response = """
+                                FirstHeader: FirstValue
+                                SecondHeader: SecondValue
 
-                       This is an
-                        example of some
-                        body text
-                        as returned by
-                        the server.
-                       """;
+                                This is an
+                                 example of some
+                                 body text
+                                 as returned by
+                                 the server.
+                                """;
 
         using var stream = new MemoryStream(Encoding.ASCII.GetBytes(response));
         using var reader = new StreamReader(stream, Encoding.ASCII);
