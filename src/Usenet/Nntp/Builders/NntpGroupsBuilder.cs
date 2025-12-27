@@ -75,7 +75,7 @@ public class NntpGroupsBuilder
     /// Creates a <see cref="NntpGroups"/> with al the properties from the <see cref="NntpGroupsBuilder"/>.
     /// </summary>
     /// <returns>The <see cref="NntpGroups"/>.</returns>
-    public NntpGroups Build() => new NntpGroups(_groups, false);
+    public NntpGroups Build() => new(_groups, false);
 
     private void AddGroups(IEnumerable<string> values)
     {

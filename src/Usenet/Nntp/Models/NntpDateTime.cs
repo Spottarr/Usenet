@@ -50,7 +50,7 @@ public class NntpDateTime : IEquatable<NntpDateTime>
     /// Converts a <see cref="DateTime"/> implicitly to a <see cref="NntpDateTime"/>.
     /// </summary>
     /// <param name="value">The value to convert.</param>
-    public static NntpDateTime FromDateTime(DateTime value) => new NntpDateTime(value);
+    public static NntpDateTime FromDateTime(DateTime value) => new(value);
 
     /// <summary>
     /// Converts a <see cref="DateTimeOffset"/> implicitly to a <see cref="NntpDateTime"/>.
@@ -62,7 +62,7 @@ public class NntpDateTime : IEquatable<NntpDateTime>
     /// Converts a <see cref="DateTimeOffset"/> implicitly to a <see cref="NntpDateTime"/>.
     /// </summary>
     /// <param name="value">The value to convert.</param>
-    public static NntpDateTime FromDateTimeOffset(DateTimeOffset value) => new NntpDateTime(value);
+    public static NntpDateTime FromDateTimeOffset(DateTimeOffset value) => new(value);
 
     /// <summary>
     /// Returns the hash code for this instance.

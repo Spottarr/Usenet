@@ -16,7 +16,7 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// <summary>
     /// Creates a new instance of the <see cref="NntpMessageId"/> class.
     /// </summary>
-    /// <param name="value">A string representing a <see cref="NntpMessageId"/>. 
+    /// <param name="value">A string representing a <see cref="NntpMessageId"/>.
     /// Wrapping characters "&lt;" and "&gt;" will be stripped.</param>
     public NntpMessageId(string value)
     {
@@ -27,7 +27,7 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// Gets a value indicating whether the current <see cref="NntpMessageId" /> object has a valid value.
     /// </summary>
     /// <returns>
-    /// true if the current <see cref="NntpMessageId" /> object has a value; 
+    /// true if the current <see cref="NntpMessageId" /> object has a value;
     /// false if the current <see cref="NntpMessageId" /> object has no value.
     /// </returns>
     public bool HasValue => !string.IsNullOrWhiteSpace(Value);
@@ -54,12 +54,12 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// Converts a string implicitly to a <see cref="NntpMessageId"/>.
     /// </summary>
     /// <param name="value">The string to convert.</param>
-    public static NntpMessageId FromString(string value) => new NntpMessageId(value);
+    public static NntpMessageId FromString(string value) => new(value);
 
     /// <summary>
     /// Represents the empty <see cref="NntpMessageId"/>. The field is read-only.
     /// </summary>
-    public static NntpMessageId Empty => new NntpMessageId(null);
+    public static NntpMessageId Empty => new(null);
 
     /// <summary>
     /// Returns the hash code for this instance.

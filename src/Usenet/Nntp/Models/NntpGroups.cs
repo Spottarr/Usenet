@@ -53,7 +53,7 @@ public class NntpGroups : IEnumerable<string>, IEquatable<NntpGroups>
     /// <summary>
     /// Gets an empty <see cref="NntpGroups"/> object.
     /// </summary>
-    public static NntpGroups Empty { get; } = new NntpGroups((string)null);
+    public static NntpGroups Empty { get; } = new((string)null);
 
     /// <summary>Returns an enumerator that iterates through the <see cref="NntpGroups" /> values.</summary>
     /// <returns>An enumerator that iterates through the <see cref="NntpGroups" /> values.</returns>

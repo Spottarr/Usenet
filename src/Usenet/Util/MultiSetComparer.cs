@@ -125,5 +125,5 @@ internal class MultiSetComparer<T> : IEqualityComparer<IEnumerable<T>>
     /// A singleton instance of the <see cref="MultiSetComparer{T}"/> class that
     /// uses the default <see cref="IEqualityComparer{T}"/> for the type specified by the generic argument.
     /// </summary>
-    public static MultiSetComparer<T> Instance { get; } = new MultiSetComparer<T>();
+    public static MultiSetComparer<T> Instance { get; } = new();
 }

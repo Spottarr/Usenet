@@ -40,14 +40,14 @@ public class NntpArticleRange : IEquatable<NntpArticleRange>
     /// </summary>
     /// <param name="number">The article number.</param>
     /// <returns>A new range of one article.</returns>
-    public static NntpArticleRange SingleArticle(long number) => new NntpArticleRange(number, number);
+    public static NntpArticleRange SingleArticle(long number) => new(number, number);
 
     /// <summary>
     /// Creates a range containing the given article and all following.
     /// </summary>
     /// <param name="from">The article number to start the range from.</param>
     /// <returns>A new range containing the given article and all following.</returns>
-    public static NntpArticleRange AllFollowing(long from) => new NntpArticleRange(@from, null);
+    public static NntpArticleRange AllFollowing(long from) => new(@from, null);
 
     /// <summary>
     /// Creates a range containing all articles between and including <paramref name="from"/> and <paramref name="to"/>.
@@ -55,7 +55,7 @@ public class NntpArticleRange : IEquatable<NntpArticleRange>
     /// <param name="from">The article number to start the range from.</param>
     /// <param name="to">The article number to end the range with.</param>
     /// <returns>A new range containg all articles between and including <paramref name="from"/> and <paramref name="to"/>.</returns>
-    public static NntpArticleRange Range(long from, long to) => new NntpArticleRange(@from, to);
+    public static NntpArticleRange Range(long from, long to) => new(@from, to);
 
     /// <summary>
     /// Returns the text representation of the value formatted according to the NNTP specifications.

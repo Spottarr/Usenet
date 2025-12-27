@@ -113,7 +113,7 @@ public class NzbBuilder
     /// Creates a <see cref="NzbDocument"/> with al the properties from the <see cref="NzbBuilder"/>.
     /// </summary>
     /// <returns>The <see cref="NzbDocument"/>.</returns>
-    public NzbDocument Build() => new NzbDocument(GetMetaData(), GetFiles());
+    public NzbDocument Build() => new(GetMetaData(), GetFiles());
 
     private MultiValueDictionary<string, string> GetMetaData()
     {
