@@ -52,8 +52,8 @@ internal class MultiSetComparer<T> : IEqualityComparer<IEnumerable<T>>
             return true;
         }
 
-        if (!(first is ICollection<T> firstCollection) ||
-            !(second is ICollection<T> secondCollection))
+        if (first is not ICollection<T> firstCollection ||
+            second is not ICollection<T> secondCollection)
         {
             return !HaveMismatchedElement(first, second);
         }
