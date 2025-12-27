@@ -51,12 +51,12 @@ internal class ArticleWriter
         }
 
         // header line is too long, fold it
-        await connection.WriteLineAsync(line.Substring(0, MaxHeaderLength), cancellationToken).ConfigureAwait(false);
-        line = line.Substring(MaxHeaderLength);
+        await connection.WriteLineAsync(line[..MaxHeaderLength], cancellationToken).ConfigureAwait(false);
+        line = line[MaxHeaderLength..];
         while (line.Length > MaxHeaderLength)
         {
             await connection.WriteLineAsync(StringShims.Concat("\t".AsSpan(), line.AsSpan(0, MaxHeaderLength - 1)), cancellationToken).ConfigureAwait(false);
-            line = line.Substring(MaxHeaderLength - 1);
+            line = line[(MaxHeaderLength - 1)..];
         }
 
         await connection.WriteLineAsync("\t" + line, cancellationToken).ConfigureAwait(false);

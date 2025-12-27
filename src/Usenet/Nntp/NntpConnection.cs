@@ -86,7 +86,7 @@ public sealed class NntpConnection : INntpConnection
             throw new NntpException("Received invalid response.");
         }
 
-        return parser.Parse(code, responseText.Substring(3).Trim());
+        return parser.Parse(code, responseText[3..].Trim());
     }
 
     /// <inheritdoc/>

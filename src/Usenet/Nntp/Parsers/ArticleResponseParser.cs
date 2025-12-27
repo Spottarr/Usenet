@@ -115,7 +115,7 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
                 }
                 else
                 {
-                    prevHeader = new Header(line.Substring(0, splitPos), line.Substring(splitPos + 1).Trim());
+                    prevHeader = new Header(line[..splitPos], line[(splitPos + 1)..].Trim());
                     headers.Add(prevHeader);
                 }
             }
