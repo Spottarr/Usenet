@@ -24,7 +24,7 @@ internal static class DictionaryExtensions
         Guard.ThrowIfNullOrEmpty(key, nameof(key));
         Guard.ThrowIfNull(converter, nameof(converter));
 
-        return dictionary.TryGetValue(key, out var stringValue) ? converter(stringValue) : default(TValue);
+        return dictionary.TryGetValue(key, out var stringValue) ? converter(stringValue) : default;
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ internal static class DictionaryExtensions
         Guard.ThrowIfNull(dictionary, nameof(dictionary));
         Guard.ThrowIfNullOrEmpty(key, nameof(key));
 
-        return dictionary.TryGetValue(key, out var value) ? value : default(TValue);
+        return dictionary.TryGetValue(key, out var value) ? value : default;
     }
 
     /// <summary>
