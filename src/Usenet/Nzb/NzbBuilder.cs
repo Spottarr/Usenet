@@ -11,9 +11,9 @@ namespace Usenet.Nzb;
 /// </summary>
 public class NzbBuilder
 {
-    private readonly List<File> _files;
-    private readonly NntpGroupsBuilder _groupsBuilder;
-    private readonly MultiValueDictionary<string, string> _metaData;
+    private readonly List<File> _files = [];
+    private readonly NntpGroupsBuilder _groupsBuilder = new();
+    private readonly MultiValueDictionary<string, string> _metaData = new();
     private string _messageBase = "unknown.com";
     private string _documentPoster = "Anonymous <anonymous@unknown.com>";
     private long _partSize = 384_000;
@@ -23,9 +23,6 @@ public class NzbBuilder
     /// </summary>
     public NzbBuilder()
     {
-        _files = [];
-        _groupsBuilder = new();
-        _metaData = new();
     }
 
     /// <summary>
