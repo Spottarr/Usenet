@@ -17,9 +17,9 @@ public class NntpArticleBuilder
     private const string DateFormat = "dd MMM yyyy HH:mm:ss";
 
     private static readonly string[] _reservedHeaderKeys =
-    {
+    [
         NntpHeaders.Date, NntpHeaders.From, NntpHeaders.Subject, NntpHeaders.MessageId, NntpHeaders.Newsgroups
-    };
+    ];
 
     private MultiValueDictionary<string, string> _headers = new();
     private NntpGroupsBuilder _groupsBuilder = new();

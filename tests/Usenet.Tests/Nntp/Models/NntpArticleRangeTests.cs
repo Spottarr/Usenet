@@ -30,23 +30,20 @@ public class NntpArticleRangeTests
         Assert.Equal(expected, actual);
     }
 
-    public static readonly IEnumerable<object[]> EqualsWithSameValues = new[]
-    {
-        new object[]
-        {
+    public static readonly IEnumerable<object[]> EqualsWithSameValues =
+    [
+        [
             new XSerializable<NntpArticleRange>(NntpArticleRange.SingleArticle(8)),
-            new XSerializable<NntpArticleRange>(NntpArticleRange.SingleArticle(8)),
-        },
-        new object[]
-        {
-            new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)), new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)),
-        },
-        new object[]
-        {
+            new XSerializable<NntpArticleRange>(NntpArticleRange.SingleArticle(8))
+        ],
+        [
+            new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)), new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88))
+        ],
+        [
             new XSerializable<NntpArticleRange>(NntpArticleRange.AllFollowing(8)),
-            new XSerializable<NntpArticleRange>(NntpArticleRange.AllFollowing(8)),
-        },
-    };
+            new XSerializable<NntpArticleRange>(NntpArticleRange.AllFollowing(8))
+        ]
+    ];
 
     [Theory]
     [MemberData(nameof(EqualsWithSameValues))]
@@ -55,23 +52,20 @@ public class NntpArticleRangeTests
         Assert.Equal(range1.Object, range2.Object);
     }
 
-    public static readonly IEnumerable<object[]> EqualsWithDifferentValues = new[]
-    {
-        new object[]
-        {
+    public static readonly IEnumerable<object[]> EqualsWithDifferentValues =
+    [
+        [
             new XSerializable<NntpArticleRange>(NntpArticleRange.SingleArticle(8)),
-            new XSerializable<NntpArticleRange>(NntpArticleRange.SingleArticle(9)),
-        },
-        new object[]
-        {
-            new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)), new XSerializable<NntpArticleRange>(NntpArticleRange.Range(9, 88)),
-        },
-        new object[]
-        {
+            new XSerializable<NntpArticleRange>(NntpArticleRange.SingleArticle(9))
+        ],
+        [
+            new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)), new XSerializable<NntpArticleRange>(NntpArticleRange.Range(9, 88))
+        ],
+        [
             new XSerializable<NntpArticleRange>(NntpArticleRange.AllFollowing(8)),
-            new XSerializable<NntpArticleRange>(NntpArticleRange.AllFollowing(9)),
-        },
-    };
+            new XSerializable<NntpArticleRange>(NntpArticleRange.AllFollowing(9))
+        ]
+    ];
 
     [Theory]
     [MemberData(nameof(EqualsWithDifferentValues))]
