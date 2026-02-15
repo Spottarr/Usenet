@@ -21,8 +21,8 @@ public static class YencStreamDecoder
     /// <param name="encodedLines">The yEnc-encoded lines to decode.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task containing a <see cref="YencStream"/> with decoded binary data and meta-data.</returns>
-    public static Task<YencStream> DecodeAsync(IEnumerable<string> encodedLines, CancellationToken cancellationToken = default) =>
-        DecodeAsync(encodedLines, UsenetEncoding.Default, cancellationToken);
+    public static YencStream Decode(IEnumerable<string> encodedLines, CancellationToken cancellationToken = default) =>
+        Decode(encodedLines, UsenetEncoding.Default, cancellationToken);
 
     /// <summary>
     /// Decodes yEnc-encoded text into a <see cref="YencStream"/>
@@ -32,7 +32,7 @@ public static class YencStreamDecoder
     /// <param name="encoding">The character encoding to use.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task containing a <see cref="YencStream"/> with decoded binary data and meta-data.</returns>
-    public static Task<YencStream> DecodeAsync(IEnumerable<string> encodedLines, Encoding encoding, CancellationToken cancellationToken = default)
+    public static YencStream Decode(IEnumerable<string> encodedLines, Encoding encoding, CancellationToken cancellationToken = default)
     {
         Guard.ThrowIfNull(encodedLines, nameof(encodedLines));
         Guard.ThrowIfNull(encoding, nameof(encoding));
@@ -47,8 +47,7 @@ public static class YencStreamDecoder
             headers.Merge(YencMeta.GetPartHeaders(enumerator), false);
         }
 
-        var result = new YencStream(YencMeta.ParseHeader(headers), EnumerateData(enumerator, encoding));
-        return Task.FromResult(result);
+        return new YencStream(YencMeta.ParseHeader(headers), EnumerateData(enumerator, encoding));
     }
 
     private static IEnumerable<byte[]> EnumerateData(IEnumerator<string> enumerator, Encoding encoding)

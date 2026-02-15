@@ -59,13 +59,13 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <returns>A task that represents the asynchronous load operation.
     /// The value of the task's result property contains the resulting <see cref="NzbDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
-    public static Task<NzbDocument> LoadAsync(Stream stream, Encoding encoding, CancellationToken cancellationToken = default)
+    public static async Task<NzbDocument> LoadAsync(Stream stream, Encoding encoding, CancellationToken cancellationToken = default)
     {
         Guard.ThrowIfNull(stream, nameof(stream));
         Guard.ThrowIfNull(encoding, nameof(encoding));
 
         using var reader = new StreamReader(stream, encoding);
-        return NzbParser.ParseAsync(reader, cancellationToken);
+        return await NzbParser.ParseAsync(reader, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
