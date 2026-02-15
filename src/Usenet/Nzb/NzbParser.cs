@@ -143,14 +143,14 @@ public static class NzbParser
         }
 
         var len = subject.LastIndexOf(" (", StringComparison.OrdinalIgnoreCase);
-        return RemoveTrailingYenc(len < 0 ? subject : subject.Substring(0, len));
+        return RemoveTrailingYenc(len < 0 ? subject : subject[..len]);
     }
 
     private static string RemoveTrailingYenc(string subject)
     {
         subject = subject.Trim();
         var yencPos = subject.LastIndexOf(" yenc", StringComparison.OrdinalIgnoreCase);
-        return yencPos < 0 ? subject : subject.Substring(0, yencPos).Trim();
+        return yencPos < 0 ? subject : subject[..yencPos].Trim();
     }
 
     private static NntpGroups GetGroups(NzbParserContext context, XContainer groupsElement)

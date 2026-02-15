@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
 
@@ -40,14 +40,14 @@ public class NntpArticleRange : IEquatable<NntpArticleRange>
     /// </summary>
     /// <param name="number">The article number.</param>
     /// <returns>A new range of one article.</returns>
-    public static NntpArticleRange SingleArticle(long number) => new NntpArticleRange(number, number);
+    public static NntpArticleRange SingleArticle(long number) => new(number, number);
 
     /// <summary>
     /// Creates a range containing the given article and all following.
     /// </summary>
     /// <param name="from">The article number to start the range from.</param>
     /// <returns>A new range containing the given article and all following.</returns>
-    public static NntpArticleRange AllFollowing(long from) => new NntpArticleRange(@from, null);
+    public static NntpArticleRange AllFollowing(long from) => new(@from, null);
 
     /// <summary>
     /// Creates a range containing all articles between and including <paramref name="from"/> and <paramref name="to"/>.
@@ -55,7 +55,7 @@ public class NntpArticleRange : IEquatable<NntpArticleRange>
     /// <param name="from">The article number to start the range from.</param>
     /// <param name="to">The article number to end the range with.</param>
     /// <returns>A new range containg all articles between and including <paramref name="from"/> and <paramref name="to"/>.</returns>
-    public static NntpArticleRange Range(long from, long to) => new NntpArticleRange(@from, to);
+    public static NntpArticleRange Range(long from, long to) => new(@from, to);
 
     /// <summary>
     /// Returns the text representation of the value formatted according to the NNTP specifications.
@@ -76,7 +76,7 @@ public class NntpArticleRange : IEquatable<NntpArticleRange>
     /// <param name="other">A <see cref="NntpArticleRange"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
     public bool Equals(NntpArticleRange other) =>
-        (object)other != null && From == other.From && To == other.To;
+        other is not null && From == other.From && To == other.To;
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="NntpArticleRange"/> value.
@@ -92,7 +92,7 @@ public class NntpArticleRange : IEquatable<NntpArticleRange>
     /// <param name="second">The second <see cref="NntpArticleRange"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
     public static bool operator ==(NntpArticleRange first, NntpArticleRange second) =>
-        (object)first == null ? (object)second == null : first.Equals(second);
+        first?.Equals(second) ?? second is null;
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NntpArticleRange"/> value is unequal to the second <see cref="NntpArticleRange"/> value.

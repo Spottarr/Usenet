@@ -1,5 +1,6 @@
-﻿using Usenet.Exceptions;
+using Usenet.Exceptions;
 using Usenet.Extensions;
+using Usenet.Util.Compatibility;
 
 namespace Usenet.Yenc;
 
@@ -9,8 +10,9 @@ namespace Usenet.Yenc;
 /// </summary>
 internal class YencMeta
 {
-    private const string YBegin = YencKeywords.YBegin + " ";
-    private const string YPart = YencKeywords.YPart + " ";
+    private const string YBegin = $"{YencKeywords.YBegin} ";
+    private const string YPart = $"{YencKeywords.YPart} ";
+    private const string NameSeparator = $"{YencKeywords.Name}=";
 
     public static IDictionary<string, string> GetHeaders(IEnumerator<string> enumerator)
     {
@@ -92,13 +94,13 @@ internal class YencMeta
         }
 
         // name is always last item on the header line
-        var nameSplit = line.Split(new[] { $"{YencKeywords.Name}=" }, StringSplitOptions.RemoveEmptyEntries);
+        var nameSplit = line.Split(NameSeparator, StringSplitOptions.RemoveEmptyEntries);
         if (nameSplit.Length == 0)
         {
             return new Dictionary<string, string>(0);
         }
 
-        var dictionary = new Dictionary<string, string>();
+        Dictionary<string, string> dictionary = new();
         if (nameSplit.Length > 1)
         {
             // found name
@@ -106,7 +108,7 @@ internal class YencMeta
         }
 
         // parse other items
-        var pairs = nameSplit[0].Split([' '], StringSplitOptions.RemoveEmptyEntries);
+        var pairs = nameSplit[0].Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (pairs.Length == 0)
         {
             return dictionary;

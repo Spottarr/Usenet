@@ -90,6 +90,6 @@ public class NntpStreamReader : StreamReader
             return null;
         }
 
-        return line[1] == '.' ? line.Substring(1) : line;
+        return line[1] == '.' ? line[1..] : line;
     }
 }

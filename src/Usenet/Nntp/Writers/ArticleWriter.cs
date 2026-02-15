@@ -22,8 +22,7 @@ internal class ArticleWriter
         await WriteHeaderAsync(connection, NntpHeaders.Newsgroups, article.Groups.ToString(), cancellationToken).ConfigureAwait(false);
         foreach (var header in article.Headers)
         {
-            if (header.Key == NntpHeaders.MessageId ||
-                header.Key == NntpHeaders.Newsgroups)
+            if (header.Key is NntpHeaders.MessageId or NntpHeaders.Newsgroups)
             {
                 // skip message-id and newsgroups, they are already written
                 continue;
@@ -51,12 +50,12 @@ internal class ArticleWriter
         }
 
         // header line is too long, fold it
-        await connection.WriteLineAsync(line.Substring(0, MaxHeaderLength), cancellationToken).ConfigureAwait(false);
-        line = line.Substring(MaxHeaderLength);
+        await connection.WriteLineAsync(line[..MaxHeaderLength], cancellationToken).ConfigureAwait(false);
+        line = line[MaxHeaderLength..];
         while (line.Length > MaxHeaderLength)
         {
             await connection.WriteLineAsync(StringShims.Concat("\t".AsSpan(), line.AsSpan(0, MaxHeaderLength - 1)), cancellationToken).ConfigureAwait(false);
-            line = line.Substring(MaxHeaderLength - 1);
+            line = line[(MaxHeaderLength - 1)..];
         }
 
         await connection.WriteLineAsync("\t" + line, cancellationToken).ConfigureAwait(false);

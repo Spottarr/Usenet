@@ -22,7 +22,7 @@ internal static class PostingStatusParser
 
             case '=':
                 {
-                    otherGroup = input.Substring(1);
+                    otherGroup = input[1..];
                     return NntpPostingStatus.OnlyArticlesFromPeersPermittedFiledLocally;
                 }
 

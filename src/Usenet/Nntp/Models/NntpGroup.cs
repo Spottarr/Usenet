@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Usenet.Util;
 using Usenet.Util.Compatibility;
 using HashCode = Usenet.Util.HashCode;
@@ -94,10 +94,7 @@ public class NntpGroup : IEquatable<NntpGroup>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
     public bool Equals(NntpGroup other)
     {
-        if ((object)other == null)
-        {
-            return false;
-        }
+        if (other is null) return false;
 
         var equals =
             Name.Equals(other.Name, StringComparison.Ordinal) &&
@@ -124,7 +121,7 @@ public class NntpGroup : IEquatable<NntpGroup>
     /// <param name="second">The second <see cref="NntpGroup"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
     public static bool operator ==(NntpGroup first, NntpGroup second) =>
-        (object)first == null ? (object)second == null : first.Equals(second);
+        first?.Equals(second) ?? second is null;
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NntpGroup"/> value is unequal to the second <see cref="NntpGroup"/> value.

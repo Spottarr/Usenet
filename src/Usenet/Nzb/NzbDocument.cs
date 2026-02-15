@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Text;
 using Usenet.Extensions;
 using Usenet.Util;
@@ -59,13 +59,13 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <returns>A task that represents the asynchronous load operation.
     /// The value of the task's result property contains the resulting <see cref="NzbDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
-    public static Task<NzbDocument> LoadAsync(Stream stream, Encoding encoding, CancellationToken cancellationToken = default)
+    public static async Task<NzbDocument> LoadAsync(Stream stream, Encoding encoding, CancellationToken cancellationToken = default)
     {
         Guard.ThrowIfNull(stream, nameof(stream));
         Guard.ThrowIfNull(encoding, nameof(encoding));
 
         using var reader = new StreamReader(stream, encoding);
-        return NzbParser.ParseAsync(reader, cancellationToken);
+        return await NzbParser.ParseAsync(reader, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
     public bool Equals(NzbDocument other)
     {
-        if ((object)other == null)
+        if (other is null)
         {
             return false;
         }
@@ -125,7 +125,7 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <param name="second">The second <see cref="NzbDocument"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
     public static bool operator ==(NzbDocument first, NzbDocument second) =>
-        (object)first == null ? (object)second == null : first.Equals(second);
+        first?.Equals(second) ?? second is null;
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NzbDocument"/> value is unequal to the second <see cref="NzbDocument"/> value.

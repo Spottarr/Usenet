@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Usenet.Nntp.Models;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
@@ -95,10 +95,7 @@ public class NzbFile : IEquatable<NzbFile>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
     public bool Equals(NzbFile other)
     {
-        if ((object)other == null)
-        {
-            return false;
-        }
+        if (other is null) return false;
 
         return
             Poster.Equals(other.Poster, StringComparison.Ordinal) &&
@@ -124,7 +121,7 @@ public class NzbFile : IEquatable<NzbFile>
     /// <param name="second">The second <see cref="NzbFile"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
     public static bool operator ==(NzbFile first, NzbFile second) =>
-        (object)first == null ? (object)second == null : first.Equals(second);
+        first?.Equals(second) ?? second is null;
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NzbFile"/> value is unequal to the second <see cref="NzbFile"/> value.

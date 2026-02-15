@@ -4,6 +4,7 @@ using Usenet.Nntp.Builders;
 using Usenet.Nntp.Models;
 using Usenet.Util;
 using Xunit;
+// ReSharper disable DuplicateKeyCollectionInitialization
 
 namespace Usenet.Tests.Nntp.Builders;
 

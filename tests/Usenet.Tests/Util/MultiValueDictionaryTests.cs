@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Usenet.Util;
 using Xunit;
+// ReSharper disable DuplicateKeyCollectionInitialization
 
 namespace Usenet.Tests.Util;
 
