@@ -20,7 +20,7 @@ public static class YencStreamDecoder
     /// </summary>
     /// <param name="encodedLines">The yEnc-encoded lines to decode.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task containing a <see cref="YencStream"/> with decoded binary data and meta-data.</returns>
+    /// <returns>A <see cref="YencStream"/> with decoded binary data and meta-data.</returns>
     public static YencStream Decode(IEnumerable<string> encodedLines, CancellationToken cancellationToken = default) =>
         Decode(encodedLines, UsenetEncoding.Default, cancellationToken);
 
@@ -31,7 +31,7 @@ public static class YencStreamDecoder
     /// <param name="encodedLines">The yEnc-encoded lines to decode.</param>
     /// <param name="encoding">The character encoding to use.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task containing a <see cref="YencStream"/> with decoded binary data and meta-data.</returns>
+    /// <returns>A <see cref="YencStream"/> with decoded binary data and meta-data.</returns>
     public static YencStream Decode(IEnumerable<string> encodedLines, Encoding encoding, CancellationToken cancellationToken = default)
     {
         Guard.ThrowIfNull(encodedLines, nameof(encodedLines));
