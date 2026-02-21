@@ -44,10 +44,10 @@ public class NntpArticle : IEquatable<NntpArticle>
     /// <param name="body">The body of the <see cref="NntpArticle"/>.</param>
     public NntpArticle(
         long number,
-        NntpMessageId messageId,
-        NntpGroups groups,
-        IDictionary<string, ICollection<string>> headers,
-        IList<string> body)
+        NntpMessageId? messageId,
+        NntpGroups? groups,
+        IDictionary<string, ICollection<string>>? headers,
+        IList<string>? body)
     {
         Number = number;
         MessageId = messageId ?? NntpMessageId.Empty;
