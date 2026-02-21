@@ -61,5 +61,5 @@ public interface INntpConnection : IDisposable
     /// <summary>
     /// The stream used by the connection.
     /// </summary>
-    CountingStream Stream { get; }
+    CountingStream? Stream { get; }
 }

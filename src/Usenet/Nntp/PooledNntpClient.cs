@@ -33,7 +33,7 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
         return res;
     }
 
-    public async Task<bool> AuthenticateAsync(string username, string password = null, CancellationToken cancellationToken = default)
+    public async Task<bool> AuthenticateAsync(string username, string password = "", CancellationToken cancellationToken = default)
     {
         var res = await _client.AuthenticateAsync(username, password, cancellationToken).ConfigureAwait(false);
         Authenticated = res;

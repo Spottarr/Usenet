@@ -57,7 +57,7 @@ public class NntpClient : INntpClient
     }
 
     /// <inheritdoc />
-    public async Task<bool> AuthenticateAsync(string username, string password = null, CancellationToken cancellationToken = default)
+    public async Task<bool> AuthenticateAsync(string username, string password = "", CancellationToken cancellationToken = default)
     {
         Guard.ThrowIfNullOrWhiteSpace(username, nameof(username));
         var userResponse = await _connection.CommandAsync($"AUTHINFO USER {username}", new ResponseParser(281), cancellationToken).ConfigureAwait(false);
