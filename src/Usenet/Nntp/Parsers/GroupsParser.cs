@@ -16,7 +16,6 @@ internal static class GroupsParser
     public static IEnumerable<string> Parse(IEnumerable<string> values)
     {
         var groups = new List<string>();
-        if (values == null) return groups;
 
         foreach (var value in values)
         {
@@ -28,8 +27,6 @@ internal static class GroupsParser
 
     private static void AddGroups(List<string> groups, string value)
     {
-        if (value == null) return;
-
         foreach (var group in value.Split(NntpGroups.GroupSeparator, StringSplitOptions.RemoveEmptyEntries))
         {
             var packed = group.Pack();
