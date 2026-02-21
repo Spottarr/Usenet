@@ -9,16 +9,10 @@ namespace Usenet;
 /// </summary>
 public static class Logger
 {
-    private static ILoggerFactory _factoryInstance;
-
     /// <summary>
     /// The singleton <see cref="ILoggerFactory"/> to use throughout the entire library.
     /// </summary>
-    public static ILoggerFactory Factory
-    {
-        get => _factoryInstance ??= new NullLoggerFactory();
-        set => _factoryInstance = value;
-    }
+    public static ILoggerFactory Factory { get; set; } = new NullLoggerFactory();
 
     /// <summary>
     /// Uses the <see cref="ILoggerFactory"/> to create a logger for the given type.
