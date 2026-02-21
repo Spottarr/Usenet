@@ -119,17 +119,19 @@ public static class NzbParser
 
     private static NzbFile GetFile(NzbParserContext context, XElement fileElement)
     {
-        var poster = (string?)fileElement.Attribute(NzbKeywords.Poster) ?? string.Empty;
-        if (!long.TryParse((string?)fileElement.Attribute(NzbKeywords.Date) ?? "0", out var unixTimestamp))
+        var poster = fileElement.Attribute(NzbKeywords.Poster)?.Value ?? string.Empty;
+        if (!long.TryParse(fileElement.Attribute(NzbKeywords.Date)?.Value ?? "0", out var unixTimestamp))
         {
             throw new InvalidNzbDataException(Resources.Nzb.InvalidDateAttriubute);
         }
 
         var date = DateTimeOffset.FromUnixTimeSeconds(unixTimestamp);
-        var subject = (string?)fileElement.Attribute(NzbKeywords.Subject) ?? string.Empty;
+        var subject = fileElement.Attribute(NzbKeywords.Subject)?.Value ?? string.Empty;
         var fileName = GetFileName(subject);
-        var groups = GetGroups(context, fileElement.Element(context.Namespace + NzbKeywords.Groups));
-        IEnumerable<NzbSegment> segments = GetSegments(context, fileElement.Element(context.Namespace + NzbKeywords.Segments));
+        var groupsElement = fileElement.Element(context.Namespace + NzbKeywords.Groups);
+        var groups = groupsElement != null ? GetGroups(context, groupsElement) : NntpGroups.Empty;
+        var segmentsElement = fileElement.Element(context.Namespace + NzbKeywords.Segments);
+        var segments = segmentsElement != null ? GetSegments(context, segmentsElement) : [];
 
         return new NzbFile(poster, subject, fileName, date, groups, segments);
     }
@@ -153,23 +155,22 @@ public static class NzbParser
         return yencPos < 0 ? subject : subject[..yencPos].Trim();
     }
 
-    private static NntpGroups GetGroups(NzbParserContext context, XContainer? groupsElement)
+    private static NntpGroups GetGroups(NzbParserContext context, XContainer groupsElement)
     {
-        var groups = groupsElement?
+        var groups = groupsElement
             .Elements(context.Namespace + NzbKeywords.Group)
             .Select(g => g.Value);
+        
         return new NntpGroups(groups);
     }
 
-    private static List<NzbSegment> GetSegments(NzbParserContext context, XContainer? segmentsElement)
+    private static List<NzbSegment> GetSegments(NzbParserContext context, XContainer segmentsElement)
     {
-        var elements = segmentsElement?
+        var elements = segmentsElement
             .Elements(context.Namespace + NzbKeywords.Segment)
-            .OrderBy(element => ((string?)element.Attribute(NzbKeywords.Number)).ToIntSafe());
+            .OrderBy(element => element.Attribute(NzbKeywords.Number)?.Value.ToIntSafe());
 
         var segments = new List<NzbSegment>();
-        if (elements == null) return segments;
-        
         long offset = 0;
         foreach (var element in elements)
         {
