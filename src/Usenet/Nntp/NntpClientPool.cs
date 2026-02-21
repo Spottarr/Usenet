@@ -90,7 +90,7 @@ public sealed class NntpClientPool : INntpClientPool
         {
             _logger.ReturningNntpClient();
 
-            if(!_usedClients.Remove(client))
+            if (!_usedClients.Remove(client))
                 throw new InvalidOperationException("Client not borrowed from this pool.");
 
             // If the client has encountered an error (e.g. broken pipe) during the most recent operation, dispose it instead of returning it to the pool
