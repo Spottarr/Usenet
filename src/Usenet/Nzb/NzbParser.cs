@@ -90,7 +90,7 @@ public static class NzbParser
         return new NzbDocument(metaData, files);
     }
 
-    private static MultiValueDictionary<string, string> GetMetaData(NzbParserContext context, XContainer nzbElement)
+    private static MultiValueDictionary<string, string>? GetMetaData(NzbParserContext context, XContainer nzbElement)
     {
         var headElement = nzbElement.Element(context.Namespace + NzbKeywords.Head);
         if (headElement == null)
@@ -119,14 +119,14 @@ public static class NzbParser
 
     private static NzbFile GetFile(NzbParserContext context, XElement fileElement)
     {
-        var poster = (string)fileElement.Attribute(NzbKeywords.Poster) ?? string.Empty;
-        if (!long.TryParse((string)fileElement.Attribute(NzbKeywords.Date) ?? "0", out var unixTimestamp))
+        var poster = (string?)fileElement.Attribute(NzbKeywords.Poster) ?? string.Empty;
+        if (!long.TryParse((string?)fileElement.Attribute(NzbKeywords.Date) ?? "0", out var unixTimestamp))
         {
             throw new InvalidNzbDataException(Resources.Nzb.InvalidDateAttriubute);
         }
 
         var date = DateTimeOffset.FromUnixTimeSeconds(unixTimestamp);
-        var subject = (string)fileElement.Attribute(NzbKeywords.Subject) ?? string.Empty;
+        var subject = (string?)fileElement.Attribute(NzbKeywords.Subject) ?? string.Empty;
         var fileName = GetFileName(subject);
         var groups = GetGroups(context, fileElement.Element(context.Namespace + NzbKeywords.Groups));
         IEnumerable<NzbSegment> segments = GetSegments(context, fileElement.Element(context.Namespace + NzbKeywords.Segments));
@@ -153,7 +153,7 @@ public static class NzbParser
         return yencPos < 0 ? subject : subject[..yencPos].Trim();
     }
 
-    private static NntpGroups GetGroups(NzbParserContext context, XContainer groupsElement)
+    private static NntpGroups GetGroups(NzbParserContext context, XContainer? groupsElement)
     {
         var groups = groupsElement?
             .Elements(context.Namespace + NzbKeywords.Group)
@@ -161,19 +161,16 @@ public static class NzbParser
         return new NntpGroups(groups);
     }
 
-    private static List<NzbSegment> GetSegments(NzbParserContext context, XContainer segentsElement)
+    private static List<NzbSegment> GetSegments(NzbParserContext context, XContainer? segmentsElement)
     {
-        var elements = segentsElement?
+        var elements = segmentsElement?
             .Elements(context.Namespace + NzbKeywords.Segment)
-            .OrderBy(element => ((string)element.Attribute(NzbKeywords.Number)).ToIntSafe());
+            .OrderBy(element => ((string?)element.Attribute(NzbKeywords.Number)).ToIntSafe());
 
-        if (elements == null)
-        {
-            return null;
-        }
-
-        long offset = 0;
         var segments = new List<NzbSegment>();
+        if (elements == null) return segments;
+        
+        long offset = 0;
         foreach (var element in elements)
         {
             var segment = GetSegment(element, offset);
@@ -186,12 +183,12 @@ public static class NzbParser
 
     private static NzbSegment GetSegment(XElement element, long offset)
     {
-        if (!int.TryParse((string)element.Attribute(NzbKeywords.Number), out var number))
+        if (!int.TryParse((string?)element.Attribute(NzbKeywords.Number), out var number))
         {
             throw new InvalidNzbDataException(Resources.Nzb.InvalidOrMissingNumberAttribute);
         }
 
-        if (!long.TryParse((string)element.Attribute(NzbKeywords.Bytes), out var size))
+        if (!long.TryParse((string?)element.Attribute(NzbKeywords.Bytes), out var size))
         {
             throw new InvalidNzbDataException(Resources.Nzb.InvalidOrMissingBytesAttribute);
         }
