@@ -33,7 +33,7 @@ public class NntpStreamReader : StreamReader
     /// indicating end of input.
     /// </summary>
     /// <returns>The next line from the input stream, or null if the end of the input stream is reached.</returns>
-    public override string ReadLine()
+    public override string? ReadLine()
     {
         var line = base.ReadLine();
         return ProcessLine(line);
@@ -45,7 +45,7 @@ public class NntpStreamReader : StreamReader
     /// indicating end of input.
     /// </summary>
     /// <returns>The next line from the input stream, or null if the end of the input stream is reached.</returns>
-    public override async Task<string> ReadLineAsync()
+    public override async Task<string?> ReadLineAsync()
     {
         var line = await base.ReadLineAsync().ConfigureAwait(false);
         return ProcessLine(line);
@@ -59,13 +59,13 @@ public class NntpStreamReader : StreamReader
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>The next line from the input stream, or null if the end of the input stream is reached.</returns>
 #if NET8_0_OR_GREATER
-    public override async ValueTask<string> ReadLineAsync(CancellationToken cancellationToken)
+    public override async ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
     {
         var line = await base.ReadLineAsync(cancellationToken).ConfigureAwait(false);
         return ProcessLine(line);
     }
 #else
-    public async Task<string> ReadLineAsync(CancellationToken cancellationToken)
+    public async Task<string?> ReadLineAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var line = await base.ReadLineAsync().ConfigureAwait(false);
@@ -73,7 +73,7 @@ public class NntpStreamReader : StreamReader
     }
 #endif
 
-    private static string ProcessLine(string line)
+    private static string? ProcessLine(string? line)
     {
         if (line == null)
         {
