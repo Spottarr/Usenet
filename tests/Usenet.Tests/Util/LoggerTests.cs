@@ -5,7 +5,7 @@ using NSubstitute;
 using Usenet.Tests.TestHelpers;
 using Xunit;
 
-namespace Usenet.Tests;
+namespace Usenet.Tests.Util;
 
 public class LoggerTests
 {

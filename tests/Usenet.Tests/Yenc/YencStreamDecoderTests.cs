@@ -53,10 +53,10 @@ public class YencStreamDecoderTests
         using var actual = new MemoryStream();
 
         actual.Seek(part1.Header.PartOffset, SeekOrigin.Begin);
-        await part1.CopyToAsync(actual, TestContext.Current.CancellationToken);
+        await part1.CopyToAsync(actual, TestContext.Current.CancellationToken).ConfigureAwait(true);
 
         actual.Seek(part2.Header.PartOffset, SeekOrigin.Begin);
-        await part2.CopyToAsync(actual, TestContext.Current.CancellationToken);
+        await part2.CopyToAsync(actual, TestContext.Current.CancellationToken).ConfigureAwait(true);
 
         var actualFileName = part1.Header.FileName;
 
