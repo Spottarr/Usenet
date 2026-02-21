@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Usenet.Tests.Nntp.Parsers;
 
-public class ListGroupsReponseParserTest
+public class ListGroupsResponseParserTests
 {
     public static readonly IEnumerable<object[]> MultiLineParseData =
     [

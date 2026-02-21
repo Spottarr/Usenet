@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Usenet.Extensions;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Models;
@@ -23,23 +23,13 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
 
     public ArticleResponseParser(ArticleRequestType requestType)
     {
-        switch (_requestType = requestType)
+        _successCode = (_requestType = requestType) switch
         {
-            case ArticleRequestType.Head:
-                _successCode = 221;
-                break;
-
-            case ArticleRequestType.Body:
-                _successCode = 222;
-                break;
-
-            case ArticleRequestType.Article:
-                _successCode = 220;
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException(nameof(requestType), requestType, null);
-        }
+            ArticleRequestType.Head => 221,
+            ArticleRequestType.Body => 222,
+            ArticleRequestType.Article => 220,
+            _ => throw new ArgumentOutOfRangeException(nameof(requestType), requestType, null)
+        };
     }
 
     public bool IsSuccessResponse(int code) => code == _successCode;
@@ -115,7 +105,7 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
                 }
                 else
                 {
-                    prevHeader = new Header(line.Substring(0, splitPos), line.Substring(splitPos + 1).Trim());
+                    prevHeader = new Header(line[..splitPos], line[(splitPos + 1)..].Trim());
                     headers.Add(prevHeader);
                 }
             }

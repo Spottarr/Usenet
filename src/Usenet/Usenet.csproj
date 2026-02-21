@@ -18,7 +18,6 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PackageOutputPath>../../package</PackageOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,6 +30,7 @@
     <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="System.Collections.Immutable" />
+    <PackageReference Include="System.Linq.Async" Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1'" />
   </ItemGroup>
 
   <ItemGroup>

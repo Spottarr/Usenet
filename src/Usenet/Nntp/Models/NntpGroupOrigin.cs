@@ -1,4 +1,4 @@
-﻿using Usenet.Util;
+using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
 
 namespace Usenet.Nntp.Models;
@@ -57,10 +57,7 @@ public class NntpGroupOrigin : IEquatable<NntpGroupOrigin>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
     public bool Equals(NntpGroupOrigin other)
     {
-        if ((object)other == null)
-        {
-            return false;
-        }
+        if (other is null) return false;
 
         return
             Name.Equals(other.Name, StringComparison.Ordinal) &&
@@ -82,7 +79,7 @@ public class NntpGroupOrigin : IEquatable<NntpGroupOrigin>
     /// <param name="second">The second <see cref="NntpGroupOrigin"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
     public static bool operator ==(NntpGroupOrigin first, NntpGroupOrigin second) =>
-        (object)first == null ? (object)second == null : first.Equals(second);
+        first?.Equals(second) ?? second is null;
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NntpGroupOrigin"/> value is unequal to the second <see cref="NntpGroupOrigin"/> value.

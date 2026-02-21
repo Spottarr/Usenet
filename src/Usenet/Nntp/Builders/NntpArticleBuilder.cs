@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Usenet.Exceptions;
 using Usenet.Extensions;
@@ -17,9 +17,9 @@ public class NntpArticleBuilder
     private const string DateFormat = "dd MMM yyyy HH:mm:ss";
 
     private static readonly string[] _reservedHeaderKeys =
-    {
+    [
         NntpHeaders.Date, NntpHeaders.From, NntpHeaders.Subject, NntpHeaders.MessageId, NntpHeaders.Newsgroups
-    };
+    ];
 
     private MultiValueDictionary<string, string> _headers = new();
     private NntpGroupsBuilder _groupsBuilder = new();
@@ -46,9 +46,9 @@ public class NntpArticleBuilder
     {
         Guard.ThrowIfNull(article, nameof(article));
 
-        _messageId = new NntpMessageId(article.MessageId.Value);
+        _messageId = new(article.MessageId.Value);
         _groupsBuilder = new NntpGroupsBuilder().Add(article.Groups);
-        _headers = new MultiValueDictionary<string, string>();
+        _headers = new();
         _from = null;
         _subject = null;
         _dateTime = null;

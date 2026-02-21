@@ -17,9 +17,8 @@ internal static class FileInfoExtensions
         using var stream = fileInfo.CreateReadStream();
         using var reader = new StreamReader(stream, encoding);
 
-        string? line;
         var lines = new List<string>();
-        while ((line = reader.ReadLine()) != null)
+        while (reader.ReadLine() is { } line)
         {
             lines.Add(line);
         }

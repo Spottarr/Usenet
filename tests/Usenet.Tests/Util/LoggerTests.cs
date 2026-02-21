@@ -5,15 +5,15 @@ using NSubstitute;
 using Usenet.Tests.TestHelpers;
 using Xunit;
 
-namespace Usenet.Tests;
+namespace Usenet.Tests.Util;
 
 public class LoggerTests
 {
     [Fact]
     public void ShouldUseNullLogger()
     {
-        Usenet.Logger.Factory = null;
-        var logger = Usenet.Logger.Create<LoggerTests>();
+        Logger.Factory = null;
+        var logger = Logger.Create<LoggerTests>();
         var actualLogger = GetActualLogger(logger);
 
         Assert.IsType<NullLogger>(actualLogger);
@@ -25,8 +25,8 @@ public class LoggerTests
         var loggerFactory = Substitute.For<ILoggerFactory>();
         loggerFactory.CreateLogger(Arg.Any<string>()).Returns(new InMemoryLogger());
 
-        Usenet.Logger.Factory = loggerFactory;
-        var logger = Usenet.Logger.Create<LoggerTests>();
+        Logger.Factory = loggerFactory;
+        var logger = Logger.Create<LoggerTests>();
         var actualLogger = GetActualLogger(logger);
 
         Assert.IsType<InMemoryLogger>(actualLogger);

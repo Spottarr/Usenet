@@ -10,4 +10,22 @@ internal static class StringShims
         return string.Concat(str0.ToString(), str1.ToString());
 #endif
     }
+
+    internal static string[] Split(this string input, string separator, StringSplitOptions options = StringSplitOptions.None)
+    {
+#if NETSTANDARD2_0
+        return input.Split([separator], options);
+#else
+        return input.Split(separator, options);
+#endif
+    }
+
+    internal static string[] Split(this string input, char separator, StringSplitOptions options = StringSplitOptions.None)
+    {
+#if NETSTANDARD2_0
+        return input.Split([separator], options);
+#else
+        return input.Split(separator, options);
+#endif
+    }
 }
