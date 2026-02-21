@@ -50,7 +50,7 @@ public class ArticleWriterTests
     internal async Task ArticleShouldBeWrittenCorrectly(XSerializable<NntpArticle> article, string[] expectedLines)
     {
         using var connection = new MockConnection();
-        await ArticleWriter.WriteAsync(connection, article.Object, TestContext.Current.CancellationToken);
+        await ArticleWriter.WriteAsync(connection, article.Object, TestContext.Current.CancellationToken).ConfigureAwait(true);
         Assert.Equal(expectedLines, connection.GetLines());
     }
 }
