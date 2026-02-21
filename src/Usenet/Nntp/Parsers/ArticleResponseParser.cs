@@ -82,7 +82,7 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
     private MultiValueDictionary<string, string> GetHeaders(IEnumerator<string> enumerator)
     {
         var headers = new List<Header>();
-        Header prevHeader = null;
+        Header? prevHeader = null;
         while (enumerator.MoveNext())
         {
             var line = enumerator.Current;
