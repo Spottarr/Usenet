@@ -43,7 +43,7 @@ public static class YencArticleDecoder
         }
 
         var header = YencMeta.ParseHeader(headers);
-        YencFooter footer = null;
+        YencFooter? footer = null;
 
         // create buffer for part or entire file if single part
         var decodedBytes = new byte[header.PartSize];

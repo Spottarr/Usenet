@@ -63,6 +63,7 @@ public static class YencValidator
     {
         var header = article.Header;
         var footer = article.Footer;
+        if (footer == null) return;
 
         if (header.PartNumber != footer.PartNumber)
         {

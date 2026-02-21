@@ -54,7 +54,7 @@ internal class YencMeta
 
     public static YencHeader ParseHeader(IDictionary<string, string> headers)
     {
-        var name = headers.GetOrDefault(YencKeywords.Name);
+        var name = headers.GetOrDefault(YencKeywords.Name) ?? string.Empty;
         var size = headers.GetAndConvert(YencKeywords.Size, long.Parse);
         var line = headers.GetAndConvert(YencKeywords.Line, int.Parse);
         var part = headers.GetAndConvert(YencKeywords.Part, int.Parse);
