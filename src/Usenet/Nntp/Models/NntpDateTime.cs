@@ -75,14 +75,14 @@ public class NntpDateTime : IEquatable<NntpDateTime>
     /// </summary>
     /// <param name="other">A <see cref="NntpDateTime"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-    public bool Equals(NntpDateTime other) => other is not null && Value == other.Value;
+    public bool Equals(NntpDateTime? other) => other is not null && Value == other.Value;
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="object"/> value.
     /// </summary>
     /// <param name="obj">An <see cref="object"/> to compare to this instance.</param>
     /// <returns>true if <paramref name="obj" /> has the same value as this instance; otherwise, false.</returns>
-    public override bool Equals(object obj) => Equals(obj as NntpDateTime);
+    public override bool Equals(object? obj) => Equals(obj as NntpDateTime);
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NntpDateTime"/> value is equal to the second <see cref="NntpDateTime"/> value.
@@ -90,7 +90,7 @@ public class NntpDateTime : IEquatable<NntpDateTime>
     /// <param name="first">The first <see cref="NntpDateTime"/>.</param>
     /// <param name="second">The second <see cref="NntpDateTime"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator ==(NntpDateTime first, NntpDateTime second) =>
+    public static bool operator ==(NntpDateTime? first, NntpDateTime? second) =>
         first?.Equals(second) ?? second is null;
 
     /// <summary>
@@ -99,5 +99,5 @@ public class NntpDateTime : IEquatable<NntpDateTime>
     /// <param name="first">The first <see cref="NntpDateTime"/>.</param>
     /// <param name="second">The second <see cref="NntpDateTime"/>.</param>
     /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator !=(NntpDateTime first, NntpDateTime second) => !(first == second);
+    public static bool operator !=(NntpDateTime? first, NntpDateTime? second) => !(first == second);
 }

@@ -92,7 +92,7 @@ public class NntpGroup : IEquatable<NntpGroup>
     /// </summary>
     /// <param name="other">A <see cref="NntpGroup"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-    public bool Equals(NntpGroup other)
+    public bool Equals(NntpGroup? other)
     {
         if (other is null) return false;
 
@@ -112,7 +112,7 @@ public class NntpGroup : IEquatable<NntpGroup>
     /// </summary>
     /// <param name="obj">An <see cref="object"/> to compare to this instance.</param>
     /// <returns>true if <paramref name="obj" /> has the same value as this instance; otherwise, false.</returns>
-    public override bool Equals(object obj) => Equals(obj as NntpGroup);
+    public override bool Equals(object? obj) => Equals(obj as NntpGroup);
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NntpGroup"/> value is equal to the second <see cref="NntpGroup"/> value.
@@ -120,7 +120,7 @@ public class NntpGroup : IEquatable<NntpGroup>
     /// <param name="first">The first <see cref="NntpGroup"/>.</param>
     /// <param name="second">The second <see cref="NntpGroup"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator ==(NntpGroup first, NntpGroup second) =>
+    public static bool operator ==(NntpGroup? first, NntpGroup? second) =>
         first?.Equals(second) ?? second is null;
 
     /// <summary>
@@ -129,5 +129,5 @@ public class NntpGroup : IEquatable<NntpGroup>
     /// <param name="first">The first <see cref="NntpGroup"/>.</param>
     /// <param name="second">The second <see cref="NntpGroup"/>.</param>
     /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator !=(NntpGroup first, NntpGroup second) => !(first == second);
+    public static bool operator !=(NntpGroup? first, NntpGroup? second) => !(first == second);
 }

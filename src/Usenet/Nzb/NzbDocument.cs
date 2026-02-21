@@ -81,7 +81,7 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// </summary>
     /// <param name="other">A <see cref="NzbDocument"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-    public bool Equals(NzbDocument other)
+    public bool Equals(NzbDocument? other)
     {
         if (other is null)
         {
@@ -116,7 +116,7 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// </summary>
     /// <param name="obj">An <see cref="object"/> to compare to this instance.</param>
     /// <returns>true if <paramref name="obj" /> has the same value as this instance; otherwise, false.</returns>
-    public override bool Equals(object obj) => Equals(obj as NzbDocument);
+    public override bool Equals(object? obj) => Equals(obj as NzbDocument);
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NzbDocument"/> value is equal to the second <see cref="NzbDocument"/> value.
@@ -124,7 +124,7 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <param name="first">The first <see cref="NzbDocument"/>.</param>
     /// <param name="second">The second <see cref="NzbDocument"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator ==(NzbDocument first, NzbDocument second) =>
+    public static bool operator ==(NzbDocument? first, NzbDocument? second) =>
         first?.Equals(second) ?? second is null;
 
     /// <summary>
@@ -133,5 +133,5 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <param name="first">The first <see cref="NzbDocument"/>.</param>
     /// <param name="second">The second <see cref="NzbDocument"/>.</param>
     /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator !=(NzbDocument first, NzbDocument second) => !(first == second);
+    public static bool operator !=(NzbDocument? first, NzbDocument? second) => !(first == second);
 }

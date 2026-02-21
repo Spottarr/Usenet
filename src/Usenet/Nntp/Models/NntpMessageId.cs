@@ -72,14 +72,14 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// </summary>
     /// <param name="other">A <see cref="NntpMessageId"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-    public bool Equals(NntpMessageId other) => other is not null && Value == other.Value;
+    public bool Equals(NntpMessageId? other) => other is not null && Value == other.Value;
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="object"/> value.
     /// </summary>
     /// <param name="obj">An <see cref="object"/> to compare to this instance.</param>
     /// <returns>true if <paramref name="obj" /> has the same value as this instance; otherwise, false.</returns>
-    public override bool Equals(object obj) => Equals(obj as NntpMessageId);
+    public override bool Equals(object? obj) => Equals(obj as NntpMessageId);
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NntpMessageId"/> value is equal to the second <see cref="NntpMessageId"/> value.
@@ -87,7 +87,7 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// <param name="first">The first <see cref="NntpMessageId"/>.</param>
     /// <param name="second">The second <see cref="NntpMessageId"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator ==(NntpMessageId first, NntpMessageId second) =>
+    public static bool operator ==(NntpMessageId? first, NntpMessageId? second) =>
         first?.Equals(second) ?? second is null;
 
     /// <summary>
@@ -96,5 +96,5 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// <param name="first">The first <see cref="NntpMessageId"/>.</param>
     /// <param name="second">The second <see cref="NntpMessageId"/>.</param>
     /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator !=(NntpMessageId first, NntpMessageId second) => !(first == second);
+    public static bool operator !=(NntpMessageId? first, NntpMessageId? second) => !(first == second);
 }

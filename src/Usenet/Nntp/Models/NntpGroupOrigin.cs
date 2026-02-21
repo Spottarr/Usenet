@@ -55,7 +55,7 @@ public class NntpGroupOrigin : IEquatable<NntpGroupOrigin>
     /// </summary>
     /// <param name="other">A <see cref="NntpGroupOrigin"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-    public bool Equals(NntpGroupOrigin other)
+    public bool Equals(NntpGroupOrigin? other)
     {
         if (other is null) return false;
 
@@ -70,7 +70,7 @@ public class NntpGroupOrigin : IEquatable<NntpGroupOrigin>
     /// </summary>
     /// <param name="obj">An <see cref="object"/> to compare to this instance.</param>
     /// <returns>true if <paramref name="obj" /> has the same value as this instance; otherwise, false.</returns>
-    public override bool Equals(object obj) => Equals(obj as NntpGroupOrigin);
+    public override bool Equals(object? obj) => Equals(obj as NntpGroupOrigin);
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NntpGroupOrigin"/> value is equal to the second <see cref="NntpGroupOrigin"/> value.
@@ -78,7 +78,7 @@ public class NntpGroupOrigin : IEquatable<NntpGroupOrigin>
     /// <param name="first">The first <see cref="NntpGroupOrigin"/>.</param>
     /// <param name="second">The second <see cref="NntpGroupOrigin"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator ==(NntpGroupOrigin first, NntpGroupOrigin second) =>
+    public static bool operator ==(NntpGroupOrigin? first, NntpGroupOrigin? second) =>
         first?.Equals(second) ?? second is null;
 
     /// <summary>
@@ -87,5 +87,5 @@ public class NntpGroupOrigin : IEquatable<NntpGroupOrigin>
     /// <param name="first">The first <see cref="NntpGroupOrigin"/>.</param>
     /// <param name="second">The second <see cref="NntpGroupOrigin"/>.</param>
     /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator !=(NntpGroupOrigin first, NntpGroupOrigin second) => !(first == second);
+    public static bool operator !=(NntpGroupOrigin? first, NntpGroupOrigin? second) => !(first == second);
 }

@@ -65,7 +65,7 @@ public class NzbSegment : IEquatable<NzbSegment>
     /// </summary>
     /// <param name="other">A <see cref="NzbSegment"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-    public bool Equals(NzbSegment other)
+    public bool Equals(NzbSegment? other)
     {
         if (other is null) return false;
 
@@ -81,7 +81,7 @@ public class NzbSegment : IEquatable<NzbSegment>
     /// </summary>
     /// <param name="obj">An <see cref="object"/> to compare to this instance.</param>
     /// <returns>true if <paramref name="obj" /> has the same value as this instance; otherwise, false.</returns>
-    public override bool Equals(object obj) => Equals(obj as NzbSegment);
+    public override bool Equals(object? obj) => Equals(obj as NzbSegment);
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NzbSegment"/> value is equal to the second <see cref="NzbSegment"/> value.
@@ -89,7 +89,7 @@ public class NzbSegment : IEquatable<NzbSegment>
     /// <param name="first">The first <see cref="NzbSegment"/>.</param>
     /// <param name="second">The second <see cref="NzbSegment"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator ==(NzbSegment first, NzbSegment second) =>
+    public static bool operator ==(NzbSegment? first, NzbSegment? second) =>
         first?.Equals(second) ?? second is null;
 
     /// <summary>
@@ -98,5 +98,5 @@ public class NzbSegment : IEquatable<NzbSegment>
     /// <param name="first">The first <see cref="NzbSegment"/>.</param>
     /// <param name="second">The second <see cref="NzbSegment"/>.</param>
     /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator !=(NzbSegment first, NzbSegment second) => !(first == second);
+    public static bool operator !=(NzbSegment? first, NzbSegment? second) => !(first == second);
 }

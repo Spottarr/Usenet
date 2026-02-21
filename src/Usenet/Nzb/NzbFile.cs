@@ -93,7 +93,7 @@ public class NzbFile : IEquatable<NzbFile>
     /// </summary>
     /// <param name="other">A <see cref="NzbFile"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-    public bool Equals(NzbFile other)
+    public bool Equals(NzbFile? other)
     {
         if (other is null) return false;
 
@@ -112,7 +112,7 @@ public class NzbFile : IEquatable<NzbFile>
     /// </summary>
     /// <param name="obj">An <see cref="object"/> to compare to this instance.</param>
     /// <returns>true if <paramref name="obj" /> has the same value as this instance; otherwise, false.</returns>
-    public override bool Equals(object obj) => Equals(obj as NzbFile);
+    public override bool Equals(object? obj) => Equals(obj as NzbFile);
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NzbFile"/> value is equal to the second <see cref="NzbFile"/> value.
@@ -120,7 +120,7 @@ public class NzbFile : IEquatable<NzbFile>
     /// <param name="first">The first <see cref="NzbFile"/>.</param>
     /// <param name="second">The second <see cref="NzbFile"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator ==(NzbFile first, NzbFile second) =>
+    public static bool operator ==(NzbFile? first, NzbFile? second) =>
         first?.Equals(second) ?? second is null;
 
     /// <summary>
@@ -129,5 +129,5 @@ public class NzbFile : IEquatable<NzbFile>
     /// <param name="first">The first <see cref="NzbFile"/>.</param>
     /// <param name="second">The second <see cref="NzbFile"/>.</param>
     /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator !=(NzbFile first, NzbFile second) => !(first == second);
+    public static bool operator !=(NzbFile? first, NzbFile? second) => !(first == second);
 }

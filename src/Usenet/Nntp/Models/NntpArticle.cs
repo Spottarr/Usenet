@@ -71,7 +71,7 @@ public class NntpArticle : IEquatable<NntpArticle>
     /// </summary>
     /// <param name="other">A <see cref="NntpArticle"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-    public bool Equals(NntpArticle other)
+    public bool Equals(NntpArticle? other)
     {
         if (other is null) return false;
 
@@ -104,7 +104,7 @@ public class NntpArticle : IEquatable<NntpArticle>
     /// </summary>
     /// <param name="obj">An <see cref="object"/> to compare to this instance.</param>
     /// <returns>true if <paramref name="obj" /> has the same value as this instance; otherwise, false.</returns>
-    public override bool Equals(object obj) => Equals(obj as NntpArticle);
+    public override bool Equals(object? obj) => Equals(obj as NntpArticle);
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NntpArticle"/> value is equal to the second <see cref="NntpArticle"/> value.
@@ -112,7 +112,7 @@ public class NntpArticle : IEquatable<NntpArticle>
     /// <param name="first">The first <see cref="NntpArticle"/>.</param>
     /// <param name="second">The second <see cref="NntpArticle"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator ==(NntpArticle first, NntpArticle second) =>
+    public static bool operator ==(NntpArticle? first, NntpArticle? second) =>
         first?.Equals(second) ?? second is null;
 
     /// <summary>
@@ -121,5 +121,5 @@ public class NntpArticle : IEquatable<NntpArticle>
     /// <param name="first">The first <see cref="NntpArticle"/>.</param>
     /// <param name="second">The second <see cref="NntpArticle"/>.</param>
     /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator !=(NntpArticle first, NntpArticle second) => !(first == second);
+    public static bool operator !=(NntpArticle? first, NntpArticle? second) => !(first == second);
 }
