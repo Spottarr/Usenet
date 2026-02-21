@@ -21,11 +21,11 @@ public class NntpArticleBuilder
         NntpHeaders.Date, NntpHeaders.From, NntpHeaders.Subject, NntpHeaders.MessageId, NntpHeaders.Newsgroups
     ];
 
-    private MultiValueDictionary<string, string> _headers = new();
+    private MultiValueDictionary<string, string> _headers = [];
     private NntpGroupsBuilder _groupsBuilder = new();
     private NntpMessageId _messageId = NntpMessageId.Empty;
-    private string _from;
-    private string _subject;
+    private string _from = string.Empty;
+    private string _subject = string.Empty;
     private DateTimeOffset? _dateTime;
     private List<string> _body = [];
 
@@ -48,11 +48,11 @@ public class NntpArticleBuilder
 
         _messageId = new(article.MessageId.Value);
         _groupsBuilder = new NntpGroupsBuilder().Add(article.Groups);
-        _headers = new();
-        _from = null;
-        _subject = null;
+        _headers = [];
+        _from = string.Empty;
+        _subject = string.Empty;
         _dateTime = null;
-        _body = null;
+        _body = [];
 
         foreach (var header in article.Headers)
         {
@@ -73,7 +73,7 @@ public class NntpArticleBuilder
                         break;
 
                     case NntpHeaders.From:
-                        if (_from == null)
+                        if (string.IsNullOrEmpty(_from))
                         {
                             _from = value;
                         }
@@ -85,7 +85,7 @@ public class NntpArticleBuilder
                         break;
 
                     case NntpHeaders.Subject:
-                        if (_subject == null)
+                        if (string.IsNullOrEmpty(_subject))
                         {
                             _subject = value;
                         }
@@ -247,7 +247,7 @@ public class NntpArticleBuilder
     /// <param name="key">The key of the header(s) to remove.</param>
     /// <param name="value">The value of the header to remove.</param>
     /// <returns>The <see cref="NntpArticleBuilder"/> so that additional calls can be chained.</returns>
-    public NntpArticleBuilder RemoveHeader(string key, string value = null)
+    public NntpArticleBuilder RemoveHeader(string key, string value)
     {
         Guard.ThrowIfNullOrWhiteSpace(key, nameof(key));
         if (_reservedHeaderKeys.Contains(key))
