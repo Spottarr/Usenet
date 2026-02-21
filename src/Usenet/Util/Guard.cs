@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace Usenet.Util;
 
@@ -14,10 +15,10 @@ internal static class Guard
     /// <param name="obj">The object to check</param>
     /// <param name="name">The name of the object</param>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
-    public static void ThrowIfNull([NotNull] object obj, string name)
+    public static void ThrowIfNull([NotNull] object? obj, [CallerArgumentExpression(nameof(obj))] string? name = null)
     {
 #if NET8_0_OR_GREATER
-            ArgumentNullException.ThrowIfNull(obj, name);
+        ArgumentNullException.ThrowIfNull(obj, name);
 #else
         if (obj == null)
             throw new ArgumentNullException(name, Resources.Util.NullValueNotAllowed);
