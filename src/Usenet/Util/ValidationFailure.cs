@@ -20,7 +20,7 @@ public class ValidationFailure
     /// <summary>
     /// A data object containing information about the validation failure.
     /// </summary>
-    public object Data { get; }
+    public object? Data { get; }
 
     /// <summary>
     /// Creates a new instance of the <see cref="ValidationFailure"/> class.
@@ -28,7 +28,7 @@ public class ValidationFailure
     /// <param name="code">A code associated with the validation failure.</param>
     /// <param name="message">A message describing the validation failure.</param>
     /// <param name="data">A data object containing information about the validation failure.</param>
-    public ValidationFailure(string code, string message, object data = null)
+    public ValidationFailure(string code, string message, object? data = null)
     {
         Code = code.ThrowIfNullOrWhiteSpace(nameof(code));
         Message = message;
