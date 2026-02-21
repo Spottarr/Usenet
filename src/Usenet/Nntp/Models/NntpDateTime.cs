@@ -1,3 +1,5 @@
+using Usenet.Util;
+
 namespace Usenet.Nntp.Models;
 
 /// <summary>
@@ -38,7 +40,11 @@ public class NntpDateTime : IEquatable<NntpDateTime>
     /// Converts a <see cref="NntpDateTime"/> implicitly to a string.
     /// </summary>
     /// <param name="dateTime">The <see cref="NntpDateTime"/> to convert.</param>
-    public static implicit operator string(NntpDateTime dateTime) => dateTime?.ToString();
+    public static implicit operator string(NntpDateTime dateTime)
+    {
+        Guard.ThrowIfNull(dateTime);
+        return dateTime.ToString();
+    }
 
     /// <summary>
     /// Converts a <see cref="DateTime"/> implicitly to a <see cref="NntpDateTime"/>.

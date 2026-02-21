@@ -24,6 +24,7 @@ public class NntpGroups : IEnumerable<string>, IEquatable<NntpGroups>
     /// </summary>
     public NntpGroups(string groups) : this(GroupsParser.Parse(groups), false)
     {
+        Guard.ThrowIfNull(groups);
     }
 
     /// <summary>
@@ -31,15 +32,12 @@ public class NntpGroups : IEnumerable<string>, IEquatable<NntpGroups>
     /// </summary>
     public NntpGroups(IEnumerable<string> groups) : this(groups, true)
     {
+        Guard.ThrowIfNull(groups);
     }
 
     internal NntpGroups(IEnumerable<string> groups, bool doParse)
     {
-        if (groups == null)
-        {
-            _groups = ImmutableList<string>.Empty;
-            return;
-        }
+        Guard.ThrowIfNull(groups);
 
         var parsedGroups = doParse ? GroupsParser.Parse(groups) : groups;
         _groups = parsedGroups.OrderBy(g => g).ToImmutableList();
@@ -53,7 +51,7 @@ public class NntpGroups : IEnumerable<string>, IEquatable<NntpGroups>
     /// <summary>
     /// Gets an empty <see cref="NntpGroups"/> object.
     /// </summary>
-    public static NntpGroups Empty { get; } = new((string)null);
+    public static NntpGroups Empty { get; } = new(string.Empty);
 
     /// <summary>Returns an enumerator that iterates through the <see cref="NntpGroups" /> values.</summary>
     /// <returns>An enumerator that iterates through the <see cref="NntpGroups" /> values.</returns>

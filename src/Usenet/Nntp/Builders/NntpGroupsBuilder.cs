@@ -1,5 +1,6 @@
 ﻿using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
+using Usenet.Util;
 
 namespace Usenet.Nntp.Builders;
 
@@ -45,6 +46,7 @@ public class NntpGroupsBuilder
     /// <returns>The <see cref="NntpGroups"/> object so that additional calls can be chained.</returns>
     public NntpGroupsBuilder Add(IEnumerable<string> values)
     {
+        Guard.ThrowIfNull(values);
         AddGroups(GroupsParser.Parse(values));
         return this;
     }
@@ -56,6 +58,7 @@ public class NntpGroupsBuilder
     /// <returns>The <see cref="NntpGroups"/> object so that additional calls can be chained.</returns>
     public NntpGroupsBuilder Remove(string value)
     {
+        Guard.ThrowIfNull(value);
         RemoveGroups(GroupsParser.Parse(value));
         return this;
     }
@@ -67,6 +70,7 @@ public class NntpGroupsBuilder
     /// <returns>The <see cref="NntpGroups"/> object so that additional calls can be chained.</returns>
     public NntpGroupsBuilder Remove(IEnumerable<string> values)
     {
+        Guard.ThrowIfNull(values);
         RemoveGroups(GroupsParser.Parse(values));
         return this;
     }

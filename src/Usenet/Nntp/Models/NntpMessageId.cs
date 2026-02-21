@@ -1,4 +1,5 @@
 using Usenet.Extensions;
+using Usenet.Util;
 
 namespace Usenet.Nntp.Models;
 
@@ -20,7 +21,8 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// Wrapping characters "&lt;" and "&gt;" will be stripped.</param>
     public NntpMessageId(string value)
     {
-        Value = value == null ? string.Empty : value.TrimStart('<').TrimEnd('>').Pack();
+        Guard.ThrowIfNull(value);
+        Value = value.TrimStart('<').TrimEnd('>').Pack();
     }
 
     /// <summary>
@@ -42,7 +44,11 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// Converts a <see cref="NntpMessageId"/> implicitly to a string.
     /// </summary>
     /// <param name="messageId">The <see cref="NntpMessageId"/> to convert.</param>
-    public static implicit operator string(NntpMessageId messageId) => messageId?.ToString();
+    public static implicit operator string(NntpMessageId messageId)
+    {
+        Guard.ThrowIfNull(messageId);
+        return messageId.ToString();
+    }
 
     /// <summary>
     /// Converts a string implicitly to a <see cref="NntpMessageId"/>.
@@ -59,7 +65,7 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// <summary>
     /// Represents the empty <see cref="NntpMessageId"/>. The field is read-only.
     /// </summary>
-    public static NntpMessageId Empty => new(null);
+    public static NntpMessageId Empty => new(string.Empty);
 
     /// <summary>
     /// Returns the hash code for this instance.
