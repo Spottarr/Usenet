@@ -7,7 +7,7 @@
 public class EnumerableStream : AbstractBaseStream
 {
     private readonly IEnumerator<byte[]> _enumerator;
-    private byte[] _currentChunk;
+    private byte[]? _currentChunk;
     private int _currentOffset;
 
     /// <summary>
