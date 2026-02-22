@@ -8,7 +8,7 @@ namespace Usenet.Nntp;
 /// It will undo dot-stuffing and will stop at the terminating line (".").
 /// Based on Kristian Hellang's NntpLib.Net project https://github.com/khellang/NntpLib.Net.
 /// </summary>
-public class NntpStreamReader : StreamReader
+internal class NntpStreamReader : StreamReader
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="NntpStreamReader"/> class for the specified stream, with the default usenet encoding.
