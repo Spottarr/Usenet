@@ -16,7 +16,7 @@ public class NntpArticleBuilder
 
     private const string DateFormat = "dd MMM yyyy HH:mm:ss";
 
-    private static readonly string[] _reservedHeaderKeys =
+    private static readonly string[] ReservedHeaderKeys =
     [
         NntpHeaders.Date, NntpHeaders.From, NntpHeaders.Subject, NntpHeaders.MessageId, NntpHeaders.Newsgroups
     ];
@@ -231,7 +231,7 @@ public class NntpArticleBuilder
     {
         Guard.ThrowIfNullOrWhiteSpace(key, nameof(key));
         Guard.ThrowIfNull(value);
-        if (_reservedHeaderKeys.Contains(key))
+        if (ReservedHeaderKeys.Contains(key))
         {
             throw new NntpException(Resources.Nntp.ReservedHeaderKeyNotAllowed);
         }
@@ -250,7 +250,7 @@ public class NntpArticleBuilder
     public NntpArticleBuilder RemoveHeader(string key, string value)
     {
         Guard.ThrowIfNullOrWhiteSpace(key, nameof(key));
-        if (_reservedHeaderKeys.Contains(key))
+        if (ReservedHeaderKeys.Contains(key))
         {
             throw new NntpException(Resources.Nntp.ReservedHeaderKeyNotAllowed);
         }

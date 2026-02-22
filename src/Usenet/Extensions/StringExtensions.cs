@@ -8,7 +8,7 @@ namespace Usenet.Extensions;
 /// </summary>
 internal static class StringExtensions
 {
-    private static readonly Regex _whitespaceRegex = new(@"\s+", RegexOptions.Compiled);
+    private static readonly Regex WhitespaceRegex = new(@"\s+", RegexOptions.Compiled);
 
     /// <summary>
     /// Throws an <exception cref="ArgumentNullException">ArgumentNullException</exception> if the specified string is null.
@@ -61,7 +61,7 @@ internal static class StringExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string Pack(this string source) =>
-        _whitespaceRegex.Replace(source, string.Empty);
+        WhitespaceRegex.Replace(source, string.Empty);
 
     public static int IndexOf(this string source, char value, StringComparison comparisonType)
     {
