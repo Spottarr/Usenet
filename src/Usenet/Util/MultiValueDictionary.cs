@@ -5,7 +5,7 @@ namespace Usenet.Util;
 /// </summary>
 /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
 /// <typeparam name="TValue">The type of values in the dictionary.</typeparam>
-internal class MultiValueDictionary<TKey, TValue> : Dictionary<TKey, ICollection<TValue>>, IEquatable<MultiValueDictionary<TKey, TValue>> where TKey : notnull
+internal class MultiValueDictionary<TKey, TValue> : Dictionary<TKey, ICollection<TValue>>, IEquatable<MultiValueDictionary<TKey, TValue>> where TKey : notnull where TValue : notnull
 {
     private readonly Func<ICollection<TValue>> _collectionFactory;
 
