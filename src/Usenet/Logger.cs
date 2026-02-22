@@ -12,7 +12,11 @@ public static class Logger
     /// <summary>
     /// The singleton <see cref="ILoggerFactory"/> to use throughout the entire library.
     /// </summary>
-    public static ILoggerFactory Factory { get; set; } = new NullLoggerFactory();
+    public static ILoggerFactory Factory
+    {
+        get => field ??= NullLoggerFactory.Instance;
+        set;
+    }
 
     /// <summary>
     /// Uses the <see cref="ILoggerFactory"/> to create a logger for the given type.
