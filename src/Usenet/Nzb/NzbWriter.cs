@@ -18,6 +18,8 @@ public class NzbWriter
     /// <param name="textWriter">The <see cref="TextWriter"/> to use for writing.</param>
     public NzbWriter(TextWriter textWriter)
     {
+        Guard.ThrowIfNull(textWriter);
+        
         _textWriter = textWriter;
     }
 
