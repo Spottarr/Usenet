@@ -18,8 +18,8 @@ internal static class HashCode
     /// <param name="hash">The current hash code.</param>
     /// <param name="obj">The object to calculate the hash code for.</param>
     /// <returns>A 32-bit signed integer hash code.</returns>
-    public static int Hash<T>(this int hash, T obj) =>
-        unchecked(hash * 23 + EqualityComparer<T>.Default.GetHashCode(obj));
+    public static int Hash<T>(this int hash, T? obj) =>
+        obj is null ? 0 : unchecked(hash * 23 + EqualityComparer<T>.Default.GetHashCode(obj));
 
     /// <summary>
     /// Combine the current hash code with the combined hash codes of all the elements in the collection.
