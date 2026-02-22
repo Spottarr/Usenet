@@ -34,8 +34,8 @@ public static class YencStreamDecoder
     /// <returns>A <see cref="YencStream"/> with decoded binary data and meta-data.</returns>
     public static YencStream Decode(IEnumerable<string> encodedLines, Encoding encoding, CancellationToken cancellationToken = default)
     {
-        Guard.ThrowIfNull(encodedLines, nameof(encodedLines));
-        Guard.ThrowIfNull(encoding, nameof(encoding));
+        Guard.ThrowIfNull(encodedLines);
+        Guard.ThrowIfNull(encoding);
 
         cancellationToken.ThrowIfCancellationRequested();
 

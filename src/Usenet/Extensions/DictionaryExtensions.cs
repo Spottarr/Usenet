@@ -20,9 +20,9 @@ internal static class DictionaryExtensions
     /// <returns>The value if the key was found. Otherwise the default value of type <typeparamref name="TValue"/>.</returns>
     public static TValue? GetAndConvert<TValue>(this IDictionary<string, string> dictionary, string key, Func<string, TValue> converter)
     {
-        Guard.ThrowIfNull(dictionary, nameof(dictionary));
+        Guard.ThrowIfNull(dictionary);
         Guard.ThrowIfNullOrEmpty(key, nameof(key));
-        Guard.ThrowIfNull(converter, nameof(converter));
+        Guard.ThrowIfNull(converter);
 
         return dictionary.TryGetValue(key, out var stringValue) ? converter(stringValue) : default;
     }
@@ -36,7 +36,7 @@ internal static class DictionaryExtensions
     /// <returns>The value if the key was found. Otherwise the default value of type <typeparamref name="TValue"/>.</returns>
     public static TValue? GetOrDefault<TValue>(this IDictionary<string, TValue> dictionary, string key)
     {
-        Guard.ThrowIfNull(dictionary, nameof(dictionary));
+        Guard.ThrowIfNull(dictionary);
         Guard.ThrowIfNullOrEmpty(key, nameof(key));
 
         return dictionary.TryGetValue(key, out var value) ? value : default;
@@ -54,8 +54,8 @@ internal static class DictionaryExtensions
     public static IDictionary<TKey, TValue> Merge<TKey, TValue>(this IDictionary<TKey, TValue> target,
         IDictionary<TKey, TValue> source, bool overwriteExistingKeys)
     {
-        Guard.ThrowIfNull(target, nameof(target));
-        Guard.ThrowIfNull(source, nameof(source));
+        Guard.ThrowIfNull(target);
+        Guard.ThrowIfNull(source);
 
         foreach (var item in source)
         {

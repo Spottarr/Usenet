@@ -44,7 +44,7 @@ public class NntpArticleBuilder
     /// <returns>The <see cref="NntpArticleBuilder"/> so that additional calls can be chained.</returns>
     public NntpArticleBuilder InitializeFrom(NntpArticle article)
     {
-        Guard.ThrowIfNull(article, nameof(article));
+        Guard.ThrowIfNull(article);
 
         _messageId = new(article.MessageId.Value);
         _groupsBuilder = new NntpGroupsBuilder().Add(article.Groups);
@@ -196,7 +196,7 @@ public class NntpArticleBuilder
     /// <returns>The <see cref="NntpArticleBuilder"/> so that additional calls can be chained.</returns>
     public NntpArticleBuilder AddGroups(params NntpGroups[] values)
     {
-        Guard.ThrowIfNull(values, nameof(values));
+        Guard.ThrowIfNull(values);
         foreach (var value in values)
         {
             _groupsBuilder.Add(value);
@@ -212,7 +212,7 @@ public class NntpArticleBuilder
     /// <returns>The <see cref="NntpArticleBuilder"/> so that additional calls can be chained.</returns>
     public NntpArticleBuilder RemoveGroups(params NntpGroups[] values)
     {
-        Guard.ThrowIfNull(values, nameof(values));
+        Guard.ThrowIfNull(values);
         foreach (var value in values)
         {
             _groupsBuilder.Remove(value);
@@ -230,7 +230,7 @@ public class NntpArticleBuilder
     public NntpArticleBuilder AddHeader(string key, string value)
     {
         Guard.ThrowIfNullOrWhiteSpace(key, nameof(key));
-        Guard.ThrowIfNull(value, nameof(value));
+        Guard.ThrowIfNull(value);
         if (_reservedHeaderKeys.Contains(key))
         {
             throw new NntpException(Resources.Nntp.ReservedHeaderKeyNotAllowed);
@@ -266,7 +266,7 @@ public class NntpArticleBuilder
     /// <returns>The <see cref="NntpArticleBuilder"/> so that additional calls can be chained.</returns>
     public NntpArticleBuilder AddLine(string line)
     {
-        Guard.ThrowIfNull(line, nameof(line));
+        Guard.ThrowIfNull(line);
         _body.Add(line);
         return this;
     }
@@ -278,7 +278,7 @@ public class NntpArticleBuilder
     /// <returns>The <see cref="NntpArticleBuilder"/> so that additional calls can be chained.</returns>
     public NntpArticleBuilder AddLines(IEnumerable<string> lines)
     {
-        Guard.ThrowIfNull(lines, nameof(lines));
+        Guard.ThrowIfNull(lines);
 
         _body.AddRange(lines);
 

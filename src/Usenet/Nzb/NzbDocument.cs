@@ -61,8 +61,8 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
     public static async Task<NzbDocument> LoadAsync(Stream stream, Encoding encoding, CancellationToken cancellationToken = default)
     {
-        Guard.ThrowIfNull(stream, nameof(stream));
-        Guard.ThrowIfNull(encoding, nameof(encoding));
+        Guard.ThrowIfNull(stream);
+        Guard.ThrowIfNull(encoding);
 
         using var reader = new StreamReader(stream, encoding);
         return await NzbParser.ParseAsync(reader, cancellationToken).ConfigureAwait(false);

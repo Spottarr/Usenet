@@ -31,8 +31,8 @@ public static class YencArticleDecoder
     /// <returns>A <see cref="YencArticle"/> containing the decoded binary data and meta-data.</returns>
     public static YencArticle Decode(IEnumerable<string> encodedLines, Encoding encoding)
     {
-        Guard.ThrowIfNull(encodedLines, nameof(encodedLines));
-        Guard.ThrowIfNull(encoding, nameof(encoding));
+        Guard.ThrowIfNull(encodedLines);
+        Guard.ThrowIfNull(encoding);
 
         using var enumerator = encodedLines.GetEnumerator();
         var headers = YencMeta.GetHeaders(enumerator);

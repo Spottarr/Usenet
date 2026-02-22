@@ -12,7 +12,7 @@ internal static class Crc32
 
     public static uint CalculateChecksum(IEnumerable<byte> buffer)
     {
-        Guard.ThrowIfNull(buffer, nameof(buffer));
+        Guard.ThrowIfNull(buffer);
 
         var value = Seed;
         foreach (var b in buffer)

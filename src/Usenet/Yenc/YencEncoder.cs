@@ -32,9 +32,9 @@ public static class YencEncoder
     /// <returns>A task containing the yEnc-encoded text lines.</returns>
     public static async Task<IReadOnlyList<string>> EncodeAsync(YencHeader header, Stream stream, Encoding encoding, CancellationToken cancellationToken = default)
     {
-        Guard.ThrowIfNull(header, nameof(header));
-        Guard.ThrowIfNull(stream, nameof(stream));
-        Guard.ThrowIfNull(encoding, nameof(encoding));
+        Guard.ThrowIfNull(header);
+        Guard.ThrowIfNull(stream);
+        Guard.ThrowIfNull(encoding);
 
         var lines = new List<string>();
 

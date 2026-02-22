@@ -21,8 +21,8 @@ public class YencStream : EnumerableStream
     /// <param name="input">An enumeration of byte chunks from the decoded yEnc-encoded article.</param>
     public YencStream(YencHeader header, IEnumerable<byte[]> input) : base(input)
     {
-        Guard.ThrowIfNull(header, nameof(header));
-        Guard.ThrowIfNull(input, nameof(input));
+        Guard.ThrowIfNull(header);
+        Guard.ThrowIfNull(input);
         Header = header;
     }
 }

@@ -27,7 +27,7 @@ public static class NzbParser
     /// <exception cref="InvalidNzbDataException">InvalidNzbDataException</exception>
     public static async Task<NzbDocument> ParseAsync(string text, CancellationToken cancellationToken = default)
     {
-        Guard.ThrowIfNull(text, nameof(text));
+        Guard.ThrowIfNull(text);
 
         var doc = await XDocumentShims.LoadAsync(new StringReader(text), cancellationToken).ConfigureAwait(false);
         return ParseDocument(doc);
@@ -43,7 +43,7 @@ public static class NzbParser
     /// <exception cref="InvalidNzbDataException">InvalidNzbDataException</exception>
     public static async Task<NzbDocument> ParseAsync(Stream stream, CancellationToken cancellationToken = default)
     {
-        Guard.ThrowIfNull(stream, nameof(stream));
+        Guard.ThrowIfNull(stream);
 
         var doc = await XDocumentShims.LoadAsync(stream, cancellationToken).ConfigureAwait(false);
         return ParseDocument(doc);
@@ -59,7 +59,7 @@ public static class NzbParser
     /// <exception cref="InvalidNzbDataException">InvalidNzbDataException</exception>
     public static async Task<NzbDocument> ParseAsync(TextReader reader, CancellationToken cancellationToken = default)
     {
-        Guard.ThrowIfNull(reader, nameof(reader));
+        Guard.ThrowIfNull(reader);
 
         var doc = await XDocumentShims.LoadAsync(reader, cancellationToken).ConfigureAwait(false);
         return ParseDocument(doc);

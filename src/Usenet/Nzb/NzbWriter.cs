@@ -29,7 +29,7 @@ public class NzbWriter
     /// <returns>A <see cref="Task"/> that can be awaited.</returns>
     public async Task WriteAsync(NzbDocument nzbDocument, CancellationToken cancellationToken = default)
     {
-        Guard.ThrowIfNull(nzbDocument, nameof(nzbDocument));
+        Guard.ThrowIfNull(nzbDocument);
 
         cancellationToken.ThrowIfCancellationRequested();
 

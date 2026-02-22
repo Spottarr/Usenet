@@ -44,7 +44,7 @@ public sealed class NntpConnection : INntpConnection
     public async Task<TResponse> CommandAsync<TResponse>(string command, IResponseParser<TResponse> parser, CancellationToken cancellationToken = default)
     {
         ThrowIfNotConnected();
-        Guard.ThrowIfNull(command, nameof(command));
+        Guard.ThrowIfNull(command);
 
         var logCommand = command.StartsWith(AuthInfoPass, StringComparison.Ordinal)
             ? $"{AuthInfoPass} [REDACTED]"
@@ -58,7 +58,7 @@ public sealed class NntpConnection : INntpConnection
     public async Task<TResponse> MultiLineCommandAsync<TResponse>(string command, IMultiLineResponseParser<TResponse> parser, CancellationToken cancellationToken = default)
     {
         ThrowIfNotConnected();
-        Guard.ThrowIfNull(parser, nameof(parser));
+        Guard.ThrowIfNull(parser);
 
         var response = await CommandAsync(command, new ResponseParser(), cancellationToken).ConfigureAwait(false);
 
@@ -73,7 +73,7 @@ public sealed class NntpConnection : INntpConnection
     public async Task<TResponse> GetResponseAsync<TResponse>(IResponseParser<TResponse> parser, CancellationToken cancellationToken = default)
     {
         ThrowIfNotConnected();
-        Guard.ThrowIfNull(parser, nameof(parser));
+        Guard.ThrowIfNull(parser);
         
         var responseText = await _reader!.ReadLineAsync(cancellationToken).ConfigureAwait(false);
         _log.ReceivedResponse(responseText ?? "");

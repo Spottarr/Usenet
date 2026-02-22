@@ -83,7 +83,7 @@ public sealed class NntpClientPool : INntpClientPool
 
     internal void ReturnClient(IInternalPooledNntpClient client)
     {
-        Guard.ThrowIfNull(client, nameof(client));
+        Guard.ThrowIfNull(client);
         ObjectDisposedExceptionShims.ThrowIf(_disposed, this);
 
         lock (_lock)
