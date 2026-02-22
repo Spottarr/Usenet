@@ -185,7 +185,8 @@ public class NntpArticleBuilder
     /// <returns>The <see cref="NntpArticleBuilder"/> so that additional calls can be chained.</returns>
     public NntpArticleBuilder SetBody(IEnumerable<string> lines)
     {
-        _body = lines.ThrowIfNull(nameof(lines)).ToList();
+        Guard.ThrowIfNull(lines);
+        _body = lines.ToList();
         return this;
     }
 

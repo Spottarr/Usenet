@@ -1,4 +1,5 @@
 ﻿using Usenet.Extensions;
+using Usenet.Util;
 
 namespace Usenet.Yenc;
 
@@ -31,8 +32,11 @@ public class YencArticle
     /// <param name="data">The binary data obtained by decoding the yEnc-encoded article.</param>
     public YencArticle(YencHeader header, YencFooter? footer, byte[] data)
     {
-        Header = header.ThrowIfNull(nameof(header));
+        Guard.ThrowIfNull(header);
+        Guard.ThrowIfNull(data);
+        
+        Header = header;
         Footer = footer;
-        Data = data.ThrowIfNull(nameof(data));
+        Data = data;
     }
 }
