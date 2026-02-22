@@ -13,7 +13,7 @@ public class NntpMessageIdTests
     [InlineData("", "")]
     internal void ShouldBeFormattedCorrectly(string? messageId, string expectedMessageId)
     {
-        var actual = new NntpMessageId(messageId);
+        var actual = new NntpMessageId(messageId!);
         Assert.Equal(expectedMessageId, actual.ToString());
         Assert.Equal(expectedMessageId.Trim('<', '>'), actual.Value);
     }
@@ -25,8 +25,8 @@ public class NntpMessageIdTests
     [InlineData("", "")]
     internal void EqualsWithSameValuesShouldReturnTrue(string? first, string? second)
     {
-        var firstMessageId = new NntpMessageId(first);
-        var secondMessageId = new NntpMessageId(second);
+        var firstMessageId = new NntpMessageId(first!);
+        var secondMessageId = new NntpMessageId(second!);
         Assert.Equal(firstMessageId, secondMessageId);
         Assert.True(firstMessageId == secondMessageId);
         Assert.True(firstMessageId.Equals(secondMessageId));

@@ -91,7 +91,7 @@ public class NntpArticleBuilderTests
     [InlineData(null, "Val", "key")]
     public void SettingHeaderWithNullParametersShouldThrow(string? key, string? value, string expectedParamName)
     {
-        var exception = Assert.Throws<ArgumentNullException>(() => { new NntpArticleBuilder().AddHeader(key, value); });
+        var exception = Assert.Throws<ArgumentNullException>(() => { new NntpArticleBuilder().AddHeader(key!, value!); });
         Assert.Equal(expectedParamName, exception.ParamName);
     }
 

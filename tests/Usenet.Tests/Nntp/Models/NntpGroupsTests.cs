@@ -16,14 +16,14 @@ public class NntpGroupsTests
     [Fact]
     internal void ConstructWithNullShouldReturnEmptyString()
     {
-        var groups = new NntpGroups((string?)null);
+        var groups = new NntpGroups((string?)null!);
         Assert.Equal("", groups.ToString());
     }
 
     [Fact]
     internal void ConstructWithNullEnumerableShouldReturnEmptyString()
     {
-        var groups = new NntpGroups((IEnumerable<string>?)null);
+        var groups = new NntpGroups((IEnumerable<string>?)null!);
         Assert.Equal("", groups.ToString());
     }
 

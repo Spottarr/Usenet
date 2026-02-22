@@ -28,8 +28,8 @@ public class NntpGroupTests
             lowWaterMark,
             highWaterMark,
             postingStatus,
-            otherGroup,
-            articleNumbers);
+            otherGroup!,
+            articleNumbers!);
 
         var json = JsonConvert.SerializeObject(expected);
         var actual = JsonConvert.DeserializeObject<NntpGroup>(json);
@@ -39,14 +39,14 @@ public class NntpGroupTests
     public static readonly IEnumerable<object[]> EqualsWithSameValues =
     [
         [
-            new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, null,
+            new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, null!,
                 [1, 2, 3])),
-            new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, null,
+            new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, null!,
                 [1, 2, 3]))
         ],
         [
-            new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", null)),
-            new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", null))
+            new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", null!)),
+            new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", null!))
         ]
     ];
 
@@ -98,7 +98,7 @@ public class NntpGroupTests
         [
             new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other",
                 [1, 2, 3])),
-            new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", null))
+            new XSerializable<NntpGroup>(new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", null!))
         ]
     ];
 

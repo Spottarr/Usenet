@@ -22,7 +22,7 @@ public class PostingStatusParserTests
     [InlineData(null, NntpPostingStatus.Unknown, "")]
     internal void InputShouldBeParsedCorrectly(string? input, NntpPostingStatus expectedStatus, string expectedOtherGroup)
     {
-        var status = PostingStatusParser.Parse(input, out var otherGroup);
+        var status = PostingStatusParser.Parse(input!, out var otherGroup);
         Assert.Equal(expectedStatus, status);
         Assert.Equal(expectedOtherGroup, otherGroup);
     }

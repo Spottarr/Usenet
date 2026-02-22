@@ -12,7 +12,7 @@ public class LoggerTests
     [Fact]
     public void ShouldUseNullLogger()
     {
-        Logger.Factory = null;
+        Logger.Factory = null!;
         var logger = Logger.Create<LoggerTests>();
         var actualLogger = GetActualLogger(logger);
 

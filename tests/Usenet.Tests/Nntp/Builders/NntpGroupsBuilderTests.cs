@@ -8,14 +8,14 @@ public class NntpGroupsBuilderTests
     [Fact]
     public void AddNullShouldResultInEmptyCollection()
     {
-        var builder = new NntpGroupsBuilder().Add((string?)null);
+        var builder = new NntpGroupsBuilder().Add((string?)null!);
         Assert.Equal(Array.Empty<string>(), builder.Groups);
     }
 
     [Fact]
     public void AddNullEnumerableShouldResultInEmptyCollection()
     {
-        var builder = new NntpGroupsBuilder().Add((IEnumerable<string>?)null);
+        var builder = new NntpGroupsBuilder().Add((IEnumerable<string>?)null!);
         Assert.Equal(Array.Empty<string>(), builder.Groups);
     }
 

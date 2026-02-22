@@ -124,6 +124,7 @@ public class ArticleResponseParserTests
         var parser = new ArticleResponseParser(ArticleRequestType.Article);
         var articleResponse = parser.Parse(220, "", data);
 
+        Assert.NotNull(articleResponse.Article);
         var body = string.Concat(articleResponse.Article.Body);
 
         Assert.NotEmpty(body);

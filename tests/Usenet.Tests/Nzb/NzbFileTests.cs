@@ -10,9 +10,9 @@ public class NzbFileTests
     [
         [
             new XSerializable<NzbFile>(new NzbFile("poster", "subject", "fileName1",
-                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null)),
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null!)),
             new XSerializable<NzbFile>(new NzbFile("poster", "subject", "fileName1",
-                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null))
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null!))
         ],
         [
             new XSerializable<NzbFile>(new NzbFile("poster", "subject", "fileName2",
@@ -51,33 +51,33 @@ public class NzbFileTests
     [
         [
             new XSerializable<NzbFile>(new NzbFile("poster", "subject", "fileName",
-                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null)),
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null!)),
             new XSerializable<NzbFile>(new NzbFile("blabla", "subject", "fileName",
-                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null))
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null!))
         ],
         [
             new XSerializable<NzbFile>(new NzbFile("poster", "subject", "fileName",
-                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null)),
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null!)),
             new XSerializable<NzbFile>(new NzbFile("poster", "blabla", "fileName",
-                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null))
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null!))
         ],
         [
             new XSerializable<NzbFile>(new NzbFile("poster", "subject", "fileName",
-                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null)),
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null!)),
             new XSerializable<NzbFile>(new NzbFile("poster", "subject", "blabla",
-                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null))
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null!))
         ],
         [
             new XSerializable<NzbFile>(new NzbFile("poster", "subject", "fileName",
-                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null)),
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null!)),
             new XSerializable<NzbFile>(new NzbFile("poster", "subject", "fileName",
-                DateTimeOffset.MinValue, "group1;group2", null))
+                DateTimeOffset.MinValue, "group1;group2", null!))
         ],
         [
             new XSerializable<NzbFile>(new NzbFile("poster", "subject", "fileName",
-                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null)),
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "group1;group2", null!)),
             new XSerializable<NzbFile>(new NzbFile("poster", "subject", "fileName",
-                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "blabla", null))
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero), "blabla", null!))
         ],
         [
             new XSerializable<NzbFile>(new NzbFile("poster", "subject", "fileName",
