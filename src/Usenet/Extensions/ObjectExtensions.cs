@@ -15,7 +15,7 @@ internal static class ObjectExtensions
     /// <param name="name">The name of the object</param>
     /// <returns>The object</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static T ThrowIfNull<T>(this T obj, string name)
+    public static T ThrowIfNull<T>(this T? obj, string name)
     {
         Guard.ThrowIfNull(obj, name);
         return obj;
