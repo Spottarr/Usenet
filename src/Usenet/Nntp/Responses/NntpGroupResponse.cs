@@ -3,8 +3,8 @@
 namespace Usenet.Nntp.Responses;
 
 /// <summary>
-/// Represents a response to the 
-/// <a href="https://tools.ietf.org/html/rfc3977#section-6.1.1">GROUP</a> and 
+/// Represents a response to the
+/// <a href="https://tools.ietf.org/html/rfc3977#section-6.1.1">GROUP</a> and
 /// <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a> commands.
 /// </summary>
 public class NntpGroupResponse : NntpResponse

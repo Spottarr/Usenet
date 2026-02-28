@@ -24,9 +24,8 @@ internal class MultiSetComparer<T> : IEqualityComparer<IEnumerable<T>>
     /// Creates a new instance of the <see cref="MultiSetComparer{T}"/> class
     /// using the default <see cref="IEqualityComparer{T}"/> for the type specified by the generic argument.
     /// </summary>
-    public MultiSetComparer() : this(EqualityComparer<T>.Default)
-    {
-    }
+    public MultiSetComparer()
+        : this(EqualityComparer<T>.Default) { }
 
     /// <summary>
     /// Determines whether the first collection is equal to the second collection irrespective
@@ -52,8 +51,10 @@ internal class MultiSetComparer<T> : IEqualityComparer<IEnumerable<T>>
             return true;
         }
 
-        if (first is not ICollection<T> firstCollection ||
-            second is not ICollection<T> secondCollection)
+        if (
+            first is not ICollection<T> firstCollection
+            || second is not ICollection<T> secondCollection
+        )
         {
             return !HaveMismatchedElement(first, second);
         }
@@ -76,7 +77,10 @@ internal class MultiSetComparer<T> : IEqualityComparer<IEnumerable<T>>
         var firstElementCounts = GetElementCounts(first, out var firstNullCount);
         var secondElementCounts = GetElementCounts(second, out var secondNullCount);
 
-        if (firstNullCount != secondNullCount || firstElementCounts.Count != secondElementCounts.Count)
+        if (
+            firstNullCount != secondNullCount
+            || firstElementCounts.Count != secondElementCounts.Count
+        )
         {
             return true;
         }

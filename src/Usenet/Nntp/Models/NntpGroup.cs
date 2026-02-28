@@ -64,13 +64,16 @@ public class NntpGroup : IEquatable<NntpGroup>
         long highWaterMark,
         NntpPostingStatus postingStatus,
         string otherGroup,
-        IList<long> articleNumbers)
+        IList<long> articleNumbers
+    )
     {
         Name = name ?? string.Empty;
         ArticleCount = articleCount;
         LowWaterMark = lowWaterMark;
         HighWaterMark = highWaterMark;
-        PostingStatus = EnumShim.IsDefined(postingStatus) ? postingStatus : NntpPostingStatus.Unknown;
+        PostingStatus = EnumShim.IsDefined(postingStatus)
+            ? postingStatus
+            : NntpPostingStatus.Unknown;
         OtherGroup = otherGroup ?? string.Empty;
         ArticleNumbers = (articleNumbers ?? []).OrderBy(n => n).ToImmutableList();
     }
@@ -79,13 +82,14 @@ public class NntpGroup : IEquatable<NntpGroup>
     /// Returns the hash code for this instance.
     /// </summary>
     /// <returns>A 32-bit signed integer hash code.</returns>
-    public override int GetHashCode() => HashCode.Start
-        .Hash(Name)
-        .Hash(ArticleCount)
-        .Hash(LowWaterMark)
-        .Hash(HighWaterMark)
-        .Hash(PostingStatus)
-        .Hash(OtherGroup);
+    public override int GetHashCode() =>
+        HashCode
+            .Start.Hash(Name)
+            .Hash(ArticleCount)
+            .Hash(LowWaterMark)
+            .Hash(HighWaterMark)
+            .Hash(PostingStatus)
+            .Hash(OtherGroup);
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="NntpGroup"/> value.
@@ -94,15 +98,16 @@ public class NntpGroup : IEquatable<NntpGroup>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
     public bool Equals(NntpGroup other)
     {
-        if (other is null) return false;
+        if (other is null)
+            return false;
 
         var equals =
-            Name.Equals(other.Name, StringComparison.Ordinal) &&
-            ArticleCount.Equals(other.ArticleCount) &&
-            LowWaterMark.Equals(other.LowWaterMark) &&
-            HighWaterMark.Equals(other.HighWaterMark) &&
-            PostingStatus.Equals(other.PostingStatus) &&
-            OtherGroup.Equals(other.OtherGroup, StringComparison.Ordinal);
+            Name.Equals(other.Name, StringComparison.Ordinal)
+            && ArticleCount.Equals(other.ArticleCount)
+            && LowWaterMark.Equals(other.LowWaterMark)
+            && HighWaterMark.Equals(other.HighWaterMark)
+            && PostingStatus.Equals(other.PostingStatus)
+            && OtherGroup.Equals(other.OtherGroup, StringComparison.Ordinal);
 
         return equals && ArticleNumbers.SequenceEqual(other.ArticleNumbers);
     }

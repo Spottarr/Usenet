@@ -17,7 +17,7 @@ internal static class Guard
     public static void ThrowIfNull([NotNull] object obj, string name)
     {
 #if NET8_0_OR_GREATER
-            ArgumentNullException.ThrowIfNull(obj, name);
+        ArgumentNullException.ThrowIfNull(obj, name);
 #else
         if (obj == null)
             throw new ArgumentNullException(name, Resources.Util.NullValueNotAllowed);
@@ -35,7 +35,7 @@ internal static class Guard
     public static void ThrowIfNullOrEmpty([NotNull] string str, string name)
     {
 #if NET8_0_OR_GREATER
-            ArgumentException.ThrowIfNullOrEmpty(str, name);
+        ArgumentException.ThrowIfNullOrEmpty(str, name);
 #else
         ThrowIfNull(str, name);
         if (str.Length == 0)
@@ -54,7 +54,7 @@ internal static class Guard
     public static void ThrowIfNullOrWhiteSpace([NotNull] string str, string name)
     {
 #if NET8_0_OR_GREATER
-            ArgumentException.ThrowIfNullOrWhiteSpace(str, name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(str, name);
 #else
         ThrowIfNullOrEmpty(str, name);
         if (string.IsNullOrWhiteSpace(str))
@@ -71,7 +71,7 @@ internal static class Guard
     public static void ThrowIfNegativeOrZero(long value, string paramName)
     {
 #if NET8_0_OR_GREATER
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value, paramName);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value, paramName);
 #else
         if (value <= 0)
             throw new ArgumentOutOfRangeException(paramName);

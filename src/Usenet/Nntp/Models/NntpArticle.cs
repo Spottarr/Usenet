@@ -47,13 +47,19 @@ public class NntpArticle : IEquatable<NntpArticle>
         NntpMessageId messageId,
         NntpGroups groups,
         IDictionary<string, ICollection<string>> headers,
-        IList<string> body)
+        IList<string> body
+    )
     {
         Number = number;
         MessageId = messageId ?? NntpMessageId.Empty;
         Groups = groups ?? NntpGroups.Empty;
-        Headers = (headers ?? MultiValueDictionary<string, string>.EmptyIgnoreCase)
-            .ToImmutableDictionary(x => x.Key, x => x.Value.ToImmutableList(), keyComparer: StringComparer.OrdinalIgnoreCase);
+        Headers = (
+            headers ?? MultiValueDictionary<string, string>.EmptyIgnoreCase
+        ).ToImmutableDictionary(
+            x => x.Key,
+            x => x.Value.ToImmutableList(),
+            keyComparer: StringComparer.OrdinalIgnoreCase
+        );
         Body = (body ?? []).ToImmutableList();
     }
 
@@ -61,10 +67,7 @@ public class NntpArticle : IEquatable<NntpArticle>
     /// Returns the hash code for this instance.
     /// </summary>
     /// <returns>A 32-bit signed integer hash code.</returns>
-    public override int GetHashCode() => HashCode.Start
-        .Hash(Number)
-        .Hash(MessageId)
-        .Hash(Groups);
+    public override int GetHashCode() => HashCode.Start.Hash(Number).Hash(MessageId).Hash(Groups);
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="NntpArticle"/> value.
@@ -73,12 +76,13 @@ public class NntpArticle : IEquatable<NntpArticle>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
     public bool Equals(NntpArticle other)
     {
-        if (other is null) return false;
+        if (other is null)
+            return false;
 
         var equals =
-            Number.Equals(other.Number) &&
-            MessageId.Equals(other.MessageId) &&
-            Groups.Equals(other.Groups);
+            Number.Equals(other.Number)
+            && MessageId.Equals(other.MessageId)
+            && Groups.Equals(other.Groups);
 
         if (!equals)
         {
@@ -88,8 +92,10 @@ public class NntpArticle : IEquatable<NntpArticle>
         // compare headers
         foreach (var pair in Headers)
         {
-            if (!other.Headers.TryGetValue(pair.Key, out var value) ||
-                !pair.Value.ToImmutableHashSet().SetEquals(value))
+            if (
+                !other.Headers.TryGetValue(pair.Key, out var value)
+                || !pair.Value.ToImmutableHashSet().SetEquals(value)
+            )
             {
                 return false;
             }

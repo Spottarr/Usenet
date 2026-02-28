@@ -62,7 +62,13 @@ public class NntpArticleRange : IEquatable<NntpArticleRange>
     /// </summary>
     /// <returns>The text representation of the value formatted according to the NNTP specifications</returns>
     public override string ToString() =>
-        To == null ? $"{From}-" : (To.Value == From ? From.ToString(CultureInfo.InvariantCulture) : $"{From}-{To.Value}");
+        To == null
+            ? $"{From}-"
+            : (
+                To.Value == From
+                    ? From.ToString(CultureInfo.InvariantCulture)
+                    : $"{From}-{To.Value}"
+            );
 
     /// <summary>
     /// Returns the hash code for this instance.
@@ -100,5 +106,6 @@ public class NntpArticleRange : IEquatable<NntpArticleRange>
     /// <param name="first">The first <see cref="NntpArticleRange"/>.</param>
     /// <param name="second">The second <see cref="NntpArticleRange"/>.</param>
     /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator !=(NntpArticleRange first, NntpArticleRange second) => !(first == second);
+    public static bool operator !=(NntpArticleRange first, NntpArticleRange second) =>
+        !(first == second);
 }

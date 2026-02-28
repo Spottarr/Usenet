@@ -18,8 +18,11 @@ public static class YencEncoder
     /// <param name="stream">The stream containing the binary data to encode.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task containing the yEnc-encoded text lines.</returns>
-    public static Task<IReadOnlyList<string>> EncodeAsync(YencHeader header, Stream stream, CancellationToken cancellationToken = default) =>
-        EncodeAsync(header, stream, UsenetEncoding.Default, cancellationToken);
+    public static Task<IReadOnlyList<string>> EncodeAsync(
+        YencHeader header,
+        Stream stream,
+        CancellationToken cancellationToken = default
+    ) => EncodeAsync(header, stream, UsenetEncoding.Default, cancellationToken);
 
     /// <summary>
     /// Encodes the binary data in the specified stream into yEnc-encoded text
@@ -30,7 +33,12 @@ public static class YencEncoder
     /// <param name="encoding">The character encoding to use.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task containing the yEnc-encoded text lines.</returns>
-    public static async Task<IReadOnlyList<string>> EncodeAsync(YencHeader header, Stream stream, Encoding encoding, CancellationToken cancellationToken = default)
+    public static async Task<IReadOnlyList<string>> EncodeAsync(
+        YencHeader header,
+        Stream stream,
+        Encoding encoding,
+        CancellationToken cancellationToken = default
+    )
     {
         Guard.ThrowIfNull(header, nameof(header));
         Guard.ThrowIfNull(stream, nameof(stream));
@@ -52,7 +60,9 @@ public static class YencEncoder
 
         for (var offset = 0; offset < header.PartSize; offset++)
         {
-            var bytesRead = await stream.ReadByteAsync(readBuffer, cancellationToken).ConfigureAwait(false);
+            var bytesRead = await stream
+                .ReadByteAsync(readBuffer, cancellationToken)
+                .ConfigureAwait(false);
             if (bytesRead == 0)
             {
                 // end of stream
@@ -70,13 +80,15 @@ public static class YencEncoder
             var encodeWhitespace = encodedOffset == 0 || encodedOffset == lastCol;
 
             // encode critical characters
-            if (val == YencCharacters.Null ||
-                val == YencCharacters.Lf ||
-                val == YencCharacters.Cr ||
-                val == YencCharacters.Equal ||
-                val == YencCharacters.Dot && encodeDot ||
-                val == YencCharacters.Space && encodeWhitespace ||
-                val == YencCharacters.Tab && encodeWhitespace)
+            if (
+                val == YencCharacters.Null
+                || val == YencCharacters.Lf
+                || val == YencCharacters.Cr
+                || val == YencCharacters.Equal
+                || val == YencCharacters.Dot && encodeDot
+                || val == YencCharacters.Space && encodeWhitespace
+                || val == YencCharacters.Tab && encodeWhitespace
+            )
             {
                 encodedBytes[encodedOffset++] = YencCharacters.Equal;
                 val = (val + 64) % 256;
@@ -139,12 +151,20 @@ public static class YencEncoder
         {
             builder.Append(' ').Append(YencKeywords.Size).Append('=').Append(header.PartSize);
             builder.Append(' ').Append(YencKeywords.Part).Append('=').Append(header.PartNumber);
-            builder.Append(' ').Append(YencKeywords.PartCrc32).Append('=').AppendFormat(CultureInfo.InvariantCulture, "{0:x}", checksum);
+            builder
+                .Append(' ')
+                .Append(YencKeywords.PartCrc32)
+                .Append('=')
+                .AppendFormat(CultureInfo.InvariantCulture, "{0:x}", checksum);
         }
         else
         {
             builder.Append(' ').Append(YencKeywords.Size).Append('=').Append(header.FileSize);
-            builder.Append(' ').Append(YencKeywords.Crc32).Append('=').AppendFormat(CultureInfo.InvariantCulture, "{0:x}", checksum);
+            builder
+                .Append(' ')
+                .Append(YencKeywords.Crc32)
+                .Append('=')
+                .AppendFormat(CultureInfo.InvariantCulture, "{0:x}", checksum);
         }
 
         return builder.ToString();

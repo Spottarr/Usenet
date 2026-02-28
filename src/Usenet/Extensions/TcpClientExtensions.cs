@@ -4,7 +4,12 @@ namespace Usenet.Extensions;
 
 internal static class TcpClientExtensions
 {
-    public static ValueTask ConnectAsync(this TcpClient client, string host, int port, CancellationToken cancellationToken)
+    public static ValueTask ConnectAsync(
+        this TcpClient client,
+        string host,
+        int port,
+        CancellationToken cancellationToken
+    )
     {
 #if NET5_0_OR_GREATER
         return client.ConnectAsync(host, port, cancellationToken);

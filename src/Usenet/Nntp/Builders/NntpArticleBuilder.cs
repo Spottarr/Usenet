@@ -18,7 +18,11 @@ public class NntpArticleBuilder
 
     private static readonly string[] _reservedHeaderKeys =
     [
-        NntpHeaders.Date, NntpHeaders.From, NntpHeaders.Subject, NntpHeaders.MessageId, NntpHeaders.Newsgroups
+        NntpHeaders.Date,
+        NntpHeaders.From,
+        NntpHeaders.Subject,
+        NntpHeaders.MessageId,
+        NntpHeaders.Newsgroups,
     ];
 
     private MultiValueDictionary<string, string> _headers = new();
@@ -32,9 +36,7 @@ public class NntpArticleBuilder
     /// <summary>
     /// Creates a new instance of the <see cref="NntpArticleBuilder"/> class.
     /// </summary>
-    public NntpArticleBuilder()
-    {
-    }
+    public NntpArticleBuilder() { }
 
     /// <summary>
     /// Initialize the <see cref="NntpArticleBuilder"/> from the given <see cref="NntpArticle"/>.
@@ -99,8 +101,15 @@ public class NntpArticleBuilder
                     case NntpHeaders.Date:
                         if (_dateTime == null)
                         {
-                            if (DateTimeOffset.TryParseExact(value, DateFormat, CultureInfo.InvariantCulture,
-                                    DateTimeStyles.None, out var headerDateTime))
+                            if (
+                                DateTimeOffset.TryParseExact(
+                                    value,
+                                    DateFormat,
+                                    CultureInfo.InvariantCulture,
+                                    DateTimeStyles.None,
+                                    out var headerDateTime
+                                )
+                            )
                             {
                                 _dateTime = headerDateTime;
                             }
@@ -318,7 +327,9 @@ public class NntpArticleBuilder
 
         if (_dateTime.HasValue)
         {
-            var formattedDate = _dateTime.Value.ToUniversalTime().ToString(DateFormat, CultureInfo.InvariantCulture);
+            var formattedDate = _dateTime
+                .Value.ToUniversalTime()
+                .ToString(DateFormat, CultureInfo.InvariantCulture);
             _headers.Add(NntpHeaders.Date, $"{formattedDate} +0000");
         }
 

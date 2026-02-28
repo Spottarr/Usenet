@@ -65,7 +65,8 @@ public class NzbFile : IEquatable<NzbFile>
         string fileName,
         DateTimeOffset date,
         NntpGroups groups,
-        IEnumerable<NzbSegment> segments)
+        IEnumerable<NzbSegment> segments
+    )
     {
         Poster = poster;
         Subject = subject;
@@ -80,13 +81,8 @@ public class NzbFile : IEquatable<NzbFile>
     /// Returns the hash code for this instance.
     /// </summary>
     /// <returns>A 32-bit signed integer hash code.</returns>
-    public override int GetHashCode() => HashCode.Start
-        .Hash(Poster)
-        .Hash(Subject)
-        .Hash(FileName)
-        .Hash(Date)
-        .Hash(Groups)
-        .Hash(Size);
+    public override int GetHashCode() =>
+        HashCode.Start.Hash(Poster).Hash(Subject).Hash(FileName).Hash(Date).Hash(Groups).Hash(Size);
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="NzbFile"/> value.
@@ -95,16 +91,16 @@ public class NzbFile : IEquatable<NzbFile>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
     public bool Equals(NzbFile other)
     {
-        if (other is null) return false;
+        if (other is null)
+            return false;
 
-        return
-            Poster.Equals(other.Poster, StringComparison.Ordinal) &&
-            Subject.Equals(other.Subject, StringComparison.Ordinal) &&
-            FileName.Equals(other.FileName, StringComparison.Ordinal) &&
-            Date.Equals(other.Date) &&
-            Groups.Equals(other.Groups) &&
-            Size.Equals(other.Size) &&
-            Segments.SequenceEqual(other.Segments);
+        return Poster.Equals(other.Poster, StringComparison.Ordinal)
+            && Subject.Equals(other.Subject, StringComparison.Ordinal)
+            && FileName.Equals(other.FileName, StringComparison.Ordinal)
+            && Date.Equals(other.Date)
+            && Groups.Equals(other.Groups)
+            && Size.Equals(other.Size)
+            && Segments.SequenceEqual(other.Segments);
     }
 
     /// <summary>

@@ -15,7 +15,8 @@ internal sealed class InMemoryLogger : ILogger
 
     public List<Entry> Buffer { get; } = [];
 
-    public IDisposable? BeginScope<TState>(TState state) where TState : notnull
+    public IDisposable? BeginScope<TState>(TState state)
+        where TState : notnull
     {
         return null;
     }
@@ -30,12 +31,21 @@ internal sealed class InMemoryLogger : ILogger
         EventId eventId,
         TState state,
         Exception? exception,
-        Func<TState, Exception?, string> formatter)
+        Func<TState, Exception?, string> formatter
+    )
     {
-        if (!IsEnabled(logLevel)) return;
+        if (!IsEnabled(logLevel))
+            return;
 
         var str = formatter(state, exception);
-        Buffer.Add(new Entry { LogLevel = logLevel, EventId = eventId, Message = str });
+        Buffer.Add(
+            new Entry
+            {
+                LogLevel = logLevel,
+                EventId = eventId,
+                Message = str,
+            }
+        );
     }
 
     public void FlushTo(ILogger logger)

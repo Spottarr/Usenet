@@ -40,5 +40,5 @@ public enum NntpPostingStatus
     /// <summary>
     /// Only articles from peers are permitted, and are filed under the newsgroup named "other.group" (status "=other.group").
     /// </summary>
-    OnlyArticlesFromPeersPermittedFiledLocally
+    OnlyArticlesFromPeersPermittedFiledLocally,
 }

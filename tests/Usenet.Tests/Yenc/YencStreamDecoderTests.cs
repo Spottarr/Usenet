@@ -16,7 +16,10 @@ public class YencStreamDecoderTests
     {
         var expectedData = expected.ReadAllBytes();
 
-        var actualStream = YencStreamDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default), TestContext.Current.CancellationToken);
+        var actualStream = YencStreamDecoder.Decode(
+            actual.ReadAllLines(UsenetEncoding.Default),
+            TestContext.Current.CancellationToken
+        );
 
         var actualData = actualStream.ReadAllBytes();
 
@@ -33,7 +36,10 @@ public class YencStreamDecoderTests
     internal void FilePartShouldBeDecoded(IFileInfo actual)
     {
         const int expectedDataLength = 11250;
-        var actualStream = YencStreamDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default), TestContext.Current.CancellationToken);
+        var actualStream = YencStreamDecoder.Decode(
+            actual.ReadAllLines(UsenetEncoding.Default),
+            TestContext.Current.CancellationToken
+        );
         var actualData = actualStream.ReadAllBytes();
 
         Assert.True(actualStream.Header.IsFilePart);
@@ -41,14 +47,28 @@ public class YencStreamDecoderTests
     }
 
     [Theory]
-    [EmbeddedResourceData(@"yenc.multipart.joystick.jpg", @"yenc.multipart.00000020.ntx", @"yenc.multipart.00000021.ntx")]
-    internal async Task MultiPartFileShouldBeDecoded(IFileInfo expectedFile, IFileInfo part1File, IFileInfo partFile)
+    [EmbeddedResourceData(
+        @"yenc.multipart.joystick.jpg",
+        @"yenc.multipart.00000020.ntx",
+        @"yenc.multipart.00000021.ntx"
+    )]
+    internal async Task MultiPartFileShouldBeDecoded(
+        IFileInfo expectedFile,
+        IFileInfo part1File,
+        IFileInfo partFile
+    )
     {
         const string expectedFileName = "joystick.jpg";
         var expected = expectedFile.ReadAllBytes();
 
-        var part1 = YencStreamDecoder.Decode(part1File.ReadAllLines(UsenetEncoding.Default), TestContext.Current.CancellationToken);
-        var part2 = YencStreamDecoder.Decode(partFile.ReadAllLines(UsenetEncoding.Default), TestContext.Current.CancellationToken);
+        var part1 = YencStreamDecoder.Decode(
+            part1File.ReadAllLines(UsenetEncoding.Default),
+            TestContext.Current.CancellationToken
+        );
+        var part2 = YencStreamDecoder.Decode(
+            partFile.ReadAllLines(UsenetEncoding.Default),
+            TestContext.Current.CancellationToken
+        );
 
         using var actual = new MemoryStream();
 

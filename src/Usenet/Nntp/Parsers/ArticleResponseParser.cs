@@ -12,7 +12,7 @@ internal enum ArticleRequestType
 {
     Head = 0x01,
     Body = 0x02,
-    Article = 0x03
+    Article = 0x03,
 }
 
 internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleResponse>
@@ -28,7 +28,7 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
             ArticleRequestType.Head => 221,
             ArticleRequestType.Body => 222,
             ArticleRequestType.Article => 220,
-            _ => throw new ArgumentOutOfRangeException(nameof(requestType), requestType, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(requestType), requestType, null),
         };
     }
 
@@ -54,15 +54,21 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
         if (dataBlock == null)
         {
             // no headers and no body
-            return new NntpArticleResponse(code, message, true, new NntpArticle(number, messageId, null, null, null));
+            return new NntpArticleResponse(
+                code,
+                message,
+                true,
+                new NntpArticle(number, messageId, null, null, null)
+            );
         }
 
         using var enumerator = dataBlock.GetEnumerator();
 
         // get headers if requested
-        var headers = (_requestType & ArticleRequestType.Head) == ArticleRequestType.Head
-            ? GetHeaders(enumerator)
-            : MultiValueDictionary<string, string>.EmptyIgnoreCase;
+        var headers =
+            (_requestType & ArticleRequestType.Head) == ArticleRequestType.Head
+                ? GetHeaders(enumerator)
+                : MultiValueDictionary<string, string>.EmptyIgnoreCase;
 
         // get groups
         var groups = headers.TryGetValue(NntpHeaders.Newsgroups, out var values)
@@ -70,13 +76,17 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
             : null;
 
         // get body if requested
-        var bodyLines = (_requestType & ArticleRequestType.Body) == ArticleRequestType.Body
-            ? GetBody(enumerator).ToList()
-            : [];
+        var bodyLines =
+            (_requestType & ArticleRequestType.Body) == ArticleRequestType.Body
+                ? GetBody(enumerator).ToList()
+                : [];
 
         return new NntpArticleResponse(
-            code, message, true,
-            new NntpArticle(number, messageId, groups, headers, bodyLines));
+            code,
+            message,
+            true,
+            new NntpArticle(number, messageId, groups, headers, bodyLines)
+        );
     }
 
     private MultiValueDictionary<string, string> GetHeaders(IEnumerator<string> enumerator)

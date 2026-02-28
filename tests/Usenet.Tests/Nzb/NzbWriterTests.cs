@@ -14,16 +14,25 @@ public class NzbWriterTests
     [EmbeddedResourceData(@"nzb.sabnzbd-no-namespace.nzb")]
     internal async Task ShouldWriteDocumentToFile(IFileInfo file)
     {
-        var expected = await NzbParser.ParseAsync(file.ReadAllText(UsenetEncoding.Default), TestContext.Current.CancellationToken).ConfigureAwait(true);
+        var expected = await NzbParser
+            .ParseAsync(
+                file.ReadAllText(UsenetEncoding.Default),
+                TestContext.Current.CancellationToken
+            )
+            .ConfigureAwait(true);
 
         using var stream = new MemoryStream();
         using var writer = new StreamWriter(stream, UsenetEncoding.Default);
         using var reader = new StreamReader(stream, UsenetEncoding.Default);
 
         // write to file and read back for comparison
-        await writer.WriteNzbDocumentAsync(expected, TestContext.Current.CancellationToken).ConfigureAwait(true);
+        await writer
+            .WriteNzbDocumentAsync(expected, TestContext.Current.CancellationToken)
+            .ConfigureAwait(true);
         stream.Position = 0;
-        var actual = await NzbParser.ParseAsync(reader, TestContext.Current.CancellationToken).ConfigureAwait(true);
+        var actual = await NzbParser
+            .ParseAsync(reader, TestContext.Current.CancellationToken)
+            .ConfigureAwait(true);
 
         // compare
         Assert.Equal(expected, actual);

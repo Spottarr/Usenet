@@ -61,15 +61,17 @@ public static class YencArticleDecoder
                 footer = YencMeta.ParseFooter(YencMeta.ParseLine(enumerator.Current));
 
                 // skip remainder if there is some
-                while (enumerator.MoveNext())
-                {
-                }
+                while (enumerator.MoveNext()) { }
 
                 break;
             }
 
             var encodedBytes = encoding.GetBytes(enumerator.Current);
-            decodedBytesIndex += YencLineDecoder.Decode(encodedBytes, decodedBytes, decodedBytesIndex);
+            decodedBytesIndex += YencLineDecoder.Decode(
+                encodedBytes,
+                decodedBytes,
+                decodedBytesIndex
+            );
         }
 
         return new YencArticle(header, footer, decodedBytes);

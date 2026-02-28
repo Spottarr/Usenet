@@ -68,7 +68,8 @@ public class NntpDateTime : IEquatable<NntpDateTime>
     /// Returns the hash code for this instance.
     /// </summary>
     /// <returns>A 32-bit signed integer hash code.</returns>
-    public override int GetHashCode() => EqualityComparer<DateTimeOffset>.Default.GetHashCode(Value);
+    public override int GetHashCode() =>
+        EqualityComparer<DateTimeOffset>.Default.GetHashCode(Value);
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="NntpDateTime"/> value.

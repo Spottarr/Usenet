@@ -11,14 +11,20 @@ internal sealed class EmbeddedResourceDataAttribute : DataAttribute
 {
     private readonly string[] _fileNames;
 
-    private readonly EmbeddedFileProvider _fileProvider = new(typeof(EmbeddedResourceDataAttribute).Assembly, "Usenet.Tests.testdata");
+    private readonly EmbeddedFileProvider _fileProvider = new(
+        typeof(EmbeddedResourceDataAttribute).Assembly,
+        "Usenet.Tests.testdata"
+    );
 
     public EmbeddedResourceDataAttribute(params string[] fileNames) => _fileNames = fileNames;
 
     public object[] AdditionalData { get; init; } = [];
     public string[] FileNames => _fileNames;
 
-    public override ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(MethodInfo testMethod, DisposalTracker disposalTracker)
+    public override ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(
+        MethodInfo testMethod,
+        DisposalTracker disposalTracker
+    )
     {
         var result = new List<object>(_fileNames.Length + AdditionalData.Length);
 

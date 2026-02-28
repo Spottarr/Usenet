@@ -8,7 +8,7 @@ namespace Usenet.Nntp.Parsers;
 internal enum GroupStatusRequestType
 {
     Basic,
-    Extended
+    Extended,
 }
 
 internal class GroupsResponseParser : IMultiLineResponseParser<NntpGroupsResponse>
@@ -86,7 +86,8 @@ internal class GroupsResponseParser : IMultiLineResponseParser<NntpGroupsRespons
                 highWaterMark,
                 postingStatus,
                 otherGroup,
-                []);
+                []
+            );
         }
     }
 }

@@ -10,7 +10,7 @@ public class DateResponseParserTests
         [111, "20170614110733", new DateTimeOffset(2017, 6, 14, 11, 7, 33, TimeSpan.Zero)],
         [111, "2017xxxxx10733", DateTimeOffset.MinValue],
         [111, "", DateTimeOffset.MinValue],
-        [999, "20170614110733", DateTimeOffset.MinValue]
+        [999, "20170614110733", DateTimeOffset.MinValue],
     ];
 
     [Theory]
@@ -18,7 +18,8 @@ public class DateResponseParserTests
     internal void ResponseShouldBeParsedCorrectly(
         int responseCode,
         string responseMessage,
-        DateTimeOffset expectedDateTime)
+        DateTimeOffset expectedDateTime
+    )
     {
         var dateResponse = new DateResponseParser().Parse(responseCode, responseMessage);
         Assert.Equal(expectedDateTime, dateResponse.DateTime);

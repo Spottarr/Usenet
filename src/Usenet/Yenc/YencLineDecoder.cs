@@ -9,7 +9,13 @@ internal class YencLineDecoder
     public static int Decode(byte[] encodedBytes, byte[] decodedBytes, int decodedOffset) =>
         Decode(encodedBytes, 0, encodedBytes.Length, decodedBytes, decodedOffset);
 
-    public static int Decode(byte[] encodedBytes, int encodedOffset, int encodedCount, byte[] decodedBytes, int decodedOffset)
+    public static int Decode(
+        byte[] encodedBytes,
+        int encodedOffset,
+        int encodedCount,
+        byte[] decodedBytes,
+        int decodedOffset
+    )
     {
         var saveOffset = decodedOffset;
         var isEscaped = false;

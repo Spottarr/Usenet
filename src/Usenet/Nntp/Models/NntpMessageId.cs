@@ -36,7 +36,8 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// Wraps the <see cref="NntpMessageId"/> in "&lt;" and "&gt;" according to the NNTP specifications.
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => string.IsNullOrEmpty(Value) ? string.Empty : string.Concat("<", Value, ">");
+    public override string ToString() =>
+        string.IsNullOrEmpty(Value) ? string.Empty : string.Concat("<", Value, ">");
 
     /// <summary>
     /// Converts a <see cref="NntpMessageId"/> implicitly to a string.

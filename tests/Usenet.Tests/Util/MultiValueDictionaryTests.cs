@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Usenet.Util;
 using Xunit;
+
 // ReSharper disable DuplicateKeyCollectionInitialization
 
 namespace Usenet.Tests.Util;
@@ -16,7 +17,7 @@ public class MultiValueDictionaryTests
             { 1, "een" },
             { 2, "two" },
             { 2, "twee" },
-            { 2, "deux" }
+            { 2, "deux" },
         };
 
         Assert.Equal(5, dict.Count);
@@ -30,13 +31,16 @@ public class MultiValueDictionaryTests
     [Fact]
     public void MultipleValuesWithSameKeyShouldBeAddedIgnoreCase()
     {
-        var dict = new MultiValueDictionary<string, string>(() => new HashSet<string>(), StringComparer.OrdinalIgnoreCase)
+        var dict = new MultiValueDictionary<string, string>(
+            () => new HashSet<string>(),
+            StringComparer.OrdinalIgnoreCase
+        )
         {
             { "A", "one" },
             { "a", "een" },
             { "B", "two" },
             { "b", "twee" },
-            { "b", "deux" }
+            { "b", "deux" },
         };
 
         Assert.Equal(5, dict.Count);
@@ -50,7 +54,11 @@ public class MultiValueDictionaryTests
     [Fact]
     public void SameValueWithSameKeyShouldNotBeAddedWhenUsingHashSet()
     {
-        var dict = new MultiValueDictionary<int, string>(() => new HashSet<string>()) { { 1, "one" }, { 1, "one" }, };
+        var dict = new MultiValueDictionary<int, string>(() => new HashSet<string>())
+        {
+            { 1, "one" },
+            { 1, "one" },
+        };
 
         Assert.Equal(1, dict.Count);
 #pragma warning disable xUnit2013
@@ -63,7 +71,11 @@ public class MultiValueDictionaryTests
     [Fact]
     public void SameValueWithSameKeyShouldBeAddedWhenUsingList()
     {
-        var dict = new MultiValueDictionary<int, string>(() => new List<string>()) { { 1, "one" }, { 1, "one" }, };
+        var dict = new MultiValueDictionary<int, string>(() => new List<string>())
+        {
+            { 1, "one" },
+            { 1, "one" },
+        };
 
         Assert.Equal(2, dict.Count);
         Assert.Equal(2, dict[1].Count);
@@ -80,7 +92,7 @@ public class MultiValueDictionaryTests
             { 1, "een" },
             { 2, "two" },
             { 2, "twee" },
-            { 2, "deux" }
+            { 2, "deux" },
         };
         dict.Remove(2, "twee");
         dict.Remove(1);
@@ -98,7 +110,7 @@ public class MultiValueDictionaryTests
             { 1, "een" },
             { 2, "two" },
             { 2, "twee" },
-            { 2, "deux" }
+            { 2, "deux" },
         };
         dict.Clear();
 
@@ -123,7 +135,7 @@ public class MultiValueDictionaryTests
             { 1, "een" },
             { 2, "two" },
             { 2, "twee" },
-            { 2, "deux" }
+            { 2, "deux" },
         };
 
         Assert.Equal(dict1, dict2);

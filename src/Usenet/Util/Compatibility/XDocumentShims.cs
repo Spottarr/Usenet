@@ -13,7 +13,10 @@ internal static class XDocumentShims
 #endif
     }
 
-    internal static Task<XDocument> LoadAsync(TextReader reader, CancellationToken cancellationToken)
+    internal static Task<XDocument> LoadAsync(
+        TextReader reader,
+        CancellationToken cancellationToken
+    )
     {
 #if NETSTANDARD2_0
         return Task.FromResult(XDocument.Load(reader));

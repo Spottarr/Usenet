@@ -32,7 +32,14 @@ public class NntpStatResponse : NntpResponse
     /// <param name="responseType">The type of the response received from the server.</param>
     /// <param name="number">The <see cref="NntpArticle"/> number received from the server.</param>
     /// <param name="messageId">The <see cref="NntpMessageId"/> received from the server.</param>
-    public NntpStatResponse(int code, string message, bool success, NntpStatResponseType responseType, long number, NntpMessageId messageId)
+    public NntpStatResponse(
+        int code,
+        string message,
+        bool success,
+        NntpStatResponseType responseType,
+        long number,
+        NntpMessageId messageId
+    )
         : base(code, message, success)
     {
         ResponseType = responseType;

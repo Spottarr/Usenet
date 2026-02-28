@@ -34,20 +34,24 @@ public class NntpArticleRangeTests
     [
         [
             new XSerializable<NntpArticleRange>(NntpArticleRange.SingleArticle(8)),
-            new XSerializable<NntpArticleRange>(NntpArticleRange.SingleArticle(8))
+            new XSerializable<NntpArticleRange>(NntpArticleRange.SingleArticle(8)),
         ],
         [
-            new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)), new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88))
+            new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)),
+            new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)),
         ],
         [
             new XSerializable<NntpArticleRange>(NntpArticleRange.AllFollowing(8)),
-            new XSerializable<NntpArticleRange>(NntpArticleRange.AllFollowing(8))
-        ]
+            new XSerializable<NntpArticleRange>(NntpArticleRange.AllFollowing(8)),
+        ],
     ];
 
     [Theory]
     [MemberData(nameof(EqualsWithSameValues))]
-    internal void EqualsWithSameValuesShouldReturnTrue(XSerializable<NntpArticleRange> range1, XSerializable<NntpArticleRange> range2)
+    internal void EqualsWithSameValuesShouldReturnTrue(
+        XSerializable<NntpArticleRange> range1,
+        XSerializable<NntpArticleRange> range2
+    )
     {
         Assert.Equal(range1.Object, range2.Object);
     }
@@ -56,20 +60,24 @@ public class NntpArticleRangeTests
     [
         [
             new XSerializable<NntpArticleRange>(NntpArticleRange.SingleArticle(8)),
-            new XSerializable<NntpArticleRange>(NntpArticleRange.SingleArticle(9))
+            new XSerializable<NntpArticleRange>(NntpArticleRange.SingleArticle(9)),
         ],
         [
-            new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)), new XSerializable<NntpArticleRange>(NntpArticleRange.Range(9, 88))
+            new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)),
+            new XSerializable<NntpArticleRange>(NntpArticleRange.Range(9, 88)),
         ],
         [
             new XSerializable<NntpArticleRange>(NntpArticleRange.AllFollowing(8)),
-            new XSerializable<NntpArticleRange>(NntpArticleRange.AllFollowing(9))
-        ]
+            new XSerializable<NntpArticleRange>(NntpArticleRange.AllFollowing(9)),
+        ],
     ];
 
     [Theory]
     [MemberData(nameof(EqualsWithDifferentValues))]
-    internal void EqualsWithDifferentValuesShouldReturnFalse(XSerializable<NntpArticleRange> range1, XSerializable<NntpArticleRange> range2)
+    internal void EqualsWithDifferentValuesShouldReturnFalse(
+        XSerializable<NntpArticleRange> range1,
+        XSerializable<NntpArticleRange> range2
+    )
     {
         Assert.NotEqual(range1.Object, range2.Object);
     }
