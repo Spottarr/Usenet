@@ -25,5 +25,5 @@ public enum NntpModeReaderResponseType
     /// <summary>
     /// Reading service permanently unavailale (response code 502)
     /// </summary>
-    ReadingServiceUnavailable = 502
+    ReadingServiceUnavailable = 502,
 }

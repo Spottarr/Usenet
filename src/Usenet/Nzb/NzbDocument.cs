@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Text;
 using Usenet.Extensions;
 using Usenet.Util;
@@ -32,9 +32,14 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// </summary>
     /// <param name="metaData">A collection of metadata elements found in the NZB file.</param>
     /// <param name="files">A collection of files found in the NZB file.</param>
-    public NzbDocument(IDictionary<string, ICollection<string>> metaData, IEnumerable<NzbFile> files)
+    public NzbDocument(
+        IDictionary<string, ICollection<string>> metaData,
+        IEnumerable<NzbFile> files
+    )
     {
-        MetaData = (metaData ?? MultiValueDictionary<string, string>.Empty).ToImmutableDictionaryWithHashSets();
+        MetaData = (
+            metaData ?? MultiValueDictionary<string, string>.Empty
+        ).ToImmutableDictionaryWithHashSets();
         Files = (files ?? new List<NzbFile>(0)).OrderBy(f => f.FileName).ToImmutableList();
         Size = Files.Sum(f => f.Size);
     }
@@ -43,60 +48,42 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// Loads a <see cref="NzbDocument"/> from the specified stream asynchronously using the default usenet encoding.
     /// </summary>
     /// <param name="stream">The stream to be read.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>A task that represents the asynchronous load operation.
     /// The value of the task's result property contains the resulting <see cref="NzbDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
-    public static Task<NzbDocument> LoadAsync(Stream stream, CancellationToken cancellationToken = default) =>
-        LoadAsync(stream, UsenetEncoding.Default, cancellationToken);
+    public static Task<NzbDocument> LoadAsync(
+        Stream stream,
+        CancellationToken cancellationToken = default
+    ) => LoadAsync(stream, UsenetEncoding.Default, cancellationToken);
 
     /// <summary>
     /// Loads a <see cref="NzbDocument"/> from the specified stream asynchronously using the specified character encoding.
     /// </summary>
     /// <param name="stream">The stream to be read.</param>
     /// <param name="encoding">The character encoding to use.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>A task that represents the asynchronous load operation.
     /// The value of the task's result property contains the resulting <see cref="NzbDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
-    public static async Task<NzbDocument> LoadAsync(Stream stream, Encoding encoding, CancellationToken cancellationToken = default)
+    public static async Task<NzbDocument> LoadAsync(
+        Stream stream,
+        Encoding encoding,
+        CancellationToken cancellationToken = default
+    )
     {
         Guard.ThrowIfNull(stream, nameof(stream));
         Guard.ThrowIfNull(encoding, nameof(encoding));
 
         using var reader = new StreamReader(stream, encoding);
-        return NzbParser.Parse(await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false));
-    }
-
-    /// <summary>
-    /// Loads a <see cref="NzbDocument"/> from the specified stream using the default usenet encoding.
-    /// </summary>
-    /// <param name="stream">The stream to be read.</param>
-    /// <returns>The parsed <see cref="NzbDocument"/>.</returns>
-    /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
-    public static NzbDocument Load(Stream stream) => Load(stream, UsenetEncoding.Default);
-
-    /// <summary>
-    /// Loads a <see cref="NzbDocument"/> from the specified stream using the specified character encoding.
-    /// </summary>
-    /// <param name="stream">The stream to be read.</param>
-    /// <param name="encoding">The character encoding to use.</param>
-    /// <returns>The parsed <see cref="NzbDocument"/>.</returns>
-    /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
-    public static NzbDocument Load(Stream stream, Encoding encoding)
-    {
-        Guard.ThrowIfNull(stream, nameof(stream));
-        Guard.ThrowIfNull(encoding, nameof(encoding));
-
-        using var reader = new StreamReader(stream, encoding);
-        return NzbParser.Parse(reader.ReadToEnd());
+        return await NzbParser.ParseAsync(reader, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Returns the hash code for this instance.
     /// </summary>
     /// <returns>A 32-bit signed integer hash code.</returns>
-    public override int GetHashCode() => HashCode.Start
-        .Hash(Size)
-        .Hash(Files);
+    public override int GetHashCode() => HashCode.Start.Hash(Size).Hash(Files);
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="NzbDocument"/> value.
@@ -105,15 +92,15 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
     public bool Equals(NzbDocument other)
     {
-        if ((object)other == null)
+        if (other is null)
         {
             return false;
         }
 
         var equals =
-            Size.Equals(other.Size) &&
-            Files.SequenceEqual(other.Files) &&
-            MetaData.Count == other.MetaData.Count;
+            Size.Equals(other.Size)
+            && Files.SequenceEqual(other.Files)
+            && MetaData.Count == other.MetaData.Count;
 
         if (!equals)
         {
@@ -123,8 +110,9 @@ public class NzbDocument : IEquatable<NzbDocument>
         // compare metadata
         foreach (var pair in MetaData)
         {
-            if (!other.MetaData.TryGetValue(pair.Key, out var value) ||
-                !pair.Value.SetEquals(value))
+            if (
+                !other.MetaData.TryGetValue(pair.Key, out var value) || !pair.Value.SetEquals(value)
+            )
             {
                 return false;
             }
@@ -147,7 +135,7 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <param name="second">The second <see cref="NzbDocument"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
     public static bool operator ==(NzbDocument first, NzbDocument second) =>
-        (object)first == null ? (object)second == null : first.Equals(second);
+        first?.Equals(second) ?? second is null;
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NzbDocument"/> value is unequal to the second <see cref="NzbDocument"/> value.

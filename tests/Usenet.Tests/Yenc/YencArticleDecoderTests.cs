@@ -23,7 +23,13 @@ public class YencArticleDecoderTests
         Assert.Equal(584, actualArticle.Header.FileSize);
         Assert.Equal("testfile.txt", actualArticle.Header.FileName);
         Assert.Equal(584, actualArticle.Footer.PartSize);
-        Assert.Equal("ded29f4f", ((int)actualArticle.Footer.Crc32.GetValueOrDefault()).ToString("x", CultureInfo.InvariantCulture));
+        Assert.Equal(
+            "ded29f4f",
+            ((int)actualArticle.Footer.Crc32.GetValueOrDefault()).ToString(
+                "x",
+                CultureInfo.InvariantCulture
+            )
+        );
         Assert.Equal(expectedData, actualArticle.Data);
     }
 
@@ -40,8 +46,16 @@ public class YencArticleDecoderTests
     }
 
     [Theory]
-    [EmbeddedResourceData(@"yenc.multipart.joystick.jpg", @"yenc.multipart.00000020.ntx", @"yenc.multipart.00000021.ntx")]
-    internal void MultiPartFileShouldBeDecoded(IFileInfo expectedFile, IFileInfo part1File, IFileInfo part2File)
+    [EmbeddedResourceData(
+        @"yenc.multipart.joystick.jpg",
+        @"yenc.multipart.00000020.ntx",
+        @"yenc.multipart.00000021.ntx"
+    )]
+    internal void MultiPartFileShouldBeDecoded(
+        IFileInfo expectedFile,
+        IFileInfo part1File,
+        IFileInfo part2File
+    )
     {
         const string expectedFileName = "joystick.jpg";
         var expected = expectedFile.ReadAllBytes();

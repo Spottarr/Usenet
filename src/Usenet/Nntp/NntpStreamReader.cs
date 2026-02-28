@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Usenet.Util;
 
 namespace Usenet.Nntp;
@@ -14,18 +14,16 @@ public class NntpStreamReader : StreamReader
     /// Initializes a new instance of the <see cref="NntpStreamReader"/> class for the specified stream, with the default usenet encoding.
     /// </summary>
     /// <param name="stream">The stream to be read.</param>
-    public NntpStreamReader(Stream stream) : base(stream, UsenetEncoding.Default)
-    {
-    }
+    public NntpStreamReader(Stream stream)
+        : base(stream, UsenetEncoding.Default) { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NntpStreamReader"/> class for the specified stream, with the specified character encoding.
     /// </summary>
     /// <param name="stream">The stream to be read.</param>
     /// <param name="encoding">The character encoding to use.</param>
-    public NntpStreamReader(Stream stream, Encoding encoding) : base(stream, encoding)
-    {
-    }
+    public NntpStreamReader(Stream stream, Encoding encoding)
+        : base(stream, encoding) { }
 
     /// <summary>
     /// Reads a line of characters from the current stream and returns the data as a string.
@@ -36,6 +34,45 @@ public class NntpStreamReader : StreamReader
     public override string ReadLine()
     {
         var line = base.ReadLine();
+        return ProcessLine(line);
+    }
+
+    /// <summary>
+    /// Asynchronously reads a line of characters from the current stream and returns the data as a string.
+    /// Dot-stuffing will be undone and the terminating line (".") will result in a null value
+    /// indicating end of input.
+    /// </summary>
+    /// <returns>The next line from the input stream, or null if the end of the input stream is reached.</returns>
+    public override async Task<string> ReadLineAsync()
+    {
+        var line = await base.ReadLineAsync().ConfigureAwait(false);
+        return ProcessLine(line);
+    }
+
+    /// <summary>
+    /// Asynchronously reads a line of characters from the current stream and returns the data as a string.
+    /// Dot-stuffing will be undone and the terminating line (".") will result in a null value
+    /// indicating end of input.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>The next line from the input stream, or null if the end of the input stream is reached.</returns>
+#if NET8_0_OR_GREATER
+    public override async ValueTask<string> ReadLineAsync(CancellationToken cancellationToken)
+    {
+        var line = await base.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+        return ProcessLine(line);
+    }
+#else
+    public async Task<string> ReadLineAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var line = await base.ReadLineAsync().ConfigureAwait(false);
+        return ProcessLine(line);
+    }
+#endif
+
+    private static string ProcessLine(string line)
+    {
         if (line == null)
         {
             return null;
@@ -51,6 +88,6 @@ public class NntpStreamReader : StreamReader
             return null;
         }
 
-        return line[1] == '.' ? line.Substring(1) : line;
+        return line[1] == '.' ? line[1..] : line;
     }
 }

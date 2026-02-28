@@ -1,4 +1,4 @@
-﻿using Usenet.Extensions;
+using Usenet.Extensions;
 
 namespace Usenet.Nntp.Models;
 
@@ -16,7 +16,7 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// <summary>
     /// Creates a new instance of the <see cref="NntpMessageId"/> class.
     /// </summary>
-    /// <param name="value">A string representing a <see cref="NntpMessageId"/>. 
+    /// <param name="value">A string representing a <see cref="NntpMessageId"/>.
     /// Wrapping characters "&lt;" and "&gt;" will be stripped.</param>
     public NntpMessageId(string value)
     {
@@ -27,7 +27,7 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// Gets a value indicating whether the current <see cref="NntpMessageId" /> object has a valid value.
     /// </summary>
     /// <returns>
-    /// true if the current <see cref="NntpMessageId" /> object has a value; 
+    /// true if the current <see cref="NntpMessageId" /> object has a value;
     /// false if the current <see cref="NntpMessageId" /> object has no value.
     /// </returns>
     public bool HasValue => !string.IsNullOrWhiteSpace(Value);
@@ -36,7 +36,8 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// Wraps the <see cref="NntpMessageId"/> in "&lt;" and "&gt;" according to the NNTP specifications.
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => string.IsNullOrEmpty(Value) ? string.Empty : string.Concat("<", Value, ">");
+    public override string ToString() =>
+        string.IsNullOrEmpty(Value) ? string.Empty : string.Concat("<", Value, ">");
 
     /// <summary>
     /// Converts a <see cref="NntpMessageId"/> implicitly to a string.
@@ -54,12 +55,12 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// Converts a string implicitly to a <see cref="NntpMessageId"/>.
     /// </summary>
     /// <param name="value">The string to convert.</param>
-    public static NntpMessageId FromString(string value) => new NntpMessageId(value);
+    public static NntpMessageId FromString(string value) => new(value);
 
     /// <summary>
     /// Represents the empty <see cref="NntpMessageId"/>. The field is read-only.
     /// </summary>
-    public static NntpMessageId Empty => new NntpMessageId(null);
+    public static NntpMessageId Empty => new(null);
 
     /// <summary>
     /// Returns the hash code for this instance.
@@ -72,7 +73,7 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// </summary>
     /// <param name="other">A <see cref="NntpMessageId"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-    public bool Equals(NntpMessageId other) => (object)other != null && Value == other.Value;
+    public bool Equals(NntpMessageId other) => other is not null && Value == other.Value;
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="object"/> value.
@@ -88,7 +89,7 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// <param name="second">The second <see cref="NntpMessageId"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
     public static bool operator ==(NntpMessageId first, NntpMessageId second) =>
-        (object)first == null ? (object)second == null : first.Equals(second);
+        first?.Equals(second) ?? second is null;
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NntpMessageId"/> value is unequal to the second <see cref="NntpMessageId"/> value.

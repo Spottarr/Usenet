@@ -15,7 +15,10 @@ public static class HeaderDateParser
         + @"(?<tz>[+-]\d+|(?:UT|UTC|GMT|Z|EDT|EST|CDT|CST|MDT|MST|PDT|PST|A|N|M|Y|[A-Z]+)"
         + @")?";
 
-    private static readonly Regex _dateTimeRegex = new(DateTimeRegexString, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly Regex _dateTimeRegex = new(
+        DateTimeRegexString,
+        RegexOptions.IgnoreCase | RegexOptions.Compiled
+    );
 
     /// <summary>
     /// Parses header date/time strings as described in the
@@ -41,8 +44,12 @@ public static class HeaderDateParser
         var tz = matches.Groups["tz"].Value;
         var zone = ParseZone(tz);
 
-        var monthIndex = 1 + Array.FindIndex(DateTimeFormatInfo.InvariantInfo.AbbreviatedMonthNames,
-            m => string.Equals(m, month, StringComparison.OrdinalIgnoreCase));
+        var monthIndex =
+            1
+            + Array.FindIndex(
+                DateTimeFormatInfo.InvariantInfo.AbbreviatedMonthNames,
+                m => string.Equals(m, month, StringComparison.OrdinalIgnoreCase)
+            );
 
         if (matches.Groups["year"].Value.Length < 4)
         {
@@ -56,7 +63,8 @@ public static class HeaderDateParser
     {
         var today = DateTime.UtcNow.Date;
         var currentCentury = today.Year / 100;
-        return new DateTime(currentCentury * 100 + year, month, day, 0, 0, 0, DateTimeKind.Utc) > today
+        return
+            new DateTime(currentCentury * 100 + year, month, day, 0, 0, 0, DateTimeKind.Utc) > today
             ? currentCentury - 1
             : currentCentury;
     }
@@ -92,7 +100,7 @@ public static class HeaderDateParser
             "N" => +0100,
             "M" => -1200,
             "Y" => +1200,
-            _ => 9999
+            _ => 9999,
         };
 
         return zone != 9999;

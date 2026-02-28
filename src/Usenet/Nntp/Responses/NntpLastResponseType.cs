@@ -29,5 +29,5 @@ public enum NntpLastResponseType
     /// <summary>
     /// No previous article in group (response code 422)
     /// </summary>
-    NoPreviousArticleInGroup = 422
+    NoPreviousArticleInGroup = 422,
 }

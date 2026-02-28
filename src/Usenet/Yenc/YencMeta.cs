@@ -1,5 +1,6 @@
-﻿using Usenet.Exceptions;
+using Usenet.Exceptions;
 using Usenet.Extensions;
+using Usenet.Util.Compatibility;
 
 namespace Usenet.Yenc;
 
@@ -9,8 +10,9 @@ namespace Usenet.Yenc;
 /// </summary>
 internal class YencMeta
 {
-    private const string YBegin = YencKeywords.YBegin + " ";
-    private const string YPart = YencKeywords.YPart + " ";
+    private const string YBegin = $"{YencKeywords.YBegin} ";
+    private const string YPart = $"{YencKeywords.YPart} ";
+    private const string NameSeparator = $"{YencKeywords.Name}=";
 
     public static IDictionary<string, string> GetHeaders(IEnumerator<string> enumerator)
     {
@@ -42,7 +44,11 @@ internal class YencMeta
             throw new InvalidYencDataException(Resources.Yenc.MissingPartHeader);
         }
 
-        if (enumerator.MoveNext() && enumerator.Current != null && enumerator.Current.StartsWith(YPart, StringComparison.Ordinal))
+        if (
+            enumerator.MoveNext()
+            && enumerator.Current != null
+            && enumerator.Current.StartsWith(YPart, StringComparison.Ordinal)
+        )
         {
             return ParseLine(enumerator.Current);
         }
@@ -67,21 +73,24 @@ internal class YencMeta
             part > 0 ? part : 0,
             part > 0 ? total : 1,
             part > 0 ? end - begin + 1 : size,
-            part > 0 ? begin - 1 : 0);
+            part > 0 ? begin - 1 : 0
+        );
     }
 
     public static YencFooter ParseFooter(IDictionary<string, string> footer)
     {
         var size = footer.GetAndConvert(YencKeywords.Size, long.Parse);
         var part = footer.GetAndConvert(YencKeywords.Part, int.Parse);
-        var crc32 = footer.GetAndConvert<uint?>(YencKeywords.Crc32, crc => Convert.ToUInt32(crc, 16));
-        var partCrc32 = footer.GetAndConvert<uint?>(YencKeywords.PartCrc32, crc => Convert.ToUInt32(crc, 16));
+        var crc32 = footer.GetAndConvert<uint?>(
+            YencKeywords.Crc32,
+            crc => Convert.ToUInt32(crc, 16)
+        );
+        var partCrc32 = footer.GetAndConvert<uint?>(
+            YencKeywords.PartCrc32,
+            crc => Convert.ToUInt32(crc, 16)
+        );
 
-        return new YencFooter(
-            size > 0 ? size : 0,
-            part > 0 ? part : 0,
-            crc32,
-            partCrc32);
+        return new YencFooter(size > 0 ? size : 0, part > 0 ? part : 0, crc32, partCrc32);
     }
 
     public static Dictionary<string, string> ParseLine(string line)
@@ -92,13 +101,13 @@ internal class YencMeta
         }
 
         // name is always last item on the header line
-        var nameSplit = line.Split(new[] { $"{YencKeywords.Name}=" }, StringSplitOptions.RemoveEmptyEntries);
+        var nameSplit = line.Split(NameSeparator, StringSplitOptions.RemoveEmptyEntries);
         if (nameSplit.Length == 0)
         {
             return new Dictionary<string, string>(0);
         }
 
-        var dictionary = new Dictionary<string, string>();
+        Dictionary<string, string> dictionary = new();
         if (nameSplit.Length > 1)
         {
             // found name
@@ -106,7 +115,7 @@ internal class YencMeta
         }
 
         // parse other items
-        var pairs = nameSplit[0].Split([' '], StringSplitOptions.RemoveEmptyEntries);
+        var pairs = nameSplit[0].Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (pairs.Length == 0)
         {
             return dictionary;

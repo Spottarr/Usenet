@@ -1,4 +1,4 @@
-﻿using Usenet.Util;
+using Usenet.Util;
 
 namespace Usenet.Extensions;
 
@@ -21,5 +21,19 @@ internal static class StreamExtensions
         using var ms = new MemoryStream();
         stream.CopyTo(ms);
         return ms.ToArray();
+    }
+
+    public static ValueTask<int> ReadByteAsync(
+        this Stream stream,
+        byte[] buffer,
+        CancellationToken cancellationToken
+    )
+    {
+#if NETSTANDARD2_0
+        cancellationToken.ThrowIfCancellationRequested();
+        return new ValueTask<int>(stream.ReadAsync(buffer, 0, 1, cancellationToken));
+#else
+        return stream.ReadAsync(buffer.AsMemory(0, 1), cancellationToken);
+#endif
     }
 }

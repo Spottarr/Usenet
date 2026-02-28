@@ -1,4 +1,4 @@
-﻿namespace Usenet.Nzb;
+namespace Usenet.Nzb;
 
 /// <summary>
 /// TextWriter extension methods.
@@ -10,19 +10,14 @@ public static class TextWriterExtensions
     /// </summary>
     /// <param name="textWriter">The <see cref="TextWriter"/> to use.</param>
     /// <param name="nzbDocument">The <see cref="NzbDocument"/> to write.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A <see cref="Task"/> that can be awaited.</returns>
-    public static Task WriteNzbDocumentAsync(this TextWriter textWriter, NzbDocument nzbDocument)
+    public static Task WriteNzbDocumentAsync(
+        this TextWriter textWriter,
+        NzbDocument nzbDocument,
+        CancellationToken cancellationToken = default
+    )
     {
-        return new NzbWriter(textWriter).WriteAsync(nzbDocument);
-    }
-
-    /// <summary>
-    /// Writes the specified <see cref="NzbDocument"/> to the stream.
-    /// </summary>
-    /// <param name="textWriter">The <see cref="TextWriter"/> to use.</param>
-    /// <param name="nzbDocument">The <see cref="NzbDocument"/> to write.</param>
-    public static void WriteNzbDocument(this TextWriter textWriter, NzbDocument nzbDocument)
-    {
-        new NzbWriter(textWriter).Write(nzbDocument);
+        return new NzbWriter(textWriter).WriteAsync(nzbDocument, cancellationToken);
     }
 }

@@ -29,5 +29,5 @@ public enum NntpNextResponseType
     /// <summary>
     /// No next article in group (response code 421)
     /// </summary>
-    NoNextArticleInGroup = 421
+    NoNextArticleInGroup = 421,
 }

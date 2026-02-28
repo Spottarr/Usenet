@@ -1,4 +1,4 @@
-﻿using Usenet.Util;
+using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
 
 namespace Usenet.Nntp.Models;
@@ -45,10 +45,7 @@ public class NntpGroupOrigin : IEquatable<NntpGroupOrigin>
     /// Returns the hash code for this instance.
     /// </summary>
     /// <returns>A 32-bit signed integer hash code.</returns>
-    public override int GetHashCode() => HashCode.Start
-        .Hash(Name)
-        .Hash(CreatedAt)
-        .Hash(CreatedBy);
+    public override int GetHashCode() => HashCode.Start.Hash(Name).Hash(CreatedAt).Hash(CreatedBy);
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="NntpGroupOrigin"/> value.
@@ -57,15 +54,12 @@ public class NntpGroupOrigin : IEquatable<NntpGroupOrigin>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
     public bool Equals(NntpGroupOrigin other)
     {
-        if ((object)other == null)
-        {
+        if (other is null)
             return false;
-        }
 
-        return
-            Name.Equals(other.Name, StringComparison.Ordinal) &&
-            CreatedAt.Equals(other.CreatedAt) &&
-            CreatedBy.Equals(other.CreatedBy, StringComparison.Ordinal);
+        return Name.Equals(other.Name, StringComparison.Ordinal)
+            && CreatedAt.Equals(other.CreatedAt)
+            && CreatedBy.Equals(other.CreatedBy, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -82,7 +76,7 @@ public class NntpGroupOrigin : IEquatable<NntpGroupOrigin>
     /// <param name="second">The second <see cref="NntpGroupOrigin"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
     public static bool operator ==(NntpGroupOrigin first, NntpGroupOrigin second) =>
-        (object)first == null ? (object)second == null : first.Equals(second);
+        first?.Equals(second) ?? second is null;
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NntpGroupOrigin"/> value is unequal to the second <see cref="NntpGroupOrigin"/> value.
@@ -90,5 +84,6 @@ public class NntpGroupOrigin : IEquatable<NntpGroupOrigin>
     /// <param name="first">The first <see cref="NntpGroupOrigin"/>.</param>
     /// <param name="second">The second <see cref="NntpGroupOrigin"/>.</param>
     /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator !=(NntpGroupOrigin first, NntpGroupOrigin second) => !(first == second);
+    public static bool operator !=(NntpGroupOrigin first, NntpGroupOrigin second) =>
+        !(first == second);
 }

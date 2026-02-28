@@ -19,19 +19,39 @@ public class YencValidatorTests
     {
         var article = YencArticleDecoder.Decode(file.ReadAllLines(UsenetEncoding.Default));
 
-
         var actual = YencValidator.Validate(article).IsValid;
         Assert.True(actual);
     }
 
     [Theory]
-    [EmbeddedResourceData(@"yenc.singlepart.00000005 (checksum mismatch).ntx", AdditionalData = [YencValidationErrorCodes.ChecksumMismatch])]
-    [EmbeddedResourceData(@"yenc.singlepart.00000005 (missing checksum).ntx", AdditionalData = [YencValidationErrorCodes.MissingChecksum])]
-    [EmbeddedResourceData(@"yenc.singlepart.00000005 (size mismatch).ntx", AdditionalData = [YencValidationErrorCodes.SizeMismatch])]
-    [EmbeddedResourceData(@"yenc.multipart.00000021 (checksum mismatch).ntx", AdditionalData = [YencValidationErrorCodes.ChecksumMismatch])]
-    [EmbeddedResourceData(@"yenc.multipart.00000021 (missing checksum).ntx", AdditionalData = [YencValidationErrorCodes.MissingChecksum])]
-    [EmbeddedResourceData(@"yenc.multipart.00000021 (part mismatch).ntx", AdditionalData = [YencValidationErrorCodes.PartMismatch])]
-    [EmbeddedResourceData(@"yenc.multipart.00000021 (size mismatch).ntx", AdditionalData = [YencValidationErrorCodes.SizeMismatch])]
+    [EmbeddedResourceData(
+        @"yenc.singlepart.00000005 (checksum mismatch).ntx",
+        AdditionalData = [YencValidationErrorCodes.ChecksumMismatch]
+    )]
+    [EmbeddedResourceData(
+        @"yenc.singlepart.00000005 (missing checksum).ntx",
+        AdditionalData = [YencValidationErrorCodes.MissingChecksum]
+    )]
+    [EmbeddedResourceData(
+        @"yenc.singlepart.00000005 (size mismatch).ntx",
+        AdditionalData = [YencValidationErrorCodes.SizeMismatch]
+    )]
+    [EmbeddedResourceData(
+        @"yenc.multipart.00000021 (checksum mismatch).ntx",
+        AdditionalData = [YencValidationErrorCodes.ChecksumMismatch]
+    )]
+    [EmbeddedResourceData(
+        @"yenc.multipart.00000021 (missing checksum).ntx",
+        AdditionalData = [YencValidationErrorCodes.MissingChecksum]
+    )]
+    [EmbeddedResourceData(
+        @"yenc.multipart.00000021 (part mismatch).ntx",
+        AdditionalData = [YencValidationErrorCodes.PartMismatch]
+    )]
+    [EmbeddedResourceData(
+        @"yenc.multipart.00000021 (size mismatch).ntx",
+        AdditionalData = [YencValidationErrorCodes.SizeMismatch]
+    )]
     internal void ArticleShouldBeInvalid(IFileInfo file, string errorCode)
     {
         var article = YencArticleDecoder.Decode(file.ReadAllLines(UsenetEncoding.Default));

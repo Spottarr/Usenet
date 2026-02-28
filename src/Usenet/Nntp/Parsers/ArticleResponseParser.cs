@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Usenet.Extensions;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Models;
@@ -12,7 +12,7 @@ internal enum ArticleRequestType
 {
     Head = 0x01,
     Body = 0x02,
-    Article = 0x03
+    Article = 0x03,
 }
 
 internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleResponse>
@@ -23,23 +23,13 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
 
     public ArticleResponseParser(ArticleRequestType requestType)
     {
-        switch (_requestType = requestType)
+        _successCode = (_requestType = requestType) switch
         {
-            case ArticleRequestType.Head:
-                _successCode = 221;
-                break;
-
-            case ArticleRequestType.Body:
-                _successCode = 222;
-                break;
-
-            case ArticleRequestType.Article:
-                _successCode = 220;
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException(nameof(requestType), requestType, null);
-        }
+            ArticleRequestType.Head => 221,
+            ArticleRequestType.Body => 222,
+            ArticleRequestType.Article => 220,
+            _ => throw new ArgumentOutOfRangeException(nameof(requestType), requestType, null),
+        };
     }
 
     public bool IsSuccessResponse(int code) => code == _successCode;
@@ -64,15 +54,21 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
         if (dataBlock == null)
         {
             // no headers and no body
-            return new NntpArticleResponse(code, message, true, new NntpArticle(number, messageId, null, null, null));
+            return new NntpArticleResponse(
+                code,
+                message,
+                true,
+                new NntpArticle(number, messageId, null, null, null)
+            );
         }
 
         using var enumerator = dataBlock.GetEnumerator();
 
         // get headers if requested
-        var headers = (_requestType & ArticleRequestType.Head) == ArticleRequestType.Head
-            ? GetHeaders(enumerator)
-            : MultiValueDictionary<string, string>.EmptyIgnoreCase;
+        var headers =
+            (_requestType & ArticleRequestType.Head) == ArticleRequestType.Head
+                ? GetHeaders(enumerator)
+                : MultiValueDictionary<string, string>.EmptyIgnoreCase;
 
         // get groups
         var groups = headers.TryGetValue(NntpHeaders.Newsgroups, out var values)
@@ -80,13 +76,17 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
             : null;
 
         // get body if requested
-        var bodyLines = (_requestType & ArticleRequestType.Body) == ArticleRequestType.Body
-            ? GetBody(enumerator).ToList()
-            : [];
+        var bodyLines =
+            (_requestType & ArticleRequestType.Body) == ArticleRequestType.Body
+                ? GetBody(enumerator).ToList()
+                : [];
 
         return new NntpArticleResponse(
-            code, message, true,
-            new NntpArticle(number, messageId, groups, headers, bodyLines));
+            code,
+            message,
+            true,
+            new NntpArticle(number, messageId, groups, headers, bodyLines)
+        );
     }
 
     private MultiValueDictionary<string, string> GetHeaders(IEnumerator<string> enumerator)
@@ -115,7 +115,7 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
                 }
                 else
                 {
-                    prevHeader = new Header(line.Substring(0, splitPos), line.Substring(splitPos + 1).Trim());
+                    prevHeader = new Header(line[..splitPos], line[(splitPos + 1)..].Trim());
                     headers.Add(prevHeader);
                 }
             }

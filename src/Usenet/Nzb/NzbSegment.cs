@@ -1,4 +1,4 @@
-﻿using Usenet.Nntp.Models;
+using Usenet.Nntp.Models;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
 
@@ -38,11 +38,7 @@ public class NzbSegment : IEquatable<NzbSegment>
     /// <param name="offset">Offset of the segment in the file.</param>
     /// <param name="size">Size of the article, in bytes, as a number, with no comma separation.</param>
     /// <param name="messageId">The Message-ID of this article.</param>
-    public NzbSegment(
-        int number,
-        long offset,
-        long size,
-        NntpMessageId messageId)
+    public NzbSegment(int number, long offset, long size, NntpMessageId messageId)
     {
         Number = number;
         Offset = offset;
@@ -54,11 +50,8 @@ public class NzbSegment : IEquatable<NzbSegment>
     /// Returns the hash code for this instance.
     /// </summary>
     /// <returns>A 32-bit signed integer hash code.</returns>
-    public override int GetHashCode() => HashCode.Start
-        .Hash(Number)
-        .Hash(Offset)
-        .Hash(Size)
-        .Hash(MessageId);
+    public override int GetHashCode() =>
+        HashCode.Start.Hash(Number).Hash(Offset).Hash(Size).Hash(MessageId);
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="NzbSegment"/> value.
@@ -67,16 +60,13 @@ public class NzbSegment : IEquatable<NzbSegment>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
     public bool Equals(NzbSegment other)
     {
-        if ((object)other == null)
-        {
+        if (other is null)
             return false;
-        }
 
-        return
-            Number.Equals(other.Number) &&
-            Offset.Equals(other.Offset) &&
-            Size.Equals(other.Size) &&
-            MessageId.Equals(other.MessageId);
+        return Number.Equals(other.Number)
+            && Offset.Equals(other.Offset)
+            && Size.Equals(other.Size)
+            && MessageId.Equals(other.MessageId);
     }
 
     /// <summary>
@@ -93,7 +83,7 @@ public class NzbSegment : IEquatable<NzbSegment>
     /// <param name="second">The second <see cref="NzbSegment"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
     public static bool operator ==(NzbSegment first, NzbSegment second) =>
-        (object)first == null ? (object)second == null : first.Equals(second);
+        first?.Equals(second) ?? second is null;
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NzbSegment"/> value is unequal to the second <see cref="NzbSegment"/> value.

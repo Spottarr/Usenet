@@ -44,7 +44,7 @@ internal static class StringExtensions
     /// <param name="str">The string to convert.</param>
     /// <returns>The integer value obtained from the string or null if the string does not represent a valid integer.</returns>
     public static int? ToIntSafe(this string str) =>
-        str != null && int.TryParse(str, out var value) ? (int?)value : null;
+        str != null && int.TryParse(str, out var value) ? value : null;
 
     /// <summary>
     /// Converts a string safely to an integer. If the string does not represent a valid integer the specified default value will be returned.
@@ -65,10 +65,10 @@ internal static class StringExtensions
 
     public static int IndexOf(this string source, char value, StringComparison comparisonType)
     {
-#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
-        return source.IndexOf(value, comparisonType);
-#else
+#if NETSTANDARD2_0
         return source.IndexOf(value);
+#else
+        return source.IndexOf(value, comparisonType);
 #endif
     }
 }

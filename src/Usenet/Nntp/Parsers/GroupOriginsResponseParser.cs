@@ -45,7 +45,8 @@ internal class GroupOriginsResponseParser : IMultiLineResponseParser<NntpGroupOr
             yield return new NntpGroupOrigin(
                 lineSplit[0],
                 DateTimeOffset.FromUnixTimeSeconds(createdAtTimestamp),
-                lineSplit[2]);
+                lineSplit[2]
+            );
         }
     }
 }

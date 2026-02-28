@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Microsoft.Extensions.FileProviders;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Models;
@@ -11,9 +11,9 @@ namespace Usenet.Nzb;
 /// </summary>
 public class NzbBuilder
 {
-    private readonly List<File> _files;
-    private readonly NntpGroupsBuilder _groupsBuilder;
-    private readonly MultiValueDictionary<string, string> _metaData;
+    private readonly List<File> _files = [];
+    private readonly NntpGroupsBuilder _groupsBuilder = new();
+    private readonly MultiValueDictionary<string, string> _metaData = new();
     private string _messageBase = "unknown.com";
     private string _documentPoster = "Anonymous <anonymous@unknown.com>";
     private long _partSize = 384_000;
@@ -21,12 +21,7 @@ public class NzbBuilder
     /// <summary>
     /// Creates a new instance of the <see cref="NzbBuilder"/> class.
     /// </summary>
-    public NzbBuilder()
-    {
-        _files = new List<File>();
-        _groupsBuilder = new NntpGroupsBuilder();
-        _metaData = new MultiValueDictionary<string, string>();
-    }
+    public NzbBuilder() { }
 
     /// <summary>
     /// Sets the NZB document's default poster. Will be used for every file.
@@ -113,7 +108,7 @@ public class NzbBuilder
     /// Creates a <see cref="NzbDocument"/> with al the properties from the <see cref="NzbBuilder"/>.
     /// </summary>
     /// <returns>The <see cref="NzbDocument"/>.</returns>
-    public NzbDocument Build() => new NzbDocument(GetMetaData(), GetFiles());
+    public NzbDocument Build() => new(GetMetaData(), GetFiles());
 
     private MultiValueDictionary<string, string> GetMetaData()
     {
@@ -141,7 +136,8 @@ public class NzbBuilder
                 f.FileInfo.Name,
                 date,
                 new NntpGroupsBuilder().Add(f.Groups).Add(_groupsBuilder.Groups).Build(),
-                GetSegments(f.FileInfo)))
+                GetSegments(f.FileInfo)
+            ))
             .ToList();
     }
 
@@ -155,8 +151,8 @@ public class NzbBuilder
     private List<NzbSegment> GetSegments(IFileInfo fileInfo)
     {
         var fileGuid = Guid.NewGuid();
-        var segments = new List<NzbSegment>();
         var segmentCount = GetSegmentCount(fileInfo);
+        var segments = new List<NzbSegment>(segmentCount);
         var offset = 0L;
         for (var number = 1; number <= segmentCount; number++)
         {

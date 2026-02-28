@@ -11,17 +11,12 @@ internal sealed class InMemoryLogger : ILogger
         public string? Message;
     }
 
-    public LogLevel MinLogLevel { get; set; }
+    public LogLevel MinLogLevel { get; set; } = LogLevel.Trace;
 
-    public List<Entry> Buffer { get; }
+    public List<Entry> Buffer { get; } = [];
 
-    public InMemoryLogger()
-    {
-        MinLogLevel = LogLevel.Trace;
-        Buffer = new List<Entry>();
-    }
-
-    public IDisposable? BeginScope<TState>(TState state) where TState : notnull
+    public IDisposable? BeginScope<TState>(TState state)
+        where TState : notnull
     {
         return null;
     }
@@ -36,20 +31,32 @@ internal sealed class InMemoryLogger : ILogger
         EventId eventId,
         TState state,
         Exception? exception,
-        Func<TState, Exception?, string> formatter)
+        Func<TState, Exception?, string> formatter
+    )
     {
-        if (IsEnabled(logLevel))
-        {
-            var str = formatter(state, exception);
-            Buffer.Add(new Entry { LogLevel = logLevel, EventId = eventId, Message = str });
-        }
+        if (!IsEnabled(logLevel))
+            return;
+
+        var str = formatter(state, exception);
+        Buffer.Add(
+            new Entry
+            {
+                LogLevel = logLevel,
+                EventId = eventId,
+                Message = str,
+            }
+        );
     }
 
     public void FlushTo(ILogger logger)
     {
         foreach (var entry in Buffer)
         {
-            //logger.Log(entry.LogLevel, entry.EventId, entry.Message);
+#pragma warning disable CA1848
+#pragma warning disable CA2254
+            logger.Log(entry.LogLevel, entry.EventId, entry.Message);
+#pragma warning restore CA2254
+#pragma warning restore CA1848
         }
 
         Buffer.Clear();

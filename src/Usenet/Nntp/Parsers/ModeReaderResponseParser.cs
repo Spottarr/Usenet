@@ -8,7 +8,8 @@ internal class ModeReaderResponseParser : IResponseParser<NntpModeReaderResponse
 {
     private readonly ILogger _log = Logger.Create<ModeReaderResponseParser>();
 
-    public bool IsSuccessResponse(int code) => GetResponseType(code) != NntpModeReaderResponseType.Unknown;
+    public bool IsSuccessResponse(int code) =>
+        GetResponseType(code) != NntpModeReaderResponseType.Unknown;
 
     public NntpModeReaderResponse Parse(int code, string message)
     {

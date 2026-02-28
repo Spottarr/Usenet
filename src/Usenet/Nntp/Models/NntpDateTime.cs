@@ -1,4 +1,4 @@
-﻿namespace Usenet.Nntp.Models;
+namespace Usenet.Nntp.Models;
 
 /// <summary>
 /// Represents an NNTP datetime object.
@@ -50,7 +50,7 @@ public class NntpDateTime : IEquatable<NntpDateTime>
     /// Converts a <see cref="DateTime"/> implicitly to a <see cref="NntpDateTime"/>.
     /// </summary>
     /// <param name="value">The value to convert.</param>
-    public static NntpDateTime FromDateTime(DateTime value) => new NntpDateTime(value);
+    public static NntpDateTime FromDateTime(DateTime value) => new(value);
 
     /// <summary>
     /// Converts a <see cref="DateTimeOffset"/> implicitly to a <see cref="NntpDateTime"/>.
@@ -62,20 +62,21 @@ public class NntpDateTime : IEquatable<NntpDateTime>
     /// Converts a <see cref="DateTimeOffset"/> implicitly to a <see cref="NntpDateTime"/>.
     /// </summary>
     /// <param name="value">The value to convert.</param>
-    public static NntpDateTime FromDateTimeOffset(DateTimeOffset value) => new NntpDateTime(value);
+    public static NntpDateTime FromDateTimeOffset(DateTimeOffset value) => new(value);
 
     /// <summary>
     /// Returns the hash code for this instance.
     /// </summary>
     /// <returns>A 32-bit signed integer hash code.</returns>
-    public override int GetHashCode() => EqualityComparer<DateTimeOffset>.Default.GetHashCode(Value);
+    public override int GetHashCode() =>
+        EqualityComparer<DateTimeOffset>.Default.GetHashCode(Value);
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="NntpDateTime"/> value.
     /// </summary>
     /// <param name="other">A <see cref="NntpDateTime"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-    public bool Equals(NntpDateTime other) => (object)other != null && Value == other.Value;
+    public bool Equals(NntpDateTime other) => other is not null && Value == other.Value;
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="object"/> value.
@@ -91,7 +92,7 @@ public class NntpDateTime : IEquatable<NntpDateTime>
     /// <param name="second">The second <see cref="NntpDateTime"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
     public static bool operator ==(NntpDateTime first, NntpDateTime second) =>
-        (object)first == null ? (object)second == null : first.Equals(second);
+        first?.Equals(second) ?? second is null;
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NntpDateTime"/> value is unequal to the second <see cref="NntpDateTime"/> value.
