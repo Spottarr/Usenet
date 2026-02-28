@@ -1,8 +1,8 @@
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
-using Usenet.Exceptions;
 using Microsoft.Extensions.Logging;
+using Usenet.Exceptions;
 using Usenet.Extensions;
 using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Parsers;
@@ -29,8 +29,13 @@ public sealed class NntpConnection : INntpConnection
     public CountingStream? Stream { get; private set; }
 
     /// <inheritdoc/>
-    public async Task<TResponse> ConnectAsync<TResponse>(string hostname, int port, bool useSsl, IResponseParser<TResponse> parser,
-        CancellationToken cancellationToken = default)
+    public async Task<TResponse> ConnectAsync<TResponse>(
+        string hostname,
+        int port,
+        bool useSsl,
+        IResponseParser<TResponse> parser,
+        CancellationToken cancellationToken = default
+    )
     {
         _log.Connecting(hostname, port, useSsl);
         await _client.ConnectAsync(hostname, port, cancellationToken).ConfigureAwait(false);
@@ -41,7 +46,11 @@ public sealed class NntpConnection : INntpConnection
     }
 
     /// <inheritdoc/>
-    public async Task<TResponse> CommandAsync<TResponse>(string command, IResponseParser<TResponse> parser, CancellationToken cancellationToken = default)
+    public async Task<TResponse> CommandAsync<TResponse>(
+        string command,
+        IResponseParser<TResponse> parser,
+        CancellationToken cancellationToken = default
+    )
     {
         ThrowIfNotConnected();
         Guard.ThrowIfNull(command);
@@ -55,26 +64,36 @@ public sealed class NntpConnection : INntpConnection
     }
 
     /// <inheritdoc/>
-    public async Task<TResponse> MultiLineCommandAsync<TResponse>(string command, IMultiLineResponseParser<TResponse> parser, CancellationToken cancellationToken = default)
+    public async Task<TResponse> MultiLineCommandAsync<TResponse>(
+        string command,
+        IMultiLineResponseParser<TResponse> parser,
+        CancellationToken cancellationToken = default
+    )
     {
         ThrowIfNotConnected();
         Guard.ThrowIfNull(parser);
 
-        var response = await CommandAsync(command, new ResponseParser(), cancellationToken).ConfigureAwait(false);
+        var response = await CommandAsync(command, new ResponseParser(), cancellationToken)
+            .ConfigureAwait(false);
 
         var dataBlock = parser.IsSuccessResponse(response.Code)
-            ? await ReadMultiLineDataBlockAsync(cancellationToken).ToListAsync(cancellationToken).ConfigureAwait(false)
+            ? await ReadMultiLineDataBlockAsync(cancellationToken)
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false)
             : [];
 
         return parser.Parse(response.Code, response.Message, dataBlock);
     }
 
     /// <inheritdoc/>
-    public async Task<TResponse> GetResponseAsync<TResponse>(IResponseParser<TResponse> parser, CancellationToken cancellationToken = default)
+    public async Task<TResponse> GetResponseAsync<TResponse>(
+        IResponseParser<TResponse> parser,
+        CancellationToken cancellationToken = default
+    )
     {
         ThrowIfNotConnected();
         Guard.ThrowIfNull(parser);
-        
+
         var responseText = await _reader!.ReadLineAsync(cancellationToken).ConfigureAwait(false);
         _log.ReceivedResponse(responseText ?? "");
 
@@ -106,7 +125,11 @@ public sealed class NntpConnection : INntpConnection
             throw new NntpException("Client not connected.");
     }
 
-    private async Task<CountingStream> GetStreamAsync(string hostname, bool useSsl, CancellationToken cancellationToken = default)
+    private async Task<CountingStream> GetStreamAsync(
+        string hostname,
+        bool useSsl,
+        CancellationToken cancellationToken = default
+    )
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -121,7 +144,9 @@ public sealed class NntpConnection : INntpConnection
         return new CountingStream(sslStream);
     }
 
-    private async IAsyncEnumerable<string> ReadMultiLineDataBlockAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
+    private async IAsyncEnumerable<string> ReadMultiLineDataBlockAsync(
+        [EnumeratorCancellation] CancellationToken cancellationToken = default
+    )
     {
         while (await _reader!.ReadLineAsync(cancellationToken).ConfigureAwait(false) is { } line)
         {

@@ -13,5 +13,6 @@ internal class ResponseParser : IResponseParser<NntpResponse>
 
     public bool IsSuccessResponse(int code) => _successCodes.Contains(code);
 
-    public NntpResponse Parse(int code, string message) => new(code, message, IsSuccessResponse(code));
+    public NntpResponse Parse(int code, string message) =>
+        new(code, message, IsSuccessResponse(code));
 }

@@ -3,7 +3,7 @@
 namespace Usenet.Nntp.Responses;
 
 /// <summary>
-/// Represents a response to the 
+/// Represents a response to the
 /// <a href="https://tools.ietf.org/html/rfc3977#section-6.2.1">ARTICLE</a>,
 /// <a href="https://tools.ietf.org/html/rfc3977#section-6.2.2">HEAD</a> and
 /// <a href="https://tools.ietf.org/html/rfc3977#section-6.2.3">BODY</a> commands.

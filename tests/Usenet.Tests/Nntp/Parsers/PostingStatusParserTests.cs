@@ -15,12 +15,20 @@ public class PostingStatusParserTests
     [InlineData("x", NntpPostingStatus.ArticlesFromPeersNotPermitted, "")]
     [InlineData("j", NntpPostingStatus.OnlyArticlesFromPeersPermittedNotFiledLocally, "")]
     [InlineData("=", NntpPostingStatus.OnlyArticlesFromPeersPermittedFiledLocally, "")]
-    [InlineData("=misc.test", NntpPostingStatus.OnlyArticlesFromPeersPermittedFiledLocally, "misc.test")]
+    [InlineData(
+        "=misc.test",
+        NntpPostingStatus.OnlyArticlesFromPeersPermittedFiledLocally,
+        "misc.test"
+    )]
     [InlineData("b", NntpPostingStatus.Unknown, "")]
     [InlineData("bbbbb", NntpPostingStatus.Unknown, "")]
     [InlineData("", NntpPostingStatus.Unknown, "")]
     [InlineData(null, NntpPostingStatus.Unknown, "")]
-    internal void InputShouldBeParsedCorrectly(string? input, NntpPostingStatus expectedStatus, string expectedOtherGroup)
+    internal void InputShouldBeParsedCorrectly(
+        string? input,
+        NntpPostingStatus expectedStatus,
+        string expectedOtherGroup
+    )
     {
         var status = PostingStatusParser.Parse(input!, out var otherGroup);
         Assert.Equal(expectedStatus, status);

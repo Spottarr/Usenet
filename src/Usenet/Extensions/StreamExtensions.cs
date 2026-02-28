@@ -23,7 +23,11 @@ internal static class StreamExtensions
         return ms.ToArray();
     }
 
-    public static ValueTask<int> ReadByteAsync(this Stream stream, byte[] buffer, CancellationToken cancellationToken)
+    public static ValueTask<int> ReadByteAsync(
+        this Stream stream,
+        byte[] buffer,
+        CancellationToken cancellationToken
+    )
     {
 #if NETSTANDARD2_0
         cancellationToken.ThrowIfCancellationRequested();

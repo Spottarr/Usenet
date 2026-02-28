@@ -20,11 +20,8 @@ public class NntpMultiLineResponse : NntpResponse
     /// <param name="message">The response message received from the server.</param>
     /// <param name="success">A value indicating whether the command succeeded or failed.</param>
     /// <param name="lines">The lines received from the server.</param>
-    public NntpMultiLineResponse(
-        int code,
-        string message,
-        bool success,
-        IEnumerable<string> lines) : base(code, message, success)
+    public NntpMultiLineResponse(int code, string message, bool success, IEnumerable<string> lines)
+        : base(code, message, success)
     {
         Lines = (lines ?? []).ToImmutableList();
     }

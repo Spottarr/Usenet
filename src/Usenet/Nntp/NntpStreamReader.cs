@@ -14,18 +14,16 @@ internal class NntpStreamReader : StreamReader
     /// Initializes a new instance of the <see cref="NntpStreamReader"/> class for the specified stream, with the default usenet encoding.
     /// </summary>
     /// <param name="stream">The stream to be read.</param>
-    public NntpStreamReader(Stream stream) : base(stream, UsenetEncoding.Default)
-    {
-    }
+    public NntpStreamReader(Stream stream)
+        : base(stream, UsenetEncoding.Default) { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NntpStreamReader"/> class for the specified stream, with the specified character encoding.
     /// </summary>
     /// <param name="stream">The stream to be read.</param>
     /// <param name="encoding">The character encoding to use.</param>
-    public NntpStreamReader(Stream stream, Encoding encoding) : base(stream, encoding)
-    {
-    }
+    public NntpStreamReader(Stream stream, Encoding encoding)
+        : base(stream, encoding) { }
 
     /// <summary>
     /// Reads a line of characters from the current stream and returns the data as a string.

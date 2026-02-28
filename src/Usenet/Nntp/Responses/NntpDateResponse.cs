@@ -1,7 +1,7 @@
 ﻿namespace Usenet.Nntp.Responses;
 
 /// <summary>
-/// Represents a response to the 
+/// Represents a response to the
 /// <a href="https://tools.ietf.org/html/rfc3977#section-7.1">DATE</a> command.
 /// </summary>
 public class NntpDateResponse : NntpResponse

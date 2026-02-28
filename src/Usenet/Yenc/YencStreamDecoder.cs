@@ -21,8 +21,10 @@ public static class YencStreamDecoder
     /// <param name="encodedLines">The yEnc-encoded lines to decode.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A <see cref="YencStream"/> with decoded binary data and meta-data.</returns>
-    public static YencStream Decode(IEnumerable<string> encodedLines, CancellationToken cancellationToken = default) =>
-        Decode(encodedLines, UsenetEncoding.Default, cancellationToken);
+    public static YencStream Decode(
+        IEnumerable<string> encodedLines,
+        CancellationToken cancellationToken = default
+    ) => Decode(encodedLines, UsenetEncoding.Default, cancellationToken);
 
     /// <summary>
     /// Decodes yEnc-encoded text into a <see cref="YencStream"/>
@@ -32,7 +34,11 @@ public static class YencStreamDecoder
     /// <param name="encoding">The character encoding to use.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A <see cref="YencStream"/> with decoded binary data and meta-data.</returns>
-    public static YencStream Decode(IEnumerable<string> encodedLines, Encoding encoding, CancellationToken cancellationToken = default)
+    public static YencStream Decode(
+        IEnumerable<string> encodedLines,
+        Encoding encoding,
+        CancellationToken cancellationToken = default
+    )
     {
         Guard.ThrowIfNull(encodedLines);
         Guard.ThrowIfNull(encoding);
@@ -50,7 +56,10 @@ public static class YencStreamDecoder
         return new YencStream(YencMeta.ParseHeader(headers), EnumerateData(enumerator, encoding));
     }
 
-    private static IEnumerable<byte[]> EnumerateData(IEnumerator<string> enumerator, Encoding encoding)
+    private static IEnumerable<byte[]> EnumerateData(
+        IEnumerator<string> enumerator,
+        Encoding encoding
+    )
     {
         var buffer = new byte[BufferSize];
         while (enumerator.MoveNext())
@@ -63,9 +72,7 @@ public static class YencStreamDecoder
             if (enumerator.Current.StartsWith(YEnd, StringComparison.Ordinal))
             {
                 // skip rest if there is some
-                while (enumerator.MoveNext())
-                {
-                }
+                while (enumerator.MoveNext()) { }
 
                 yield break;
             }

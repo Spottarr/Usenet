@@ -32,9 +32,14 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// </summary>
     /// <param name="metaData">A collection of metadata elements found in the NZB file.</param>
     /// <param name="files">A collection of files found in the NZB file.</param>
-    public NzbDocument(IDictionary<string, ICollection<string>>? metaData, IEnumerable<NzbFile>? files)
+    public NzbDocument(
+        IDictionary<string, ICollection<string>>? metaData,
+        IEnumerable<NzbFile>? files
+    )
     {
-        MetaData = (metaData ?? MultiValueDictionary<string, string>.Empty).ToImmutableDictionaryWithHashSets();
+        MetaData = (
+            metaData ?? MultiValueDictionary<string, string>.Empty
+        ).ToImmutableDictionaryWithHashSets();
         Files = (files ?? []).OrderBy(f => f.FileName).ToImmutableList();
         Size = Files.Sum(f => f.Size);
     }
@@ -47,8 +52,10 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <returns>A task that represents the asynchronous load operation.
     /// The value of the task's result property contains the resulting <see cref="NzbDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
-    public static Task<NzbDocument> LoadAsync(Stream stream, CancellationToken cancellationToken = default) =>
-        LoadAsync(stream, UsenetEncoding.Default, cancellationToken);
+    public static Task<NzbDocument> LoadAsync(
+        Stream stream,
+        CancellationToken cancellationToken = default
+    ) => LoadAsync(stream, UsenetEncoding.Default, cancellationToken);
 
     /// <summary>
     /// Loads a <see cref="NzbDocument"/> from the specified stream asynchronously using the specified character encoding.
@@ -59,7 +66,11 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <returns>A task that represents the asynchronous load operation.
     /// The value of the task's result property contains the resulting <see cref="NzbDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
-    public static async Task<NzbDocument> LoadAsync(Stream stream, Encoding encoding, CancellationToken cancellationToken = default)
+    public static async Task<NzbDocument> LoadAsync(
+        Stream stream,
+        Encoding encoding,
+        CancellationToken cancellationToken = default
+    )
     {
         Guard.ThrowIfNull(stream);
         Guard.ThrowIfNull(encoding);
@@ -72,9 +83,7 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// Returns the hash code for this instance.
     /// </summary>
     /// <returns>A 32-bit signed integer hash code.</returns>
-    public override int GetHashCode() => HashCode.Start
-        .Hash(Size)
-        .Hash(Files);
+    public override int GetHashCode() => HashCode.Start.Hash(Size).Hash(Files);
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="NzbDocument"/> value.
@@ -89,9 +98,9 @@ public class NzbDocument : IEquatable<NzbDocument>
         }
 
         var equals =
-            Size.Equals(other.Size) &&
-            Files.SequenceEqual(other.Files) &&
-            MetaData.Count == other.MetaData.Count;
+            Size.Equals(other.Size)
+            && Files.SequenceEqual(other.Files)
+            && MetaData.Count == other.MetaData.Count;
 
         if (!equals)
         {
@@ -101,8 +110,9 @@ public class NzbDocument : IEquatable<NzbDocument>
         // compare metadata
         foreach (var pair in MetaData)
         {
-            if (!other.MetaData.TryGetValue(pair.Key, out var value) ||
-                !pair.Value.SetEquals(value))
+            if (
+                !other.MetaData.TryGetValue(pair.Key, out var value) || !pair.Value.SetEquals(value)
+            )
             {
                 return false;
             }

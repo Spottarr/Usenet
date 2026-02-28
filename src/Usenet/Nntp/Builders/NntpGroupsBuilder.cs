@@ -19,9 +19,7 @@ public class NntpGroupsBuilder
     /// <summary>
     /// Creates a new instance of the <see cref="NntpGroupsBuilder"/> class.
     /// </summary>
-    public NntpGroupsBuilder()
-    {
-    }
+    public NntpGroupsBuilder() { }
 
     /// <summary>
     /// Gets a value that indicates whether this list is empty.

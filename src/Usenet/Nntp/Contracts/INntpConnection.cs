@@ -19,7 +19,13 @@ public interface INntpConnection : IDisposable
     /// <param name="parser">The response parser to use.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A response object of type <typeparamref name="TResponse"/>.</returns>
-    Task<TResponse> ConnectAsync<TResponse>(string hostname, int port, bool useSsl, IResponseParser<TResponse> parser, CancellationToken cancellationToken = default);
+    Task<TResponse> ConnectAsync<TResponse>(
+        string hostname,
+        int port,
+        bool useSsl,
+        IResponseParser<TResponse> parser,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Sends a command to the usenet server asynchronously. The response is expected to be a single line.
@@ -29,7 +35,11 @@ public interface INntpConnection : IDisposable
     /// <param name="parser">The response parser to use.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A response object of type <typeparamref name="TResponse"/>.</returns>
-    Task<TResponse> CommandAsync<TResponse>(string command, IResponseParser<TResponse> parser, CancellationToken cancellationToken = default);
+    Task<TResponse> CommandAsync<TResponse>(
+        string command,
+        IResponseParser<TResponse> parser,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Sends a command to the usenet server asynchronously. The response is expected to be multiple lines.
@@ -39,7 +49,11 @@ public interface INntpConnection : IDisposable
     /// <param name="parser">The multi-line response parser to use.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A response object of type <typeparamref name="TResponse"/>.</returns>
-    Task<TResponse> MultiLineCommandAsync<TResponse>(string command, IMultiLineResponseParser<TResponse> parser, CancellationToken cancellationToken = default);
+    Task<TResponse> MultiLineCommandAsync<TResponse>(
+        string command,
+        IMultiLineResponseParser<TResponse> parser,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets a single-line response from the usenet server asynchronously.
@@ -48,7 +62,10 @@ public interface INntpConnection : IDisposable
     /// <param name="parser">The response parser to use.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A response object of type <typeparamref name="TResponse"/>.</returns>
-    Task<TResponse> GetResponseAsync<TResponse>(IResponseParser<TResponse> parser, CancellationToken cancellationToken = default);
+    Task<TResponse> GetResponseAsync<TResponse>(
+        IResponseParser<TResponse> parser,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Sends a line to the usenet server asynchronously.

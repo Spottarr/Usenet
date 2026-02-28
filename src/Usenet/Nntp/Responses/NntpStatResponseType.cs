@@ -34,5 +34,5 @@ public enum NntpStatResponseType
     /// <summary>
     /// No article with that message-id (response code 430)
     /// </summary>
-    NoArticleWithThatMessageId = 430
+    NoArticleWithThatMessageId = 430,
 }

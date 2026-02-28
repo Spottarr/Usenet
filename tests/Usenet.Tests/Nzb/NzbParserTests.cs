@@ -18,7 +18,9 @@ public class NzbParserTests
     internal async Task ValidNzbDataShouldBeParsed(IFileInfo file)
     {
         var nzbData = file.ReadAllText(UsenetEncoding.Default);
-        var actualDocument = await NzbParser.ParseAsync(nzbData, TestContext.Current.CancellationToken).ConfigureAwait(true);
+        var actualDocument = await NzbParser
+            .ParseAsync(nzbData, TestContext.Current.CancellationToken)
+            .ConfigureAwait(true);
 
         Assert.Equal("Your File!", actualDocument.MetaData["title"].Single());
         Assert.Equal("secret", actualDocument.MetaData["password"].Single());
@@ -31,7 +33,9 @@ public class NzbParserTests
     internal async Task MinimalNzbDataShouldBeParsed()
     {
         const string nzbText = """<nzb xmlns="http://www.newzbin.com/DTD/2003/nzb"></nzb>""";
-        var actualDocument = await NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken).ConfigureAwait(true);
+        var actualDocument = await NzbParser
+            .ParseAsync(nzbText, TestContext.Current.CancellationToken)
+            .ConfigureAwait(true);
 
         Assert.Empty(actualDocument.MetaData);
         Assert.Empty(actualDocument.Files);
@@ -41,14 +45,16 @@ public class NzbParserTests
     internal async Task MultipleMetaDataKeysShouldBeParsed()
     {
         const string nzbText = """
-                               <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
-                                 <head>
-                                   <meta type="tag">SD</meta>
-                                   <meta type="tag">avi</meta>
-                                 </head>
-                               </nzb>
-                               """;
-        var actualDocument = await NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken).ConfigureAwait(true);
+            <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
+              <head>
+                <meta type="tag">SD</meta>
+                <meta type="tag">avi</meta>
+              </head>
+            </nzb>
+            """;
+        var actualDocument = await NzbParser
+            .ParseAsync(nzbText, TestContext.Current.CancellationToken)
+            .ConfigureAwait(true);
 
         Assert.Single(actualDocument.MetaData);
         Assert.Equal(2, actualDocument.MetaData["tag"].Count);
@@ -60,12 +66,14 @@ public class NzbParserTests
     internal async Task MinimalFileShouldBeParsed()
     {
         const string nzbText = """
-                               <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
-                                 <file></file>
-                               </nzb>
-                               """;
+            <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
+              <file></file>
+            </nzb>
+            """;
 
-        var actualDocument = await NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken).ConfigureAwait(true);
+        var actualDocument = await NzbParser
+            .ParseAsync(nzbText, TestContext.Current.CancellationToken)
+            .ConfigureAwait(true);
 
         Assert.Empty(actualDocument.MetaData);
         Assert.Single(actualDocument.Files);
@@ -74,14 +82,19 @@ public class NzbParserTests
     [Fact]
     internal async Task FileDateShouldBeParsed()
     {
-        var expected = DateTimeOffset.Parse(@"2017-06-01T06:49:13+00:00", CultureInfo.InvariantCulture);
+        var expected = DateTimeOffset.Parse(
+            @"2017-06-01T06:49:13+00:00",
+            CultureInfo.InvariantCulture
+        );
         const string nzbText = """
-                               <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
-                                 <file date="1496299753"></file>
-                               </nzb>
-                               """;
+            <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
+              <file date="1496299753"></file>
+            </nzb>
+            """;
 
-        var actualDocument = await NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken).ConfigureAwait(true);
+        var actualDocument = await NzbParser
+            .ParseAsync(nzbText, TestContext.Current.CancellationToken)
+            .ConfigureAwait(true);
         Assert.Equal(expected, actualDocument.Files[0].Date);
     }
 
@@ -89,103 +102,132 @@ public class NzbParserTests
     internal async Task InvalidFileDateShouldThrow()
     {
         const string nzbText = """
-                               <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
-                                 <file date="1496xxx753"></file>
-                               </nzb>
-                               """;
+            <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
+              <file date="1496xxx753"></file>
+            </nzb>
+            """;
 
-        await Assert.ThrowsAsync<InvalidNzbDataException>(() => NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken)).ConfigureAwait(true);
+        await Assert
+            .ThrowsAsync<InvalidNzbDataException>(() =>
+                NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken)
+            )
+            .ConfigureAwait(true);
     }
 
     [Fact]
     internal async Task InvalidSegmentNumberShouldThrow()
     {
         const string nzbText = """
-                               <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
-                                 <file>
-                                   <segments>
-                                     <segment number="123ffg45"></segment>
-                                   </segments>
-                                 </file>
-                               </nzb>
-                               """;
+            <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
+              <file>
+                <segments>
+                  <segment number="123ffg45"></segment>
+                </segments>
+              </file>
+            </nzb>
+            """;
 
-        await Assert.ThrowsAsync<InvalidNzbDataException>(() => NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken)).ConfigureAwait(true);
+        await Assert
+            .ThrowsAsync<InvalidNzbDataException>(() =>
+                NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken)
+            )
+            .ConfigureAwait(true);
     }
 
     [Fact]
     internal async Task MissingSegmentNumberShouldThrow()
     {
         const string nzbText = """
-                               <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
-                                 <file>
-                                   <segments>
-                                     <segment bytes="1000"></segment>
-                                   </segments>
-                                 </file>
-                               </nzb>
-                               """;
+            <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
+              <file>
+                <segments>
+                  <segment bytes="1000"></segment>
+                </segments>
+              </file>
+            </nzb>
+            """;
 
-        await Assert.ThrowsAsync<InvalidNzbDataException>(() => NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken)).ConfigureAwait(true);
+        await Assert
+            .ThrowsAsync<InvalidNzbDataException>(() =>
+                NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken)
+            )
+            .ConfigureAwait(true);
     }
-
 
     [Fact]
     internal async Task InvalidSegmentSizeShouldThrow()
     {
         const string nzbText = """
-                               <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
-                                 <file>
-                                   <segments>
-                                     <segment bytes="123ffg45"></segment>
-                                   </segments>
-                                 </file>
-                               </nzb>
-                               """;
+            <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
+              <file>
+                <segments>
+                  <segment bytes="123ffg45"></segment>
+                </segments>
+              </file>
+            </nzb>
+            """;
 
-        await Assert.ThrowsAsync<InvalidNzbDataException>(() => NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken)).ConfigureAwait(true);
+        await Assert
+            .ThrowsAsync<InvalidNzbDataException>(() =>
+                NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken)
+            )
+            .ConfigureAwait(true);
     }
 
     [Fact]
     internal async Task MissingSegmentSizeShouldThrow()
     {
         const string nzbText = """
-                               <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
-                                 <file>
-                                   <segments>
-                                     <segment number="1"></segment>
-                                   </segments>
-                                 </file>
-                               </nzb>
-                               """;
+            <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
+              <file>
+                <segments>
+                  <segment number="1"></segment>
+                </segments>
+              </file>
+            </nzb>
+            """;
 
-        await Assert.ThrowsAsync<InvalidNzbDataException>(() => NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken)).ConfigureAwait(true);
+        await Assert
+            .ThrowsAsync<InvalidNzbDataException>(() =>
+                NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken)
+            )
+            .ConfigureAwait(true);
     }
 
     [Fact]
     internal async Task InvalidXmlShouldThrow()
     {
         const string nzbText = "sdfsfasfasdfasdf";
-        await Assert.ThrowsAsync<XmlException>(() => NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken)).ConfigureAwait(true);
+        await Assert
+            .ThrowsAsync<XmlException>(() =>
+                NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken)
+            )
+            .ConfigureAwait(true);
     }
 
     [Fact]
     internal async Task InvalidNzbShouldThrow()
     {
         const string nzbText = "<html></html>";
-        await Assert.ThrowsAsync<InvalidNzbDataException>(() => NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken)).ConfigureAwait(true);
+        await Assert
+            .ThrowsAsync<InvalidNzbDataException>(() =>
+                NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken)
+            )
+            .ConfigureAwait(true);
     }
 
     [Fact]
     internal async Task FileShouldBeExtractedFromSubjectWhenQuoted()
     {
         const string nzbText = """
-                               <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
-                                 <file subject="(TWD151 - 153)[2 / 9] - &quot;TWD151 - 153.rar&quot; yEnc (001 / 249)"></file>
-                               </nzb>
-                               """;
+            <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
+              <file subject="(TWD151 - 153)[2 / 9] - &quot;TWD151 - 153.rar&quot; yEnc (001 / 249)"></file>
+            </nzb>
+            """;
 
-        var actualDocument = await NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken).ConfigureAwait(true);
+        var actualDocument = await NzbParser
+            .ParseAsync(nzbText, TestContext.Current.CancellationToken)
+            .ConfigureAwait(true);
         Assert.Equal("TWD151 - 153.rar", actualDocument.Files.Single().FileName);
     }
 
@@ -193,25 +235,32 @@ public class NzbParserTests
     internal async Task FileShouldBeExtractedFromSubjectWhenNotQuoted()
     {
         const string nzbText = """
-                               <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
-                                 <file subject="(TWD151 - 153)[2 / 9] - TWD151 - 153.rar yEnc (001 / 249)"></file>
-                               </nzb>
-                               """;
+            <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
+              <file subject="(TWD151 - 153)[2 / 9] - TWD151 - 153.rar yEnc (001 / 249)"></file>
+            </nzb>
+            """;
 
-        var actualDocument = await NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken).ConfigureAwait(true);
-        Assert.Equal("(TWD151 - 153)[2 / 9] - TWD151 - 153.rar", actualDocument.Files.Single().FileName);
+        var actualDocument = await NzbParser
+            .ParseAsync(nzbText, TestContext.Current.CancellationToken)
+            .ConfigureAwait(true);
+        Assert.Equal(
+            "(TWD151 - 153)[2 / 9] - TWD151 - 153.rar",
+            actualDocument.Files.Single().FileName
+        );
     }
 
     [Fact]
     internal async Task FileShouldBeExtractedFromSubjectWhenNotQuotedAndNoParenthesis()
     {
         const string nzbText = """
-                               <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
-                                 <file subject="[2 / 9] - TWD151 - 153.rar yEnc"></file>
-                               </nzb>
-                               """;
+            <nzb xmlns="http://www.newzbin.com/DTD/2003/nzb">
+              <file subject="[2 / 9] - TWD151 - 153.rar yEnc"></file>
+            </nzb>
+            """;
 
-        var actualDocument = await NzbParser.ParseAsync(nzbText, TestContext.Current.CancellationToken).ConfigureAwait(true);
+        var actualDocument = await NzbParser
+            .ParseAsync(nzbText, TestContext.Current.CancellationToken)
+            .ConfigureAwait(true);
         Assert.Equal("[2 / 9] - TWD151 - 153.rar", actualDocument.Files.Single().FileName);
     }
 }

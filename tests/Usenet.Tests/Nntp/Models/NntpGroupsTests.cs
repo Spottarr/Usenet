@@ -45,21 +45,24 @@ public class NntpGroupsTests
     [
         [
             new XSerializable<NntpGroups>(new NntpGroups("group1;group2")),
-            new XSerializable<NntpGroups>(new NntpGroups("group1;group2"))
+            new XSerializable<NntpGroups>(new NntpGroups("group1;group2")),
         ],
         [
             new XSerializable<NntpGroups>(new NntpGroups("group3;group4")),
-            new XSerializable<NntpGroups>(new NntpGroups("group4;group3"))
+            new XSerializable<NntpGroups>(new NntpGroups("group4;group3")),
         ],
         [
             new XSerializable<NntpGroups>(new NntpGroups("group5;group6")),
-            new XSerializable<NntpGroups>(new NntpGroups("group6;group5;group5"))
-        ]
+            new XSerializable<NntpGroups>(new NntpGroups("group6;group5;group5")),
+        ],
     ];
 
     [Theory]
     [MemberData(nameof(EqualsWithSameValues))]
-    internal void EqualsWithSameValuesShouldReturnTrue(XSerializable<NntpGroups> groups1, XSerializable<NntpGroups> groups2)
+    internal void EqualsWithSameValuesShouldReturnTrue(
+        XSerializable<NntpGroups> groups1,
+        XSerializable<NntpGroups> groups2
+    )
     {
         Assert.Equal(groups1.Object, groups2.Object);
     }

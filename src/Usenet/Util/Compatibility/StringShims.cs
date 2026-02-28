@@ -11,7 +11,11 @@ internal static class StringShims
 #endif
     }
 
-    internal static string[] Split(this string input, string separator, StringSplitOptions options = StringSplitOptions.None)
+    internal static string[] Split(
+        this string input,
+        string separator,
+        StringSplitOptions options = StringSplitOptions.None
+    )
     {
 #if NETSTANDARD2_0
         return input.Split([separator], options);
@@ -20,7 +24,11 @@ internal static class StringShims
 #endif
     }
 
-    internal static string[] Split(this string input, char separator, StringSplitOptions options = StringSplitOptions.None)
+    internal static string[] Split(
+        this string input,
+        char separator,
+        StringSplitOptions options = StringSplitOptions.None
+    )
     {
 #if NETSTANDARD2_0
         return input.Split([separator], options);

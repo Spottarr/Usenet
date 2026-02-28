@@ -38,7 +38,8 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// Wraps the <see cref="NntpMessageId"/> in "&lt;" and "&gt;" according to the NNTP specifications.
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => string.IsNullOrEmpty(Value) ? string.Empty : string.Concat("<", Value, ">");
+    public override string ToString() =>
+        string.IsNullOrEmpty(Value) ? string.Empty : string.Concat("<", Value, ">");
 
     /// <summary>
     /// Converts a <see cref="NntpMessageId"/> implicitly to a string.
@@ -102,5 +103,6 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// <param name="first">The first <see cref="NntpMessageId"/>.</param>
     /// <param name="second">The second <see cref="NntpMessageId"/>.</param>
     /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator !=(NntpMessageId? first, NntpMessageId? second) => !(first == second);
+    public static bool operator !=(NntpMessageId? first, NntpMessageId? second) =>
+        !(first == second);
 }

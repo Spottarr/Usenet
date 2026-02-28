@@ -22,7 +22,8 @@ public class NntpGroups : IEnumerable<string>, IEquatable<NntpGroups>
     /// <summary>
     /// Creates a new <see cref="NntpGroups"/> object.
     /// </summary>
-    public NntpGroups(string groups) : this(GroupsParser.Parse(groups), false)
+    public NntpGroups(string groups)
+        : this(GroupsParser.Parse(groups), false)
     {
         Guard.ThrowIfNull(groups);
     }
@@ -30,7 +31,8 @@ public class NntpGroups : IEnumerable<string>, IEquatable<NntpGroups>
     /// <summary>
     /// Creates a new <see cref="NntpGroups"/> object.
     /// </summary>
-    public NntpGroups(IEnumerable<string> groups) : this(groups, true)
+    public NntpGroups(IEnumerable<string> groups)
+        : this(groups, true)
     {
         Guard.ThrowIfNull(groups);
     }
@@ -89,7 +91,8 @@ public class NntpGroups : IEnumerable<string>, IEquatable<NntpGroups>
     /// </summary>
     /// <param name="other">A <see cref="NntpGroups"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-    public bool Equals(NntpGroups? other) => other is not null && _groups.SequenceEqual(other._groups);
+    public bool Equals(NntpGroups? other) =>
+        other is not null && _groups.SequenceEqual(other._groups);
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="NntpGroups"/> value.

@@ -6,7 +6,8 @@
 /// (<a href="https://stackoverflow.com/questions/50098/comparing-two-collections-for-equality-irrespective-of-the-order-of-items-in-the">Source</a>)
 /// </summary>
 /// <typeparam name="T"></typeparam>
-internal class MultiSetComparer<T> : IEqualityComparer<IEnumerable<T>> where T : notnull
+internal class MultiSetComparer<T> : IEqualityComparer<IEnumerable<T>>
+    where T : notnull
 {
     private readonly IEqualityComparer<T> _comparer;
 
@@ -24,9 +25,8 @@ internal class MultiSetComparer<T> : IEqualityComparer<IEnumerable<T>> where T :
     /// Creates a new instance of the <see cref="MultiSetComparer{T}"/> class
     /// using the default <see cref="IEqualityComparer{T}"/> for the type specified by the generic argument.
     /// </summary>
-    public MultiSetComparer() : this(EqualityComparer<T>.Default)
-    {
-    }
+    public MultiSetComparer()
+        : this(EqualityComparer<T>.Default) { }
 
     /// <summary>
     /// Determines whether the first collection is equal to the second collection irrespective
@@ -37,14 +37,18 @@ internal class MultiSetComparer<T> : IEqualityComparer<IEnumerable<T>> where T :
     /// <returns></returns>
     public bool Equals(IEnumerable<T>? first, IEnumerable<T>? second)
     {
-        if (first == null) return second == null;
-        if (second == null) return false;
+        if (first == null)
+            return second == null;
+        if (second == null)
+            return false;
 
-        if (ReferenceEquals(first, second)) 
+        if (ReferenceEquals(first, second))
             return true;
 
-        if (first is not ICollection<T> firstCollection ||
-            second is not ICollection<T> secondCollection)
+        if (
+            first is not ICollection<T> firstCollection
+            || second is not ICollection<T> secondCollection
+        )
             return !HaveMismatchedElement(first, second);
 
         if (firstCollection.Count != secondCollection.Count)
@@ -61,7 +65,10 @@ internal class MultiSetComparer<T> : IEqualityComparer<IEnumerable<T>> where T :
         var firstElementCounts = GetElementCounts(first, out var firstNullCount);
         var secondElementCounts = GetElementCounts(second, out var secondNullCount);
 
-        if (firstNullCount != secondNullCount || firstElementCounts.Count != secondElementCounts.Count)
+        if (
+            firstNullCount != secondNullCount
+            || firstElementCounts.Count != secondElementCounts.Count
+        )
         {
             return true;
         }

@@ -34,7 +34,7 @@ public class YencArticle
     {
         Guard.ThrowIfNull(header);
         Guard.ThrowIfNull(data);
-        
+
         Header = header;
         Footer = footer;
         Data = data;

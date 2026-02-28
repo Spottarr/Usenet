@@ -16,8 +16,11 @@ internal class GroupResponseParser : IResponseParser<NntpGroupResponse>
         if (!IsSuccessResponse(code))
         {
             return new NntpGroupResponse(
-                code, message, false,
-                new NntpGroup(string.Empty, 0, 0, 0, NntpPostingStatus.Unknown, string.Empty, []));
+                code,
+                message,
+                false,
+                new NntpGroup(string.Empty, 0, 0, 0, NntpPostingStatus.Unknown, string.Empty, [])
+            );
         }
 
         var responseSplit = message.Split(' ');
@@ -28,11 +31,16 @@ internal class GroupResponseParser : IResponseParser<NntpGroupResponse>
 
         _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out var articleCount);
         _ = long.TryParse(responseSplit.Length > 1 ? responseSplit[1] : null, out var lowWaterMark);
-        _ = long.TryParse(responseSplit.Length > 2 ? responseSplit[2] : null, out var highWaterMark);
+        _ = long.TryParse(
+            responseSplit.Length > 2 ? responseSplit[2] : null,
+            out var highWaterMark
+        );
         var name = responseSplit.Length > 3 ? responseSplit[3] : string.Empty;
 
         return new NntpGroupResponse(
-            code, message, true,
+            code,
+            message,
+            true,
             new NntpGroup(
                 name,
                 articleCount,
@@ -40,6 +48,8 @@ internal class GroupResponseParser : IResponseParser<NntpGroupResponse>
                 highWaterMark,
                 NntpPostingStatus.Unknown,
                 string.Empty,
-                []));
+                []
+            )
+        );
     }
 }

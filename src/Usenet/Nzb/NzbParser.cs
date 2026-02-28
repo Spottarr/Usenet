@@ -25,11 +25,16 @@ public static class NzbParser
     /// <returns>A task containing a parsed <see cref="NzbDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
     /// <exception cref="InvalidNzbDataException">InvalidNzbDataException</exception>
-    public static async Task<NzbDocument> ParseAsync(string text, CancellationToken cancellationToken = default)
+    public static async Task<NzbDocument> ParseAsync(
+        string text,
+        CancellationToken cancellationToken = default
+    )
     {
         Guard.ThrowIfNull(text);
 
-        var doc = await XDocumentShims.LoadAsync(new StringReader(text), cancellationToken).ConfigureAwait(false);
+        var doc = await XDocumentShims
+            .LoadAsync(new StringReader(text), cancellationToken)
+            .ConfigureAwait(false);
         return ParseDocument(doc);
     }
 
@@ -41,7 +46,10 @@ public static class NzbParser
     /// <returns>A task containing a parsed <see cref="NzbDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
     /// <exception cref="InvalidNzbDataException">InvalidNzbDataException</exception>
-    public static async Task<NzbDocument> ParseAsync(Stream stream, CancellationToken cancellationToken = default)
+    public static async Task<NzbDocument> ParseAsync(
+        Stream stream,
+        CancellationToken cancellationToken = default
+    )
     {
         Guard.ThrowIfNull(stream);
 
@@ -57,7 +65,10 @@ public static class NzbParser
     /// <returns>A task containing a parsed <see cref="NzbDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
     /// <exception cref="InvalidNzbDataException">InvalidNzbDataException</exception>
-    public static async Task<NzbDocument> ParseAsync(TextReader reader, CancellationToken cancellationToken = default)
+    public static async Task<NzbDocument> ParseAsync(
+        TextReader reader,
+        CancellationToken cancellationToken = default
+    )
     {
         Guard.ThrowIfNull(reader);
 
@@ -90,7 +101,10 @@ public static class NzbParser
         return new NzbDocument(metaData, files);
     }
 
-    private static MultiValueDictionary<string, string>? GetMetaData(NzbParserContext context, XContainer nzbElement)
+    private static MultiValueDictionary<string, string>? GetMetaData(
+        NzbParserContext context,
+        XContainer nzbElement
+    )
     {
         var headElement = nzbElement.Element(context.Namespace + NzbKeywords.Head);
         if (headElement == null)
@@ -113,14 +127,18 @@ public static class NzbParser
         return dict;
     }
 
-    private static IEnumerable<NzbFile> GetFiles(NzbParserContext context, XContainer nzbElement) => nzbElement
-        .Elements(context.Namespace + NzbKeywords.File)
-        .Select(f => GetFile(context, f));
+    private static IEnumerable<NzbFile> GetFiles(NzbParserContext context, XContainer nzbElement) =>
+        nzbElement.Elements(context.Namespace + NzbKeywords.File).Select(f => GetFile(context, f));
 
     private static NzbFile GetFile(NzbParserContext context, XElement fileElement)
     {
         var poster = fileElement.Attribute(NzbKeywords.Poster)?.Value ?? string.Empty;
-        if (!long.TryParse(fileElement.Attribute(NzbKeywords.Date)?.Value ?? "0", out var unixTimestamp))
+        if (
+            !long.TryParse(
+                fileElement.Attribute(NzbKeywords.Date)?.Value ?? "0",
+                out var unixTimestamp
+            )
+        )
         {
             throw new InvalidNzbDataException(Resources.Nzb.InvalidDateAttriubute);
         }
@@ -160,11 +178,14 @@ public static class NzbParser
         var groups = groupsElement
             .Elements(context.Namespace + NzbKeywords.Group)
             .Select(g => g.Value);
-        
+
         return new NntpGroups(groups);
     }
 
-    private static List<NzbSegment> GetSegments(NzbParserContext context, XContainer segmentsElement)
+    private static List<NzbSegment> GetSegments(
+        NzbParserContext context,
+        XContainer segmentsElement
+    )
     {
         var elements = segmentsElement
             .Elements(context.Namespace + NzbKeywords.Segment)

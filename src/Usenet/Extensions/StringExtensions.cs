@@ -60,8 +60,7 @@ internal static class StringExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static string Pack(this string source) =>
-        WhitespaceRegex.Replace(source, string.Empty);
+    public static string Pack(this string source) => WhitespaceRegex.Replace(source, string.Empty);
 
     public static int IndexOf(this string source, char value, StringComparison comparisonType)
     {

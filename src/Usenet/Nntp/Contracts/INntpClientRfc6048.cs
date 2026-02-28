@@ -23,7 +23,10 @@ public interface INntpClientRfc6048
     /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A groups response object containing a list of valid newsgroups.</returns>
-    Task<NntpGroupsResponse> ListCountsAsync(string wildmat, CancellationToken cancellationToken = default);
+    Task<NntpGroupsResponse> ListCountsAsync(
+        string wildmat,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-2.3">LIST DISTRIBUTIONS</a>
@@ -35,7 +38,9 @@ public interface INntpClientRfc6048
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response object containing the distributions list.</returns>
-    Task<NntpMultiLineResponse> ListDistributionsAsync(CancellationToken cancellationToken = default);
+    Task<NntpMultiLineResponse> ListDistributionsAsync(
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-2.4">LIST MODERATORS</a>
@@ -64,7 +69,9 @@ public interface INntpClientRfc6048
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing a list of recommended subscriptions.</returns>
-    Task<NntpMultiLineResponse> ListSubscriptionsAsync(CancellationToken cancellationToken = default);
+    Task<NntpMultiLineResponse> ListSubscriptionsAsync(
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-3">LIST ACTIVE</a>
@@ -87,5 +94,8 @@ public interface INntpClientRfc6048
     /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A groups response object containing a list of valid newsgroups and associated information.</returns>
-    Task<NntpGroupsResponse> ListActiveAsync(string wildmat, CancellationToken cancellationToken = default);
+    Task<NntpGroupsResponse> ListActiveAsync(
+        string wildmat,
+        CancellationToken cancellationToken = default
+    );
 }

@@ -15,7 +15,10 @@ internal static class Guard
     /// <param name="obj">The object to check</param>
     /// <param name="name">The name of the object</param>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
-    public static void ThrowIfNull([NotNull] object? obj, [CallerArgumentExpression(nameof(obj))] string? name = null)
+    public static void ThrowIfNull(
+        [NotNull] object? obj,
+        [CallerArgumentExpression(nameof(obj))] string? name = null
+    )
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(obj, name);
@@ -36,7 +39,7 @@ internal static class Guard
     public static void ThrowIfNullOrEmpty([NotNull] string str, string name)
     {
 #if NET8_0_OR_GREATER
-            ArgumentException.ThrowIfNullOrEmpty(str, name);
+        ArgumentException.ThrowIfNullOrEmpty(str, name);
 #else
         ThrowIfNull(str, name);
         if (str.Length == 0)
@@ -55,7 +58,7 @@ internal static class Guard
     public static void ThrowIfNullOrWhiteSpace([NotNull] string str, string name)
     {
 #if NET8_0_OR_GREATER
-            ArgumentException.ThrowIfNullOrWhiteSpace(str, name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(str, name);
 #else
         ThrowIfNullOrEmpty(str, name);
         if (string.IsNullOrWhiteSpace(str))
@@ -72,7 +75,7 @@ internal static class Guard
     public static void ThrowIfNegativeOrZero(long value, string paramName)
     {
 #if NET8_0_OR_GREATER
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value, paramName);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value, paramName);
 #else
         if (value <= 0)
             throw new ArgumentOutOfRangeException(paramName);

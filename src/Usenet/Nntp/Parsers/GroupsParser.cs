@@ -27,7 +27,12 @@ internal static class GroupsParser
 
     private static void AddGroups(List<string> groups, string value)
     {
-        foreach (var group in value.Split(NntpGroups.GroupSeparator, StringSplitOptions.RemoveEmptyEntries))
+        foreach (
+            var group in value.Split(
+                NntpGroups.GroupSeparator,
+                StringSplitOptions.RemoveEmptyEntries
+            )
+        )
         {
             var packed = group.Pack();
             if (packed.Length > 0 && !groups.Contains(packed))

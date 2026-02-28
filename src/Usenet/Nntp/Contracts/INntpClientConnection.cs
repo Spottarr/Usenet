@@ -12,7 +12,12 @@ public interface INntpClientConnection
     /// <param name="useSsl">A value to indicate whether or not to use SSL encryption.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>true if a connection was made; otherwise false</returns>
-    Task<bool> ConnectAsync(string hostname, int port, bool useSsl, CancellationToken cancellationToken = default);
+    Task<bool> ConnectAsync(
+        string hostname,
+        int port,
+        bool useSsl,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// The client uses the

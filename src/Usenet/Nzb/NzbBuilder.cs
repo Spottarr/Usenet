@@ -21,9 +21,7 @@ public class NzbBuilder
     /// <summary>
     /// Creates a new instance of the <see cref="NzbBuilder"/> class.
     /// </summary>
-    public NzbBuilder()
-    {
-    }
+    public NzbBuilder() { }
 
     /// <summary>
     /// Sets the NZB document's default poster. Will be used for every file.
@@ -138,7 +136,8 @@ public class NzbBuilder
                 f.FileInfo.Name,
                 date,
                 new NntpGroupsBuilder().Add(f.Groups).Add(_groupsBuilder.Groups).Build(),
-                GetSegments(f.FileInfo)))
+                GetSegments(f.FileInfo)
+            ))
             .ToList();
     }
 

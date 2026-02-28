@@ -14,19 +14,25 @@ internal static class PostingStatusParser
 
         switch (input[0])
         {
-            case 'y': return NntpPostingStatus.PostingPermitted;
-            case 'n': return NntpPostingStatus.PostingNotPermitted;
-            case 'm': return NntpPostingStatus.PostingsWillBeReviewed;
-            case 'x': return NntpPostingStatus.ArticlesFromPeersNotPermitted;
-            case 'j': return NntpPostingStatus.OnlyArticlesFromPeersPermittedNotFiledLocally;
+            case 'y':
+                return NntpPostingStatus.PostingPermitted;
+            case 'n':
+                return NntpPostingStatus.PostingNotPermitted;
+            case 'm':
+                return NntpPostingStatus.PostingsWillBeReviewed;
+            case 'x':
+                return NntpPostingStatus.ArticlesFromPeersNotPermitted;
+            case 'j':
+                return NntpPostingStatus.OnlyArticlesFromPeersPermittedNotFiledLocally;
 
             case '=':
-                {
-                    otherGroup = input[1..];
-                    return NntpPostingStatus.OnlyArticlesFromPeersPermittedFiledLocally;
-                }
+            {
+                otherGroup = input[1..];
+                return NntpPostingStatus.OnlyArticlesFromPeersPermittedFiledLocally;
+            }
 
-            default: return NntpPostingStatus.Unknown;
+            default:
+                return NntpPostingStatus.Unknown;
         }
     }
 }

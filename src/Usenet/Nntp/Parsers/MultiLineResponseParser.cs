@@ -13,5 +13,6 @@ internal class MultiLineResponseParser : IMultiLineResponseParser<NntpMultiLineR
 
     public bool IsSuccessResponse(int code) => _successCodes.Contains(code);
 
-    public NntpMultiLineResponse Parse(int code, string message, IEnumerable<string> dataBlock) => new(code, message, IsSuccessResponse(code), dataBlock);
+    public NntpMultiLineResponse Parse(int code, string message, IEnumerable<string> dataBlock) =>
+        new(code, message, IsSuccessResponse(code), dataBlock);
 }

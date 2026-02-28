@@ -4,6 +4,7 @@ using Usenet.Nntp.Builders;
 using Usenet.Nntp.Models;
 using Usenet.Util;
 using Xunit;
+
 // ReSharper disable DuplicateKeyCollectionInitialization
 
 namespace Usenet.Tests.Nntp.Builders;
@@ -73,35 +74,61 @@ public class NntpArticleBuilderTests
     [InlineData(NntpHeaders.From)]
     public void SettingHeaderWithReservedKeyShouldThrow(string headerKey)
     {
-        var exception = Assert.Throws<NntpException>(() => { new NntpArticleBuilder().AddHeader(headerKey, "val"); });
+        var exception = Assert.Throws<NntpException>(() =>
+        {
+            new NntpArticleBuilder().AddHeader(headerKey, "val");
+        });
         Assert.Equal("Reserved header key not allowed", exception.Message);
     }
 
     [Theory]
     [InlineData("", "Val", "key")]
     [InlineData(" ", "Val", "key")]
-    public void SettingHeaderWithEmptyParametersShouldThrow(string key, string value, string expectedParamName)
+    public void SettingHeaderWithEmptyParametersShouldThrow(
+        string key,
+        string value,
+        string expectedParamName
+    )
     {
-        var exception = Assert.Throws<ArgumentException>(() => { new NntpArticleBuilder().AddHeader(key, value); });
+        var exception = Assert.Throws<ArgumentException>(() =>
+        {
+            new NntpArticleBuilder().AddHeader(key, value);
+        });
         Assert.Equal(expectedParamName, exception.ParamName);
     }
 
     [Theory]
     [InlineData("Key", null, "value")]
     [InlineData(null, "Val", "key")]
-    public void SettingHeaderWithNullParametersShouldThrow(string? key, string? value, string expectedParamName)
+    public void SettingHeaderWithNullParametersShouldThrow(
+        string? key,
+        string? value,
+        string expectedParamName
+    )
     {
-        var exception = Assert.Throws<ArgumentNullException>(() => { new NntpArticleBuilder().AddHeader(key!, value!); });
+        var exception = Assert.Throws<ArgumentNullException>(() =>
+        {
+            new NntpArticleBuilder().AddHeader(key!, value!);
+        });
         Assert.Equal(expectedParamName, exception.ParamName);
     }
 
     [Fact]
     public void BuildShouldBuildArticle()
     {
-        var expected = new NntpArticle(0, "123@hhh.net", "alt.test;alt.testclient", new MultiValueDictionary<string, string>
-        {
-            { NntpHeaders.Subject, "subject" }, { NntpHeaders.From, "superuser" }, { "Header1", "Value1" }, { "Header1", "Value2" },
-        }, null);
+        var expected = new NntpArticle(
+            0,
+            "123@hhh.net",
+            "alt.test;alt.testclient",
+            new MultiValueDictionary<string, string>
+            {
+                { NntpHeaders.Subject, "subject" },
+                { NntpHeaders.From, "superuser" },
+                { "Header1", "Value1" },
+                { "Header1", "Value2" },
+            },
+            null
+        );
 
         var actual = new NntpArticleBuilder()
             .SetMessageId("123@hhh.net")
@@ -113,7 +140,6 @@ public class NntpArticleBuilderTests
             .AddHeader("Header1", "Value1")
             .Build();
 
-
         Assert.Equal(expected, actual);
         Assert.True(expected.Equals(actual));
         Assert.True(expected == actual);
@@ -122,14 +148,21 @@ public class NntpArticleBuilderTests
     [Fact]
     public void BuildInitializedFromExistingArticleShouldBuildSameArticle()
     {
-        var expected = new NntpArticle(0, "123@hhh.net", "alt.test;alt.testclient", new MultiValueDictionary<string, string>
-        {
-            { NntpHeaders.Subject, "subject" }, { NntpHeaders.From, "superuser" }, { "Header1", "Value1" }, { "Header1", "Value2" },
-        }, null);
+        var expected = new NntpArticle(
+            0,
+            "123@hhh.net",
+            "alt.test;alt.testclient",
+            new MultiValueDictionary<string, string>
+            {
+                { NntpHeaders.Subject, "subject" },
+                { NntpHeaders.From, "superuser" },
+                { "Header1", "Value1" },
+                { "Header1", "Value2" },
+            },
+            null
+        );
 
-        var actual = new NntpArticleBuilder()
-            .InitializeFrom(expected)
-            .Build();
+        var actual = new NntpArticleBuilder().InitializeFrom(expected).Build();
 
         Assert.Equal(expected, actual);
         Assert.True(expected.Equals(actual));

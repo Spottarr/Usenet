@@ -7,7 +7,8 @@ internal static class ObjectDisposedExceptionShims
 #if NET7_0_OR_GREATER
         ObjectDisposedException.ThrowIf(condition, instance);
 #else
-        if (condition) throw new ObjectDisposedException(instance?.GetType().FullName);
+        if (condition)
+            throw new ObjectDisposedException(instance?.GetType().FullName);
 #endif
     }
 }
