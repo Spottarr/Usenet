@@ -113,8 +113,10 @@ static Usenet.Yenc.YencArticleDecoder.Decode(System.Collections.Generic.IEnumera
 static Usenet.Yenc.YencArticleDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines, System.Text.Encoding! encoding) -> Usenet.Yenc.YencArticle!
 static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string!>!>!
 static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string!>!>!
-static Usenet.Yenc.YencStreamDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> Usenet.Yenc.YencStream!
-static Usenet.Yenc.YencStreamDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> Usenet.Yenc.YencStream!
+static Usenet.Yenc.YencStreamDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines) -> Usenet.Yenc.YencStream!
+static Usenet.Yenc.YencStreamDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines, System.Text.Encoding! encoding) -> Usenet.Yenc.YencStream!
+static Usenet.Yenc.YencStreamDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken) -> Usenet.Yenc.YencStream!
+static Usenet.Yenc.YencStreamDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines, System.Threading.CancellationToken cancellationToken) -> Usenet.Yenc.YencStream!
 static Usenet.Yenc.YencValidator.Validate(Usenet.Yenc.YencArticle! article) -> Usenet.Util.ValidationResult!
 Usenet.Exceptions.InvalidNzbDataException
 Usenet.Exceptions.InvalidNzbDataException.InvalidNzbDataException() -> void
