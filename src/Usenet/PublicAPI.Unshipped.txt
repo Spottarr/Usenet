@@ -228,14 +228,22 @@ Usenet.Nntp.Contracts.INntpClientRfc3977.StatAsync(Usenet.Nntp.Models.NntpMessag
 Usenet.Nntp.Contracts.INntpClientRfc4643
 Usenet.Nntp.Contracts.INntpClientRfc4643.AuthenticateAsync(string! username, string! password = "", System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
 Usenet.Nntp.Contracts.INntpClientRfc6048
-Usenet.Nntp.Contracts.INntpClientRfc6048.ListActiveAsync(string! wildmat, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpGroupsResponse!>!
-Usenet.Nntp.Contracts.INntpClientRfc6048.ListActiveAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpGroupsResponse!>!
-Usenet.Nntp.Contracts.INntpClientRfc6048.ListCountsAsync(string! wildmat, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpGroupsResponse!>!
-Usenet.Nntp.Contracts.INntpClientRfc6048.ListCountsAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpGroupsResponse!>!
-Usenet.Nntp.Contracts.INntpClientRfc6048.ListDistributionsAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
-Usenet.Nntp.Contracts.INntpClientRfc6048.ListModeratorsAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
-Usenet.Nntp.Contracts.INntpClientRfc6048.ListMotdAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
-Usenet.Nntp.Contracts.INntpClientRfc6048.ListSubscriptionsAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc6048.ListActiveAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpGroupsResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc6048.ListActiveAsync(string! wildmat) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpGroupsResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc6048.ListActiveAsync(string! wildmat, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpGroupsResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc6048.ListActiveAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpGroupsResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc6048.ListCountsAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpGroupsResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc6048.ListCountsAsync(string! wildmat) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpGroupsResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc6048.ListCountsAsync(string! wildmat, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpGroupsResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc6048.ListCountsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpGroupsResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc6048.ListDistributionsAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc6048.ListDistributionsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc6048.ListModeratorsAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc6048.ListModeratorsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc6048.ListMotdAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc6048.ListMotdAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc6048.ListSubscriptionsAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc6048.ListSubscriptionsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
 Usenet.Nntp.Contracts.INntpConnection
 Usenet.Nntp.Contracts.INntpConnection.CommandAsync<TResponse>(string! command, Usenet.Nntp.Parsers.IResponseParser<TResponse>! parser, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
 Usenet.Nntp.Contracts.INntpConnection.ConnectAsync<TResponse>(string! hostname, int port, bool useSsl, Usenet.Nntp.Parsers.IResponseParser<TResponse>! parser, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
