@@ -29,7 +29,7 @@ public class NntpGroupsBuilder
     /// <summary>
     /// Adds a new value to the <see cref="NntpGroups"/> object.
     /// </summary>
-    /// <param name="value">One or more NNTP newsgroup names seperated by the ';' character.</param>
+    /// <param name="value">One or more NNTP newsgroup names separated by the ';' character.</param>
     /// <returns>The <see cref="NntpGroups"/> object so that additional calls can be chained.</returns>
     public NntpGroupsBuilder Add(string value)
     {
@@ -40,7 +40,7 @@ public class NntpGroupsBuilder
     /// <summary>
     /// Adds new values to the <see cref="NntpGroups"/> object.
     /// </summary>
-    /// <param name="values">One or more NNTP newsgroup names seperated by the ';' character.</param>
+    /// <param name="values">One or more NNTP newsgroup names separated by the ';' character.</param>
     /// <returns>The <see cref="NntpGroups"/> object so that additional calls can be chained.</returns>
     public NntpGroupsBuilder Add(IEnumerable<string> values)
     {
@@ -52,7 +52,7 @@ public class NntpGroupsBuilder
     /// <summary>
     /// Removes a new value from the <see cref="NntpGroups"/> object.
     /// </summary>
-    /// <param name="value">One or more NNTP newsgroup names seperated by the ';' character.</param>
+    /// <param name="value">One or more NNTP newsgroup names separated by the ';' character.</param>
     /// <returns>The <see cref="NntpGroups"/> object so that additional calls can be chained.</returns>
     public NntpGroupsBuilder Remove(string value)
     {
@@ -64,7 +64,7 @@ public class NntpGroupsBuilder
     /// <summary>
     /// Removes values from the <see cref="NntpGroups"/> object.
     /// </summary>
-    /// <param name="values">One or more NNTP newsgroup names seperated by the ';' character.</param>
+    /// <param name="values">One or more NNTP newsgroup names separated by the ';' character.</param>
     /// <returns>The <see cref="NntpGroups"/> object so that additional calls can be chained.</returns>
     public NntpGroupsBuilder Remove(IEnumerable<string> values)
     {

@@ -65,7 +65,7 @@ public class NntpGroups : IEnumerable<string>, IEquatable<NntpGroups>
     /// Concatenates all NNTP newsgroup names in a single string using the ';' character as a seperator.
     /// This is the format used in the NNTP Newsgroups header.
     /// </summary>
-    /// <returns>All NNTP newsgroup names in a single string seperated by the ';' character.</returns>
+    /// <returns>All NNTP newsgroup names in a single string separated by the ';' character.</returns>
     public override string ToString() => string.Join(GroupSeparator, _groups);
 
     /// <summary>
