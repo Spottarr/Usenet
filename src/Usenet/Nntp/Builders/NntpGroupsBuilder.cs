@@ -33,6 +33,7 @@ public class NntpGroupsBuilder
     /// <returns>The <see cref="NntpGroups"/> object so that additional calls can be chained.</returns>
     public NntpGroupsBuilder Add(string value)
     {
+        Guard.ThrowIfNull(value);
         AddGroups(GroupsParser.Parse(value));
         return this;
     }
