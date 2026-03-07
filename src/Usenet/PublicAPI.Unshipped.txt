@@ -111,8 +111,10 @@ static Usenet.Nzb.TextWriterExtensions.WriteNzbDocumentAsync(this System.IO.Text
 static Usenet.Util.UsenetEncoding.Default.get -> System.Text.Encoding!
 static Usenet.Yenc.YencArticleDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines) -> Usenet.Yenc.YencArticle!
 static Usenet.Yenc.YencArticleDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines, System.Text.Encoding! encoding) -> Usenet.Yenc.YencArticle!
-static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string!>!>!
-static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string!>!>!
+static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string!>!>!
+static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Text.Encoding! encoding) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string!>!>!
+static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string!>!>!
+static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string!>!>!
 static Usenet.Yenc.YencStreamDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines) -> Usenet.Yenc.YencStream!
 static Usenet.Yenc.YencStreamDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines, System.Text.Encoding! encoding) -> Usenet.Yenc.YencStream!
 static Usenet.Yenc.YencStreamDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken) -> Usenet.Yenc.YencStream!

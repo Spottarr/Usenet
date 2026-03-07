@@ -16,12 +16,36 @@ public static class YencEncoder
     /// </summary>
     /// <param name="header">The yEnc header.</param>
     /// <param name="stream">The stream containing the binary data to encode.</param>
+    /// <returns>A task containing the yEnc-encoded text lines.</returns>
+    public static Task<IReadOnlyList<string>> EncodeAsync(YencHeader header, Stream stream) =>
+        EncodeAsync(header, stream, UsenetEncoding.Default, CancellationToken.None);
+
+    /// <summary>
+    /// Encodes the binary data in the specified stream into yEnc-encoded text
+    /// using the default Usenet character encoding.
+    /// </summary>
+    /// <param name="header">The yEnc header.</param>
+    /// <param name="stream">The stream containing the binary data to encode.</param>
+    /// <param name="encoding">The character encoding to use.</param>
+    /// <returns>A task containing the yEnc-encoded text lines.</returns>
+    public static Task<IReadOnlyList<string>> EncodeAsync(
+        YencHeader header,
+        Stream stream,
+        Encoding encoding
+    ) => EncodeAsync(header, stream, encoding, CancellationToken.None);
+
+    /// <summary>
+    /// Encodes the binary data in the specified stream into yEnc-encoded text
+    /// using the default Usenet character encoding.
+    /// </summary>
+    /// <param name="header">The yEnc header.</param>
+    /// <param name="stream">The stream containing the binary data to encode.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task containing the yEnc-encoded text lines.</returns>
     public static Task<IReadOnlyList<string>> EncodeAsync(
         YencHeader header,
         Stream stream,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     ) => EncodeAsync(header, stream, UsenetEncoding.Default, cancellationToken);
 
     /// <summary>
@@ -37,7 +61,7 @@ public static class YencEncoder
         YencHeader header,
         Stream stream,
         Encoding encoding,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         Guard.ThrowIfNull(header);
