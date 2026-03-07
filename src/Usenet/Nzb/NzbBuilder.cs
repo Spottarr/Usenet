@@ -69,9 +69,9 @@ public class NzbBuilder
     /// <param name="groups">The newsgroups to post the file in.</param>
     /// <param name="poster">Can be used to override the default poster.</param>
     /// <returns>The <see cref="NzbBuilder"/> so that additional calls can be chained.</returns>
-    public NzbBuilder AddFile(IFileInfo fileInfo, NntpGroups groups = null, string poster = null)
+    public NzbBuilder AddFile(IFileInfo fileInfo, NntpGroups? groups = null, string? poster = null)
     {
-        Guard.ThrowIfNull(fileInfo, nameof(fileInfo));
+        Guard.ThrowIfNull(fileInfo);
         _files.Add(new File(fileInfo, groups ?? NntpGroups.Empty, poster));
         return this;
     }
@@ -83,7 +83,7 @@ public class NzbBuilder
     /// <returns>The <see cref="NzbBuilder"/> so that additional calls can be chained.</returns>
     public NzbBuilder AddGroups(params NntpGroups[] groups)
     {
-        Guard.ThrowIfNull(groups, nameof(groups));
+        Guard.ThrowIfNull(groups);
         foreach (var group in groups)
         {
             _groupsBuilder.Add(group);
@@ -180,9 +180,9 @@ public class NzbBuilder
     {
         public IFileInfo FileInfo { get; }
         public NntpGroups Groups { get; }
-        public string Poster { get; }
+        public string? Poster { get; }
 
-        public File(IFileInfo fileInfo, NntpGroups groups, string poster)
+        public File(IFileInfo fileInfo, NntpGroups groups, string? poster)
         {
             FileInfo = fileInfo;
             Groups = groups;

@@ -81,7 +81,7 @@ public class NntpArticleRange : IEquatable<NntpArticleRange>
     /// </summary>
     /// <param name="other">A <see cref="NntpArticleRange"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-    public bool Equals(NntpArticleRange other) =>
+    public bool Equals(NntpArticleRange? other) =>
         other is not null && From == other.From && To == other.To;
 
     /// <summary>
@@ -89,7 +89,7 @@ public class NntpArticleRange : IEquatable<NntpArticleRange>
     /// </summary>
     /// <param name="obj">An <see cref="object"/> to compare to this instance.</param>
     /// <returns>true if <paramref name="obj" /> has the same value as this instance; otherwise, false.</returns>
-    public override bool Equals(object obj) => Equals(obj as NntpArticleRange);
+    public override bool Equals(object? obj) => Equals(obj as NntpArticleRange);
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NntpArticleRange"/> value is equal to the second <see cref="NntpArticleRange"/> value.
@@ -97,7 +97,7 @@ public class NntpArticleRange : IEquatable<NntpArticleRange>
     /// <param name="first">The first <see cref="NntpArticleRange"/>.</param>
     /// <param name="second">The second <see cref="NntpArticleRange"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator ==(NntpArticleRange first, NntpArticleRange second) =>
+    public static bool operator ==(NntpArticleRange? first, NntpArticleRange? second) =>
         first?.Equals(second) ?? second is null;
 
     /// <summary>
@@ -106,6 +106,6 @@ public class NntpArticleRange : IEquatable<NntpArticleRange>
     /// <param name="first">The first <see cref="NntpArticleRange"/>.</param>
     /// <param name="second">The second <see cref="NntpArticleRange"/>.</param>
     /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator !=(NntpArticleRange first, NntpArticleRange second) =>
+    public static bool operator !=(NntpArticleRange? first, NntpArticleRange? second) =>
         !(first == second);
 }

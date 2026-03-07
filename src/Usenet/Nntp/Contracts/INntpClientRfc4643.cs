@@ -13,7 +13,7 @@ public interface INntpClientRfc4643
     /// <returns>true if the user was authenticated successfully; otherwise false.</returns>
     Task<bool> AuthenticateAsync(
         string username,
-        string password = null,
+        string password = "",
         CancellationToken cancellationToken = default
     );
 }

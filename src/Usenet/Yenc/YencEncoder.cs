@@ -40,9 +40,9 @@ public static class YencEncoder
         CancellationToken cancellationToken = default
     )
     {
-        Guard.ThrowIfNull(header, nameof(header));
-        Guard.ThrowIfNull(stream, nameof(stream));
-        Guard.ThrowIfNull(encoding, nameof(encoding));
+        Guard.ThrowIfNull(header);
+        Guard.ThrowIfNull(stream);
+        Guard.ThrowIfNull(encoding);
 
         var lines = new List<string>();
 

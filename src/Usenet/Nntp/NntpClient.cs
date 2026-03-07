@@ -27,7 +27,8 @@ public class NntpClient : INntpClient
     /// <param name="connection">The connection to use.</param>
     public NntpClient(INntpConnection connection)
     {
-        _connection = connection.ThrowIfNull(nameof(connection));
+        Guard.ThrowIfNull(connection);
+        _connection = connection;
     }
 
     /// <summary>
@@ -66,7 +67,7 @@ public class NntpClient : INntpClient
     /// <inheritdoc />
     public async Task<bool> AuthenticateAsync(
         string username,
-        string password = null,
+        string password = "",
         CancellationToken cancellationToken = default
     )
     {

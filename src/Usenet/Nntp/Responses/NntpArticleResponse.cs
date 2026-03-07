@@ -13,7 +13,7 @@ public class NntpArticleResponse : NntpResponse
     /// <summary>
     /// The <see cref="NntpArticle"/> received from the server.
     /// </summary>
-    public NntpArticle Article { get; }
+    public NntpArticle? Article { get; }
 
     /// <summary>
     /// Creates a new instance of the <see cref="NntpArticleResponse"/> class.
@@ -22,7 +22,7 @@ public class NntpArticleResponse : NntpResponse
     /// <param name="message">The response message received from the server.</param>
     /// <param name="success">A value indicating whether the command succeeded or failed.</param>
     /// <param name="article">The <see cref="NntpArticle"/> received from the server.</param>
-    public NntpArticleResponse(int code, string message, bool success, NntpArticle article)
+    public NntpArticleResponse(int code, string message, bool success, NntpArticle? article)
         : base(code, message, success)
     {
         Article = article;

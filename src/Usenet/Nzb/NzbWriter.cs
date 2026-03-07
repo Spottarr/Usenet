@@ -18,6 +18,8 @@ public class NzbWriter
     /// <param name="textWriter">The <see cref="TextWriter"/> to use for writing.</param>
     public NzbWriter(TextWriter textWriter)
     {
+        Guard.ThrowIfNull(textWriter);
+
         _textWriter = textWriter;
     }
 
@@ -32,7 +34,7 @@ public class NzbWriter
         CancellationToken cancellationToken = default
     )
     {
-        Guard.ThrowIfNull(nzbDocument, nameof(nzbDocument));
+        Guard.ThrowIfNull(nzbDocument);
 
         cancellationToken.ThrowIfCancellationRequested();
 

@@ -21,12 +21,12 @@ public sealed class NntpConnection : INntpConnection
 {
     private readonly ILogger _log = Logger.Create<NntpConnection>();
     private readonly TcpClient _client = new();
-    private StreamWriter _writer;
-    private NntpStreamReader _reader;
+    private StreamWriter? _writer;
+    private NntpStreamReader? _reader;
     private const string AuthInfoPass = "AUTHINFO PASS";
 
     /// <inheritdoc/>
-    public CountingStream Stream { get; private set; }
+    public CountingStream? Stream { get; private set; }
 
     /// <inheritdoc/>
     public async Task<TResponse> ConnectAsync<TResponse>(
@@ -53,13 +53,13 @@ public sealed class NntpConnection : INntpConnection
     )
     {
         ThrowIfNotConnected();
-        Guard.ThrowIfNull(command, nameof(command));
+        Guard.ThrowIfNull(command);
 
         var logCommand = command.StartsWith(AuthInfoPass, StringComparison.Ordinal)
             ? $"{AuthInfoPass} [REDACTED]"
             : command;
         _log.SendingCommand(logCommand);
-        await _writer.WriteLineAsync(command, cancellationToken).ConfigureAwait(false);
+        await _writer!.WriteLineAsync(command, cancellationToken).ConfigureAwait(false);
         return await GetResponseAsync(parser, cancellationToken).ConfigureAwait(false);
     }
 
@@ -70,7 +70,8 @@ public sealed class NntpConnection : INntpConnection
         CancellationToken cancellationToken = default
     )
     {
-        Guard.ThrowIfNull(parser, nameof(parser));
+        ThrowIfNotConnected();
+        Guard.ThrowIfNull(parser);
 
         var response = await CommandAsync(command, new ResponseParser(), cancellationToken)
             .ConfigureAwait(false);
@@ -90,9 +91,10 @@ public sealed class NntpConnection : INntpConnection
         CancellationToken cancellationToken = default
     )
     {
-        Guard.ThrowIfNull(parser, nameof(parser));
+        ThrowIfNotConnected();
+        Guard.ThrowIfNull(parser);
 
-        var responseText = await _reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+        var responseText = await _reader!.ReadLineAsync(cancellationToken).ConfigureAwait(false);
         _log.ReceivedResponse(responseText ?? "");
 
         if (responseText == null)
@@ -112,17 +114,15 @@ public sealed class NntpConnection : INntpConnection
     public async Task WriteLineAsync(string line, CancellationToken cancellationToken = default)
     {
         ThrowIfNotConnected();
-        await _writer.WriteLineAsync(line, cancellationToken).ConfigureAwait(false);
+        await _writer!.WriteLineAsync(line, cancellationToken).ConfigureAwait(false);
     }
 
     internal bool Connected => _client.Connected;
 
     private void ThrowIfNotConnected()
     {
-        if (!_client.Connected)
-        {
+        if (!_client.Connected || _reader == null || _writer == null || Stream == null)
             throw new NntpException("Client not connected.");
-        }
     }
 
     private async Task<CountingStream> GetStreamAsync(
@@ -148,7 +148,7 @@ public sealed class NntpConnection : INntpConnection
         [EnumeratorCancellation] CancellationToken cancellationToken = default
     )
     {
-        while (await _reader.ReadLineAsync(cancellationToken).ConfigureAwait(false) is { } line)
+        while (await _reader!.ReadLineAsync(cancellationToken).ConfigureAwait(false) is { } line)
         {
             yield return line;
         }

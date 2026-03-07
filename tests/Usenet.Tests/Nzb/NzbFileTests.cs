@@ -16,7 +16,7 @@ public class NzbFileTests
                     "fileName1",
                     new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                     "group1;group2",
-                    null
+                    null!
                 )
             ),
             new XSerializable<NzbFile>(
@@ -26,7 +26,7 @@ public class NzbFileTests
                     "fileName1",
                     new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                     "group1;group2",
-                    null
+                    null!
                 )
             ),
         ],
@@ -108,7 +108,7 @@ public class NzbFileTests
                     "fileName",
                     new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                     "group1;group2",
-                    null
+                    null!
                 )
             ),
             new XSerializable<NzbFile>(
@@ -118,7 +118,7 @@ public class NzbFileTests
                     "fileName",
                     new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                     "group1;group2",
-                    null
+                    null!
                 )
             ),
         ],
@@ -130,7 +130,7 @@ public class NzbFileTests
                     "fileName",
                     new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                     "group1;group2",
-                    null
+                    null!
                 )
             ),
             new XSerializable<NzbFile>(
@@ -140,7 +140,7 @@ public class NzbFileTests
                     "fileName",
                     new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                     "group1;group2",
-                    null
+                    null!
                 )
             ),
         ],
@@ -152,7 +152,7 @@ public class NzbFileTests
                     "fileName",
                     new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                     "group1;group2",
-                    null
+                    null!
                 )
             ),
             new XSerializable<NzbFile>(
@@ -162,7 +162,7 @@ public class NzbFileTests
                     "blabla",
                     new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                     "group1;group2",
-                    null
+                    null!
                 )
             ),
         ],
@@ -174,7 +174,7 @@ public class NzbFileTests
                     "fileName",
                     new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                     "group1;group2",
-                    null
+                    null!
                 )
             ),
             new XSerializable<NzbFile>(
@@ -184,7 +184,7 @@ public class NzbFileTests
                     "fileName",
                     DateTimeOffset.MinValue,
                     "group1;group2",
-                    null
+                    null!
                 )
             ),
         ],
@@ -196,7 +196,7 @@ public class NzbFileTests
                     "fileName",
                     new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                     "group1;group2",
-                    null
+                    null!
                 )
             ),
             new XSerializable<NzbFile>(
@@ -206,7 +206,7 @@ public class NzbFileTests
                     "fileName",
                     new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                     "blabla",
-                    null
+                    null!
                 )
             ),
         ],

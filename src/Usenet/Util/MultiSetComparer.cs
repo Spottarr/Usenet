@@ -7,6 +7,7 @@
 /// </summary>
 /// <typeparam name="T"></typeparam>
 internal class MultiSetComparer<T> : IEqualityComparer<IEnumerable<T>>
+    where T : notnull
 {
     private readonly IEqualityComparer<T> _comparer;
 
@@ -34,40 +35,27 @@ internal class MultiSetComparer<T> : IEqualityComparer<IEnumerable<T>>
     /// <param name="first"></param>
     /// <param name="second"></param>
     /// <returns></returns>
-    public bool Equals(IEnumerable<T> first, IEnumerable<T> second)
+    public bool Equals(IEnumerable<T>? first, IEnumerable<T>? second)
     {
         if (first == null)
-        {
             return second == null;
-        }
-
         if (second == null)
-        {
             return false;
-        }
 
         if (ReferenceEquals(first, second))
-        {
             return true;
-        }
 
         if (
             first is not ICollection<T> firstCollection
             || second is not ICollection<T> secondCollection
         )
-        {
             return !HaveMismatchedElement(first, second);
-        }
 
         if (firstCollection.Count != secondCollection.Count)
-        {
             return false;
-        }
 
         if (firstCollection.Count == 0)
-        {
             return true;
-        }
 
         return !HaveMismatchedElement(first, second);
     }
@@ -98,7 +86,7 @@ internal class MultiSetComparer<T> : IEqualityComparer<IEnumerable<T>>
         return false;
     }
 
-    private Dictionary<T, int> GetElementCounts(IEnumerable<T> enumerable, out int nullCount)
+    private Dictionary<T, int> GetElementCounts(IEnumerable<T?> enumerable, out int nullCount)
     {
         nullCount = 0;
         var dictionary = new Dictionary<T, int>(_comparer);

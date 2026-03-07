@@ -108,7 +108,7 @@ public class NntpArticleBuilderTests
     {
         var exception = Assert.Throws<ArgumentNullException>(() =>
         {
-            new NntpArticleBuilder().AddHeader(key, value);
+            new NntpArticleBuilder().AddHeader(key!, value!);
         });
         Assert.Equal(expectedParamName, exception.ParamName);
     }

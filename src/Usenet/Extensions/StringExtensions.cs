@@ -8,7 +8,7 @@ namespace Usenet.Extensions;
 /// </summary>
 internal static class StringExtensions
 {
-    private static readonly Regex _whitespaceRegex = new(@"\s+", RegexOptions.Compiled);
+    private static readonly Regex WhitespaceRegex = new(@"\s+", RegexOptions.Compiled);
 
     /// <summary>
     /// Throws an <exception cref="ArgumentNullException">ArgumentNullException</exception> if the specified string is null.
@@ -43,7 +43,7 @@ internal static class StringExtensions
     /// </summary>
     /// <param name="str">The string to convert.</param>
     /// <returns>The integer value obtained from the string or null if the string does not represent a valid integer.</returns>
-    public static int? ToIntSafe(this string str) =>
+    public static int? ToIntSafe(this string? str) =>
         str != null && int.TryParse(str, out var value) ? value : null;
 
     /// <summary>
@@ -52,7 +52,7 @@ internal static class StringExtensions
     /// <param name="str">The string to convert.</param>
     /// <param name="defaultValue">The default value to use when the string is not a valid integer.</param>
     /// <returns>The integer value obtained from the string or the specified default value if the string does not represent a valid integer.</returns>
-    public static int ToIntSafe(this string str, int defaultValue) =>
+    public static int ToIntSafe(this string? str, int defaultValue) =>
         str != null && int.TryParse(str, out var value) ? value : defaultValue;
 
     /// <summary>
@@ -60,8 +60,7 @@ internal static class StringExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static string Pack(this string source) =>
-        source == null ? null : _whitespaceRegex.Replace(source, string.Empty);
+    public static string Pack(this string source) => WhitespaceRegex.Replace(source, string.Empty);
 
     public static int IndexOf(this string source, char value, StringComparison comparisonType)
     {

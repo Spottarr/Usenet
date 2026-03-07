@@ -23,7 +23,7 @@ public class NzbDocumentTests
                             "fileName1",
                             new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                             "group1;group2",
-                            null
+                            null!
                         ),
                         new NzbFile(
                             "poster",
@@ -31,7 +31,7 @@ public class NzbDocumentTests
                             "fileName2",
                             new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                             "group1;group2",
-                            null
+                            null!
                         ),
                     ]
                 )
@@ -46,7 +46,7 @@ public class NzbDocumentTests
                             "fileName1",
                             new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                             "group1;group2",
-                            null
+                            null!
                         ),
                         new NzbFile(
                             "poster",
@@ -54,7 +54,7 @@ public class NzbDocumentTests
                             "fileName2",
                             new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                             "group1;group2",
-                            null
+                            null!
                         ),
                     ]
                 )
@@ -71,7 +71,7 @@ public class NzbDocumentTests
                             "fileName3",
                             new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                             "group1;group2",
-                            null
+                            null!
                         ),
                         new NzbFile(
                             "poster",
@@ -79,7 +79,7 @@ public class NzbDocumentTests
                             "fileName4",
                             new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                             "group1;group2",
-                            null
+                            null!
                         ),
                     ]
                 )
@@ -94,7 +94,7 @@ public class NzbDocumentTests
                             "fileName4",
                             new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                             "group1;group2",
-                            null
+                            null!
                         ),
                         new NzbFile(
                             "poster",
@@ -102,7 +102,7 @@ public class NzbDocumentTests
                             "fileName3",
                             new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                             "group1;group2",
-                            null
+                            null!
                         ),
                     ]
                 )

@@ -22,8 +22,8 @@ public class YencStream : EnumerableStream
     public YencStream(YencHeader header, IEnumerable<byte[]> input)
         : base(input)
     {
-        Guard.ThrowIfNull(header, nameof(header));
-        Guard.ThrowIfNull(input, nameof(input));
+        Guard.ThrowIfNull(header);
+        Guard.ThrowIfNull(input);
         Header = header;
     }
 }

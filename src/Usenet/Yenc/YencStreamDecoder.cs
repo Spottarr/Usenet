@@ -40,8 +40,8 @@ public static class YencStreamDecoder
         CancellationToken cancellationToken = default
     )
     {
-        Guard.ThrowIfNull(encodedLines, nameof(encodedLines));
-        Guard.ThrowIfNull(encoding, nameof(encoding));
+        Guard.ThrowIfNull(encodedLines);
+        Guard.ThrowIfNull(encoding);
 
         cancellationToken.ThrowIfCancellationRequested();
 

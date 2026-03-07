@@ -18,15 +18,15 @@ internal static class DictionaryExtensions
     /// <param name="key">The key to find.</param>
     /// <param name="converter">The converter function to use.</param>
     /// <returns>The value if the key was found. Otherwise the default value of type <typeparamref name="TValue"/>.</returns>
-    public static TValue GetAndConvert<TValue>(
+    public static TValue? GetAndConvert<TValue>(
         this IDictionary<string, string> dictionary,
         string key,
         Func<string, TValue> converter
     )
     {
-        Guard.ThrowIfNull(dictionary, nameof(dictionary));
+        Guard.ThrowIfNull(dictionary);
         Guard.ThrowIfNullOrEmpty(key, nameof(key));
-        Guard.ThrowIfNull(converter, nameof(converter));
+        Guard.ThrowIfNull(converter);
 
         return dictionary.TryGetValue(key, out var stringValue) ? converter(stringValue) : default;
     }
@@ -38,12 +38,12 @@ internal static class DictionaryExtensions
     /// <param name="dictionary">The dictionary to search.</param>
     /// <param name="key">The key to find.</param>
     /// <returns>The value if the key was found. Otherwise the default value of type <typeparamref name="TValue"/>.</returns>
-    public static TValue GetOrDefault<TValue>(
+    public static TValue? GetOrDefault<TValue>(
         this IDictionary<string, TValue> dictionary,
         string key
     )
     {
-        Guard.ThrowIfNull(dictionary, nameof(dictionary));
+        Guard.ThrowIfNull(dictionary);
         Guard.ThrowIfNullOrEmpty(key, nameof(key));
 
         return dictionary.TryGetValue(key, out var value) ? value : default;
@@ -64,8 +64,8 @@ internal static class DictionaryExtensions
         bool overwriteExistingKeys
     )
     {
-        Guard.ThrowIfNull(target, nameof(target));
-        Guard.ThrowIfNull(source, nameof(source));
+        Guard.ThrowIfNull(target);
+        Guard.ThrowIfNull(source);
 
         foreach (var item in source)
         {
@@ -87,13 +87,16 @@ internal static class DictionaryExtensions
         ImmutableHashSet<TValue>
     > ToImmutableDictionaryWithHashSets<TKey, TValue>(
         this IDictionary<TKey, ICollection<TValue>> multiValueDictionary
-    ) => multiValueDictionary.ToImmutableDictionary(x => x.Key, x => x.Value.ToImmutableHashSet());
+    )
+        where TKey : notnull =>
+        multiValueDictionary.ToImmutableDictionary(x => x.Key, x => x.Value.ToImmutableHashSet());
 
     public static bool Remove<TKey, TValue>(
         this Dictionary<TKey, TValue> source,
         TKey key,
         [MaybeNullWhen(false)] out TValue value
     )
+        where TKey : notnull
     {
 #if NETSTANDARD2_0
         var result = source.TryGetValue(key, out value);

@@ -8,7 +8,7 @@ namespace Usenet.Nntp.Parsers;
 
 internal class GroupOriginsResponseParser : IMultiLineResponseParser<NntpGroupOriginsResponse>
 {
-    private static readonly ILogger _log = Logger.Create<GroupOriginsResponseParser>();
+    private static readonly ILogger Log = Logger.Create<GroupOriginsResponseParser>();
 
     public bool IsSuccessResponse(int code) => code == 215;
 
@@ -36,7 +36,7 @@ internal class GroupOriginsResponseParser : IMultiLineResponseParser<NntpGroupOr
             var lineSplit = line.Split(' ');
             if (lineSplit.Length < 3)
             {
-                _log.InvalidGroupOriginLine(line);
+                Log.InvalidGroupOriginLine(line);
                 continue;
             }
 

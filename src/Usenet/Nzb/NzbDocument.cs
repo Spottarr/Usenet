@@ -33,14 +33,14 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <param name="metaData">A collection of metadata elements found in the NZB file.</param>
     /// <param name="files">A collection of files found in the NZB file.</param>
     public NzbDocument(
-        IDictionary<string, ICollection<string>> metaData,
-        IEnumerable<NzbFile> files
+        IDictionary<string, ICollection<string>>? metaData,
+        IEnumerable<NzbFile>? files
     )
     {
         MetaData = (
             metaData ?? MultiValueDictionary<string, string>.Empty
         ).ToImmutableDictionaryWithHashSets();
-        Files = (files ?? new List<NzbFile>(0)).OrderBy(f => f.FileName).ToImmutableList();
+        Files = (files ?? []).OrderBy(f => f.FileName).ToImmutableList();
         Size = Files.Sum(f => f.Size);
     }
 
@@ -72,8 +72,8 @@ public class NzbDocument : IEquatable<NzbDocument>
         CancellationToken cancellationToken = default
     )
     {
-        Guard.ThrowIfNull(stream, nameof(stream));
-        Guard.ThrowIfNull(encoding, nameof(encoding));
+        Guard.ThrowIfNull(stream);
+        Guard.ThrowIfNull(encoding);
 
         using var reader = new StreamReader(stream, encoding);
         return await NzbParser.ParseAsync(reader, cancellationToken).ConfigureAwait(false);
@@ -90,7 +90,7 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// </summary>
     /// <param name="other">A <see cref="NzbDocument"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-    public bool Equals(NzbDocument other)
+    public bool Equals(NzbDocument? other)
     {
         if (other is null)
         {
@@ -126,7 +126,7 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// </summary>
     /// <param name="obj">An <see cref="object"/> to compare to this instance.</param>
     /// <returns>true if <paramref name="obj" /> has the same value as this instance; otherwise, false.</returns>
-    public override bool Equals(object obj) => Equals(obj as NzbDocument);
+    public override bool Equals(object? obj) => Equals(obj as NzbDocument);
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NzbDocument"/> value is equal to the second <see cref="NzbDocument"/> value.
@@ -134,7 +134,7 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <param name="first">The first <see cref="NzbDocument"/>.</param>
     /// <param name="second">The second <see cref="NzbDocument"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator ==(NzbDocument first, NzbDocument second) =>
+    public static bool operator ==(NzbDocument? first, NzbDocument? second) =>
         first?.Equals(second) ?? second is null;
 
     /// <summary>
@@ -143,5 +143,5 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// <param name="first">The first <see cref="NzbDocument"/>.</param>
     /// <param name="second">The second <see cref="NzbDocument"/>.</param>
     /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator !=(NzbDocument first, NzbDocument second) => !(first == second);
+    public static bool operator !=(NzbDocument? first, NzbDocument? second) => !(first == second);
 }

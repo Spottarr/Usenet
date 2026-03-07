@@ -1,5 +1,6 @@
 ﻿using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
+using Usenet.Util;
 
 namespace Usenet.Nntp.Builders;
 
@@ -28,10 +29,11 @@ public class NntpGroupsBuilder
     /// <summary>
     /// Adds a new value to the <see cref="NntpGroups"/> object.
     /// </summary>
-    /// <param name="value">One or more NNTP newsgroup names seperated by the ';' character.</param>
+    /// <param name="value">One or more NNTP newsgroup names separated by the ';' character.</param>
     /// <returns>The <see cref="NntpGroups"/> object so that additional calls can be chained.</returns>
     public NntpGroupsBuilder Add(string value)
     {
+        Guard.ThrowIfNull(value);
         AddGroups(GroupsParser.Parse(value));
         return this;
     }
@@ -39,10 +41,11 @@ public class NntpGroupsBuilder
     /// <summary>
     /// Adds new values to the <see cref="NntpGroups"/> object.
     /// </summary>
-    /// <param name="values">One or more NNTP newsgroup names seperated by the ';' character.</param>
+    /// <param name="values">One or more NNTP newsgroup names separated by the ';' character.</param>
     /// <returns>The <see cref="NntpGroups"/> object so that additional calls can be chained.</returns>
     public NntpGroupsBuilder Add(IEnumerable<string> values)
     {
+        Guard.ThrowIfNull(values);
         AddGroups(GroupsParser.Parse(values));
         return this;
     }
@@ -50,10 +53,11 @@ public class NntpGroupsBuilder
     /// <summary>
     /// Removes a new value from the <see cref="NntpGroups"/> object.
     /// </summary>
-    /// <param name="value">One or more NNTP newsgroup names seperated by the ';' character.</param>
+    /// <param name="value">One or more NNTP newsgroup names separated by the ';' character.</param>
     /// <returns>The <see cref="NntpGroups"/> object so that additional calls can be chained.</returns>
     public NntpGroupsBuilder Remove(string value)
     {
+        Guard.ThrowIfNull(value);
         RemoveGroups(GroupsParser.Parse(value));
         return this;
     }
@@ -61,10 +65,11 @@ public class NntpGroupsBuilder
     /// <summary>
     /// Removes values from the <see cref="NntpGroups"/> object.
     /// </summary>
-    /// <param name="values">One or more NNTP newsgroup names seperated by the ';' character.</param>
+    /// <param name="values">One or more NNTP newsgroup names separated by the ';' character.</param>
     /// <returns>The <see cref="NntpGroups"/> object so that additional calls can be chained.</returns>
     public NntpGroupsBuilder Remove(IEnumerable<string> values)
     {
+        Guard.ThrowIfNull(values);
         RemoveGroups(GroupsParser.Parse(values));
         return this;
     }
@@ -73,7 +78,7 @@ public class NntpGroupsBuilder
     /// Creates a <see cref="NntpGroups"/> with al the properties from the <see cref="NntpGroupsBuilder"/>.
     /// </summary>
     /// <returns>The <see cref="NntpGroups"/>.</returns>
-    public NntpGroups Build() => new(_groups, false);
+    public NntpGroups Build() => new(_groups);
 
     private void AddGroups(IEnumerable<string> values)
     {

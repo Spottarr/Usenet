@@ -15,7 +15,7 @@ public static class HeaderDateParser
         + @"(?<tz>[+-]\d+|(?:UT|UTC|GMT|Z|EDT|EST|CDT|CST|MDT|MST|PDT|PST|A|N|M|Y|[A-Z]+)"
         + @")?";
 
-    private static readonly Regex _dateTimeRegex = new(
+    private static readonly Regex DateTimeRegex = new(
         DateTimeRegexString,
         RegexOptions.IgnoreCase | RegexOptions.Compiled
     );
@@ -31,7 +31,7 @@ public static class HeaderDateParser
         if (string.IsNullOrWhiteSpace(value))
             return null;
 
-        var matches = _dateTimeRegex.Match(value);
+        var matches = DateTimeRegex.Match(value);
         if (!matches.Success)
             throw new FormatException(Resources.Nntp.BadHeaderDateFormat);
 

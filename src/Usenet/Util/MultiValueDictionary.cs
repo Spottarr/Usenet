@@ -8,6 +8,8 @@ namespace Usenet.Util;
 internal class MultiValueDictionary<TKey, TValue>
     : Dictionary<TKey, ICollection<TValue>>,
         IEquatable<MultiValueDictionary<TKey, TValue>>
+    where TKey : notnull
+    where TValue : notnull
 {
     private readonly Func<ICollection<TValue>> _collectionFactory;
 
@@ -31,10 +33,20 @@ internal class MultiValueDictionary<TKey, TValue>
     /// that is empty and uses the specified <paramref name="collectionFactory"/> to create the internal collections.
     /// </summary>
     /// <param name="collectionFactory">The collection factory to use.</param>
+    public MultiValueDictionary(Func<ICollection<TValue>> collectionFactory)
+    {
+        _collectionFactory = collectionFactory;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MultiValueDictionary{TKey,TValue}"/>
+    /// that is empty and uses the specified <paramref name="collectionFactory"/> to create the internal collections.
+    /// </summary>
+    /// <param name="collectionFactory">The collection factory to use.</param>
     /// <param name="keyComparer"></param>
     public MultiValueDictionary(
         Func<ICollection<TValue>> collectionFactory,
-        IEqualityComparer<TKey> keyComparer = null
+        IEqualityComparer<TKey> keyComparer
     )
         : base(keyComparer)
     {
@@ -109,7 +121,7 @@ internal class MultiValueDictionary<TKey, TValue>
     /// </summary>
     /// <param name="other">A <see cref="MultiValueDictionary{TKey,TValue}"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-    public bool Equals(MultiValueDictionary<TKey, TValue> other)
+    public bool Equals(MultiValueDictionary<TKey, TValue>? other)
     {
         if (other is null || Count != other.Count)
             return false;
@@ -135,7 +147,7 @@ internal class MultiValueDictionary<TKey, TValue>
     /// </summary>
     /// <param name="obj">An <see cref="object"/> to compare to this instance.</param>
     /// <returns>true if <paramref name="obj" /> has the same value as this instance; otherwise, false.</returns>
-    public override bool Equals(object obj) => Equals(obj as MultiValueDictionary<TKey, TValue>);
+    public override bool Equals(object? obj) => Equals(obj as MultiValueDictionary<TKey, TValue>);
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="MultiValueDictionary{TKey,TValue}"/>
@@ -145,8 +157,8 @@ internal class MultiValueDictionary<TKey, TValue>
     /// <param name="second">The second <see cref="MultiValueDictionary{TKey,TValue}"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
     public static bool operator ==(
-        MultiValueDictionary<TKey, TValue> first,
-        MultiValueDictionary<TKey, TValue> second
+        MultiValueDictionary<TKey, TValue>? first,
+        MultiValueDictionary<TKey, TValue>? second
     ) => first?.Equals(second) ?? second is null;
 
     /// <summary>
@@ -157,7 +169,7 @@ internal class MultiValueDictionary<TKey, TValue>
     /// <param name="second">The second <see cref="MultiValueDictionary{TKey,TValue}"/>.</param>
     /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
     public static bool operator !=(
-        MultiValueDictionary<TKey, TValue> first,
-        MultiValueDictionary<TKey, TValue> second
+        MultiValueDictionary<TKey, TValue>? first,
+        MultiValueDictionary<TKey, TValue>? second
     ) => !(first == second);
 }

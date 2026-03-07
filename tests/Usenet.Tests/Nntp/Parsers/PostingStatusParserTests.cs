@@ -30,7 +30,7 @@ public class PostingStatusParserTests
         string expectedOtherGroup
     )
     {
-        var status = PostingStatusParser.Parse(input, out var otherGroup);
+        var status = PostingStatusParser.Parse(input!, out var otherGroup);
         Assert.Equal(expectedStatus, status);
         Assert.Equal(expectedOtherGroup, otherGroup);
     }

@@ -31,8 +31,8 @@ public static class YencArticleDecoder
     /// <returns>A <see cref="YencArticle"/> containing the decoded binary data and meta-data.</returns>
     public static YencArticle Decode(IEnumerable<string> encodedLines, Encoding encoding)
     {
-        Guard.ThrowIfNull(encodedLines, nameof(encodedLines));
-        Guard.ThrowIfNull(encoding, nameof(encoding));
+        Guard.ThrowIfNull(encodedLines);
+        Guard.ThrowIfNull(encoding);
 
         using var enumerator = encodedLines.GetEnumerator();
         var headers = YencMeta.GetHeaders(enumerator);
@@ -43,7 +43,7 @@ public static class YencArticleDecoder
         }
 
         var header = YencMeta.ParseHeader(headers);
-        YencFooter footer = null;
+        YencFooter? footer = null;
 
         // create buffer for part or entire file if single part
         var decodedBytes = new byte[header.PartSize];

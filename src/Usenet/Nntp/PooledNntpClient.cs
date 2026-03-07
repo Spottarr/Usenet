@@ -42,7 +42,7 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
 
     public async Task<bool> AuthenticateAsync(
         string username,
-        string password = null,
+        string password = "",
         CancellationToken cancellationToken = default
     )
     {

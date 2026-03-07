@@ -61,8 +61,8 @@ public class NntpGroupTests
             lowWaterMark,
             highWaterMark,
             postingStatus,
-            otherGroup,
-            articleNumbers
+            otherGroup!,
+            articleNumbers!
         );
 
         var json = JsonConvert.SerializeObject(expected);
@@ -80,7 +80,7 @@ public class NntpGroupTests
                     1,
                     10,
                     NntpPostingStatus.PostingPermitted,
-                    null,
+                    null!,
                     [1, 2, 3]
                 )
             ),
@@ -91,7 +91,7 @@ public class NntpGroupTests
                     1,
                     10,
                     NntpPostingStatus.PostingPermitted,
-                    null,
+                    null!,
                     [1, 2, 3]
                 )
             ),
@@ -105,7 +105,7 @@ public class NntpGroupTests
                     10,
                     NntpPostingStatus.PostingPermitted,
                     "other",
-                    null
+                    null!
                 )
             ),
             new XSerializable<NntpGroup>(
@@ -116,7 +116,7 @@ public class NntpGroupTests
                     10,
                     NntpPostingStatus.PostingPermitted,
                     "other",
-                    null
+                    null!
                 )
             ),
         ],
@@ -298,7 +298,7 @@ public class NntpGroupTests
                     10,
                     NntpPostingStatus.PostingPermitted,
                     "other",
-                    null
+                    null!
                 )
             ),
         ],
