@@ -23,26 +23,18 @@ public class NntpGroups : IEnumerable<string>, IEquatable<NntpGroups>
     /// Creates a new <see cref="NntpGroups"/> object.
     /// </summary>
     public NntpGroups(string groups)
-        : this(GroupsParser.Parse(groups), false)
     {
         Guard.ThrowIfNull(groups);
+        _groups = GroupsParser.Parse(groups).OrderBy(g => g).ToImmutableList();
     }
 
     /// <summary>
     /// Creates a new <see cref="NntpGroups"/> object.
     /// </summary>
     public NntpGroups(IEnumerable<string> groups)
-        : this(groups, true)
     {
         Guard.ThrowIfNull(groups);
-    }
-
-    internal NntpGroups(IEnumerable<string> groups, bool doParse)
-    {
-        Guard.ThrowIfNull(groups);
-
-        var parsedGroups = doParse ? GroupsParser.Parse(groups) : groups;
-        _groups = parsedGroups.OrderBy(g => g).ToImmutableList();
+        _groups = GroupsParser.Parse(groups).OrderBy(g => g).ToImmutableList();
     }
 
     /// <summary>
