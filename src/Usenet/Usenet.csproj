@@ -48,4 +48,9 @@
     <None Include="../../readme.md" Pack="true" PackagePath="" />
     <None Include="../../logo.png" Pack="true" PackagePath="" />
   </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI.Unshipped.txt" />
+  </ItemGroup>
 </Project>
