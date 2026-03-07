@@ -11,7 +11,7 @@ public interface INntpClientRfc6048
     /// and is similar to LIST ACTIVE.
     /// </summary>
     /// <returns>A groups response containing a list of valid newsgroups.</returns>
-    Task<NntpGroupsResponse> ListCountsAsync() => ListCountsAsync(CancellationToken.None);
+    Task<NntpGroupsResponse> ListCountsAsync();
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-2.2">LIST COUNTS</a>
@@ -31,8 +31,7 @@ public interface INntpClientRfc6048
     /// </summary>
     /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
     /// <returns>A groups response object containing a list of valid newsgroups.</returns>
-    Task<NntpGroupsResponse> ListCountsAsync(string wildmat) =>
-        ListCountsAsync(wildmat, CancellationToken.None);
+    Task<NntpGroupsResponse> ListCountsAsync(string wildmat);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-2.2">LIST COUNTS</a>
@@ -54,8 +53,7 @@ public interface INntpClientRfc6048
     /// in a news article header and about what the values mean.
     /// </summary>
     /// <returns>A multi-line response object containing the distributions list.</returns>
-    Task<NntpMultiLineResponse> ListDistributionsAsync() =>
-        ListDistributionsAsync(CancellationToken.None);
+    Task<NntpMultiLineResponse> ListDistributionsAsync();
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-2.3">LIST DISTRIBUTIONS</a>
@@ -77,8 +75,7 @@ public interface INntpClientRfc6048
     /// newsgroup.
     /// </summary>
     /// <returns>A multi-line response object containing the moderators list.</returns>
-    Task<NntpMultiLineResponse> ListModeratorsAsync() =>
-        ListModeratorsAsync(CancellationToken.None);
+    Task<NntpMultiLineResponse> ListModeratorsAsync();
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-2.4">LIST MODERATORS</a>
@@ -96,7 +93,7 @@ public interface INntpClientRfc6048
     /// command contains a "message of the day" relevant to the news server.
     /// </summary>
     /// <returns>A multi-line response object containing the message of the day.</returns>
-    Task<NntpMultiLineResponse> ListMotdAsync() => ListMotdAsync(CancellationToken.None);
+    Task<NntpMultiLineResponse> ListMotdAsync();
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-2.5">LIST MOTD</a>
@@ -113,8 +110,7 @@ public interface INntpClientRfc6048
     /// of this server.
     /// </summary>
     /// <returns>A multi-line response containing a list of recommended subscriptions.</returns>
-    Task<NntpMultiLineResponse> ListSubscriptionsAsync() =>
-        ListSubscriptionsAsync(CancellationToken.None);
+    Task<NntpMultiLineResponse> ListSubscriptionsAsync();
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-2.6">LIST SUBSCRIPTIONS</a>
@@ -134,7 +130,7 @@ public interface INntpClientRfc6048
     /// information.
     /// </summary>
     /// <returns>A groups response object containing a list of valid newsgroups and associated information.</returns>
-    Task<NntpGroupsResponse> ListActiveAsync() => ListActiveAsync(CancellationToken.None);
+    Task<NntpGroupsResponse> ListActiveAsync();
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-3">LIST ACTIVE</a>
@@ -156,8 +152,7 @@ public interface INntpClientRfc6048
     /// </summary>
     /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
     /// <returns>A groups response object containing a list of valid newsgroups and associated information.</returns>
-    Task<NntpGroupsResponse> ListActiveAsync(string wildmat) =>
-        ListActiveAsync(wildmat, CancellationToken.None);
+    Task<NntpGroupsResponse> ListActiveAsync(string wildmat);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-3">LIST ACTIVE</a>
