@@ -7,7 +7,7 @@
 public class EnumerableStream : AbstractBaseStream
 {
     private readonly IEnumerator<byte[]> _enumerator;
-    private byte[] _currentChunk;
+    private byte[]? _currentChunk;
     private int _currentOffset;
 
     /// <summary>
@@ -16,7 +16,7 @@ public class EnumerableStream : AbstractBaseStream
     /// <param name="input">An enumerable collection of byte buffers.</param>
     public EnumerableStream(IEnumerable<byte[]> input)
     {
-        Guard.ThrowIfNull(input, nameof(input));
+        Guard.ThrowIfNull(input);
         _enumerator = input.GetEnumerator();
     }
 
@@ -39,7 +39,7 @@ public class EnumerableStream : AbstractBaseStream
     /// <inheritdoc/>
     public override int Read(byte[] buffer, int offset, int count)
     {
-        Guard.ThrowIfNull(buffer, nameof(buffer));
+        Guard.ThrowIfNull(buffer);
         if (offset < 0 || offset >= buffer.Length)
         {
             throw new ArgumentOutOfRangeException(nameof(offset));

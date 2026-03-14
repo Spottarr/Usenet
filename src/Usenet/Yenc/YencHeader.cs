@@ -1,7 +1,7 @@
 ﻿namespace Usenet.Yenc;
 
 /// <summary>
-/// Represents the combined information of the yEnc header (=ybegin) line 
+/// Represents the combined information of the yEnc header (=ybegin) line
 /// and the yEnc part header (=ypart) line if present.
 /// Based on Kristian Hellang's yEnc project https://github.com/khellang/yEnc.
 /// </summary>
@@ -52,7 +52,15 @@ public class YencHeader
     /// <param name="totalParts">Total number of parts or 1 in case of a single-part file.</param>
     /// <param name="partSize">Size of the part or entire file.</param>
     /// <param name="partOffset">Offset of the part or 0 in case of a single-part file.</param>
-    public YencHeader(string fileName, long fileSize, int lineLength, int partNumber, int totalParts, long partSize, long partOffset)
+    public YencHeader(
+        string fileName,
+        long fileSize,
+        int lineLength,
+        int partNumber,
+        int totalParts,
+        long partSize,
+        long partOffset
+    )
     {
         FileName = fileName;
         FileSize = fileSize;

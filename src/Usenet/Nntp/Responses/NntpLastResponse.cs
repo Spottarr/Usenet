@@ -14,13 +14,13 @@ public class NntpLastResponse : NntpResponse
     public NntpLastResponseType ResponseType { get; }
 
     /// <summary>
-    /// The highest existing <see cref="NntpArticle"/> number less than the 
+    /// The highest existing <see cref="NntpArticle"/> number less than the
     /// current <see cref="NntpArticle"/> in the currently selected <see cref="NntpGroup"/>.
     /// </summary>
     public long Number { get; }
 
     /// <summary>
-    /// The <see cref="NntpMessageId"/> of the <see cref="NntpArticle"/> with the highest existing number less than the 
+    /// The <see cref="NntpMessageId"/> of the <see cref="NntpArticle"/> with the highest existing number less than the
     /// current <see cref="NntpArticle"/> in the currently selected <see cref="NntpGroup"/>.
     /// </summary>
     public NntpMessageId MessageId { get; }
@@ -34,7 +34,14 @@ public class NntpLastResponse : NntpResponse
     /// <param name="responseType">The type of the response received from the server.</param>
     /// <param name="number">The <see cref="NntpArticle"/> number received from the server.</param>
     /// <param name="messageId">The <see cref="NntpMessageId"/> received from the server.</param>
-    public NntpLastResponse(int code, string message, bool success, NntpLastResponseType responseType, long number, NntpMessageId messageId)
+    public NntpLastResponse(
+        int code,
+        string message,
+        bool success,
+        NntpLastResponseType responseType,
+        long number,
+        NntpMessageId messageId
+    )
         : base(code, message, success)
     {
         ResponseType = responseType;

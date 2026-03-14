@@ -16,9 +16,11 @@ internal class ListGroupResponseParser : IMultiLineResponseParser<NntpGroupRespo
         if (!IsSuccessResponse(code))
         {
             return new NntpGroupResponse(
-                code, message, false,
-                new NntpGroup(string.Empty, 0, 0, 0, NntpPostingStatus.Unknown,
-                    string.Empty, []));
+                code,
+                message,
+                false,
+                new NntpGroup(string.Empty, 0, 0, 0, NntpPostingStatus.Unknown, string.Empty, [])
+            );
         }
 
         var responseSplit = message.Split(' ');
@@ -29,12 +31,18 @@ internal class ListGroupResponseParser : IMultiLineResponseParser<NntpGroupRespo
 
         _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out var articleCount);
         _ = long.TryParse(responseSplit.Length > 1 ? responseSplit[1] : null, out var lowWaterMark);
-        _ = long.TryParse(responseSplit.Length > 2 ? responseSplit[2] : null, out var highWaterMark);
+        _ = long.TryParse(
+            responseSplit.Length > 2 ? responseSplit[2] : null,
+            out var highWaterMark
+        );
         var name = responseSplit.Length > 3 ? responseSplit[3] : string.Empty;
 
         var articleNumbers = EnumerateArticleNumbers(dataBlock).ToList();
 
-        return new NntpGroupResponse(code, message, true,
+        return new NntpGroupResponse(
+            code,
+            message,
+            true,
             new NntpGroup(
                 name,
                 articleCount,
@@ -42,7 +50,9 @@ internal class ListGroupResponseParser : IMultiLineResponseParser<NntpGroupRespo
                 highWaterMark,
                 NntpPostingStatus.Unknown,
                 string.Empty,
-                articleNumbers));
+                articleNumbers
+            )
+        );
     }
 
     private static IEnumerable<long> EnumerateArticleNumbers(IEnumerable<string> dataBlock)

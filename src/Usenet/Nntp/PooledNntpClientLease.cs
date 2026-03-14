@@ -18,7 +18,8 @@ internal sealed class PooledNntpClientLease : IPooledNntpClientLease
 
     public void Dispose()
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
 
         _pool.ReturnClient(_client);
         _disposed = true;

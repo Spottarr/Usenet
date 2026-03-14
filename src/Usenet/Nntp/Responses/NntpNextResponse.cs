@@ -14,13 +14,13 @@ public class NntpNextResponse : NntpResponse
     public NntpNextResponseType ResponseType { get; }
 
     /// <summary>
-    /// The lowest existing <see cref="NntpArticle"/> number greater than the 
+    /// The lowest existing <see cref="NntpArticle"/> number greater than the
     /// current <see cref="NntpArticle"/> in the currently selected <see cref="NntpGroup"/>.
     /// </summary>
     public long Number { get; }
 
     /// <summary>
-    /// The <see cref="NntpMessageId"/> of the <see cref="NntpArticle"/> with the lowest existing number greater than the 
+    /// The <see cref="NntpMessageId"/> of the <see cref="NntpArticle"/> with the lowest existing number greater than the
     /// current <see cref="NntpArticle"/> in the currently selected <see cref="NntpGroup"/>.
     /// </summary>
     public NntpMessageId MessageId { get; }
@@ -34,7 +34,14 @@ public class NntpNextResponse : NntpResponse
     /// <param name="responseType">The type of the response received from the server.</param>
     /// <param name="number">The <see cref="NntpArticle"/> number received from the server.</param>
     /// <param name="messageId">The <see cref="NntpMessageId"/> received from the server.</param>
-    public NntpNextResponse(int code, string message, bool success, NntpNextResponseType responseType, long number, NntpMessageId messageId)
+    public NntpNextResponse(
+        int code,
+        string message,
+        bool success,
+        NntpNextResponseType responseType,
+        long number,
+        NntpMessageId messageId
+    )
         : base(code, message, success)
     {
         ResponseType = responseType;

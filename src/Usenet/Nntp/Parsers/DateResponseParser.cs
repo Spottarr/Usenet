@@ -15,8 +15,17 @@ internal class DateResponseParser : IResponseParser<NntpDateResponse>
     {
         var responseSplit = message.Split(' ');
 
-        if (IsSuccessResponse(code) && responseSplit.Length >= 1 && DateTimeOffset.TryParseExact(responseSplit[0], "yyyyMMddHHmmss",
-                CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var dateTime))
+        if (
+            IsSuccessResponse(code)
+            && responseSplit.Length >= 1
+            && DateTimeOffset.TryParseExact(
+                responseSplit[0],
+                "yyyyMMddHHmmss",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.AssumeUniversal,
+                out var dateTime
+            )
+        )
         {
             return new NntpDateResponse(code, message, true, dateTime);
         }

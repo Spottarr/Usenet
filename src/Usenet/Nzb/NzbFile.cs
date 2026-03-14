@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Usenet.Nntp.Models;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
@@ -65,7 +65,8 @@ public class NzbFile : IEquatable<NzbFile>
         string fileName,
         DateTimeOffset date,
         NntpGroups groups,
-        IEnumerable<NzbSegment> segments)
+        IEnumerable<NzbSegment> segments
+    )
     {
         Poster = poster;
         Subject = subject;
@@ -80,34 +81,26 @@ public class NzbFile : IEquatable<NzbFile>
     /// Returns the hash code for this instance.
     /// </summary>
     /// <returns>A 32-bit signed integer hash code.</returns>
-    public override int GetHashCode() => HashCode.Start
-        .Hash(Poster)
-        .Hash(Subject)
-        .Hash(FileName)
-        .Hash(Date)
-        .Hash(Groups)
-        .Hash(Size);
+    public override int GetHashCode() =>
+        HashCode.Start.Hash(Poster).Hash(Subject).Hash(FileName).Hash(Date).Hash(Groups).Hash(Size);
 
     /// <summary>
     /// Returns a value indicating whether this instance is equal to the specified <see cref="NzbFile"/> value.
     /// </summary>
     /// <param name="other">A <see cref="NzbFile"/> object to compare to this instance.</param>
     /// <returns>true if <paramref name="other" /> has the same value as this instance; otherwise, false.</returns>
-    public bool Equals(NzbFile other)
+    public bool Equals(NzbFile? other)
     {
-        if ((object)other == null)
-        {
+        if (other is null)
             return false;
-        }
 
-        return
-            Poster.Equals(other.Poster, StringComparison.Ordinal) &&
-            Subject.Equals(other.Subject, StringComparison.Ordinal) &&
-            FileName.Equals(other.FileName, StringComparison.Ordinal) &&
-            Date.Equals(other.Date) &&
-            Groups.Equals(other.Groups) &&
-            Size.Equals(other.Size) &&
-            Segments.SequenceEqual(other.Segments);
+        return Poster.Equals(other.Poster, StringComparison.Ordinal)
+            && Subject.Equals(other.Subject, StringComparison.Ordinal)
+            && FileName.Equals(other.FileName, StringComparison.Ordinal)
+            && Date.Equals(other.Date)
+            && Groups.Equals(other.Groups)
+            && Size.Equals(other.Size)
+            && Segments.SequenceEqual(other.Segments);
     }
 
     /// <summary>
@@ -115,7 +108,7 @@ public class NzbFile : IEquatable<NzbFile>
     /// </summary>
     /// <param name="obj">An <see cref="object"/> to compare to this instance.</param>
     /// <returns>true if <paramref name="obj" /> has the same value as this instance; otherwise, false.</returns>
-    public override bool Equals(object obj) => Equals(obj as NzbFile);
+    public override bool Equals(object? obj) => Equals(obj as NzbFile);
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NzbFile"/> value is equal to the second <see cref="NzbFile"/> value.
@@ -123,8 +116,8 @@ public class NzbFile : IEquatable<NzbFile>
     /// <param name="first">The first <see cref="NzbFile"/>.</param>
     /// <param name="second">The second <see cref="NzbFile"/>.</param>
     /// <returns>true if <paramref name="first"/> has the same value as <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator ==(NzbFile first, NzbFile second) =>
-        (object)first == null ? (object)second == null : first.Equals(second);
+    public static bool operator ==(NzbFile? first, NzbFile? second) =>
+        first?.Equals(second) ?? second is null;
 
     /// <summary>
     /// Returns a value indicating whether the frst <see cref="NzbFile"/> value is unequal to the second <see cref="NzbFile"/> value.
@@ -132,5 +125,5 @@ public class NzbFile : IEquatable<NzbFile>
     /// <param name="first">The first <see cref="NzbFile"/>.</param>
     /// <param name="second">The second <see cref="NzbFile"/>.</param>
     /// <returns>true if <paramref name="first"/> has a different value than <paramref name="second"/>; otherwise false.</returns>
-    public static bool operator !=(NzbFile first, NzbFile second) => !(first == second);
+    public static bool operator !=(NzbFile? first, NzbFile? second) => !(first == second);
 }

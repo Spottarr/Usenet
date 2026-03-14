@@ -1,4 +1,5 @@
 ﻿using Usenet.Extensions;
+using Usenet.Util;
 
 namespace Usenet.Yenc;
 
@@ -16,7 +17,7 @@ public class YencArticle
     /// <summary>
     /// Contains the information obtained from the =yend footer line.
     /// </summary>
-    public YencFooter Footer { get; }
+    public YencFooter? Footer { get; }
 
     /// <summary>
     /// The binary data obtained by decoding the yEnc-encoded article.
@@ -29,10 +30,13 @@ public class YencArticle
     /// <param name="header">The header of the yEnc-encoded article.</param>
     /// <param name="footer">The optional footer of the yEnc-encoded article.</param>
     /// <param name="data">The binary data obtained by decoding the yEnc-encoded article.</param>
-    public YencArticle(YencHeader header, YencFooter footer, byte[] data)
+    public YencArticle(YencHeader header, YencFooter? footer, byte[] data)
     {
-        Header = header.ThrowIfNull(nameof(header));
+        Guard.ThrowIfNull(header);
+        Guard.ThrowIfNull(data);
+
+        Header = header;
         Footer = footer;
-        Data = data.ThrowIfNull(nameof(data));
+        Data = data;
     }
 }

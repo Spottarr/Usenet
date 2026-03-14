@@ -19,10 +19,11 @@ public class YencStream : EnumerableStream
     /// </summary>
     /// <param name="header">The header of the yEnc-encoded article.</param>
     /// <param name="input">An enumeration of byte chunks from the decoded yEnc-encoded article.</param>
-    public YencStream(YencHeader header, IEnumerable<byte[]> input) : base(input)
+    public YencStream(YencHeader header, IEnumerable<byte[]> input)
+        : base(input)
     {
-        Guard.ThrowIfNull(header, nameof(header));
-        Guard.ThrowIfNull(input, nameof(input));
+        Guard.ThrowIfNull(header);
+        Guard.ThrowIfNull(input);
         Header = header;
     }
 }

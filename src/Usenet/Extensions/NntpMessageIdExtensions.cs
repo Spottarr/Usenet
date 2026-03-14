@@ -10,7 +10,7 @@ internal static class NntpMessageIdExtensions
 {
     /// <summary>
     /// Throws an <exception cref="ArgumentNullException"/> if the messageId of it's value is null.
-    /// Throws an <exception cref="ArgumentException"/> if the value of the messageId is empty or 
+    /// Throws an <exception cref="ArgumentException"/> if the value of the messageId is empty or
     /// if it consists only of white-space characters.
     /// </summary>
     /// <param name="messageId">The messageId to check.</param>

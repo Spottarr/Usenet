@@ -23,6 +23,8 @@ public class CountingStream : AbstractBaseStream
     /// <param name="innerStream">The stream on which counting needs to be enabled.</param>
     public CountingStream(Stream innerStream)
     {
+        Guard.ThrowIfNull(innerStream);
+
         _innerStream = innerStream;
     }
 
@@ -79,7 +81,8 @@ public class CountingStream : AbstractBaseStream
 
     protected override void Dispose(bool disposing)
     {
-        if (disposing) _innerStream.Dispose();
+        if (disposing)
+            _innerStream.Dispose();
         base.Dispose(disposing);
     }
 }

@@ -6,17 +6,17 @@ namespace Usenet.Tests.Nntp.Builders;
 public class NntpGroupsBuilderTests
 {
     [Fact]
-    public void AddNullShouldResultInEmptyCollection()
+    public void AddNullShouldThrow()
     {
-        var builder = new NntpGroupsBuilder().Add((string?)null);
-        Assert.Equal(Array.Empty<string>(), builder.Groups);
+        var builder = new NntpGroupsBuilder();
+        Assert.Throws<ArgumentNullException>(() => builder.Add((string?)null!));
     }
 
     [Fact]
-    public void AddNullEnumerableShouldResultInEmptyCollection()
+    public void AddNullEnumerableShouldThrow()
     {
-        var builder = new NntpGroupsBuilder().Add((IEnumerable<string>?)null);
-        Assert.Equal(Array.Empty<string>(), builder.Groups);
+        var builder = new NntpGroupsBuilder();
+        Assert.Throws<ArgumentNullException>(() => builder.Add((IEnumerable<string>?)null!));
     }
 
     [Fact]
