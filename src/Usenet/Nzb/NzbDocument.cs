@@ -48,14 +48,33 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// Loads a <see cref="NzbDocument"/> from the specified stream asynchronously using the default usenet encoding.
     /// </summary>
     /// <param name="stream">The stream to be read.</param>
+    /// <returns>A task that represents the asynchronous load operation.
+    /// The value of the task's result property contains the resulting <see cref="NzbDocument"/>.</returns>
+    /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
+    public static Task<NzbDocument> LoadAsync(Stream stream) =>
+        LoadAsync(stream, UsenetEncoding.Default, CancellationToken.None);
+
+    /// <summary>
+    /// Loads a <see cref="NzbDocument"/> from the specified stream asynchronously using the default usenet encoding.
+    /// </summary>
+    /// <param name="stream">The stream to be read.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>A task that represents the asynchronous load operation.
     /// The value of the task's result property contains the resulting <see cref="NzbDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
-    public static Task<NzbDocument> LoadAsync(
-        Stream stream,
-        CancellationToken cancellationToken = default
-    ) => LoadAsync(stream, UsenetEncoding.Default, cancellationToken);
+    public static Task<NzbDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) =>
+        LoadAsync(stream, UsenetEncoding.Default, cancellationToken);
+
+    /// <summary>
+    /// Loads a <see cref="NzbDocument"/> from the specified stream asynchronously using the specified character encoding.
+    /// </summary>
+    /// <param name="stream">The stream to be read.</param>
+    /// <param name="encoding">The character encoding to use.</param>
+    /// <returns>A task that represents the asynchronous load operation.
+    /// The value of the task's result property contains the resulting <see cref="NzbDocument"/>.</returns>
+    /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
+    public static Task<NzbDocument> LoadAsync(Stream stream, Encoding encoding) =>
+        LoadAsync(stream, encoding, CancellationToken.None);
 
     /// <summary>
     /// Loads a <see cref="NzbDocument"/> from the specified stream asynchronously using the specified character encoding.
@@ -69,7 +88,7 @@ public class NzbDocument : IEquatable<NzbDocument>
     public static async Task<NzbDocument> LoadAsync(
         Stream stream,
         Encoding encoding,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         Guard.ThrowIfNull(stream);

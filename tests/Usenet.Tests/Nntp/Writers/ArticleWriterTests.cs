@@ -118,32 +118,50 @@ internal sealed class MockConnection : INntpConnection
         string hostname,
         int port,
         bool useSsl,
+        IResponseParser<TResponse> parser
+    ) => throw new NotImplementedException();
+
+    public Task<TResponse> ConnectAsync<TResponse>(
+        string hostname,
+        int port,
+        bool useSsl,
         IResponseParser<TResponse> parser,
-        CancellationToken cancellationToken = default
-    )
-    {
-        throw new NotImplementedException();
-    }
+        CancellationToken cancellationToken
+    ) => throw new NotImplementedException();
+
+    public Task<TResponse> CommandAsync<TResponse>(
+        string command,
+        IResponseParser<TResponse> parser
+    ) => throw new NotImplementedException();
 
     public Task<TResponse> CommandAsync<TResponse>(
         string command,
         IResponseParser<TResponse> parser,
-        CancellationToken cancellationToken = default
-    )
-    {
-        throw new NotImplementedException();
-    }
+        CancellationToken cancellationToken
+    ) => throw new NotImplementedException();
+
+    public Task<TResponse> MultiLineCommandAsync<TResponse>(
+        string command,
+        IMultiLineResponseParser<TResponse> parser
+    ) => throw new NotImplementedException();
 
     public Task<TResponse> MultiLineCommandAsync<TResponse>(
         string command,
         IMultiLineResponseParser<TResponse> parser,
-        CancellationToken cancellationToken = default
-    )
-    {
-        throw new NotImplementedException();
-    }
+        CancellationToken cancellationToken
+    ) => throw new NotImplementedException();
 
-    public Task WriteLineAsync(string line, CancellationToken cancellationToken = default)
+    public Task<TResponse> GetResponseAsync<TResponse>(IResponseParser<TResponse> parser) =>
+        throw new NotImplementedException();
+
+    public Task<TResponse> GetResponseAsync<TResponse>(
+        IResponseParser<TResponse> parser,
+        CancellationToken cancellationToken
+    ) => throw new NotImplementedException();
+
+    public Task WriteLineAsync(string line) => WriteLineAsync(line, CancellationToken.None);
+
+    public Task WriteLineAsync(string line, CancellationToken cancellationToken)
     {
         _lines.Add(line);
         return Task.CompletedTask;
@@ -151,16 +169,5 @@ internal sealed class MockConnection : INntpConnection
 
     public CountingStream Stream => throw new NotImplementedException();
 
-    public Task<TResponse> GetResponseAsync<TResponse>(
-        IResponseParser<TResponse> parser,
-        CancellationToken cancellationToken = default
-    )
-    {
-        throw new NotImplementedException();
-    }
-
-    public string[] GetLines()
-    {
-        return _lines.ToArray();
-    }
+    public string[] GetLines() => _lines.ToArray();
 }

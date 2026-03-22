@@ -17,7 +17,7 @@ namespace Usenet.Nntp;
 /// </summary>
 /// <remarks>This implementation of the <see cref="INntpConnection"/> interface does support SSL encryption but
 /// does not support compressed multi-line results.</remarks>
-public sealed class NntpConnection : INntpConnection
+public sealed partial class NntpConnection : INntpConnection
 {
     private readonly ILogger _log = Logger.Create<NntpConnection>();
     private readonly TcpClient _client = new();
@@ -34,7 +34,7 @@ public sealed class NntpConnection : INntpConnection
         int port,
         bool useSsl,
         IResponseParser<TResponse> parser,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         _log.Connecting(hostname, port, useSsl);
@@ -49,7 +49,7 @@ public sealed class NntpConnection : INntpConnection
     public async Task<TResponse> CommandAsync<TResponse>(
         string command,
         IResponseParser<TResponse> parser,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         ThrowIfNotConnected();
@@ -67,7 +67,7 @@ public sealed class NntpConnection : INntpConnection
     public async Task<TResponse> MultiLineCommandAsync<TResponse>(
         string command,
         IMultiLineResponseParser<TResponse> parser,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         ThrowIfNotConnected();
@@ -88,7 +88,7 @@ public sealed class NntpConnection : INntpConnection
     /// <inheritdoc/>
     public async Task<TResponse> GetResponseAsync<TResponse>(
         IResponseParser<TResponse> parser,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         ThrowIfNotConnected();
@@ -111,7 +111,7 @@ public sealed class NntpConnection : INntpConnection
     }
 
     /// <inheritdoc/>
-    public async Task WriteLineAsync(string line, CancellationToken cancellationToken = default)
+    public async Task WriteLineAsync(string line, CancellationToken cancellationToken)
     {
         ThrowIfNotConnected();
         await _writer!.WriteLineAsync(line, cancellationToken).ConfigureAwait(false);
@@ -128,7 +128,7 @@ public sealed class NntpConnection : INntpConnection
     private async Task<CountingStream> GetStreamAsync(
         string hostname,
         bool useSsl,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -145,7 +145,7 @@ public sealed class NntpConnection : INntpConnection
     }
 
     private async IAsyncEnumerable<string> ReadMultiLineDataBlockAsync(
-        [EnumeratorCancellation] CancellationToken cancellationToken = default
+        [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
         while (await _reader!.ReadLineAsync(cancellationToken).ConfigureAwait(false) is { } line)

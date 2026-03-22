@@ -63,9 +63,9 @@ public sealed class NntpClientPool : INntpClientPool
         Task.Run(() => MonitorIdleClients(_cts.Token));
     }
 
-    public async Task<IPooledNntpClientLease> GetLease(
-        CancellationToken cancellationToken = default
-    )
+    public Task<IPooledNntpClientLease> GetLease() => GetLease(CancellationToken.None);
+
+    public async Task<IPooledNntpClientLease> GetLease(CancellationToken cancellationToken)
     {
         var client = await BorrowClient(cancellationToken).ConfigureAwait(false);
         return new PooledNntpClientLease(this, client);

@@ -27,12 +27,17 @@ public class NzbWriter
     /// Writes the specified <see cref="NzbDocument"/> asynchronously to the stream.
     /// </summary>
     /// <param name="nzbDocument">The NZB document to write.</param>
+    /// <returns>A <see cref="Task"/> that can be awaited.</returns>
+    public Task WriteAsync(NzbDocument nzbDocument) =>
+        WriteAsync(nzbDocument, CancellationToken.None);
+
+    /// <summary>
+    /// Writes the specified <see cref="NzbDocument"/> asynchronously to the stream.
+    /// </summary>
+    /// <param name="nzbDocument">The NZB document to write.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A <see cref="Task"/> that can be awaited.</returns>
-    public async Task WriteAsync(
-        NzbDocument nzbDocument,
-        CancellationToken cancellationToken = default
-    )
+    public async Task WriteAsync(NzbDocument nzbDocument, CancellationToken cancellationToken)
     {
         Guard.ThrowIfNull(nzbDocument);
 

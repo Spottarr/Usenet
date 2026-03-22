@@ -11,7 +11,7 @@ internal class ArticleWriter
     public static async Task WriteAsync(
         INntpConnection connection,
         NntpArticle article,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         await WriteHeadersAsync(connection, article, cancellationToken).ConfigureAwait(false);
