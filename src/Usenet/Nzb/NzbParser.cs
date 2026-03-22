@@ -21,13 +21,23 @@ public static class NzbParser
     /// Asynchronously parses the xml input from a string into an instance of the <see cref="NzbDocument"/> class.
     /// </summary>
     /// <param name="text">An xml string representing the NZB document.</param>
+    /// <returns>A task containing a parsed <see cref="NzbDocument"/>.</returns>
+    /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
+    /// <exception cref="InvalidNzbDataException">InvalidNzbDataException</exception>
+    public static Task<NzbDocument> ParseAsync(string text) =>
+        ParseAsync(text, CancellationToken.None);
+
+    /// <summary>
+    /// Asynchronously parses the xml input from a string into an instance of the <see cref="NzbDocument"/> class.
+    /// </summary>
+    /// <param name="text">An xml string representing the NZB document.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task containing a parsed <see cref="NzbDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
     /// <exception cref="InvalidNzbDataException">InvalidNzbDataException</exception>
     public static async Task<NzbDocument> ParseAsync(
         string text,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         Guard.ThrowIfNull(text);
@@ -42,13 +52,23 @@ public static class NzbParser
     /// Asynchronously parses the xml input from a stream into an instance of the <see cref="NzbDocument"/> class.
     /// </summary>
     /// <param name="stream">A stream containing the xml NZB document.</param>
+    /// <returns>A task containing a parsed <see cref="NzbDocument"/>.</returns>
+    /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
+    /// <exception cref="InvalidNzbDataException">InvalidNzbDataException</exception>
+    public static Task<NzbDocument> ParseAsync(Stream stream) =>
+        ParseAsync(stream, CancellationToken.None);
+
+    /// <summary>
+    /// Asynchronously parses the xml input from a stream into an instance of the <see cref="NzbDocument"/> class.
+    /// </summary>
+    /// <param name="stream">A stream containing the xml NZB document.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task containing a parsed <see cref="NzbDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
     /// <exception cref="InvalidNzbDataException">InvalidNzbDataException</exception>
     public static async Task<NzbDocument> ParseAsync(
         Stream stream,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         Guard.ThrowIfNull(stream);
@@ -61,13 +81,23 @@ public static class NzbParser
     /// Asynchronously parses the xml input from a text reader into an instance of the <see cref="NzbDocument"/> class.
     /// </summary>
     /// <param name="reader">A text reader containing the xml NZB document.</param>
+    /// <returns>A task containing a parsed <see cref="NzbDocument"/>.</returns>
+    /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
+    /// <exception cref="InvalidNzbDataException">InvalidNzbDataException</exception>
+    public static Task<NzbDocument> ParseAsync(TextReader reader) =>
+        ParseAsync(reader, CancellationToken.None);
+
+    /// <summary>
+    /// Asynchronously parses the xml input from a text reader into an instance of the <see cref="NzbDocument"/> class.
+    /// </summary>
+    /// <param name="reader">A text reader containing the xml NZB document.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task containing a parsed <see cref="NzbDocument"/>.</returns>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
     /// <exception cref="InvalidNzbDataException">InvalidNzbDataException</exception>
     public static async Task<NzbDocument> ParseAsync(
         TextReader reader,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         Guard.ThrowIfNull(reader);

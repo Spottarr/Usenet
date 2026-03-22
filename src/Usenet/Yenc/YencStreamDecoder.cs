@@ -19,16 +19,35 @@ public static class YencStreamDecoder
     /// using the default Usenet character encoding.
     /// </summary>
     /// <param name="encodedLines">The yEnc-encoded lines to decode.</param>
+    /// <returns>A <see cref="YencStream"/> with decoded binary data and meta-data.</returns>
+    public static YencStream Decode(IEnumerable<string> encodedLines) =>
+        Decode(encodedLines, UsenetEncoding.Default, CancellationToken.None);
+
+    /// <summary>
+    /// Decodes yEnc-encoded text into a <see cref="YencStream"/>
+    /// using the default Usenet character encoding.
+    /// </summary>
+    /// <param name="encodedLines">The yEnc-encoded lines to decode.</param>
+    /// <param name="encoding">The character encoding to use.</param>
+    /// <returns>A <see cref="YencStream"/> with decoded binary data and meta-data.</returns>
+    public static YencStream Decode(IEnumerable<string> encodedLines, Encoding encoding) =>
+        Decode(encodedLines, encoding, CancellationToken.None);
+
+    /// <summary>
+    /// Decodes yEnc-encoded text into a <see cref="YencStream"/>
+    /// using the default Usenet character encoding.
+    /// </summary>
+    /// <param name="encodedLines">The yEnc-encoded lines to decode.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A <see cref="YencStream"/> with decoded binary data and meta-data.</returns>
     public static YencStream Decode(
         IEnumerable<string> encodedLines,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     ) => Decode(encodedLines, UsenetEncoding.Default, cancellationToken);
 
     /// <summary>
     /// Decodes yEnc-encoded text into a <see cref="YencStream"/>
-    /// using the specified character encoding.
+    /// using the default Usenet character encoding.
     /// </summary>
     /// <param name="encodedLines">The yEnc-encoded lines to decode.</param>
     /// <param name="encoding">The character encoding to use.</param>
@@ -37,7 +56,7 @@ public static class YencStreamDecoder
     public static YencStream Decode(
         IEnumerable<string> encodedLines,
         Encoding encoding,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         Guard.ThrowIfNull(encodedLines);

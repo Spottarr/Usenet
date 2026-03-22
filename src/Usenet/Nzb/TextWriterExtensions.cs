@@ -10,12 +10,21 @@ public static class TextWriterExtensions
     /// </summary>
     /// <param name="textWriter">The <see cref="TextWriter"/> to use.</param>
     /// <param name="nzbDocument">The <see cref="NzbDocument"/> to write.</param>
+    /// <returns>A <see cref="Task"/> that can be awaited.</returns>
+    public static Task WriteNzbDocumentAsync(this TextWriter textWriter, NzbDocument nzbDocument) =>
+        WriteNzbDocumentAsync(textWriter, nzbDocument, CancellationToken.None);
+
+    /// <summary>
+    /// Writes the specified <see cref="NzbDocument"/> asynchronously to the stream.
+    /// </summary>
+    /// <param name="textWriter">The <see cref="TextWriter"/> to use.</param>
+    /// <param name="nzbDocument">The <see cref="NzbDocument"/> to write.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A <see cref="Task"/> that can be awaited.</returns>
     public static Task WriteNzbDocumentAsync(
         this TextWriter textWriter,
         NzbDocument nzbDocument,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         return new NzbWriter(textWriter).WriteAsync(nzbDocument, cancellationToken);
