@@ -11,12 +11,11 @@ internal sealed class GroupOriginsResponseParserTests
             (
                 215,
                 "information follows",
-                new[]
-                {
+                [
                     "misc.test 930445408 <creatme@isc.org>",
                     "alt.rfc-writers.recovery 930562309 <m@example.com>",
                     "tx.natives.recovery 930678923 <sob@academ.com>",
-                },
+                ],
                 [
                     new NntpGroupOrigin(
                         "misc.test",

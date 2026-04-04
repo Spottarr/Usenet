@@ -11,7 +11,7 @@ internal sealed class ListGroupsResponseParserTests
             (
                 211,
                 "1234 3000234 3002322 misc.test list follows",
-                Array.Empty<string>(),
+                [],
                 new NntpGroup(
                     "misc.test",
                     1234,
@@ -27,7 +27,7 @@ internal sealed class ListGroupsResponseParserTests
             (
                 211,
                 "1234 3000234 3000236 misc.test list follows",
-                new[] { "3000234", "3000235", "3000236" },
+                ["3000234", "3000235", "3000236"],
                 new NntpGroup(
                     "misc.test",
                     1234,
@@ -43,7 +43,7 @@ internal sealed class ListGroupsResponseParserTests
             (
                 411,
                 "example.is.sob.bradner.or.barber is unknown",
-                Array.Empty<string>(),
+                [],
                 new NntpGroup(
                     "",
                     0,
@@ -59,7 +59,7 @@ internal sealed class ListGroupsResponseParserTests
             (
                 412,
                 "no newsgroup selected",
-                Array.Empty<string>(),
+                [],
                 new NntpGroup(
                     "",
                     0,

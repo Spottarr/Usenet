@@ -11,45 +11,13 @@ internal sealed class NntpGroupTests
     {
         yield return () => ("test", 10, 2, 11, NntpPostingStatus.PostingPermitted, null, null);
         yield return () =>
-            (
-                "alt.rfc-writers.recovery",
-                0,
-                1,
-                4,
-                NntpPostingStatus.PostingPermitted,
-                "",
-                Array.Empty<long>()
-            );
+            ("alt.rfc-writers.recovery", 0, 1, 4, NntpPostingStatus.PostingPermitted, "", []);
         yield return () =>
-            (
-                "tx.natives.recovery",
-                0,
-                56,
-                89,
-                NntpPostingStatus.PostingPermitted,
-                "",
-                Array.Empty<long>()
-            );
+            ("tx.natives.recovery", 0, 56, 89, NntpPostingStatus.PostingPermitted, "", []);
         yield return () =>
-            (
-                "misc.test",
-                1234,
-                3000234,
-                3002322,
-                NntpPostingStatus.PostingPermitted,
-                "",
-                Array.Empty<long>()
-            );
+            ("misc.test", 1234, 3000234, 3002322, NntpPostingStatus.PostingPermitted, "", []);
         yield return () =>
-            (
-                "rec.food.drink.tea",
-                3,
-                51,
-                100,
-                NntpPostingStatus.PostingPermitted,
-                "",
-                Array.Empty<long>()
-            );
+            ("rec.food.drink.tea", 3, 51, 100, NntpPostingStatus.PostingPermitted, "", []);
     }
 
     [Test]

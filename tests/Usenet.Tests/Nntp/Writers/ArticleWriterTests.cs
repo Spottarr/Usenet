@@ -13,13 +13,13 @@ internal sealed class ArticleWriterTests
         yield return () =>
             (
                 new NntpArticle(0, "1@example.com", "group", null, new List<string>(0)),
-                new[] { "Message-ID: <1@example.com>", "Newsgroups: group", "", "." }
+                ["Message-ID: <1@example.com>", "Newsgroups: group", "", "."]
             );
 
         yield return () =>
             (
                 new NntpArticle(0, "<2@example.com>", "group", null, new List<string>(0)),
-                new[] { "Message-ID: <2@example.com>", "Newsgroups: group", "", "." }
+                ["Message-ID: <2@example.com>", "Newsgroups: group", "", "."]
             );
 
         yield return () =>
@@ -34,15 +34,14 @@ internal sealed class ArticleWriterTests
                     },
                     new List<string> { "This is just a test article." }
                 ),
-                new[]
-                {
+                [
                     "Message-ID: <3@example.com>",
                     "Newsgroups: group",
                     "From: \"Demo User\" <nobody@example.net>",
                     "",
                     "This is just a test article.",
                     ".",
-                }
+                ]
             );
 
         yield return () =>
@@ -57,14 +56,13 @@ internal sealed class ArticleWriterTests
                     },
                     new List<string> { "This is just a test article." }
                 ),
-                new[]
-                {
+                [
                     "Message-ID: <4@example.com>",
                     "Newsgroups: group",
                     "",
                     "This is just a test article.",
                     ".",
-                }
+                ]
             );
 
         yield return () =>
@@ -79,14 +77,13 @@ internal sealed class ArticleWriterTests
                     },
                     new List<string> { "This is just a test article." }
                 ),
-                new[]
-                {
+                [
                     "Message-ID: <5@example.com>",
                     "Newsgroups: group",
                     "",
                     "This is just a test article.",
                     ".",
-                }
+                ]
             );
     }
 

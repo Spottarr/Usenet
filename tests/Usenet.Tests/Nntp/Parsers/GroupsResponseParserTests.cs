@@ -15,9 +15,8 @@ internal sealed class GroupsResponseParserTests
                 "list of new newsgroups follows",
                 231,
                 (int)GroupStatusRequestType.Basic,
-                new[] { "alt.rfc-writers.recovery 4 1 y", "tx.natives.recovery 89 56 y" },
-                new NntpGroup[]
-                {
+                ["alt.rfc-writers.recovery 4 1 y", "tx.natives.recovery 89 56 y"],
+                [
                     new(
                         "alt.rfc-writers.recovery",
                         0,
@@ -36,18 +35,11 @@ internal sealed class GroupsResponseParserTests
                         string.Empty,
                         new List<long>(0)
                     ),
-                }
+                ]
             );
 
         yield return () =>
-            (
-                231,
-                "list of new newsgroups follows",
-                231,
-                (int)GroupStatusRequestType.Basic,
-                Array.Empty<string>(),
-                Array.Empty<NntpGroup>()
-            );
+            (231, "list of new newsgroups follows", 231, (int)GroupStatusRequestType.Basic, [], []);
 
         yield return () =>
             (
@@ -55,9 +47,8 @@ internal sealed class GroupsResponseParserTests
                 "list of new newsgroups follows",
                 215,
                 (int)GroupStatusRequestType.Extended,
-                new[] { "misc.test 3002322 3000234 1234 y", "rec.food.drink.tea 100 51 3 y" },
-                new NntpGroup[]
-                {
+                ["misc.test 3002322 3000234 1234 y", "rec.food.drink.tea 100 51 3 y"],
+                [
                     new(
                         "misc.test",
                         1234,
@@ -76,7 +67,7 @@ internal sealed class GroupsResponseParserTests
                         string.Empty,
                         new List<long>(0)
                     ),
-                }
+                ]
             );
 
         yield return () =>
@@ -85,8 +76,8 @@ internal sealed class GroupsResponseParserTests
                 "list of new newsgroups follows",
                 215,
                 (int)GroupStatusRequestType.Extended,
-                Array.Empty<string>(),
-                Array.Empty<NntpGroup>()
+                [],
+                []
             );
     }
 
