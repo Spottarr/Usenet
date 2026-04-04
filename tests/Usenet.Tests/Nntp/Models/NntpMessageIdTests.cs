@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using Usenet.Nntp.Models;
 
 namespace Usenet.Tests.Nntp.Models;
@@ -40,8 +40,8 @@ internal sealed class NntpMessageIdTests
     internal async Task SerializedInstanceShouldBeDeserializedCorrectly(string messageId)
     {
         var expectedMessageId = new NntpMessageId(messageId);
-        var json = JsonConvert.SerializeObject(expectedMessageId);
-        var actualMessageId = JsonConvert.DeserializeObject<NntpMessageId>(json)!;
+        var json = JsonSerializer.Serialize(expectedMessageId);
+        var actualMessageId = JsonSerializer.Deserialize<NntpMessageId>(json)!;
         await Assert.That(actualMessageId).IsEqualTo(expectedMessageId);
     }
 }

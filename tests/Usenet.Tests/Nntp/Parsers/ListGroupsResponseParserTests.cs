@@ -19,7 +19,7 @@ internal sealed class ListGroupsResponseParserTests
                     3002322,
                     NntpPostingStatus.Unknown,
                     string.Empty,
-                    new List<long>(0)
+                    []
                 )
             );
 
@@ -44,15 +44,7 @@ internal sealed class ListGroupsResponseParserTests
                 411,
                 "example.is.sob.bradner.or.barber is unknown",
                 [],
-                new NntpGroup(
-                    "",
-                    0,
-                    0,
-                    0,
-                    NntpPostingStatus.Unknown,
-                    string.Empty,
-                    new List<long>(0)
-                )
+                new NntpGroup("", 0, 0, 0, NntpPostingStatus.Unknown, string.Empty, [])
             );
 
         yield return () =>
@@ -60,15 +52,7 @@ internal sealed class ListGroupsResponseParserTests
                 412,
                 "no newsgroup selected",
                 [],
-                new NntpGroup(
-                    "",
-                    0,
-                    0,
-                    0,
-                    NntpPostingStatus.Unknown,
-                    string.Empty,
-                    new List<long>(0)
-                )
+                new NntpGroup("", 0, 0, 0, NntpPostingStatus.Unknown, string.Empty, [])
             );
     }
 

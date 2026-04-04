@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Immutable;
+using System.Text.Json;
 using Usenet.Nntp.Models;
 
 namespace Usenet.Tests.Nntp.Models;
@@ -39,11 +40,11 @@ internal sealed class NntpGroupTests
             highWaterMark,
             postingStatus,
             otherGroup!,
-            articleNumbers!
+            articleNumbers?.ToImmutableList()!
         );
 
-        var json = JsonConvert.SerializeObject(expected);
-        var actual = JsonConvert.DeserializeObject<NntpGroup>(json);
+        var json = JsonSerializer.Serialize(expected);
+        var actual = JsonSerializer.Deserialize<NntpGroup>(json);
         await Assert.That(actual).IsEqualTo(expected);
     }
 

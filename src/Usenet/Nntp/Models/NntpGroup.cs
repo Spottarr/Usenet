@@ -64,7 +64,7 @@ public class NntpGroup : IEquatable<NntpGroup>
         long highWaterMark,
         NntpPostingStatus postingStatus,
         string otherGroup,
-        IList<long> articleNumbers
+        IImmutableList<long> articleNumbers
     )
     {
         Name = name ?? string.Empty;

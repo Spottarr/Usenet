@@ -348,7 +348,7 @@ Usenet.Nntp.Models.NntpGroup.Equals(Usenet.Nntp.Models.NntpGroup? other) -> bool
 Usenet.Nntp.Models.NntpGroup.HighWaterMark.get -> long
 Usenet.Nntp.Models.NntpGroup.LowWaterMark.get -> long
 Usenet.Nntp.Models.NntpGroup.Name.get -> string!
-Usenet.Nntp.Models.NntpGroup.NntpGroup(string! name, long articleCount, long lowWaterMark, long highWaterMark, Usenet.Nntp.Models.NntpPostingStatus postingStatus, string! otherGroup, System.Collections.Generic.IList<long>! articleNumbers) -> void
+Usenet.Nntp.Models.NntpGroup.NntpGroup(string! name, long articleCount, long lowWaterMark, long highWaterMark, Usenet.Nntp.Models.NntpPostingStatus postingStatus, string! otherGroup, System.Collections.Immutable.IImmutableList<long>! articleNumbers) -> void
 Usenet.Nntp.Models.NntpGroup.OtherGroup.get -> string!
 Usenet.Nntp.Models.NntpGroup.PostingStatus.get -> Usenet.Nntp.Models.NntpPostingStatus
 Usenet.Nntp.Models.NntpGroupOrigin

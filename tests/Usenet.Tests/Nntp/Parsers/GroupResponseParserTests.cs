@@ -18,22 +18,14 @@ internal sealed class GroupResponseParserTests
                     3002322,
                     NntpPostingStatus.Unknown,
                     string.Empty,
-                    new List<long>(0)
+                    []
                 )
             );
         yield return () =>
             (
                 411,
                 "example.is.sob.bradner.or.barber is unknown",
-                new NntpGroup(
-                    "",
-                    0,
-                    0,
-                    0,
-                    NntpPostingStatus.Unknown,
-                    string.Empty,
-                    new List<long>(0)
-                )
+                new NntpGroup("", 0, 0, 0, NntpPostingStatus.Unknown, string.Empty, [])
             );
     }
 

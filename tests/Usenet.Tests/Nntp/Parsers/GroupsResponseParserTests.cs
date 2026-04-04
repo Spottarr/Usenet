@@ -24,7 +24,7 @@ internal sealed class GroupsResponseParserTests
                         4,
                         NntpPostingStatus.PostingPermitted,
                         string.Empty,
-                        new List<long>(0)
+                        []
                     ),
                     new(
                         "tx.natives.recovery",
@@ -33,7 +33,7 @@ internal sealed class GroupsResponseParserTests
                         89,
                         NntpPostingStatus.PostingPermitted,
                         string.Empty,
-                        new List<long>(0)
+                        []
                     ),
                 ]
             );
@@ -56,7 +56,7 @@ internal sealed class GroupsResponseParserTests
                         3002322,
                         NntpPostingStatus.PostingPermitted,
                         string.Empty,
-                        new List<long>(0)
+                        []
                     ),
                     new(
                         "rec.food.drink.tea",
@@ -65,7 +65,7 @@ internal sealed class GroupsResponseParserTests
                         100,
                         NntpPostingStatus.PostingPermitted,
                         string.Empty,
-                        new List<long>(0)
+                        []
                     ),
                 ]
             );

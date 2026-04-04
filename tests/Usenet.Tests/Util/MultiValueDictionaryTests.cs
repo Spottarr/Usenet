@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using Usenet.Util;
 
 // ReSharper disable DuplicateKeyCollectionInitialization
@@ -156,8 +156,8 @@ internal sealed class MultiValueDictionaryTests
             { 1, "one" },
         };
 
-        var json = JsonConvert.SerializeObject(expected);
-        var actual = JsonConvert.DeserializeObject<MultiValueDictionary<int, string>>(json);
+        var json = JsonSerializer.Serialize(expected);
+        var actual = JsonSerializer.Deserialize<MultiValueDictionary<int, string>>(json);
         await Assert.That(actual).IsEqualTo(expected);
     }
 }
