@@ -3,118 +3,146 @@ using Usenet.Nntp;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Models;
 using Usenet.Util;
-using Xunit;
 
 // ReSharper disable DuplicateKeyCollectionInitialization
 
 namespace Usenet.Tests.Nntp.Builders;
 
-public class NntpArticleBuilderTests
+internal sealed class NntpArticleBuilderTests
 {
-    [Fact]
-    public void BuildWithoutMessageIdShouldThrow()
+    [Test]
+    public async Task BuildWithoutMessageIdShouldThrow()
     {
-        var exception = Assert.Throws<NntpException>(() =>
-        {
-            new NntpArticleBuilder()
-                .SetFrom("superuser")
-                .SetSubject("subject")
-                .AddGroups("alt.test")
-                .Build();
-        });
-        Assert.Equal($"{NntpHeaders.MessageId} header not set", exception.Message);
+        await Assert
+            .That(() =>
+            {
+                new NntpArticleBuilder()
+                    .SetFrom("superuser")
+                    .SetSubject("subject")
+                    .AddGroups("alt.test")
+                    .Build();
+            })
+            .ThrowsExactly<NntpException>()
+            .WithMessage($"{NntpHeaders.MessageId} header not set", StringComparison.Ordinal);
     }
 
-    [Fact]
-    public void BuildWithoutFromShouldThrow()
+    [Test]
+    public async Task BuildWithoutFromShouldThrow()
     {
-        var exception = Assert.Throws<NntpException>(() =>
-        {
-            new NntpArticleBuilder()
-                .SetMessageId("123@hhh.net")
-                .SetSubject("subject")
-                .AddGroups("alt.test")
-                .Build();
-        });
-        Assert.Equal($"{NntpHeaders.From} header not set", exception.Message);
+        await Assert
+            .That(() =>
+            {
+                new NntpArticleBuilder()
+                    .SetMessageId("123@hhh.net")
+                    .SetSubject("subject")
+                    .AddGroups("alt.test")
+                    .Build();
+            })
+            .ThrowsExactly<NntpException>()
+            .WithMessage($"{NntpHeaders.From} header not set", StringComparison.Ordinal);
     }
 
-    [Fact]
-    public void BuildWithoutSubjectShouldThrow()
+    [Test]
+    public async Task BuildWithoutSubjectShouldThrow()
     {
-        var exception = Assert.Throws<NntpException>(() =>
-        {
-            new NntpArticleBuilder()
-                .SetMessageId("123@hhh.net")
-                .SetFrom("superuser")
-                .AddGroups("alt.test")
-                .Build();
-        });
-        Assert.Equal($"{NntpHeaders.Subject} header not set", exception.Message);
+        await Assert
+            .That(() =>
+            {
+                new NntpArticleBuilder()
+                    .SetMessageId("123@hhh.net")
+                    .SetFrom("superuser")
+                    .AddGroups("alt.test")
+                    .Build();
+            })
+            .ThrowsExactly<NntpException>()
+            .WithMessage($"{NntpHeaders.Subject} header not set", StringComparison.Ordinal);
     }
 
-    [Fact]
-    public void BuildWithoutGroupShouldThrow()
+    [Test]
+    public async Task BuildWithoutGroupShouldThrow()
     {
-        var exception = Assert.Throws<NntpException>(() =>
-        {
-            new NntpArticleBuilder()
-                .SetMessageId("123@hhh.net")
-                .SetFrom("superuser")
-                .SetSubject("subject")
-                .Build();
-        });
-        Assert.Equal($"{NntpHeaders.Newsgroups} header not set", exception.Message);
+        await Assert
+            .That(() =>
+            {
+                new NntpArticleBuilder()
+                    .SetMessageId("123@hhh.net")
+                    .SetFrom("superuser")
+                    .SetSubject("subject")
+                    .Build();
+            })
+            .ThrowsExactly<NntpException>()
+            .WithMessage($"{NntpHeaders.Newsgroups} header not set", StringComparison.Ordinal);
     }
 
-    [Theory]
-    [InlineData(NntpHeaders.Subject)]
-    [InlineData(NntpHeaders.MessageId)]
-    [InlineData(NntpHeaders.Newsgroups)]
-    [InlineData(NntpHeaders.From)]
-    public void SettingHeaderWithReservedKeyShouldThrow(string headerKey)
+    [Test]
+    [Arguments(NntpHeaders.Subject)]
+    [Arguments(NntpHeaders.MessageId)]
+    [Arguments(NntpHeaders.Newsgroups)]
+    [Arguments(NntpHeaders.From)]
+    public async Task SettingHeaderWithReservedKeyShouldThrow(string headerKey)
     {
-        var exception = Assert.Throws<NntpException>(() =>
-        {
-            new NntpArticleBuilder().AddHeader(headerKey, "val");
-        });
-        Assert.Equal("Reserved header key not allowed", exception.Message);
+        await Assert
+            .That(() =>
+            {
+                new NntpArticleBuilder().AddHeader(headerKey, "val");
+            })
+            .ThrowsExactly<NntpException>()
+            .WithMessage("Reserved header key not allowed", StringComparison.Ordinal);
     }
 
-    [Theory]
-    [InlineData("", "Val", "key")]
-    [InlineData(" ", "Val", "key")]
-    public void SettingHeaderWithEmptyParametersShouldThrow(
+    [Test]
+    [Arguments("", "Val", "key")]
+    [Arguments(" ", "Val", "key")]
+    public async Task SettingHeaderWithEmptyParametersShouldThrow(
         string key,
         string value,
         string expectedParamName
     )
     {
-        var exception = Assert.Throws<ArgumentException>(() =>
+        ArgumentException? caught = null;
+        try
         {
             new NntpArticleBuilder().AddHeader(key, value);
-        });
-        Assert.Equal(expectedParamName, exception.ParamName);
+        }
+        catch (ArgumentException ex)
+        {
+            caught = ex;
+        }
+
+        await Assert.That(caught).IsNotNull();
+        await Assert.That(caught!.ParamName).IsEqualTo(expectedParamName);
     }
 
-    [Theory]
-    [InlineData("Key", null, "value")]
-    [InlineData(null, "Val", "key")]
-    public void SettingHeaderWithNullParametersShouldThrow(
+    [Test]
+    [MethodDataSource(nameof(GetNullParameterData))]
+    public async Task SettingHeaderWithNullParametersShouldThrow(
         string? key,
         string? value,
         string expectedParamName
     )
     {
-        var exception = Assert.Throws<ArgumentNullException>(() =>
+        ArgumentNullException? caught = null;
+        try
         {
             new NntpArticleBuilder().AddHeader(key!, value!);
-        });
-        Assert.Equal(expectedParamName, exception.ParamName);
+        }
+        catch (ArgumentNullException ex)
+        {
+            caught = ex;
+        }
+
+        await Assert.That(caught).IsNotNull();
+        await Assert.That(caught!.ParamName).IsEqualTo(expectedParamName);
     }
 
-    [Fact]
-    public void BuildShouldBuildArticle()
+    public static IEnumerable<(string?, string?, string)> GetNullParameterData()
+    {
+        yield return ("Key", null, "value");
+        yield return (null, "Val", "key");
+    }
+
+    [Test]
+    public async Task BuildShouldBuildArticle()
     {
         var expected = new NntpArticle(
             0,
@@ -140,13 +168,13 @@ public class NntpArticleBuilderTests
             .AddHeader("Header1", "Value1")
             .Build();
 
-        Assert.Equal(expected, actual);
-        Assert.True(expected.Equals(actual));
-        Assert.True(expected == actual);
+        await Assert.That(actual).IsEqualTo(expected);
+        await Assert.That(expected.Equals(actual)).IsTrue();
+        await Assert.That(expected == actual).IsTrue();
     }
 
-    [Fact]
-    public void BuildInitializedFromExistingArticleShouldBuildSameArticle()
+    [Test]
+    public async Task BuildInitializedFromExistingArticleShouldBuildSameArticle()
     {
         var expected = new NntpArticle(
             0,
@@ -164,8 +192,8 @@ public class NntpArticleBuilderTests
 
         var actual = new NntpArticleBuilder().InitializeFrom(expected).Build();
 
-        Assert.Equal(expected, actual);
-        Assert.True(expected.Equals(actual));
-        Assert.True(expected == actual);
+        await Assert.That(actual).IsEqualTo(expected);
+        await Assert.That(expected.Equals(actual)).IsTrue();
+        await Assert.That(expected == actual).IsTrue();
     }
 }

@@ -1,12 +1,11 @@
 ﻿using Usenet.Util;
-using Xunit;
 
 namespace Usenet.Tests.Util;
 
-public class CountingStreamTests
+internal sealed class CountingStreamTests
 {
-    [Fact]
-    public void CountingStreamShouldCountBytesRead()
+    [Test]
+    public async Task CountingStreamShouldCountBytesRead()
     {
         using var memStream = new MemoryStream(new byte[10]);
         using var stream = new CountingStream(memStream);
@@ -16,11 +15,11 @@ public class CountingStreamTests
         stream.ReadByte();
         stream.ReadByte();
 
-        Assert.Equal(5, stream.BytesRead);
+        await Assert.That(stream.BytesRead).IsEqualTo(5);
     }
 
-    [Fact]
-    public void CountingStreamShouldCountBytesWritten()
+    [Test]
+    public async Task CountingStreamShouldCountBytesWritten()
     {
         using var memStream = new MemoryStream(new byte[10]);
         using var stream = new CountingStream(memStream);
@@ -30,11 +29,11 @@ public class CountingStreamTests
         stream.WriteByte(4);
         stream.WriteByte(5);
 
-        Assert.Equal(5, stream.BytesWritten);
+        await Assert.That(stream.BytesWritten).IsEqualTo(5);
     }
 
-    [Fact]
-    public void ResetCountersShouldResetBytesReadAndBytesWritten()
+    [Test]
+    public async Task ResetCountersShouldResetBytesReadAndBytesWritten()
     {
         using var memStream = new MemoryStream(new byte[10]);
         using var stream = new CountingStream(memStream);
@@ -43,12 +42,12 @@ public class CountingStreamTests
         stream.WriteByte(1);
         stream.WriteByte(2);
 
-        Assert.Equal(2, stream.BytesRead);
-        Assert.Equal(2, stream.BytesWritten);
+        await Assert.That(stream.BytesRead).IsEqualTo(2);
+        await Assert.That(stream.BytesWritten).IsEqualTo(2);
 
         stream.ResetCounters();
 
-        Assert.Equal(0, stream.BytesRead);
-        Assert.Equal(0, stream.BytesWritten);
+        await Assert.That(stream.BytesRead).IsEqualTo(0);
+        await Assert.That(stream.BytesWritten).IsEqualTo(0);
     }
 }

@@ -1,38 +1,35 @@
 ﻿using System.Text;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
-using Usenet.Tests.TestHelpers;
 using Usenet.Util;
-using Xunit;
 
 namespace Usenet.Tests.Nntp.Parsers;
 
-public class ArticleResponseParserTests
+internal sealed class ArticleResponseParserTests
 {
-    public static readonly IEnumerable<object[]> MultiLineParseData =
-    [
-        [
-            220,
-            "123 <123@poster.com>",
-            (int)ArticleRequestType.Article,
-            Array.Empty<string>(),
-            new XSerializable<NntpArticle>(
+    public static IEnumerable<Func<(int, string, int, string[], NntpArticle)>> MultiLineParseData()
+    {
+        yield return () =>
+            (
+                220,
+                "123 <123@poster.com>",
+                (int)ArticleRequestType.Article,
+                [],
                 new NntpArticle(123, "<123@poster.com>", null, null, new List<string>(0))
-            ),
-        ],
-        [
-            220,
-            "123 <123@poster.com>",
-            (int)ArticleRequestType.Article,
-            new[]
-            {
-                "Path: pathost!demo!whitehouse!not-for-mail",
-                "From: \"Demo User\" <nobody@example.net>",
-                "",
-                "This is just a test article (1).",
-                "With two lines.",
-            },
-            new XSerializable<NntpArticle>(
+            );
+
+        yield return () =>
+            (
+                220,
+                "123 <123@poster.com>",
+                (int)ArticleRequestType.Article,
+                [
+                    "Path: pathost!demo!whitehouse!not-for-mail",
+                    "From: \"Demo User\" <nobody@example.net>",
+                    "",
+                    "This is just a test article (1).",
+                    "With two lines.",
+                ],
                 new NntpArticle(
                     123,
                     "<123@poster.com>",
@@ -44,14 +41,14 @@ public class ArticleResponseParserTests
                     },
                     new List<string> { "This is just a test article (1).", "With two lines." }
                 )
-            ),
-        ],
-        [
-            222,
-            "123 <123@poster.com>",
-            (int)ArticleRequestType.Body,
-            new[] { "This is just a test article (2).", "With two lines." },
-            new XSerializable<NntpArticle>(
+            );
+
+        yield return () =>
+            (
+                222,
+                "123 <123@poster.com>",
+                (int)ArticleRequestType.Body,
+                ["This is just a test article (2).", "With two lines."],
                 new NntpArticle(
                     123,
                     "<123@poster.com>",
@@ -59,20 +56,14 @@ public class ArticleResponseParserTests
                     null,
                     new List<string> { "This is just a test article (2).", "With two lines." }
                 )
-            ),
-        ],
-        [
-            221,
-            "123 <123@poster.com>",
-            (int)ArticleRequestType.Head,
-            new[]
-            {
-                "Multi: line1",
-                " line2",
-                " line3",
-                "Path: pathost!demo!whitehouse!not-for-mail",
-            },
-            new XSerializable<NntpArticle>(
+            );
+
+        yield return () =>
+            (
+                221,
+                "123 <123@poster.com>",
+                (int)ArticleRequestType.Head,
+                ["Multi: line1", " line2", " line3", "Path: pathost!demo!whitehouse!not-for-mail"],
                 new NntpArticle(
                     123,
                     "<123@poster.com>",
@@ -84,14 +75,14 @@ public class ArticleResponseParserTests
                     },
                     new List<string>(0)
                 )
-            ),
-        ],
-        [
-            221,
-            "123 <123@poster.com>",
-            (int)ArticleRequestType.Head,
-            new[] { "Invalid header line", "Path: pathost!demo!whitehouse!not-for-mail" },
-            new XSerializable<NntpArticle>(
+            );
+
+        yield return () =>
+            (
+                221,
+                "123 <123@poster.com>",
+                (int)ArticleRequestType.Head,
+                ["Invalid header line", "Path: pathost!demo!whitehouse!not-for-mail"],
                 new NntpArticle(
                     123,
                     "<123@poster.com>",
@@ -102,51 +93,41 @@ public class ArticleResponseParserTests
                     },
                     new List<string>(0)
                 )
-            ),
-        ],
-    ];
+            );
+    }
 
-    [Theory]
-    [MemberData(nameof(MultiLineParseData))]
-    internal void MultiLineResponseShouldBeParsedCorrectly(
+    [Test]
+    [MethodDataSource(nameof(MultiLineParseData))]
+    internal async Task MultiLineResponseShouldBeParsedCorrectly(
         int responseCode,
         string responseMessage,
         int requestType,
         string[] lines,
-        XSerializable<NntpArticle> expected
+        NntpArticle expectedArticle
     )
     {
-        var expectedArticle = expected.Object;
         var articleResponse = new ArticleResponseParser((ArticleRequestType)requestType).Parse(
             responseCode,
             responseMessage,
             lines.ToList()
         );
         var actualArticle = articleResponse.Article;
-        Assert.Equal(expectedArticle, actualArticle);
+        await Assert.That(actualArticle).IsEqualTo(expectedArticle);
     }
 
-    public static readonly IEnumerable<object[]> InvalidMultiLineParseData =
-    [
-        [412, "No newsgroup selected", (int)ArticleRequestType.Article, Array.Empty<string>()],
-        [
-            420,
-            "No current article selected",
-            (int)ArticleRequestType.Article,
-            Array.Empty<string>(),
-        ],
-        [
-            423,
-            "No article with that number",
-            (int)ArticleRequestType.Article,
-            Array.Empty<string>(),
-        ],
-        [430, "No such article found", (int)ArticleRequestType.Article, Array.Empty<string>()],
-    ];
+    public static IEnumerable<Func<(int, string, int, string[])>> InvalidMultiLineParseData()
+    {
+        yield return () => (412, "No newsgroup selected", (int)ArticleRequestType.Article, []);
+        yield return () =>
+            (420, "No current article selected", (int)ArticleRequestType.Article, []);
+        yield return () =>
+            (423, "No article with that number", (int)ArticleRequestType.Article, []);
+        yield return () => (430, "No such article found", (int)ArticleRequestType.Article, []);
+    }
 
-    [Theory]
-    [MemberData(nameof(InvalidMultiLineParseData))]
-    internal void InvalidMultiLineResponseShouldBeParsedCorrectly(
+    [Test]
+    [MethodDataSource(nameof(InvalidMultiLineParseData))]
+    internal async Task InvalidMultiLineResponseShouldBeParsedCorrectly(
         int responseCode,
         string responseMessage,
         int requestType,
@@ -158,7 +139,7 @@ public class ArticleResponseParserTests
             responseMessage,
             lines.ToList()
         );
-        Assert.Null(articleResponse.Article);
+        await Assert.That(articleResponse.Article).IsNull();
     }
 
     /// <summary>
@@ -168,8 +149,8 @@ public class ArticleResponseParserTests
     /// This causes the IEnumerable to return no data while the underlying stream still contains it.
     /// Any subsequent command would then receive this data that was still in the stream, causing them to fail.
     /// </summary>
-    [Fact]
-    public void LazyEnumerationOfBodyShouldReadFromSourceStream()
+    [Test]
+    public async Task LazyEnumerationOfBodyShouldReadFromSourceStream()
     {
         const string response = """
             FirstHeader: FirstValue
@@ -189,10 +170,10 @@ public class ArticleResponseParserTests
         var parser = new ArticleResponseParser(ArticleRequestType.Article);
         var articleResponse = parser.Parse(220, "", data);
 
-        Assert.NotNull(articleResponse.Article);
-        var body = string.Concat(articleResponse.Article.Body);
+        await Assert.That(articleResponse.Article).IsNotNull();
+        var body = string.Concat(articleResponse.Article!.Body);
 
-        Assert.NotEmpty(body);
+        await Assert.That(body).IsNotEmpty();
     }
 
     /// <summary>

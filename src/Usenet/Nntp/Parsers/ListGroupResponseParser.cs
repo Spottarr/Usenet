@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Collections.Immutable;
+using Microsoft.Extensions.Logging;
 using Usenet.Extensions;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
@@ -37,7 +38,7 @@ internal class ListGroupResponseParser : IMultiLineResponseParser<NntpGroupRespo
         );
         var name = responseSplit.Length > 3 ? responseSplit[3] : string.Empty;
 
-        var articleNumbers = EnumerateArticleNumbers(dataBlock).ToList();
+        var articleNumbers = EnumerateArticleNumbers(dataBlock).ToImmutableList();
 
         return new NntpGroupResponse(
             code,

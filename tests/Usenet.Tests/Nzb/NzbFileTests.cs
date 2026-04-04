@@ -1,296 +1,253 @@
 ﻿using Usenet.Nzb;
-using Usenet.Tests.TestHelpers;
-using Xunit;
 
 namespace Usenet.Tests.Nzb;
 
-public class NzbFileTests
+internal sealed class NzbFileTests
 {
-    public static readonly IEnumerable<object[]> EqualsWithSameValues =
-    [
-        [
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName1",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    null!
-                )
-            ),
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName1",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    null!
-                )
-            ),
-        ],
-        [
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName2",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    [
-                        new NzbSegment(1, 1000, 1200, "1234567890@base.msg"),
-                        new NzbSegment(2, 2000, 2200, "aaaaaaaaaa@base.msg"),
-                    ]
-                )
-            ),
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName2",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    [
-                        new NzbSegment(1, 1000, 1200, "1234567890@base.msg"),
-                        new NzbSegment(2, 2000, 2200, "aaaaaaaaaa@base.msg"),
-                    ]
-                )
-            ),
-        ],
-        [
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName3",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    [
-                        new NzbSegment(1, 1000, 1200, "1234567890@base.msg"),
-                        new NzbSegment(2, 2000, 2200, "aaaaaaaaaa@base.msg"),
-                    ]
-                )
-            ),
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName3",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    [
-                        new NzbSegment(2, 2000, 2200, "aaaaaaaaaa@base.msg"),
-                        new NzbSegment(1, 1000, 1200, "1234567890@base.msg"),
-                    ]
-                )
-            ),
-        ],
-    ];
-
-    [Theory]
-    [MemberData(nameof(EqualsWithSameValues))]
-    internal void EqualsWithSameValuesShouldReturnTrue(
-        XSerializable<NzbFile> expected,
-        XSerializable<NzbFile> actual
-    )
+    public static IEnumerable<(NzbFile, NzbFile)> EqualsWithSameValues()
     {
-        Assert.Equal(expected.Object, actual.Object);
+        yield return (
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName1",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                null!
+            ),
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName1",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                null!
+            )
+        );
+
+        yield return (
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName2",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                [
+                    new NzbSegment(1, 1000, 1200, "1234567890@base.msg"),
+                    new NzbSegment(2, 2000, 2200, "aaaaaaaaaa@base.msg"),
+                ]
+            ),
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName2",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                [
+                    new NzbSegment(1, 1000, 1200, "1234567890@base.msg"),
+                    new NzbSegment(2, 2000, 2200, "aaaaaaaaaa@base.msg"),
+                ]
+            )
+        );
+
+        yield return (
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName3",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                [
+                    new NzbSegment(1, 1000, 1200, "1234567890@base.msg"),
+                    new NzbSegment(2, 2000, 2200, "aaaaaaaaaa@base.msg"),
+                ]
+            ),
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName3",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                [
+                    new NzbSegment(2, 2000, 2200, "aaaaaaaaaa@base.msg"),
+                    new NzbSegment(1, 1000, 1200, "1234567890@base.msg"),
+                ]
+            )
+        );
     }
 
-    public static readonly IEnumerable<object[]> EqualsWithDifferentValues =
-    [
-        [
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    null!
-                )
-            ),
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "blabla",
-                    "subject",
-                    "fileName",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    null!
-                )
-            ),
-        ],
-        [
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    null!
-                )
-            ),
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "blabla",
-                    "fileName",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    null!
-                )
-            ),
-        ],
-        [
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    null!
-                )
-            ),
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "blabla",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    null!
-                )
-            ),
-        ],
-        [
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    null!
-                )
-            ),
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName",
-                    DateTimeOffset.MinValue,
-                    "group1;group2",
-                    null!
-                )
-            ),
-        ],
-        [
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    null!
-                )
-            ),
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "blabla",
-                    null!
-                )
-            ),
-        ],
-        [
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    [
-                        new NzbSegment(1, 1000, 1200, "1234567890@base.msg"),
-                        new NzbSegment(2, 2000, 2200, "aaaaaaaaaa@base.msg"),
-                    ]
-                )
-            ),
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    [new NzbSegment(1, 1000, 1200, "1234567890@base.msg")]
-                )
-            ),
-        ],
-        [
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    [new NzbSegment(2, 2000, 2200, "aaaaaaaaaa@base.msg")]
-                )
-            ),
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    [
-                        new NzbSegment(2, 2000, 2200, "aaaaaaaaaa@base.msg"),
-                        new NzbSegment(1, 1000, 1200, "1234567890@base.msg"),
-                    ]
-                )
-            ),
-        ],
-        [
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    [new NzbSegment(2, 2000, 2200, "aaaaaaaaaa@base.msg")]
-                )
-            ),
-            new XSerializable<NzbFile>(
-                new NzbFile(
-                    "poster",
-                    "subject",
-                    "fileName",
-                    new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
-                    "group1;group2",
-                    [new NzbSegment(2, 2000, 2200, "bbbbbbbbbb@base.msg")]
-                )
-            ),
-        ],
-    ];
-
-    [Theory]
-    [MemberData(nameof(EqualsWithDifferentValues))]
-    internal void EqualsWithDifferentValuesShouldReturnFalse(
-        XSerializable<NzbFile> expected,
-        XSerializable<NzbFile> actual
-    )
+    [Test]
+    [MethodDataSource(nameof(EqualsWithSameValues))]
+    internal async Task EqualsWithSameValuesShouldReturnTrue(NzbFile expected, NzbFile actual)
     {
-        Assert.NotEqual(expected.Object, actual.Object);
+        await Assert.That(actual).IsEqualTo(expected);
+    }
+
+    public static IEnumerable<(NzbFile, NzbFile)> EqualsWithDifferentValues()
+    {
+        yield return (
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                null!
+            ),
+            new NzbFile(
+                "blabla",
+                "subject",
+                "fileName",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                null!
+            )
+        );
+
+        yield return (
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                null!
+            ),
+            new NzbFile(
+                "poster",
+                "blabla",
+                "fileName",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                null!
+            )
+        );
+
+        yield return (
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                null!
+            ),
+            new NzbFile(
+                "poster",
+                "subject",
+                "blabla",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                null!
+            )
+        );
+
+        yield return (
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                null!
+            ),
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName",
+                DateTimeOffset.MinValue,
+                "group1;group2",
+                null!
+            )
+        );
+
+        yield return (
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                null!
+            ),
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "blabla",
+                null!
+            )
+        );
+
+        yield return (
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                [
+                    new NzbSegment(1, 1000, 1200, "1234567890@base.msg"),
+                    new NzbSegment(2, 2000, 2200, "aaaaaaaaaa@base.msg"),
+                ]
+            ),
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                [new NzbSegment(1, 1000, 1200, "1234567890@base.msg")]
+            )
+        );
+
+        yield return (
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                [new NzbSegment(2, 2000, 2200, "aaaaaaaaaa@base.msg")]
+            ),
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                [
+                    new NzbSegment(2, 2000, 2200, "aaaaaaaaaa@base.msg"),
+                    new NzbSegment(1, 1000, 1200, "1234567890@base.msg"),
+                ]
+            )
+        );
+
+        yield return (
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                [new NzbSegment(2, 2000, 2200, "aaaaaaaaaa@base.msg")]
+            ),
+            new NzbFile(
+                "poster",
+                "subject",
+                "fileName",
+                new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
+                "group1;group2",
+                [new NzbSegment(2, 2000, 2200, "bbbbbbbbbb@base.msg")]
+            )
+        );
+    }
+
+    [Test]
+    [MethodDataSource(nameof(EqualsWithDifferentValues))]
+    internal async Task EqualsWithDifferentValuesShouldReturnFalse(NzbFile expected, NzbFile actual)
+    {
+        await Assert.That(actual).IsNotEqualTo(expected);
     }
 }

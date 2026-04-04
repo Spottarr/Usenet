@@ -1,36 +1,35 @@
 ﻿using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Responses;
-using Xunit;
 
 namespace Usenet.Tests.Nntp.Parsers;
 
-public class NextResponseParserTests
+internal sealed class NextResponseParserTests
 {
-    [Theory]
-    [InlineData(
+    [Test]
+    [Arguments(
         223,
         "123 <123@poster.com> retrieved",
         NntpNextResponseType.ArticleExists,
         123,
         "123@poster.com"
     )]
-    [InlineData(412, "No newsgroup selected", NntpNextResponseType.NoGroupSelected, 0, "")]
-    [InlineData(
+    [Arguments(412, "No newsgroup selected", NntpNextResponseType.NoGroupSelected, 0, "")]
+    [Arguments(
         420,
         "No current article selected",
         NntpNextResponseType.CurrentArticleInvalid,
         0,
         ""
     )]
-    [InlineData(
+    [Arguments(
         421,
         "No next article to retrieve",
         NntpNextResponseType.NoNextArticleInGroup,
         0,
         ""
     )]
-    [InlineData(999, "Unspecified response", NntpNextResponseType.Unknown, 0, "")]
-    internal void ResponseShouldBeParsedCorrectly(
+    [Arguments(999, "Unspecified response", NntpNextResponseType.Unknown, 0, "")]
+    internal async Task ResponseShouldBeParsedCorrectly(
         int responseCode,
         string responseMessage,
         NntpNextResponseType expectedResponseType,
@@ -39,8 +38,8 @@ public class NextResponseParserTests
     )
     {
         var nextResponse = new NextResponseParser().Parse(responseCode, responseMessage);
-        Assert.Equal(expectedResponseType, nextResponse.ResponseType);
-        Assert.Equal(expectedArticleNumber, nextResponse.Number);
-        Assert.Equal(expectedMessageId, nextResponse.MessageId.Value);
+        await Assert.That(nextResponse.ResponseType).IsEqualTo(expectedResponseType);
+        await Assert.That(nextResponse.Number).IsEqualTo(expectedArticleNumber);
+        await Assert.That(nextResponse.MessageId.Value).IsEqualTo(expectedMessageId);
     }
 }

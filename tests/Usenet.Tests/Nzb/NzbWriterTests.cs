@@ -3,22 +3,20 @@ using Usenet.Nzb;
 using Usenet.Tests.Extensions;
 using Usenet.Tests.TestHelpers;
 using Usenet.Util;
-using Xunit;
 
 namespace Usenet.Tests.Nzb;
 
-public class NzbWriterTests
+internal sealed class NzbWriterTests
 {
-    [Theory]
-    [EmbeddedResourceData(@"nzb.sabnzbd.nzb")]
-    [EmbeddedResourceData(@"nzb.sabnzbd-no-namespace.nzb")]
-    internal async Task ShouldWriteDocumentToFile(IFileInfo file)
+    [Test]
+    [MethodDataSource(nameof(GetNzbFiles))]
+    internal async Task ShouldWriteDocumentToFile(
+        IFileInfo file,
+        CancellationToken cancellationToken
+    )
     {
         var expected = await NzbParser
-            .ParseAsync(
-                file.ReadAllText(UsenetEncoding.Default),
-                TestContext.Current.CancellationToken
-            )
+            .ParseAsync(file.ReadAllText(UsenetEncoding.Default), cancellationToken)
             .ConfigureAwait(true);
 
         using var stream = new MemoryStream();
@@ -26,15 +24,17 @@ public class NzbWriterTests
         using var reader = new StreamReader(stream, UsenetEncoding.Default);
 
         // write to file and read back for comparison
-        await writer
-            .WriteNzbDocumentAsync(expected, TestContext.Current.CancellationToken)
-            .ConfigureAwait(true);
+        await writer.WriteNzbDocumentAsync(expected, cancellationToken).ConfigureAwait(true);
         stream.Position = 0;
-        var actual = await NzbParser
-            .ParseAsync(reader, TestContext.Current.CancellationToken)
-            .ConfigureAwait(true);
+        var actual = await NzbParser.ParseAsync(reader, cancellationToken).ConfigureAwait(true);
 
         // compare
-        Assert.Equal(expected, actual);
+        await Assert.That(actual).IsEqualTo(expected);
+    }
+
+    public static IEnumerable<Func<IFileInfo>> GetNzbFiles()
+    {
+        yield return () => EmbeddedResourceHelper.GetFileInfo("nzb.sabnzbd.nzb");
+        yield return () => EmbeddedResourceHelper.GetFileInfo("nzb.sabnzbd-no-namespace.nzb");
     }
 }

@@ -1,37 +1,43 @@
 ﻿using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
-using Xunit;
 
 namespace Usenet.Tests.Nntp.Parsers;
 
-public class PostingStatusParserTests
+internal sealed class PostingStatusParserTests
 {
-    [Theory]
-    [InlineData("y", NntpPostingStatus.PostingPermitted, "")]
-    [InlineData("yes", NntpPostingStatus.PostingPermitted, "")]
-    [InlineData("n", NntpPostingStatus.PostingNotPermitted, "")]
-    [InlineData("no", NntpPostingStatus.PostingNotPermitted, "")]
-    [InlineData("m", NntpPostingStatus.PostingsWillBeReviewed, "")]
-    [InlineData("x", NntpPostingStatus.ArticlesFromPeersNotPermitted, "")]
-    [InlineData("j", NntpPostingStatus.OnlyArticlesFromPeersPermittedNotFiledLocally, "")]
-    [InlineData("=", NntpPostingStatus.OnlyArticlesFromPeersPermittedFiledLocally, "")]
-    [InlineData(
+    [Test]
+    [Arguments("y", NntpPostingStatus.PostingPermitted, "")]
+    [Arguments("yes", NntpPostingStatus.PostingPermitted, "")]
+    [Arguments("n", NntpPostingStatus.PostingNotPermitted, "")]
+    [Arguments("no", NntpPostingStatus.PostingNotPermitted, "")]
+    [Arguments("m", NntpPostingStatus.PostingsWillBeReviewed, "")]
+    [Arguments("x", NntpPostingStatus.ArticlesFromPeersNotPermitted, "")]
+    [Arguments("j", NntpPostingStatus.OnlyArticlesFromPeersPermittedNotFiledLocally, "")]
+    [Arguments("=", NntpPostingStatus.OnlyArticlesFromPeersPermittedFiledLocally, "")]
+    [Arguments(
         "=misc.test",
         NntpPostingStatus.OnlyArticlesFromPeersPermittedFiledLocally,
         "misc.test"
     )]
-    [InlineData("b", NntpPostingStatus.Unknown, "")]
-    [InlineData("bbbbb", NntpPostingStatus.Unknown, "")]
-    [InlineData("", NntpPostingStatus.Unknown, "")]
-    [InlineData(null, NntpPostingStatus.Unknown, "")]
-    internal void InputShouldBeParsedCorrectly(
+    [Arguments("b", NntpPostingStatus.Unknown, "")]
+    [Arguments("bbbbb", NntpPostingStatus.Unknown, "")]
+    [Arguments("", NntpPostingStatus.Unknown, "")]
+    internal async Task InputShouldBeParsedCorrectly(
         string? input,
         NntpPostingStatus expectedStatus,
         string expectedOtherGroup
     )
     {
         var status = PostingStatusParser.Parse(input!, out var otherGroup);
-        Assert.Equal(expectedStatus, status);
-        Assert.Equal(expectedOtherGroup, otherGroup);
+        await Assert.That(status).IsEqualTo(expectedStatus);
+        await Assert.That(otherGroup).IsEqualTo(expectedOtherGroup);
+    }
+
+    [Test]
+    internal async Task NullInputShouldBeParsedCorrectly()
+    {
+        var status = PostingStatusParser.Parse(null!, out var otherGroup);
+        await Assert.That(status).IsEqualTo(NntpPostingStatus.Unknown);
+        await Assert.That(otherGroup).IsEqualTo("");
     }
 }

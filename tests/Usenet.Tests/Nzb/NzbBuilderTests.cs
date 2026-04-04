@@ -1,15 +1,14 @@
 ﻿using Microsoft.Extensions.FileProviders;
 using Usenet.Nzb;
 using Usenet.Tests.TestHelpers;
-using Xunit;
 
 namespace Usenet.Tests.Nzb;
 
-public class NzbBuilderTests
+internal sealed class NzbBuilderTests
 {
-    [Theory]
-    [EmbeddedResourceData(@"yenc.multipart.joystick.jpg")]
-    internal void ShouldBuildDocumentFromFile(IFileInfo file)
+    [Test]
+    [MethodDataSource(nameof(GetYencMultipartJoystickData))]
+    internal async Task ShouldBuildDocumentFromFile(IFileInfo file)
     {
         var actualDocument = new NzbBuilder()
             .AddFile(file)
@@ -20,6 +19,11 @@ public class NzbBuilderTests
             .SetPoster("dummy@ignorethis.com")
             .SetMessageBase("ignorethis.com")
             .Build();
-        Assert.Equal("joystick", actualDocument.MetaData["title"].Single());
+        await Assert.That(actualDocument.MetaData["title"].Single()).IsEqualTo("joystick");
+    }
+
+    public static IEnumerable<Func<IFileInfo>> GetYencMultipartJoystickData()
+    {
+        yield return () => EmbeddedResourceHelper.GetFileInfo("yenc.multipart.joystick.jpg");
     }
 }

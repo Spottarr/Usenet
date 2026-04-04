@@ -4,55 +4,65 @@ using Usenet.Tests.Extensions;
 using Usenet.Tests.TestHelpers;
 using Usenet.Util;
 using Usenet.Yenc;
-using Xunit;
 
 namespace Usenet.Tests.Yenc;
 
-public class YencArticleDecoderTests
+internal sealed class YencArticleDecoderTests
 {
-    [Theory]
-    [EmbeddedResourceData(@"yenc.singlepart.testfile.txt", @"yenc.singlepart.00000005.ntx")]
-    internal void SinglePartFileShouldBeDecoded(IFileInfo expected, IFileInfo actual)
+    [Test]
+    [MethodDataSource(nameof(GetSinglePartData))]
+    internal async Task SinglePartFileShouldBeDecoded(IFileInfo expected, IFileInfo actual)
     {
         var expectedData = expected.ReadAllBytes().ToList();
 
         var actualArticle = YencArticleDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default));
 
-        Assert.False(actualArticle.Header.IsFilePart);
-        Assert.Equal(128, actualArticle.Header.LineLength);
-        Assert.Equal(584, actualArticle.Header.FileSize);
-        Assert.Equal("testfile.txt", actualArticle.Header.FileName);
-        Assert.NotNull(actualArticle.Footer);
-        Assert.Equal(584, actualArticle.Footer.PartSize);
-        Assert.Equal(
-            "ded29f4f",
-            ((int)actualArticle.Footer.Crc32.GetValueOrDefault()).ToString(
-                "x",
-                CultureInfo.InvariantCulture
+        await Assert.That(actualArticle.Header.IsFilePart).IsFalse();
+        await Assert.That(actualArticle.Header.LineLength).IsEqualTo(128);
+        await Assert.That(actualArticle.Header.FileSize).IsEqualTo(584);
+        await Assert.That(actualArticle.Header.FileName).IsEqualTo("testfile.txt");
+        await Assert.That(actualArticle.Footer).IsNotNull();
+        await Assert.That(actualArticle.Footer!.PartSize).IsEqualTo(584);
+        await Assert
+            .That(
+                ((int)actualArticle.Footer.Crc32.GetValueOrDefault()).ToString(
+                    "x",
+                    CultureInfo.InvariantCulture
+                )
             )
-        );
-        Assert.Equal(expectedData, actualArticle.Data);
+            .IsEqualTo("ded29f4f");
+        await Assert.That(actualArticle.Data).IsEquivalentTo(expectedData);
     }
 
-    [Theory]
-    [EmbeddedResourceData(@"yenc.multipart.00000020.ntx")]
-    internal void FilePartShouldBeDecoded(IFileInfo actual)
+    public static IEnumerable<Func<(IFileInfo, IFileInfo)>> GetSinglePartData()
+    {
+        yield return () =>
+            (
+                EmbeddedResourceHelper.GetFileInfo("yenc.singlepart.testfile.txt"),
+                EmbeddedResourceHelper.GetFileInfo("yenc.singlepart.00000005.ntx")
+            );
+    }
+
+    [Test]
+    [MethodDataSource(nameof(GetFilePartData))]
+    internal async Task FilePartShouldBeDecoded(IFileInfo actual)
     {
         const int expectedDataLength = 11250;
 
         var actualArticle = YencArticleDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default));
 
-        Assert.True(actualArticle.Header.IsFilePart);
-        Assert.Equal(expectedDataLength, actualArticle.Data.Count);
+        await Assert.That(actualArticle.Header.IsFilePart).IsTrue();
+        await Assert.That(actualArticle.Data.Count).IsEqualTo(expectedDataLength);
     }
 
-    [Theory]
-    [EmbeddedResourceData(
-        @"yenc.multipart.joystick.jpg",
-        @"yenc.multipart.00000020.ntx",
-        @"yenc.multipart.00000021.ntx"
-    )]
-    internal void MultiPartFileShouldBeDecoded(
+    public static IEnumerable<Func<IFileInfo>> GetFilePartData()
+    {
+        yield return () => EmbeddedResourceHelper.GetFileInfo("yenc.multipart.00000020.ntx");
+    }
+
+    [Test]
+    [MethodDataSource(nameof(GetMultiPartData))]
+    internal async Task MultiPartFileShouldBeDecoded(
         IFileInfo expectedFile,
         IFileInfo part1File,
         IFileInfo part2File
@@ -67,14 +77,28 @@ public class YencArticleDecoderTests
         using var actual = new MemoryStream();
 
         actual.Seek(part1.Header.PartOffset, SeekOrigin.Begin);
-        actual.Write(part1.Data.ToArray(), 0, (int)part1.Header.PartSize);
+        await actual
+            .WriteAsync(part1.Data.ToArray().AsMemory(0, (int)part1.Header.PartSize))
+            .ConfigureAwait(true);
 
         actual.Seek(part2.Header.PartOffset, SeekOrigin.Begin);
-        actual.Write(part2.Data.ToArray(), 0, (int)part2.Header.PartSize);
+        await actual
+            .WriteAsync(part2.Data.ToArray().AsMemory(0, (int)part2.Header.PartSize))
+            .ConfigureAwait(true);
 
         var actualFileName = part1.Header.FileName;
 
-        Assert.Equal(expectedFileName, actualFileName);
-        Assert.Equal(expected, actual.ToArray());
+        await Assert.That(actualFileName).IsEqualTo(expectedFileName);
+        await Assert.That(actual.ToArray()).IsEquivalentTo(expected);
+    }
+
+    public static IEnumerable<Func<(IFileInfo, IFileInfo, IFileInfo)>> GetMultiPartData()
+    {
+        yield return () =>
+            (
+                EmbeddedResourceHelper.GetFileInfo("yenc.multipart.joystick.jpg"),
+                EmbeddedResourceHelper.GetFileInfo("yenc.multipart.00000020.ntx"),
+                EmbeddedResourceHelper.GetFileInfo("yenc.multipart.00000021.ntx")
+            );
     }
 }

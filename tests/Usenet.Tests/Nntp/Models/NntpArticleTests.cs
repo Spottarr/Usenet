@@ -1,13 +1,12 @@
 ﻿using Usenet.Nntp.Models;
 using Usenet.Util;
-using Xunit;
 
 namespace Usenet.Tests.Nntp.Models;
 
-public class NntpArticleTests
+internal sealed class NntpArticleTests
 {
-    [Fact]
-    internal void EqualsWithSameValuesShouldReturnTrue()
+    [Test]
+    internal async Task EqualsWithSameValuesShouldReturnTrue()
     {
         var article1 = new NntpArticle(
             0,
@@ -37,6 +36,6 @@ public class NntpArticleTests
             new List<string>(0)
         );
 
-        Assert.Equal(article1, article2);
+        await Assert.That(article2).IsEqualTo(article1);
     }
 }

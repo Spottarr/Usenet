@@ -1,84 +1,64 @@
 ﻿using Usenet.Nntp.Models;
-using Usenet.Tests.TestHelpers;
-using Xunit;
 
 namespace Usenet.Tests.Nntp.Models;
 
-public class NntpArticleRangeTests
+internal sealed class NntpArticleRangeTests
 {
-    [Fact]
-    internal void SingleArticleShouldHaveCorrectStringRepresentation()
+    [Test]
+    internal async Task SingleArticleShouldHaveCorrectStringRepresentation()
     {
         const string expected = "8";
         var actual = NntpArticleRange.SingleArticle(8).ToString();
-        Assert.Equal(expected, actual);
+        await Assert.That(actual).IsEqualTo(expected);
     }
 
-    [Fact]
-    internal void AllFollowingShouldHaveCorrectStringRepresentation()
+    [Test]
+    internal async Task AllFollowingShouldHaveCorrectStringRepresentation()
     {
         const string expected = "8-";
         var actual = NntpArticleRange.AllFollowing(8).ToString();
-        Assert.Equal(expected, actual);
+        await Assert.That(actual).IsEqualTo(expected);
     }
 
-    [Fact]
-    internal void RangeShouldHaveCorrectStringRepresentation()
+    [Test]
+    internal async Task RangeShouldHaveCorrectStringRepresentation()
     {
         const string expected = "8-88";
         var actual = NntpArticleRange.Range(8, 88).ToString();
-        Assert.Equal(expected, actual);
+        await Assert.That(actual).IsEqualTo(expected);
     }
 
-    public static readonly IEnumerable<object[]> EqualsWithSameValues =
-    [
-        [
-            new XSerializable<NntpArticleRange>(NntpArticleRange.SingleArticle(8)),
-            new XSerializable<NntpArticleRange>(NntpArticleRange.SingleArticle(8)),
-        ],
-        [
-            new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)),
-            new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)),
-        ],
-        [
-            new XSerializable<NntpArticleRange>(NntpArticleRange.AllFollowing(8)),
-            new XSerializable<NntpArticleRange>(NntpArticleRange.AllFollowing(8)),
-        ],
-    ];
-
-    [Theory]
-    [MemberData(nameof(EqualsWithSameValues))]
-    internal void EqualsWithSameValuesShouldReturnTrue(
-        XSerializable<NntpArticleRange> range1,
-        XSerializable<NntpArticleRange> range2
-    )
+    public static IEnumerable<(NntpArticleRange, NntpArticleRange)> EqualsWithSameValues()
     {
-        Assert.Equal(range1.Object, range2.Object);
+        yield return (NntpArticleRange.SingleArticle(8), NntpArticleRange.SingleArticle(8));
+        yield return (NntpArticleRange.Range(8, 88), NntpArticleRange.Range(8, 88));
+        yield return (NntpArticleRange.AllFollowing(8), NntpArticleRange.AllFollowing(8));
     }
 
-    public static readonly IEnumerable<object[]> EqualsWithDifferentValues =
-    [
-        [
-            new XSerializable<NntpArticleRange>(NntpArticleRange.SingleArticle(8)),
-            new XSerializable<NntpArticleRange>(NntpArticleRange.SingleArticle(9)),
-        ],
-        [
-            new XSerializable<NntpArticleRange>(NntpArticleRange.Range(8, 88)),
-            new XSerializable<NntpArticleRange>(NntpArticleRange.Range(9, 88)),
-        ],
-        [
-            new XSerializable<NntpArticleRange>(NntpArticleRange.AllFollowing(8)),
-            new XSerializable<NntpArticleRange>(NntpArticleRange.AllFollowing(9)),
-        ],
-    ];
-
-    [Theory]
-    [MemberData(nameof(EqualsWithDifferentValues))]
-    internal void EqualsWithDifferentValuesShouldReturnFalse(
-        XSerializable<NntpArticleRange> range1,
-        XSerializable<NntpArticleRange> range2
+    [Test]
+    [MethodDataSource(nameof(EqualsWithSameValues))]
+    internal async Task EqualsWithSameValuesShouldReturnTrue(
+        NntpArticleRange range1,
+        NntpArticleRange range2
     )
     {
-        Assert.NotEqual(range1.Object, range2.Object);
+        await Assert.That(range2).IsEqualTo(range1);
+    }
+
+    public static IEnumerable<(NntpArticleRange, NntpArticleRange)> EqualsWithDifferentValues()
+    {
+        yield return (NntpArticleRange.SingleArticle(8), NntpArticleRange.SingleArticle(9));
+        yield return (NntpArticleRange.Range(8, 88), NntpArticleRange.Range(9, 88));
+        yield return (NntpArticleRange.AllFollowing(8), NntpArticleRange.AllFollowing(9));
+    }
+
+    [Test]
+    [MethodDataSource(nameof(EqualsWithDifferentValues))]
+    internal async Task EqualsWithDifferentValuesShouldReturnFalse(
+        NntpArticleRange range1,
+        NntpArticleRange range2
+    )
+    {
+        await Assert.That(range2).IsNotEqualTo(range1);
     }
 }

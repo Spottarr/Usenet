@@ -1,48 +1,47 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using Usenet.Nntp.Models;
-using Xunit;
 
 namespace Usenet.Tests.Nntp.Models;
 
-public class NntpMessageIdTests
+internal sealed class NntpMessageIdTests
 {
-    [Fact]
-    public void NullMessageIdShouldThrow()
+    [Test]
+    public async Task NullMessageIdShouldThrow()
     {
-        Assert.Throws<ArgumentNullException>(() => new NntpMessageId(null!));
+        await Assert.That(() => new NntpMessageId(null!)).ThrowsExactly<ArgumentNullException>();
     }
 
-    [Theory]
-    [InlineData("123@example.com", "<123@example.com>")]
-    [InlineData("<123@example.com>", "<123@example.com>")]
-    [InlineData("", "")]
-    internal void ShouldBeFormattedCorrectly(string messageId, string expectedMessageId)
+    [Test]
+    [Arguments("123@example.com", "<123@example.com>")]
+    [Arguments("<123@example.com>", "<123@example.com>")]
+    [Arguments("", "")]
+    internal async Task ShouldBeFormattedCorrectly(string messageId, string expectedMessageId)
     {
         var actual = new NntpMessageId(messageId);
-        Assert.Equal(expectedMessageId, actual.ToString());
-        Assert.Equal(expectedMessageId.Trim('<', '>'), actual.Value);
+        await Assert.That(actual.ToString()).IsEqualTo(expectedMessageId);
+        await Assert.That(actual.Value).IsEqualTo(expectedMessageId.Trim('<', '>'));
     }
 
-    [Theory]
-    [InlineData("123@example.com", "<123@example.com>")]
-    [InlineData("<123@example.com>", "<123@example.com>")]
-    [InlineData("", "")]
-    internal void EqualsWithSameValuesShouldReturnTrue(string first, string second)
+    [Test]
+    [Arguments("123@example.com", "<123@example.com>")]
+    [Arguments("<123@example.com>", "<123@example.com>")]
+    [Arguments("", "")]
+    internal async Task EqualsWithSameValuesShouldReturnTrue(string first, string second)
     {
         var firstMessageId = new NntpMessageId(first);
         var secondMessageId = new NntpMessageId(second);
-        Assert.Equal(firstMessageId, secondMessageId);
-        Assert.True(firstMessageId == secondMessageId);
-        Assert.True(firstMessageId.Equals(secondMessageId));
+        await Assert.That(secondMessageId).IsEqualTo(firstMessageId);
+        await Assert.That(firstMessageId == secondMessageId).IsTrue();
+        await Assert.That(firstMessageId.Equals(secondMessageId)).IsTrue();
     }
 
-    [Theory]
-    [InlineData("123@example.com")]
-    internal void SerializedInstanceShouldBeDeserializedCorrectly(string messageId)
+    [Test]
+    [Arguments("123@example.com")]
+    internal async Task SerializedInstanceShouldBeDeserializedCorrectly(string messageId)
     {
         var expectedMessageId = new NntpMessageId(messageId);
-        var json = JsonConvert.SerializeObject(expectedMessageId);
-        var actualMessageId = JsonConvert.DeserializeObject<NntpMessageId>(json);
-        Assert.Equal(expectedMessageId, actualMessageId);
+        var json = JsonSerializer.Serialize(expectedMessageId);
+        var actualMessageId = JsonSerializer.Deserialize<NntpMessageId>(json)!;
+        await Assert.That(actualMessageId).IsEqualTo(expectedMessageId);
     }
 }
