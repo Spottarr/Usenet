@@ -1,19 +1,17 @@
 ﻿using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
-using Usenet.Tests.TestHelpers;
-using Xunit;
 
 namespace Usenet.Tests.Nntp.Parsers;
 
-public class ListGroupsResponseParserTests
+internal sealed class ListGroupsResponseParserTests
 {
-    public static readonly IEnumerable<object[]> MultiLineParseData =
-    [
-        [
-            211,
-            "1234 3000234 3002322 misc.test list follows",
-            Array.Empty<string>(),
-            new XSerializable<NntpGroup>(
+    public static IEnumerable<Func<(int, string, string[], NntpGroup)>> MultiLineParseData()
+    {
+        yield return () =>
+            (
+                211,
+                "1234 3000234 3002322 misc.test list follows",
+                Array.Empty<string>(),
                 new NntpGroup(
                     "misc.test",
                     1234,
@@ -23,13 +21,13 @@ public class ListGroupsResponseParserTests
                     string.Empty,
                     new List<long>(0)
                 )
-            ),
-        ],
-        [
-            211,
-            "1234 3000234 3000236 misc.test list follows",
-            new[] { "3000234", "3000235", "3000236" },
-            new XSerializable<NntpGroup>(
+            );
+
+        yield return () =>
+            (
+                211,
+                "1234 3000234 3000236 misc.test list follows",
+                new[] { "3000234", "3000235", "3000236" },
                 new NntpGroup(
                     "misc.test",
                     1234,
@@ -39,49 +37,48 @@ public class ListGroupsResponseParserTests
                     string.Empty,
                     [3000234L, 3000235L, 3000236L]
                 )
-            ),
-        ],
-        [
-            411,
-            "example.is.sob.bradner.or.barber is unknown",
-            Array.Empty<string>(),
-            new XSerializable<NntpGroup>(
-                new NntpGroup(
-                    "",
-                    0,
-                    0,
-                    0,
-                    NntpPostingStatus.Unknown,
-                    string.Empty,
-                    new List<long>(0)
-                )
-            ),
-        ],
-        [
-            412,
-            "no newsgroup selected",
-            Array.Empty<string>(),
-            new XSerializable<NntpGroup>(
-                new NntpGroup(
-                    "",
-                    0,
-                    0,
-                    0,
-                    NntpPostingStatus.Unknown,
-                    string.Empty,
-                    new List<long>(0)
-                )
-            ),
-        ],
-    ];
+            );
 
-    [Theory]
-    [MemberData(nameof(MultiLineParseData))]
-    internal void MultiLineResponseShouldBeParsedCorrectly(
+        yield return () =>
+            (
+                411,
+                "example.is.sob.bradner.or.barber is unknown",
+                Array.Empty<string>(),
+                new NntpGroup(
+                    "",
+                    0,
+                    0,
+                    0,
+                    NntpPostingStatus.Unknown,
+                    string.Empty,
+                    new List<long>(0)
+                )
+            );
+
+        yield return () =>
+            (
+                412,
+                "no newsgroup selected",
+                Array.Empty<string>(),
+                new NntpGroup(
+                    "",
+                    0,
+                    0,
+                    0,
+                    NntpPostingStatus.Unknown,
+                    string.Empty,
+                    new List<long>(0)
+                )
+            );
+    }
+
+    [Test]
+    [MethodDataSource(nameof(MultiLineParseData))]
+    internal async Task MultiLineResponseShouldBeParsedCorrectly(
         int responseCode,
         string responseMessage,
         string[] lines,
-        XSerializable<NntpGroup> expectedGroup
+        NntpGroup expectedGroup
     )
     {
         var groupResponse = new ListGroupResponseParser().Parse(
@@ -89,6 +86,6 @@ public class ListGroupsResponseParserTests
             responseMessage,
             lines.ToList()
         );
-        Assert.Equal(expectedGroup.Object, groupResponse.Group);
+        await Assert.That(groupResponse.Group).IsEqualTo(expectedGroup);
     }
 }

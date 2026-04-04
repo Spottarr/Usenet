@@ -1,18 +1,16 @@
 ﻿using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
-using Usenet.Tests.TestHelpers;
-using Xunit;
 
 namespace Usenet.Tests.Nntp.Parsers;
 
-public class GroupResponseParserTests
+internal sealed class GroupResponseParserTests
 {
-    public static readonly IEnumerable<object[]> ParseData =
-    [
-        [
-            211,
-            "1234 3000234 3002322 misc.test",
-            new XSerializable<NntpGroup>(
+    public static IEnumerable<Func<(int, string, NntpGroup)>> ParseData()
+    {
+        yield return () =>
+            (
+                211,
+                "1234 3000234 3002322 misc.test",
                 new NntpGroup(
                     "misc.test",
                     1234,
@@ -22,12 +20,11 @@ public class GroupResponseParserTests
                     string.Empty,
                     new List<long>(0)
                 )
-            ),
-        ],
-        [
-            411,
-            "example.is.sob.bradner.or.barber is unknown",
-            new XSerializable<NntpGroup>(
+            );
+        yield return () =>
+            (
+                411,
+                "example.is.sob.bradner.or.barber is unknown",
                 new NntpGroup(
                     "",
                     0,
@@ -37,19 +34,18 @@ public class GroupResponseParserTests
                     string.Empty,
                     new List<long>(0)
                 )
-            ),
-        ],
-    ];
+            );
+    }
 
-    [Theory]
-    [MemberData(nameof(ParseData))]
-    internal void ResponseShouldBeParsedCorrectly(
+    [Test]
+    [MethodDataSource(nameof(ParseData))]
+    internal async Task ResponseShouldBeParsedCorrectly(
         int responseCode,
         string responseMessage,
-        XSerializable<NntpGroup> expectedGroup
+        NntpGroup expectedGroup
     )
     {
         var groupResponse = new GroupResponseParser().Parse(responseCode, responseMessage);
-        Assert.Equal(expectedGroup.Object, groupResponse.Group);
+        await Assert.That(groupResponse.Group).IsEqualTo(expectedGroup);
     }
 }

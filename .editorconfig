@@ -1,5 +1,1 @@
 root = true
-
-# xUnit requires public test classes, disable warning about making them internal
-[tests/Usenet.Tests/**/*Tests.cs]
-dotnet_diagnostic.CA1515.severity = none

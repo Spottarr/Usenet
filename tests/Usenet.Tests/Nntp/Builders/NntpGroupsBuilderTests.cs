@@ -1,51 +1,55 @@
 ﻿using Usenet.Nntp.Builders;
-using Xunit;
 
 namespace Usenet.Tests.Nntp.Builders;
 
-public class NntpGroupsBuilderTests
+internal sealed class NntpGroupsBuilderTests
 {
-    [Fact]
-    public void AddNullShouldThrow()
+    private static readonly string[] SingleGroup = ["group1"];
+    private static readonly string[] ThreeGroups = ["group1", "group2", "group3"];
+
+    [Test]
+    public async Task AddNullShouldThrow()
     {
         var builder = new NntpGroupsBuilder();
-        Assert.Throws<ArgumentNullException>(() => builder.Add((string?)null!));
+        await Assert.That(() => builder.Add((string?)null!)).ThrowsExactly<ArgumentNullException>();
     }
 
-    [Fact]
-    public void AddNullEnumerableShouldThrow()
+    [Test]
+    public async Task AddNullEnumerableShouldThrow()
     {
         var builder = new NntpGroupsBuilder();
-        Assert.Throws<ArgumentNullException>(() => builder.Add((IEnumerable<string>?)null!));
+        await Assert
+            .That(() => builder.Add((IEnumerable<string>?)null!))
+            .ThrowsExactly<ArgumentNullException>();
     }
 
-    [Fact]
-    public void AddSingleGroupShouldResultInSingleGroupString()
+    [Test]
+    public async Task AddSingleGroupShouldResultInSingleGroupString()
     {
         var builder = new NntpGroupsBuilder().Add("group1");
-        Assert.Equal(["group1"], builder.Groups);
+        await Assert.That(builder.Groups).IsEquivalentTo(SingleGroup);
     }
 
-    [Fact]
-    public void AddMultipleGroupsShouldResultInMultipleGroupsString()
+    [Test]
+    public async Task AddMultipleGroupsShouldResultInMultipleGroupsString()
     {
         var builder = new NntpGroupsBuilder().Add(["group1", "group2"]).Add("group3");
-        Assert.Equal(["group1", "group2", "group3"], builder.Groups);
+        await Assert.That(builder.Groups).IsEquivalentTo(ThreeGroups);
     }
 
-    [Fact]
-    public void EqualsWithDifferentOrderShouldReturnTrue()
+    [Test]
+    public async Task EqualsWithDifferentOrderShouldReturnTrue()
     {
         var builder1 = new NntpGroupsBuilder().Add("group1").Add("group2");
         var builder2 = new NntpGroupsBuilder().Add("group2").Add("group1");
-        Assert.Equal(builder1.Build(), builder2.Build());
+        await Assert.That(builder2.Build()).IsEqualTo(builder1.Build());
     }
 
-    [Fact]
-    public void EqualsOperatorWithDifferentOrderShouldReturnTrue()
+    [Test]
+    public async Task EqualsOperatorWithDifferentOrderShouldReturnTrue()
     {
         var builder1 = new NntpGroupsBuilder().Add("group1").Add("group2");
         var builder2 = new NntpGroupsBuilder().Add("group2").Add("group1");
-        Assert.True(builder1.Build() == builder2.Build());
+        await Assert.That(builder1.Build() == builder2.Build()).IsTrue();
     }
 }

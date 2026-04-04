@@ -1,100 +1,82 @@
 ﻿using Usenet.Nntp.Models;
-using Usenet.Tests.TestHelpers;
-using Xunit;
 
 namespace Usenet.Tests.Nntp.Models;
 
-public class NntpGroupOriginTests
+internal sealed class NntpGroupOriginTests
 {
-    public static readonly IEnumerable<object[]> EqualsWithSameValues =
-    [
-        [
-            new XSerializable<NntpGroupOrigin>(
-                new NntpGroupOrigin(
-                    "group1",
-                    new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero),
-                    "me"
-                )
-            ),
-            new XSerializable<NntpGroupOrigin>(
-                new NntpGroupOrigin(
-                    "group1",
-                    new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero),
-                    "me"
-                )
-            ),
-        ],
-    ];
-
-    [Theory]
-    [MemberData(nameof(EqualsWithSameValues))]
-    internal void EqualsWithSameValuesShouldReturnTrue(
-        XSerializable<NntpGroupOrigin> group1,
-        XSerializable<NntpGroupOrigin> group2
-    )
+    public static IEnumerable<(NntpGroupOrigin, NntpGroupOrigin)> EqualsWithSameValues()
     {
-        Assert.Equal(group1.Object, group2.Object);
+        yield return (
+            new NntpGroupOrigin(
+                "group1",
+                new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero),
+                "me"
+            ),
+            new NntpGroupOrigin(
+                "group1",
+                new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero),
+                "me"
+            )
+        );
     }
 
-    public static readonly IEnumerable<object[]> EqualsWithDifferentValues =
-    [
-        [
-            new XSerializable<NntpGroupOrigin>(
-                new NntpGroupOrigin(
-                    "group1",
-                    new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero),
-                    "me"
-                )
-            ),
-            new XSerializable<NntpGroupOrigin>(
-                new NntpGroupOrigin(
-                    "group2",
-                    new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero),
-                    "me"
-                )
-            ),
-        ],
-        [
-            new XSerializable<NntpGroupOrigin>(
-                new NntpGroupOrigin(
-                    "group1",
-                    new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero),
-                    "me"
-                )
-            ),
-            new XSerializable<NntpGroupOrigin>(
-                new NntpGroupOrigin(
-                    "group1",
-                    new DateTimeOffset(2017, 5, 24, 15, 32, 11, TimeSpan.Zero),
-                    "me"
-                )
-            ),
-        ],
-        [
-            new XSerializable<NntpGroupOrigin>(
-                new NntpGroupOrigin(
-                    "group1",
-                    new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero),
-                    "me"
-                )
-            ),
-            new XSerializable<NntpGroupOrigin>(
-                new NntpGroupOrigin(
-                    "group1",
-                    new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero),
-                    "not me"
-                )
-            ),
-        ],
-    ];
-
-    [Theory]
-    [MemberData(nameof(EqualsWithDifferentValues))]
-    internal void EqualsWithDifferentValuesShouldReturnFalse(
-        XSerializable<NntpGroupOrigin> group1,
-        XSerializable<NntpGroupOrigin> group2
+    [Test]
+    [MethodDataSource(nameof(EqualsWithSameValues))]
+    internal async Task EqualsWithSameValuesShouldReturnTrue(
+        NntpGroupOrigin group1,
+        NntpGroupOrigin group2
     )
     {
-        Assert.NotEqual(group1.Object, group2.Object);
+        await Assert.That(group2).IsEqualTo(group1);
+    }
+
+    public static IEnumerable<(NntpGroupOrigin, NntpGroupOrigin)> EqualsWithDifferentValues()
+    {
+        yield return (
+            new NntpGroupOrigin(
+                "group1",
+                new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero),
+                "me"
+            ),
+            new NntpGroupOrigin(
+                "group2",
+                new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero),
+                "me"
+            )
+        );
+        yield return (
+            new NntpGroupOrigin(
+                "group1",
+                new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero),
+                "me"
+            ),
+            new NntpGroupOrigin(
+                "group1",
+                new DateTimeOffset(2017, 5, 24, 15, 32, 11, TimeSpan.Zero),
+                "me"
+            )
+        );
+        yield return (
+            new NntpGroupOrigin(
+                "group1",
+                new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero),
+                "me"
+            ),
+            new NntpGroupOrigin(
+                "group1",
+                new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero),
+                "not me"
+            )
+        );
+    }
+
+    [Test]
+    [MethodDataSource(nameof(EqualsWithDifferentValues))]
+    internal async Task EqualsWithDifferentValuesShouldReturnFalse(
+        NntpGroupOrigin group1,
+        NntpGroupOrigin group2
+    )
+    {
+        await Assert.That(group2).IsNotEqualTo(group1);
     }
 }

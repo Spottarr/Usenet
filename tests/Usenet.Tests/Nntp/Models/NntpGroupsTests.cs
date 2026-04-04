@@ -1,67 +1,57 @@
 ﻿using Usenet.Nntp.Models;
-using Usenet.Tests.TestHelpers;
-using Xunit;
 
 namespace Usenet.Tests.Nntp.Models;
 
-public class NntpGroupsTests
+internal sealed class NntpGroupsTests
 {
-    [Fact]
-    internal void ConstructWithEmptyStringShouldReturnEmptyString()
+    [Test]
+    internal async Task ConstructWithEmptyStringShouldReturnEmptyString()
     {
         var groups = NntpGroups.Empty;
-        Assert.Equal("", groups.ToString());
+        await Assert.That(groups.ToString()).IsEqualTo("");
     }
 
-    [Fact]
-    internal void ConstructWithNullShouldThrow()
+    [Test]
+    internal async Task ConstructWithNullShouldThrow()
     {
-        Assert.Throws<ArgumentNullException>(() => new NntpGroups((string?)null!));
+        await Assert
+            .That(() => new NntpGroups((string?)null!))
+            .ThrowsExactly<ArgumentNullException>();
     }
 
-    [Fact]
-    internal void ConstructWithNullEnumerableShouldThrow()
+    [Test]
+    internal async Task ConstructWithNullEnumerableShouldThrow()
     {
-        Assert.Throws<ArgumentNullException>(() => new NntpGroups((IEnumerable<string>?)null!));
+        await Assert
+            .That(() => new NntpGroups((IEnumerable<string>?)null!))
+            .ThrowsExactly<ArgumentNullException>();
     }
 
-    [Fact]
-    internal void ConstructWithMultipleGroupsShouldReturnMultipleGroupsString()
+    [Test]
+    internal async Task ConstructWithMultipleGroupsShouldReturnMultipleGroupsString()
     {
         var groups = new NntpGroups(["group1", "group2"]);
-        Assert.Equal("group1;group2", groups.ToString());
+        await Assert.That(groups.ToString()).IsEqualTo("group1;group2");
     }
 
-    [Fact]
-    internal void ConstructWithSameGroupsShouldReturnSingleGroupString()
+    [Test]
+    internal async Task ConstructWithSameGroupsShouldReturnSingleGroupString()
     {
         var groups = new NntpGroups(["group1", "group1"]);
-        Assert.Equal("group1", groups.ToString());
+        await Assert.That(groups.ToString()).IsEqualTo("group1");
     }
 
-    public static readonly IEnumerable<object[]> EqualsWithSameValues =
-    [
-        [
-            new XSerializable<NntpGroups>(new NntpGroups("group1;group2")),
-            new XSerializable<NntpGroups>(new NntpGroups("group1;group2")),
-        ],
-        [
-            new XSerializable<NntpGroups>(new NntpGroups("group3;group4")),
-            new XSerializable<NntpGroups>(new NntpGroups("group4;group3")),
-        ],
-        [
-            new XSerializable<NntpGroups>(new NntpGroups("group5;group6")),
-            new XSerializable<NntpGroups>(new NntpGroups("group6;group5;group5")),
-        ],
-    ];
-
-    [Theory]
-    [MemberData(nameof(EqualsWithSameValues))]
-    internal void EqualsWithSameValuesShouldReturnTrue(
-        XSerializable<NntpGroups> groups1,
-        XSerializable<NntpGroups> groups2
-    )
+    public static IEnumerable<(NntpGroups, NntpGroups)> EqualsWithSameValues()
     {
-        Assert.Equal(groups1.Object, groups2.Object);
+        yield return (new NntpGroups("group1;group2"), new NntpGroups("group1;group2"));
+        yield return (new NntpGroups("group3;group4"), new NntpGroups("group4;group3"));
+        yield return (new NntpGroups("group5;group6"), new NntpGroups("group6;group5;group5"));
+    }
+
+    [Test]
+    [MethodDataSource(nameof(EqualsWithSameValues))]
+    internal async Task EqualsWithSameValuesShouldReturnTrue(NntpGroups groups1, NntpGroups groups2)
+    {
+        await Assert.That(groups2).IsEqualTo(groups1);
     }
 }

@@ -3,24 +3,23 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Usenet.Tests.TestHelpers;
-using Xunit;
 
 namespace Usenet.Tests.Util;
 
-public class LoggerTests
+internal sealed class LoggerTests
 {
-    [Fact]
-    public void ShouldUseNullLogger()
+    [Test]
+    public async Task ShouldUseNullLogger()
     {
         Logger.Factory = null!;
         var logger = Logger.Create<LoggerTests>();
         var actualLogger = GetActualLogger(logger);
 
-        Assert.IsType<NullLogger>(actualLogger);
+        await Assert.That(actualLogger).IsTypeOf<NullLogger>();
     }
 
-    [Fact]
-    public void ShouldUseSetLogger()
+    [Test]
+    public async Task ShouldUseSetLogger()
     {
         var loggerFactory = Substitute.For<ILoggerFactory>();
         loggerFactory.CreateLogger(Arg.Any<string>()).Returns(new InMemoryLogger());
@@ -29,7 +28,7 @@ public class LoggerTests
         var logger = Logger.Create<LoggerTests>();
         var actualLogger = GetActualLogger(logger);
 
-        Assert.IsType<InMemoryLogger>(actualLogger);
+        await Assert.That(actualLogger).IsTypeOf<InMemoryLogger>();
     }
 
     private static object? GetActualLogger(ILogger logger)

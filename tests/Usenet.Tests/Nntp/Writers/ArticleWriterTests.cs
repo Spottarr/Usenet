@@ -2,30 +2,28 @@ using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Writers;
-using Usenet.Tests.TestHelpers;
 using Usenet.Util;
-using Xunit;
 
 namespace Usenet.Tests.Nntp.Writers;
 
-public class ArticleWriterTests
+internal sealed class ArticleWriterTests
 {
-    public static readonly IEnumerable<object[]> ArticleWriteData =
-    [
-        [
-            new XSerializable<NntpArticle>(
-                new NntpArticle(0, "1@example.com", "group", null, new List<string>(0))
-            ),
-            new[] { "Message-ID: <1@example.com>", "Newsgroups: group", "", "." },
-        ],
-        [
-            new XSerializable<NntpArticle>(
-                new NntpArticle(0, "<2@example.com>", "group", null, new List<string>(0))
-            ),
-            new[] { "Message-ID: <2@example.com>", "Newsgroups: group", "", "." },
-        ],
-        [
-            new XSerializable<NntpArticle>(
+    public static IEnumerable<Func<(NntpArticle, string[])>> ArticleWriteData()
+    {
+        yield return () =>
+            (
+                new NntpArticle(0, "1@example.com", "group", null, new List<string>(0)),
+                new[] { "Message-ID: <1@example.com>", "Newsgroups: group", "", "." }
+            );
+
+        yield return () =>
+            (
+                new NntpArticle(0, "<2@example.com>", "group", null, new List<string>(0)),
+                new[] { "Message-ID: <2@example.com>", "Newsgroups: group", "", "." }
+            );
+
+        yield return () =>
+            (
                 new NntpArticle(
                     0,
                     "3@example.com",
@@ -35,76 +33,74 @@ public class ArticleWriterTests
                         { "From", "\"Demo User\" <nobody@example.net>" },
                     },
                     new List<string> { "This is just a test article." }
-                )
-            ),
-            new[]
-            {
-                "Message-ID: <3@example.com>",
-                "Newsgroups: group",
-                "From: \"Demo User\" <nobody@example.net>",
-                "",
-                "This is just a test article.",
-                ".",
-            },
-        ],
-        [
-            new XSerializable<NntpArticle>(
+                ),
+                new[]
+                {
+                    "Message-ID: <3@example.com>",
+                    "Newsgroups: group",
+                    "From: \"Demo User\" <nobody@example.net>",
+                    "",
+                    "This is just a test article.",
+                    ".",
+                }
+            );
+
+        yield return () =>
+            (
                 new NntpArticle(
                     0,
                     "4@example.com",
                     "group",
                     new MultiValueDictionary<string, string>
                     {
-                        { "Message-ID", "<9999@example.com>" }, // not allowed, should be ignored
+                        { "Message-ID", "<9999@example.com>" },
                     },
                     new List<string> { "This is just a test article." }
-                )
-            ),
-            new[]
-            {
-                "Message-ID: <4@example.com>",
-                "Newsgroups: group",
-                "",
-                "This is just a test article.",
-                ".",
-            },
-        ],
-        [
-            new XSerializable<NntpArticle>(
+                ),
+                new[]
+                {
+                    "Message-ID: <4@example.com>",
+                    "Newsgroups: group",
+                    "",
+                    "This is just a test article.",
+                    ".",
+                }
+            );
+
+        yield return () =>
+            (
                 new NntpArticle(
                     0,
                     "5@example.com",
                     "group",
                     new MultiValueDictionary<string, string>
                     {
-                        { "Message-ID", "9999@example.com" }, // not allowed, should be ignored
+                        { "Message-ID", "9999@example.com" },
                     },
                     new List<string> { "This is just a test article." }
-                )
-            ),
-            new[]
-            {
-                "Message-ID: <5@example.com>",
-                "Newsgroups: group",
-                "",
-                "This is just a test article.",
-                ".",
-            },
-        ],
-    ];
+                ),
+                new[]
+                {
+                    "Message-ID: <5@example.com>",
+                    "Newsgroups: group",
+                    "",
+                    "This is just a test article.",
+                    ".",
+                }
+            );
+    }
 
-    [Theory]
-    [MemberData(nameof(ArticleWriteData))]
+    [Test]
+    [MethodDataSource(nameof(ArticleWriteData))]
     internal async Task ArticleShouldBeWrittenCorrectly(
-        XSerializable<NntpArticle> article,
-        string[] expectedLines
+        NntpArticle article,
+        string[] expectedLines,
+        CancellationToken cancellationToken
     )
     {
         using var connection = new MockConnection();
-        await ArticleWriter
-            .WriteAsync(connection, article.Object, TestContext.Current.CancellationToken)
-            .ConfigureAwait(true);
-        Assert.Equal(expectedLines, connection.GetLines());
+        await ArticleWriter.WriteAsync(connection, article, cancellationToken).ConfigureAwait(true);
+        await Assert.That(connection.GetLines()).IsEquivalentTo(expectedLines);
     }
 }
 

@@ -3,15 +3,18 @@ using Usenet.Tests.Extensions;
 using Usenet.Tests.TestHelpers;
 using Usenet.Util;
 using Usenet.Yenc;
-using Xunit;
 
 namespace Usenet.Tests.Yenc;
 
-public class YencEncoderTests
+internal sealed class YencEncoderTests
 {
-    [Theory]
-    [EmbeddedResourceData(@"yenc.singlepart.test (1.2).ntx", @"yenc.singlepart.test (1.2).dat")]
-    internal async Task ShouldBeEncodedAsSinglePartFile(IFileInfo expected, IFileInfo actual)
+    [Test]
+    [MethodDataSource(nameof(GetSinglePartData))]
+    internal async Task ShouldBeEncodedAsSinglePartFile(
+        IFileInfo expected,
+        IFileInfo actual,
+        CancellationToken cancellationToken
+    )
     {
         var expectedText = expected.ReadAllLines(UsenetEncoding.Default).Skip(3).Take(9).ToList();
 
@@ -21,15 +24,28 @@ public class YencEncoderTests
 
         var header = new YencHeader("test (1.2).txt", data.Length, 10, 0, 1, data.Length, 0);
         var actualText = await YencEncoder
-            .EncodeAsync(header, stream, TestContext.Current.CancellationToken)
+            .EncodeAsync(header, stream, cancellationToken)
             .ConfigureAwait(true);
 
-        Assert.Equal(expectedText, actualText);
+        await Assert.That(actualText).IsEquivalentTo(expectedText);
     }
 
-    [Theory]
-    [EmbeddedResourceData(@"yenc.multipart.test (1.2).ntx", @"yenc.multipart.test (1.2).dat")]
-    internal async Task ShouldBeEncodedAsPartOfMultiPartFile(IFileInfo expected, IFileInfo actual)
+    public static IEnumerable<Func<(IFileInfo, IFileInfo)>> GetSinglePartData()
+    {
+        yield return () =>
+            (
+                EmbeddedResourceHelper.GetFileInfo("yenc.singlepart.test (1.2).ntx"),
+                EmbeddedResourceHelper.GetFileInfo("yenc.singlepart.test (1.2).dat")
+            );
+    }
+
+    [Test]
+    [MethodDataSource(nameof(GetMultiPartData))]
+    internal async Task ShouldBeEncodedAsPartOfMultiPartFile(
+        IFileInfo expected,
+        IFileInfo actual,
+        CancellationToken cancellationToken
+    )
     {
         var expectedText = expected.ReadAllLines(UsenetEncoding.Default).Skip(3).Take(10).ToList();
 
@@ -39,9 +55,18 @@ public class YencEncoderTests
 
         var header = new YencHeader("test (1.2).txt", 120, 10, 1, 2, data.Length, 0);
         var actualText = await YencEncoder
-            .EncodeAsync(header, stream, TestContext.Current.CancellationToken)
+            .EncodeAsync(header, stream, cancellationToken)
             .ConfigureAwait(true);
 
-        Assert.Equal(expectedText, actualText);
+        await Assert.That(actualText).IsEquivalentTo(expectedText);
+    }
+
+    public static IEnumerable<Func<(IFileInfo, IFileInfo)>> GetMultiPartData()
+    {
+        yield return () =>
+            (
+                EmbeddedResourceHelper.GetFileInfo("yenc.multipart.test (1.2).ntx"),
+                EmbeddedResourceHelper.GetFileInfo("yenc.multipart.test (1.2).dat")
+            );
     }
 }

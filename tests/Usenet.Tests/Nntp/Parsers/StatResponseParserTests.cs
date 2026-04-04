@@ -1,43 +1,42 @@
 ﻿using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Responses;
-using Xunit;
 
 namespace Usenet.Tests.Nntp.Parsers;
 
-public class StatResponseParserTests
+internal sealed class StatResponseParserTests
 {
-    [Theory]
-    [InlineData(
+    [Test]
+    [Arguments(
         223,
         "123 <123@poster.com>",
         NntpStatResponseType.ArticleExists,
         123,
         "123@poster.com"
     )]
-    [InlineData(412, "No newsgroup selected", NntpStatResponseType.NoGroupSelected, 0, "")]
-    [InlineData(
+    [Arguments(412, "No newsgroup selected", NntpStatResponseType.NoGroupSelected, 0, "")]
+    [Arguments(
         420,
         "No current article selected",
         NntpStatResponseType.CurrentArticleInvalid,
         0,
         ""
     )]
-    [InlineData(
+    [Arguments(
         423,
         "No article with that number",
         NntpStatResponseType.NoArticleWithThatNumber,
         0,
         ""
     )]
-    [InlineData(
+    [Arguments(
         430,
         "No such article found",
         NntpStatResponseType.NoArticleWithThatMessageId,
         0,
         ""
     )]
-    [InlineData(999, "Unspecified response", NntpStatResponseType.Unknown, 0, "")]
-    internal void ResponseShouldBeParsedCorrectly(
+    [Arguments(999, "Unspecified response", NntpStatResponseType.Unknown, 0, "")]
+    internal async Task ResponseShouldBeParsedCorrectly(
         int responseCode,
         string responseMessage,
         NntpStatResponseType expectedResponseType,
@@ -46,8 +45,8 @@ public class StatResponseParserTests
     )
     {
         var statResponse = new StatResponseParser().Parse(responseCode, responseMessage);
-        Assert.Equal(expectedResponseType, statResponse.ResponseType);
-        Assert.Equal(expectedArticleNumber, statResponse.Number);
-        Assert.Equal(expectedMessageId, statResponse.MessageId.Value);
+        await Assert.That(statResponse.ResponseType).IsEqualTo(expectedResponseType);
+        await Assert.That(statResponse.Number).IsEqualTo(expectedArticleNumber);
+        await Assert.That(statResponse.MessageId.Value).IsEqualTo(expectedMessageId);
     }
 }

@@ -1,44 +1,49 @@
 ﻿using Usenet.Nntp.Models;
-using Xunit;
 
 namespace Usenet.Tests.Nntp.Models;
 
-public class NntpDateTimeTests
+internal sealed class NntpDateTimeTests
 {
-    public static readonly IEnumerable<object[]> DateTimeData =
-    [
-        ["20170523 153211 GMT", new DateTime(2017, 5, 23, 15, 32, 11, DateTimeKind.Utc)],
-        [
-            "20170523 153211 GMT",
-            new DateTime(2017, 5, 23, 15, 32, 11, DateTimeKind.Utc).ToLocalTime(),
-        ],
-    ];
-
-    [Theory]
-    [MemberData(nameof(DateTimeData))]
-    internal void DateTimeShouldBeConvertedToUsenetString(string expected, DateTime dateTime)
+    public static IEnumerable<(string, DateTime)> DateTimeData()
     {
-        var actual = (NntpDateTime)dateTime;
-        Assert.Equal(expected, actual);
+        yield return (
+            "20170523 153211 GMT",
+            new DateTime(2017, 5, 23, 15, 32, 11, DateTimeKind.Utc)
+        );
+        yield return (
+            "20170523 153211 GMT",
+            new DateTime(2017, 5, 23, 15, 32, 11, DateTimeKind.Utc).ToLocalTime()
+        );
     }
 
-    public static readonly IEnumerable<object[]> DateTimeOffsetData =
-    [
-        ["20170523 153211 GMT", new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero)],
-        [
-            "20170523 153211 GMT",
-            new DateTimeOffset(2017, 5, 23, 17, 32, 11, TimeSpan.FromHours(+2)),
-        ],
-    ];
+    [Test]
+    [MethodDataSource(nameof(DateTimeData))]
+    internal async Task DateTimeShouldBeConvertedToUsenetString(string expected, DateTime dateTime)
+    {
+        var actual = (NntpDateTime)dateTime;
+        await Assert.That((string)actual).IsEqualTo(expected);
+    }
 
-    [Theory]
-    [MemberData(nameof(DateTimeOffsetData))]
-    internal void DateTimeOffsetShouldBeConvertedToUsenetString(
+    public static IEnumerable<(string, DateTimeOffset)> DateTimeOffsetData()
+    {
+        yield return (
+            "20170523 153211 GMT",
+            new DateTimeOffset(2017, 5, 23, 15, 32, 11, TimeSpan.Zero)
+        );
+        yield return (
+            "20170523 153211 GMT",
+            new DateTimeOffset(2017, 5, 23, 17, 32, 11, TimeSpan.FromHours(+2))
+        );
+    }
+
+    [Test]
+    [MethodDataSource(nameof(DateTimeOffsetData))]
+    internal async Task DateTimeOffsetShouldBeConvertedToUsenetString(
         string expected,
         DateTimeOffset dateTime
     )
     {
         var actual = (NntpDateTime)dateTime;
-        Assert.Equal(expected, actual);
+        await Assert.That((string)actual).IsEqualTo(expected);
     }
 }

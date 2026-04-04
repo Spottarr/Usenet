@@ -1,24 +1,23 @@
 ﻿using Usenet.Nzb;
-using Xunit;
 
 namespace Usenet.Tests.Nzb;
 
-public class NzbSegmentTests
+internal sealed class NzbSegmentTests
 {
-    [Fact]
-    internal void EqualsWithSameValuesShouldReturnTrue()
+    [Test]
+    internal async Task EqualsWithSameValuesShouldReturnTrue()
     {
         var expected = new NzbSegment(1, 1000, 1200, "1234567890@base.msg");
         var actual = new NzbSegment(1, 1000, 1200, "1234567890@base.msg");
-        Assert.Equal(expected, actual);
+        await Assert.That(actual).IsEqualTo(expected);
     }
 
-    [Theory]
-    [InlineData(1, 1000, 1200, "nomatch@bla.bla")]
-    [InlineData(1, 1000, 1300, "1234567890@base.msg")]
-    [InlineData(1, 1100, 1200, "1234567890@base.msg")]
-    [InlineData(2, 1000, 1200, "1234567890@base.msg")]
-    internal void EqualsWithDifferentValuesShouldReturnFalse(
+    [Test]
+    [Arguments(1, 1000, 1200, "nomatch@bla.bla")]
+    [Arguments(1, 1000, 1300, "1234567890@base.msg")]
+    [Arguments(1, 1100, 1200, "1234567890@base.msg")]
+    [Arguments(2, 1000, 1200, "1234567890@base.msg")]
+    internal async Task EqualsWithDifferentValuesShouldReturnFalse(
         int number,
         long offset,
         long size,
@@ -27,6 +26,6 @@ public class NzbSegmentTests
     {
         var expected = new NzbSegment(1, 1000, 1200, "1234567890@base.msg");
         var actual = new NzbSegment(number, offset, size, messageId);
-        Assert.NotEqual(expected, actual);
+        await Assert.That(actual).IsNotEqualTo(expected);
     }
 }

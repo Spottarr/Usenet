@@ -1,15 +1,14 @@
 ﻿using Newtonsoft.Json;
 using Usenet.Util;
-using Xunit;
 
 // ReSharper disable DuplicateKeyCollectionInitialization
 
 namespace Usenet.Tests.Util;
 
-public class MultiValueDictionaryTests
+internal sealed class MultiValueDictionaryTests
 {
-    [Fact]
-    public void MultipleValuesWithSameKeyShouldBeAdded()
+    [Test]
+    public async Task MultipleValuesWithSameKeyShouldBeAdded()
     {
         var dict = new MultiValueDictionary<int, string>(() => new HashSet<string>())
         {
@@ -20,16 +19,18 @@ public class MultiValueDictionaryTests
             { 2, "deux" },
         };
 
-        Assert.Equal(5, dict.Count);
-        Assert.Equal(2, dict[1].Count);
-        Assert.Equal(3, dict[2].Count);
+        await Assert.That(dict.Count).IsEqualTo(5);
+        await Assert.That(dict[1].Count).IsEqualTo(2);
+        await Assert.That(dict[2].Count).IsEqualTo(3);
 
-        Assert.True(new HashSet<string> { "one", "een" }.SetEquals(dict[1]));
-        Assert.True(new HashSet<string> { "two", "twee", "deux" }.SetEquals(dict[2]));
+        await Assert.That(new HashSet<string> { "one", "een" }.SetEquals(dict[1])).IsTrue();
+        await Assert
+            .That(new HashSet<string> { "two", "twee", "deux" }.SetEquals(dict[2]))
+            .IsTrue();
     }
 
-    [Fact]
-    public void MultipleValuesWithSameKeyShouldBeAddedIgnoreCase()
+    [Test]
+    public async Task MultipleValuesWithSameKeyShouldBeAddedIgnoreCase()
     {
         var dict = new MultiValueDictionary<string, string>(
             () => new HashSet<string>(),
@@ -43,16 +44,18 @@ public class MultiValueDictionaryTests
             { "b", "deux" },
         };
 
-        Assert.Equal(5, dict.Count);
-        Assert.Equal(2, dict["a"].Count);
-        Assert.Equal(3, dict["b"].Count);
+        await Assert.That(dict.Count).IsEqualTo(5);
+        await Assert.That(dict["a"].Count).IsEqualTo(2);
+        await Assert.That(dict["b"].Count).IsEqualTo(3);
 
-        Assert.True(new HashSet<string> { "one", "een" }.SetEquals(dict["a"]));
-        Assert.True(new HashSet<string> { "two", "twee", "deux" }.SetEquals(dict["b"]));
+        await Assert.That(new HashSet<string> { "one", "een" }.SetEquals(dict["a"])).IsTrue();
+        await Assert
+            .That(new HashSet<string> { "two", "twee", "deux" }.SetEquals(dict["b"]))
+            .IsTrue();
     }
 
-    [Fact]
-    public void SameValueWithSameKeyShouldNotBeAddedWhenUsingHashSet()
+    [Test]
+    public async Task SameValueWithSameKeyShouldNotBeAddedWhenUsingHashSet()
     {
         var dict = new MultiValueDictionary<int, string>(() => new HashSet<string>())
         {
@@ -60,16 +63,14 @@ public class MultiValueDictionaryTests
             { 1, "one" },
         };
 
-        Assert.Equal(1, dict.Count);
-#pragma warning disable xUnit2013
-        Assert.Equal(1, dict[1].Count);
-#pragma warning restore xUnit2013
+        await Assert.That(dict.Count).IsEqualTo(1);
+        await Assert.That(dict[1].Count).IsEqualTo(1);
 
-        Assert.True(new HashSet<string> { "one" }.SetEquals(dict[1]));
+        await Assert.That(new HashSet<string> { "one" }.SetEquals(dict[1])).IsTrue();
     }
 
-    [Fact]
-    public void SameValueWithSameKeyShouldBeAddedWhenUsingList()
+    [Test]
+    public async Task SameValueWithSameKeyShouldBeAddedWhenUsingList()
     {
         var dict = new MultiValueDictionary<int, string>(() => new List<string>())
         {
@@ -77,14 +78,14 @@ public class MultiValueDictionaryTests
             { 1, "one" },
         };
 
-        Assert.Equal(2, dict.Count);
-        Assert.Equal(2, dict[1].Count);
+        await Assert.That(dict.Count).IsEqualTo(2);
+        await Assert.That(dict[1].Count).IsEqualTo(2);
 
-        Assert.Equal(new List<string> { "one", "one" }, dict[1]);
+        await Assert.That(dict[1]).IsEquivalentTo(new List<string> { "one", "one" });
     }
 
-    [Fact]
-    public void RemovingItemsShouldDecreaseCount()
+    [Test]
+    public async Task RemovingItemsShouldDecreaseCount()
     {
         var dict = new MultiValueDictionary<int, string>(() => new HashSet<string>())
         {
@@ -97,12 +98,12 @@ public class MultiValueDictionaryTests
         dict.Remove(2, "twee");
         dict.Remove(1);
 
-        Assert.Equal(2, dict.Count);
-        Assert.Equal(2, dict[2].Count);
+        await Assert.That(dict.Count).IsEqualTo(2);
+        await Assert.That(dict[2].Count).IsEqualTo(2);
     }
 
-    [Fact]
-    public void ClearingDictionaryShouldResultInCountZero()
+    [Test]
+    public async Task ClearingDictionaryShouldResultInCountZero()
     {
         var dict = new MultiValueDictionary<int, string>(() => new HashSet<string>())
         {
@@ -114,11 +115,11 @@ public class MultiValueDictionaryTests
         };
         dict.Clear();
 
-        Assert.Equal(0, dict.Count);
+        await Assert.That(dict.Count).IsEqualTo(0);
     }
 
-    [Fact]
-    public void DictionariesShouldBeEqualIndependentOfOrder()
+    [Test]
+    public async Task DictionariesShouldBeEqualIndependentOfOrder()
     {
         var dict1 = new MultiValueDictionary<int, string>(() => new HashSet<string>())
         {
@@ -138,13 +139,13 @@ public class MultiValueDictionaryTests
             { 2, "deux" },
         };
 
-        Assert.Equal(dict1, dict2);
-        Assert.True(dict1 == dict2);
-        Assert.True(dict1.Equals(dict2));
+        await Assert.That(dict2).IsEqualTo(dict1);
+        await Assert.That(dict1 == dict2).IsTrue();
+        await Assert.That(dict1.Equals(dict2)).IsTrue();
     }
 
-    [Fact]
-    public void DictionaryCanBeSerializedToJsonAndDeserializedBackToDictionary()
+    [Test]
+    public async Task DictionaryCanBeSerializedToJsonAndDeserializedBackToDictionary()
     {
         var expected = new MultiValueDictionary<int, string>(() => new HashSet<string>())
         {
@@ -157,6 +158,6 @@ public class MultiValueDictionaryTests
 
         var json = JsonConvert.SerializeObject(expected);
         var actual = JsonConvert.DeserializeObject<MultiValueDictionary<int, string>>(json);
-        Assert.Equal(expected, actual);
+        await Assert.That(actual).IsEqualTo(expected);
     }
 }
