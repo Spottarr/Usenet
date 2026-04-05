@@ -24,8 +24,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Usenet\Usenet.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="TestHelpers\EmbeddedResourceDataSourceAttribute.cs" />
-  </ItemGroup>
 </Project>
