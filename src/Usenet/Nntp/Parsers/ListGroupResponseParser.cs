@@ -58,11 +58,6 @@ internal class ListGroupResponseParser : IMultiLineResponseParser<NntpGroupRespo
 
     private static IEnumerable<long> EnumerateArticleNumbers(IEnumerable<string> dataBlock)
     {
-        if (dataBlock == null)
-        {
-            yield break;
-        }
-
         foreach (var line in dataBlock)
         {
             if (!long.TryParse(line, out var number))

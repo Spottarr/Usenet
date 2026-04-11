@@ -27,7 +27,7 @@ internal class GroupsResponseParser : IMultiLineResponseParser<NntpGroupsRespons
 
     public NntpGroupsResponse Parse(int code, string message, IEnumerable<string> dataBlock)
     {
-        if (!IsSuccessResponse(code) || dataBlock == null)
+        if (!IsSuccessResponse(code))
         {
             return new NntpGroupsResponse(code, message, false, []);
         }
@@ -39,11 +39,6 @@ internal class GroupsResponseParser : IMultiLineResponseParser<NntpGroupsRespons
 
     private IEnumerable<NntpGroup> EnumerateGroups(IEnumerable<string> dataBlock)
     {
-        if (dataBlock == null)
-        {
-            yield break;
-        }
-
         var checkParameterCount = _requestType == GroupStatusRequestType.Basic ? 4 : 5;
 
         foreach (var line in dataBlock)
