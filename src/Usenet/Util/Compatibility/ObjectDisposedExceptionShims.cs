@@ -8,7 +8,7 @@ internal static class ObjectDisposedExceptionShims
         ObjectDisposedException.ThrowIf(condition, instance);
 #else
         if (condition)
-            throw new ObjectDisposedException(instance?.GetType().FullName);
+            throw new ObjectDisposedException(instance.GetType().FullName);
 #endif
     }
 }

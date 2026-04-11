@@ -26,9 +26,7 @@ public class EnumerableStream : AbstractBaseStream
         try
         {
             if (disposing)
-            {
-                _enumerator?.Dispose();
-            }
+                _enumerator.Dispose();
         }
         finally
         {
