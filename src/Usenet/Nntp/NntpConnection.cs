@@ -157,7 +157,7 @@ public sealed partial class NntpConnection : INntpConnection
     /// <inheritdoc/>
     public void Dispose()
     {
-        _client?.Dispose();
+        _client.Dispose();
         _writer?.Dispose();
         _reader?.Dispose();
     }
