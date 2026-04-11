@@ -133,7 +133,10 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
     private static IEnumerable<string> GetBody(IEnumerator<string> enumerator)
     {
         while (enumerator.MoveNext())
-            yield return enumerator.Current;
+        {
+            if (enumerator.Current is not null)
+                yield return enumerator.Current;
+        }
     }
 
     private class Header
