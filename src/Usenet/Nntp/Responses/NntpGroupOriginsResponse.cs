@@ -22,7 +22,7 @@ public class NntpGroupOriginsResponse : NntpResponse
     /// <param name="message">The response message received from the server.</param>
     /// <param name="success">A value indicating whether the command succeeded or failed.</param>
     /// <param name="groupOrigins">The list of <see cref="NntpGroupOrigin"/> objects received from the server.</param>
-    public NntpGroupOriginsResponse(
+    internal NntpGroupOriginsResponse(
         int code,
         string message,
         bool success,

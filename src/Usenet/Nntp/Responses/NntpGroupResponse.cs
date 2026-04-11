@@ -21,7 +21,7 @@ public class NntpGroupResponse : NntpResponse
     /// <param name="message">The response message received from the server.</param>
     /// <param name="success">A value indicating whether the command succeeded or failed.</param>
     /// <param name="group">The <see cref="NntpGroup"/> received from the server.</param>
-    public NntpGroupResponse(int code, string message, bool success, NntpGroup group)
+    internal NntpGroupResponse(int code, string message, bool success, NntpGroup group)
         : base(code, message, success)
     {
         Group = group;
