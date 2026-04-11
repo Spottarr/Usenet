@@ -1,5 +1,4 @@
-﻿using Usenet.Extensions;
-using Usenet.Util;
+﻿using Usenet.Util;
 
 namespace Usenet.Yenc;
 
