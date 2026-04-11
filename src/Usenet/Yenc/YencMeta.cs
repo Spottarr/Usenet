@@ -95,11 +95,6 @@ internal class YencMeta
 
     public static Dictionary<string, string> ParseLine(string line)
     {
-        if (line == null)
-        {
-            return new Dictionary<string, string>(0);
-        }
-
         // name is always last item on the header line
         var nameSplit = line.Split(NameSeparator, StringSplitOptions.RemoveEmptyEntries);
         if (nameSplit.Length == 0)

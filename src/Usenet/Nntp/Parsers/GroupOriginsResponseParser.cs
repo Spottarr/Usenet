@@ -14,7 +14,7 @@ internal class GroupOriginsResponseParser : IMultiLineResponseParser<NntpGroupOr
 
     public NntpGroupOriginsResponse Parse(int code, string message, IEnumerable<string> dataBlock)
     {
-        if (!IsSuccessResponse(code) || dataBlock == null)
+        if (!IsSuccessResponse(code))
         {
             return new NntpGroupOriginsResponse(code, message, false, []);
         }
@@ -26,11 +26,6 @@ internal class GroupOriginsResponseParser : IMultiLineResponseParser<NntpGroupOr
 
     private static IEnumerable<NntpGroupOrigin> EnumerateGroupOrigins(IEnumerable<string> dataBlock)
     {
-        if (dataBlock == null)
-        {
-            yield break;
-        }
-
         foreach (var line in dataBlock)
         {
             var lineSplit = line.Split(' ');
