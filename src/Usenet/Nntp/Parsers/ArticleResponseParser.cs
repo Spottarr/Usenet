@@ -51,17 +51,6 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
         _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out var number);
         var messageId = responseSplit.Length > 1 ? responseSplit[1] : string.Empty;
 
-        if (dataBlock == null)
-        {
-            // no headers and no body
-            return new NntpArticleResponse(
-                code,
-                message,
-                true,
-                new NntpArticle(number, messageId, null, null, null)
-            );
-        }
-
         using var enumerator = dataBlock.GetEnumerator();
 
         // get headers if requested
