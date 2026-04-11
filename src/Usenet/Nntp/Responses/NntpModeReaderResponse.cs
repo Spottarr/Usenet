@@ -19,7 +19,7 @@ public class NntpModeReaderResponse : NntpResponse
     /// <param name="message">The response message received from the server.</param>
     /// <param name="success">A value indicating whether the command succeeded or failed.</param>
     /// <param name="responseType">The type of the response received from the server.</param>
-    public NntpModeReaderResponse(
+    internal NntpModeReaderResponse(
         int code,
         string message,
         bool success,

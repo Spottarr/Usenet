@@ -27,7 +27,7 @@ public class NntpResponse
     /// <param name="code">The response code received from the server.</param>
     /// <param name="message">The response message received from the server.</param>
     /// <param name="success">A value indicating whether the command succeeded or failed.</param>
-    public NntpResponse(int code, string message, bool success)
+    internal NntpResponse(int code, string message, bool success)
     {
         Code = code;
         Message = message;
