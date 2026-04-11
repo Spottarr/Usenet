@@ -82,11 +82,6 @@ public class NntpGroupsBuilder
 
     private void AddGroups(IEnumerable<string> values)
     {
-        if (values == null)
-        {
-            return;
-        }
-
         foreach (var group in values)
         {
             if (!_groups.Contains(group))
@@ -98,11 +93,6 @@ public class NntpGroupsBuilder
 
     private void RemoveGroups(IEnumerable<string> values)
     {
-        if (values == null)
-        {
-            return;
-        }
-
         foreach (var group in values)
         {
             _groups.RemoveAll(g => g == group);
