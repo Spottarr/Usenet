@@ -1,6 +1,8 @@
 using Usenet.Exceptions;
 using Usenet.Extensions;
+#if NETSTANDARD2_0
 using Usenet.Util.Compatibility;
+#endif
 
 namespace Usenet.Yenc;
 
