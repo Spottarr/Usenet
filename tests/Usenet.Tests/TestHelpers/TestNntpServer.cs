@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -99,6 +100,7 @@ internal sealed class TestNntpServer : IDisposable
         }
     }
 
+    [SuppressMessage("ReSharper", "UnusedTupleComponentInReturnValue")]
     private static (string? Command, string? SubCommand, string? Arguments) ParseCommand(
         string line
     )
