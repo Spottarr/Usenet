@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using NSubstitute;
 using Usenet.Nntp;
 using Usenet.Nntp.Contracts;
@@ -20,6 +21,7 @@ internal sealed class NntpClientPoolTests
     }
 
     [Test]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
     public async Task AllClientsBorrowed(CancellationToken cancellationToken)
     {
         using var pool = new NntpClientPool(
@@ -70,6 +72,7 @@ internal sealed class NntpClientPoolTests
     }
 
     [Test]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
     public async Task DisposeClientAfterError(CancellationToken cancellationToken)
     {
         using var server = new TestNntpServer();
