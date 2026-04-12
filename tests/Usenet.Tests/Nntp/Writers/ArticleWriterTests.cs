@@ -12,13 +12,25 @@ internal sealed class ArticleWriterTests
     {
         yield return () =>
             (
-                new NntpArticle(0, "1@example.com", "group", null, new List<string>(0)),
+                new NntpArticle(
+                    0,
+                    "1@example.com",
+                    "group",
+                    MultiValueDictionary<string, string>.EmptyIgnoreCase,
+                    new List<string>(0)
+                ),
                 ["Message-ID: <1@example.com>", "Newsgroups: group", "", "."]
             );
 
         yield return () =>
             (
-                new NntpArticle(0, "<2@example.com>", "group", null, new List<string>(0)),
+                new NntpArticle(
+                    0,
+                    "<2@example.com>",
+                    "group",
+                    MultiValueDictionary<string, string>.EmptyIgnoreCase,
+                    new List<string>(0)
+                ),
                 ["Message-ID: <2@example.com>", "Newsgroups: group", "", "."]
             );
 

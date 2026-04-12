@@ -329,7 +329,6 @@ Usenet.Nntp.Models.NntpArticle.Equals(Usenet.Nntp.Models.NntpArticle? other) -> 
 Usenet.Nntp.Models.NntpArticle.Groups.get -> Usenet.Nntp.Models.NntpGroups!
 Usenet.Nntp.Models.NntpArticle.Headers.get -> System.Collections.Immutable.ImmutableDictionary<string!, System.Collections.Immutable.ImmutableList<string!>!>!
 Usenet.Nntp.Models.NntpArticle.MessageId.get -> Usenet.Nntp.Models.NntpMessageId!
-Usenet.Nntp.Models.NntpArticle.NntpArticle(long number, Usenet.Nntp.Models.NntpMessageId? messageId, Usenet.Nntp.Models.NntpGroups? groups, System.Collections.Generic.IDictionary<string!, System.Collections.Generic.ICollection<string!>!>? headers, System.Collections.Generic.IList<string!>? body) -> void
 Usenet.Nntp.Models.NntpArticle.Number.get -> long
 Usenet.Nntp.Models.NntpArticleRange
 Usenet.Nntp.Models.NntpArticleRange.Equals(Usenet.Nntp.Models.NntpArticleRange? other) -> bool
