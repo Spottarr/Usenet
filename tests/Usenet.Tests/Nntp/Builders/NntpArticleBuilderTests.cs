@@ -1,10 +1,9 @@
-﻿using Usenet.Exceptions;
+﻿using System.Diagnostics.CodeAnalysis;
+using Usenet.Exceptions;
 using Usenet.Nntp;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Models;
 using Usenet.Util;
-
-// ReSharper disable DuplicateKeyCollectionInitialization
 
 namespace Usenet.Tests.Nntp.Builders;
 
@@ -142,6 +141,7 @@ internal sealed class NntpArticleBuilderTests
     }
 
     [Test]
+    [SuppressMessage("ReSharper", "DuplicateKeyCollectionInitialization")]
     public async Task BuildShouldBuildArticle()
     {
         var expected = new NntpArticle(
@@ -174,6 +174,7 @@ internal sealed class NntpArticleBuilderTests
     }
 
     [Test]
+    [SuppressMessage("ReSharper", "DuplicateKeyCollectionInitialization")]
     public async Task BuildInitializedFromExistingArticleShouldBuildSameArticle()
     {
         var expected = new NntpArticle(
