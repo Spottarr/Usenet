@@ -131,7 +131,7 @@ public static class NzbParser
         return new NzbDocument(metaData, files);
     }
 
-    private static MultiValueDictionary<string, string>? GetMetaData(
+    private static MultiValueDictionary<string, string> GetMetaData(
         NzbParserContext context,
         XContainer nzbElement
     )
@@ -139,7 +139,7 @@ public static class NzbParser
         var headElement = nzbElement.Element(context.Namespace + NzbKeywords.Head);
         if (headElement == null)
         {
-            return null;
+            return [];
         }
 
         var headers =

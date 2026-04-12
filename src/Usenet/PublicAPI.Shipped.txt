@@ -609,14 +609,12 @@ Usenet.Nzb.NzbDocument
 Usenet.Nzb.NzbDocument.Equals(Usenet.Nzb.NzbDocument? other) -> bool
 Usenet.Nzb.NzbDocument.Files.get -> System.Collections.Immutable.ImmutableList<Usenet.Nzb.NzbFile!>!
 Usenet.Nzb.NzbDocument.MetaData.get -> System.Collections.Immutable.ImmutableDictionary<string!, System.Collections.Immutable.ImmutableHashSet<string!>!>!
-Usenet.Nzb.NzbDocument.NzbDocument(System.Collections.Generic.IDictionary<string!, System.Collections.Generic.ICollection<string!>!>? metaData, System.Collections.Generic.IEnumerable<Usenet.Nzb.NzbFile!>? files) -> void
 Usenet.Nzb.NzbDocument.Size.get -> long
 Usenet.Nzb.NzbFile
 Usenet.Nzb.NzbFile.Date.get -> System.DateTimeOffset
 Usenet.Nzb.NzbFile.Equals(Usenet.Nzb.NzbFile? other) -> bool
 Usenet.Nzb.NzbFile.FileName.get -> string!
 Usenet.Nzb.NzbFile.Groups.get -> Usenet.Nntp.Models.NntpGroups!
-Usenet.Nzb.NzbFile.NzbFile(string! poster, string! subject, string! fileName, System.DateTimeOffset date, Usenet.Nntp.Models.NntpGroups! groups, System.Collections.Generic.IEnumerable<Usenet.Nzb.NzbSegment!>! segments) -> void
 Usenet.Nzb.NzbFile.Poster.get -> string!
 Usenet.Nzb.NzbFile.Segments.get -> System.Collections.Immutable.ImmutableList<Usenet.Nzb.NzbSegment!>!
 Usenet.Nzb.NzbFile.Size.get -> long
@@ -626,7 +624,6 @@ Usenet.Nzb.NzbSegment
 Usenet.Nzb.NzbSegment.Equals(Usenet.Nzb.NzbSegment? other) -> bool
 Usenet.Nzb.NzbSegment.MessageId.get -> Usenet.Nntp.Models.NntpMessageId!
 Usenet.Nzb.NzbSegment.Number.get -> int
-Usenet.Nzb.NzbSegment.NzbSegment(int number, long offset, long size, Usenet.Nntp.Models.NntpMessageId! messageId) -> void
 Usenet.Nzb.NzbSegment.Offset.get -> long
 Usenet.Nzb.NzbSegment.Size.get -> long
 Usenet.Nzb.NzbWriter
