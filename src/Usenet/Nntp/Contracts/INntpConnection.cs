@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using Usenet.Nntp.Parsers;
 using Usenet.Util;
 
@@ -7,6 +8,7 @@ namespace Usenet.Nntp.Contracts;
 /// Represents an NNTP connection.
 /// Based on Kristian Hellang's NntpLib.Net project https://github.com/khellang/NntpLib.Net.
 /// </summary>
+[PublicAPI]
 public interface INntpConnection : IDisposable
 {
     /// <summary>

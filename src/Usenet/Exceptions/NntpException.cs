@@ -1,7 +1,10 @@
-﻿namespace Usenet.Exceptions;
+﻿using JetBrains.Annotations;
+
+namespace Usenet.Exceptions;
 
 /// <inheritdoc />
 /// <summary>The exception that is thrown when communicating using the Network News Transfer Protocol.</summary>
+[PublicAPI]
 public class NntpException : Exception
 {
     /// <inheritdoc />

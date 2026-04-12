@@ -1,9 +1,12 @@
-﻿namespace Usenet.Nntp.Responses;
+﻿using JetBrains.Annotations;
+
+namespace Usenet.Nntp.Responses;
 
 /// <summary>
 /// Represents a response to the
 /// <a href="https://tools.ietf.org/html/rfc3977#section-7.1">DATE</a> command.
 /// </summary>
+[PublicAPI]
 public class NntpDateResponse : NntpResponse
 {
     /// <summary>

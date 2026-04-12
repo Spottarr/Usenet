@@ -1,4 +1,5 @@
 using System.Globalization;
+using JetBrains.Annotations;
 using Microsoft.Extensions.FileProviders;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Models;
@@ -9,6 +10,7 @@ namespace Usenet.Nzb;
 /// <summary>
 /// Represents a mutable <see cref="NzbDocument"/>.
 /// </summary>
+[PublicAPI]
 public class NzbBuilder
 {
     private readonly List<File> _files = [];

@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Text;
+using JetBrains.Annotations;
 using Usenet.Extensions;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
@@ -10,6 +11,7 @@ namespace Usenet.Nzb;
 /// Represents a <a href="https://sabnzbd.org/wiki/extra/nzb-spec">NZB</a> document.
 /// Based on Kristian Hellang's Nzb project https://github.com/khellang/Nzb.
 /// </summary>
+[PublicAPI]
 public class NzbDocument : IEquatable<NzbDocument>
 {
     /// <summary>

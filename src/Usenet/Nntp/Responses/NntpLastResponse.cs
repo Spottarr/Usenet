@@ -1,4 +1,5 @@
-﻿using Usenet.Nntp.Models;
+﻿using JetBrains.Annotations;
+using Usenet.Nntp.Models;
 
 namespace Usenet.Nntp.Responses;
 
@@ -6,6 +7,7 @@ namespace Usenet.Nntp.Responses;
 /// Represents a response to the
 /// <a href="https://tools.ietf.org/html/rfc3977#section-6.1.3">LAST</a> command.
 /// </summary>
+[PublicAPI]
 public class NntpLastResponse : NntpResponse
 {
     /// <summary>

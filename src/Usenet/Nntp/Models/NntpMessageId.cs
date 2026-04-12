@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using Usenet.Extensions;
 using Usenet.Util;
 
@@ -7,6 +8,7 @@ namespace Usenet.Nntp.Models;
 /// Represents an NNTP <a href="https://tools.ietf.org/html/rfc3977#appendix-A.2">Message-ID</a>.
 /// (<a href="https://tools.ietf.org/html/rfc3977#section-3.6">More information</a>).
 /// </summary>
+[PublicAPI]
 public class NntpMessageId : IEquatable<NntpMessageId>
 {
     /// <summary>

@@ -1,8 +1,11 @@
+using JetBrains.Annotations;
+
 namespace Usenet.Nntp.Contracts;
 
 /// <summary>
 /// An NNTP client for which connections and authentication are managed by a pool.
 /// </summary>
+[PublicAPI]
 public interface IPooledNntpClient
     : INntpClientRfc2980,
         INntpClientRfc3977,

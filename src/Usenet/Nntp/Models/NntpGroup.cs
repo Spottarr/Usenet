@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using JetBrains.Annotations;
 using Usenet.Util;
 using Usenet.Util.Compatibility;
 using HashCode = Usenet.Util.HashCode;
@@ -8,6 +9,7 @@ namespace Usenet.Nntp.Models;
 /// <summary>
 /// Represents an NNTP newsgroup.
 /// </summary>
+[PublicAPI]
 public class NntpGroup : IEquatable<NntpGroup>
 {
     /// <summary>
