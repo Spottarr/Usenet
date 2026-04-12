@@ -333,7 +333,6 @@ Usenet.Nntp.Models.NntpArticle.Number.get -> long
 Usenet.Nntp.Models.NntpArticleRange
 Usenet.Nntp.Models.NntpArticleRange.Equals(Usenet.Nntp.Models.NntpArticleRange? other) -> bool
 Usenet.Nntp.Models.NntpArticleRange.From.get -> long
-Usenet.Nntp.Models.NntpArticleRange.NntpArticleRange(long from, long? to) -> void
 Usenet.Nntp.Models.NntpArticleRange.To.get -> long?
 Usenet.Nntp.Models.NntpDateTime
 Usenet.Nntp.Models.NntpDateTime.Equals(Usenet.Nntp.Models.NntpDateTime? other) -> bool
