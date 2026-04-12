@@ -38,12 +38,12 @@ public class NzbSegment : IEquatable<NzbSegment>
     /// <param name="offset">Offset of the segment in the file.</param>
     /// <param name="size">Size of the article, in bytes, as a number, with no comma separation.</param>
     /// <param name="messageId">The Message-ID of this article.</param>
-    public NzbSegment(int number, long offset, long size, NntpMessageId messageId)
+    internal NzbSegment(int number, long offset, long size, NntpMessageId messageId)
     {
         Number = number;
         Offset = offset;
         Size = size;
-        MessageId = messageId ?? NntpMessageId.Empty;
+        MessageId = messageId;
     }
 
     /// <summary>
