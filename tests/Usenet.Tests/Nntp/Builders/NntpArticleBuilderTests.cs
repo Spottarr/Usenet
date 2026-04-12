@@ -155,7 +155,7 @@ internal sealed class NntpArticleBuilderTests
                 { "Header1", "Value1" },
                 { "Header1", "Value2" },
             },
-            null
+            []
         );
 
         var actual = new NntpArticleBuilder()
@@ -187,7 +187,7 @@ internal sealed class NntpArticleBuilderTests
                 { "Header1", "Value1" },
                 { "Header1", "Value2" },
             },
-            null
+            []
         );
 
         var actual = new NntpArticleBuilder().InitializeFrom(expected).Build();
