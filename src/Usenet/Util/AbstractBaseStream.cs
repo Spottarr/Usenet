@@ -1,9 +1,12 @@
-﻿namespace Usenet.Util;
+﻿using JetBrains.Annotations;
+
+namespace Usenet.Util;
 
 /// <summary>
 /// Represents an abstract base stream that overrides all abstract methods of the <see cref="Stream"/> class.
 /// Derived classes only need to override the methods they need.
 /// </summary>
+[PublicAPI]
 public abstract class AbstractBaseStream : Stream
 {
     /// <inheritdoc/>

@@ -1,10 +1,13 @@
-﻿namespace Usenet.Nntp.Responses;
+﻿using JetBrains.Annotations;
+
+namespace Usenet.Nntp.Responses;
 
 /// <summary>
 /// Represents the response to the
 /// <a href="https://tools.ietf.org/html/rfc3977#section-5.3">MODE READER</a>
 /// (<a href="https://tools.ietf.org/html/rfc2980#section-2.3">ad 1</a>) command.
 /// </summary>
+[PublicAPI]
 public class NntpModeReaderResponse : NntpResponse
 {
     /// <summary>
@@ -19,7 +22,7 @@ public class NntpModeReaderResponse : NntpResponse
     /// <param name="message">The response message received from the server.</param>
     /// <param name="success">A value indicating whether the command succeeded or failed.</param>
     /// <param name="responseType">The type of the response received from the server.</param>
-    public NntpModeReaderResponse(
+    internal NntpModeReaderResponse(
         int code,
         string message,
         bool success,

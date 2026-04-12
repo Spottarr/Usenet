@@ -49,18 +49,7 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
         }
 
         _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out var number);
-        var messageId = responseSplit.Length > 1 ? responseSplit[1] : string.Empty;
-
-        if (dataBlock == null)
-        {
-            // no headers and no body
-            return new NntpArticleResponse(
-                code,
-                message,
-                true,
-                new NntpArticle(number, messageId, null, null, null)
-            );
-        }
+        NntpMessageId messageId = responseSplit.Length > 1 ? responseSplit[1] : NntpMessageId.Empty;
 
         using var enumerator = dataBlock.GetEnumerator();
 
@@ -73,7 +62,7 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
         // get groups
         var groups = headers.TryGetValue(NntpHeaders.Newsgroups, out var values)
             ? new NntpGroupsBuilder().Add(values).Build()
-            : null;
+            : NntpGroups.Empty;
 
         // get body if requested
         var bodyLines =
@@ -133,7 +122,10 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
     private static IEnumerable<string> GetBody(IEnumerator<string> enumerator)
     {
         while (enumerator.MoveNext())
-            yield return enumerator.Current;
+        {
+            if (enumerator.Current is not null)
+                yield return enumerator.Current;
+        }
     }
 
     private class Header

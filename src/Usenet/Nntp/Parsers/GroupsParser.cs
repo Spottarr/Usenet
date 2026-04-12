@@ -1,6 +1,8 @@
 ﻿using Usenet.Extensions;
 using Usenet.Nntp.Models;
+#if NETSTANDARD2_0
 using Usenet.Util.Compatibility;
+#endif
 
 namespace Usenet.Nntp.Parsers;
 

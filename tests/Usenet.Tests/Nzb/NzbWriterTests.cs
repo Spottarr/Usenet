@@ -15,18 +15,19 @@ internal sealed class NzbWriterTests
         CancellationToken cancellationToken
     )
     {
-        var expected = await NzbParser
-            .ParseAsync(file.ReadAllText(UsenetEncoding.Default), cancellationToken)
-            .ConfigureAwait(true);
+        var expected = await NzbParser.ParseAsync(
+            file.ReadAllText(UsenetEncoding.Default),
+            cancellationToken
+        );
 
         using var stream = new MemoryStream();
-        using var writer = new StreamWriter(stream, UsenetEncoding.Default);
+        await using var writer = new StreamWriter(stream, UsenetEncoding.Default);
         using var reader = new StreamReader(stream, UsenetEncoding.Default);
 
         // write to file and read back for comparison
-        await writer.WriteNzbDocumentAsync(expected, cancellationToken).ConfigureAwait(true);
+        await writer.WriteNzbDocumentAsync(expected, cancellationToken);
         stream.Position = 0;
-        var actual = await NzbParser.ParseAsync(reader, cancellationToken).ConfigureAwait(true);
+        var actual = await NzbParser.ParseAsync(reader, cancellationToken);
 
         // compare
         await Assert.That(actual).IsEqualTo(expected);

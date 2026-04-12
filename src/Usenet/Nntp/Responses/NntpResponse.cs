@@ -1,9 +1,12 @@
-﻿namespace Usenet.Nntp.Responses;
+﻿using JetBrains.Annotations;
+
+namespace Usenet.Nntp.Responses;
 
 /// <summary>
 /// Represents a single-line response.
 /// Based on Kristian Hellang's NntpLib.Net project https://github.com/khellang/NntpLib.Net.
 /// </summary>
+[PublicAPI]
 public class NntpResponse
 {
     /// <summary>
@@ -27,7 +30,7 @@ public class NntpResponse
     /// <param name="code">The response code received from the server.</param>
     /// <param name="message">The response message received from the server.</param>
     /// <param name="success">A value indicating whether the command succeeded or failed.</param>
-    public NntpResponse(int code, string message, bool success)
+    internal NntpResponse(int code, string message, bool success)
     {
         Code = code;
         Message = message;

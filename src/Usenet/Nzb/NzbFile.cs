@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using JetBrains.Annotations;
 using Usenet.Nntp.Models;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
@@ -9,6 +10,7 @@ namespace Usenet.Nzb;
 /// Represents a file in a <a href="https://sabnzbd.org/wiki/extra/nzb-spec">NZB</a> document.
 /// Based on Kristian Hellang's Nzb project https://github.com/khellang/Nzb.
 /// </summary>
+[PublicAPI]
 public class NzbFile : IEquatable<NzbFile>
 {
     /// <summary>
@@ -59,7 +61,7 @@ public class NzbFile : IEquatable<NzbFile>
     /// <param name="date">The date the server saw this article.</param>
     /// <param name="groups">The list of groups that reference this file.</param>
     /// <param name="segments">The list of segments that make up this file.</param>
-    public NzbFile(
+    internal NzbFile(
         string poster,
         string subject,
         string fileName,
@@ -72,8 +74,8 @@ public class NzbFile : IEquatable<NzbFile>
         Subject = subject;
         FileName = fileName;
         Date = date;
-        Groups = groups ?? NntpGroups.Empty;
-        Segments = (segments ?? new List<NzbSegment>(0)).OrderBy(s => s.Number).ToImmutableList();
+        Groups = groups;
+        Segments = segments.OrderBy(s => s.Number).ToImmutableList();
         Size = Segments.Sum(s => s.Size);
     }
 

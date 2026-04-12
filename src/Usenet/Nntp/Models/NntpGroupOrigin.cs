@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
 
@@ -9,6 +10,7 @@ namespace Usenet.Nntp.Models;
 /// <a href="https://tools.ietf.org/html/rfc3977#section-7.6.4">LIST ACTIVE.TIMES</a> command.
 /// (<a href="https://tools.ietf.org/html/rfc2980#section-2.1.3">Some older information</a>).
 /// </summary>
+[PublicAPI]
 public class NntpGroupOrigin : IEquatable<NntpGroupOrigin>
 {
     /// <summary>
@@ -34,11 +36,11 @@ public class NntpGroupOrigin : IEquatable<NntpGroupOrigin>
     /// <param name="createdAt">The date and time the <see cref="NntpGroup"/> was created.</param>
     /// <param name="createdBy">A description of the entity that created the <see cref="NntpGroup"/>;
     /// it is often a mailbox as described in <a href="https://tools.ietf.org/html/rfc2822">RFC 2822</a>. </param>
-    public NntpGroupOrigin(string name, DateTimeOffset createdAt, string createdBy)
+    internal NntpGroupOrigin(string name, DateTimeOffset createdAt, string createdBy)
     {
-        Name = name ?? string.Empty;
+        Name = name;
         CreatedAt = createdAt;
-        CreatedBy = createdBy ?? string.Empty;
+        CreatedBy = createdBy;
     }
 
     /// <summary>

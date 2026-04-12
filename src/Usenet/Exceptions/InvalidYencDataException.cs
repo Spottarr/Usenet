@@ -1,7 +1,10 @@
-﻿namespace Usenet.Exceptions;
+﻿using JetBrains.Annotations;
+
+namespace Usenet.Exceptions;
 
 /// <inheritdoc />
 /// <summary>The exception that is thrown when a data stream or text is not in a valid yEnc format.</summary>
+[PublicAPI]
 public class InvalidYencDataException : Exception
 {
     /// <inheritdoc />

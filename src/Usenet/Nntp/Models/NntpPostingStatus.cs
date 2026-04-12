@@ -1,10 +1,13 @@
-﻿namespace Usenet.Nntp.Models;
+﻿using JetBrains.Annotations;
+
+namespace Usenet.Nntp.Models;
 
 /// <summary>
 /// Represents the status a <see cref="NntpGroup"/> can have on the server. Can be retrieved with
 /// the <a href="https://tools.ietf.org/html/rfc3977#section-7.6.3">LIST ACTIVE</a> command.
 /// (<a href="https://tools.ietf.org/html/rfc6048#section-3.1">More information</a>).
 /// </summary>
+[PublicAPI]
 public enum NntpPostingStatus
 {
     /// <summary>

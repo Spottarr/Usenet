@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using JetBrains.Annotations;
 using Usenet.Extensions;
 using Usenet.Util;
 
@@ -8,6 +9,7 @@ namespace Usenet.Yenc;
 /// <summary>
 /// Represents an yEnc encoder.
 /// </summary>
+[PublicAPI]
 public static class YencEncoder
 {
     /// <summary>
@@ -68,9 +70,8 @@ public static class YencEncoder
         Guard.ThrowIfNull(stream);
         Guard.ThrowIfNull(encoding);
 
-        var lines = new List<string>();
+        List<string> lines = [GetHeaderLine(header)];
 
-        lines.Add(GetHeaderLine(header));
         if (header.IsFilePart)
         {
             lines.Add(GetPartHeaderLine(header));

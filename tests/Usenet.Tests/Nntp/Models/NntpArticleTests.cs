@@ -1,4 +1,5 @@
-﻿using Usenet.Nntp.Models;
+﻿using System.Diagnostics.CodeAnalysis;
+using Usenet.Nntp.Models;
 using Usenet.Util;
 
 namespace Usenet.Tests.Nntp.Models;
@@ -6,12 +7,13 @@ namespace Usenet.Tests.Nntp.Models;
 internal sealed class NntpArticleTests
 {
     [Test]
+    [SuppressMessage("ReSharper", "DuplicateKeyCollectionInitialization")]
     internal async Task EqualsWithSameValuesShouldReturnTrue()
     {
         var article1 = new NntpArticle(
             0,
             "123@bla.nl",
-            null,
+            NntpGroups.Empty,
             new MultiValueDictionary<string, string>
             {
                 { "h1", "val1" },
@@ -25,7 +27,7 @@ internal sealed class NntpArticleTests
         var article2 = new NntpArticle(
             0,
             "123@bla.nl",
-            null,
+            NntpGroups.Empty,
             new MultiValueDictionary<string, string>
             {
                 { "h3", "val4" },

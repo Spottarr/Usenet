@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using JetBrains.Annotations;
 using Usenet.Exceptions;
 using Usenet.Extensions;
 using Usenet.Nntp.Models;
@@ -13,6 +14,7 @@ namespace Usenet.Nzb;
 /// It takes an xml string as input and parses it into an instance of the <see cref="NzbDocument"/> class.
 /// Based on Kristian Hellang's Nzb project https://github.com/khellang/Nzb.
 /// </summary>
+[PublicAPI]
 public static class NzbParser
 {
     private static readonly Regex FileNameRegex = new("\"([^\"]*)\"", RegexOptions.Compiled);
@@ -131,7 +133,7 @@ public static class NzbParser
         return new NzbDocument(metaData, files);
     }
 
-    private static MultiValueDictionary<string, string>? GetMetaData(
+    private static MultiValueDictionary<string, string> GetMetaData(
         NzbParserContext context,
         XContainer nzbElement
     )
@@ -139,7 +141,7 @@ public static class NzbParser
         var headElement = nzbElement.Element(context.Namespace + NzbKeywords.Head);
         if (headElement == null)
         {
-            return null;
+            return [];
         }
 
         var headers =
@@ -236,15 +238,10 @@ public static class NzbParser
     private static NzbSegment GetSegment(XElement element, long offset)
     {
         if (!int.TryParse((string?)element.Attribute(NzbKeywords.Number), out var number))
-        {
             throw new InvalidNzbDataException(Resources.Nzb.InvalidOrMissingNumberAttribute);
-        }
 
-        if (!long.TryParse((string?)element.Attribute(NzbKeywords.Bytes), out var size))
-        {
-            throw new InvalidNzbDataException(Resources.Nzb.InvalidOrMissingBytesAttribute);
-        }
-
-        return new NzbSegment(number, offset, size, element.Value);
+        return !long.TryParse((string?)element.Attribute(NzbKeywords.Bytes), out var size)
+            ? throw new InvalidNzbDataException(Resources.Nzb.InvalidOrMissingBytesAttribute)
+            : new NzbSegment(number, offset, size, element.Value);
     }
 }

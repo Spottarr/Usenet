@@ -1,4 +1,5 @@
 using System.Globalization;
+using JetBrains.Annotations;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
 
@@ -12,6 +13,7 @@ namespace Usenet.Nntp.Models;
 /// <a href="https://tools.ietf.org/html/rfc2980#section-2.9">XPAT</a> and
 /// <a href="https://tools.ietf.org/html/rfc2980#section-2.11">XROVER</a> commands.
 /// </summary>
+[PublicAPI]
 public class NntpArticleRange : IEquatable<NntpArticleRange>
 {
     /// <summary>
@@ -29,7 +31,7 @@ public class NntpArticleRange : IEquatable<NntpArticleRange>
     /// </summary>
     /// <param name="from">The article number to start the range from.</param>
     /// <param name="to">The optional article number to end the range with.</param>
-    public NntpArticleRange(long from, long? to)
+    private NntpArticleRange(long from, long? to)
     {
         From = from;
         To = to;
@@ -47,7 +49,7 @@ public class NntpArticleRange : IEquatable<NntpArticleRange>
     /// </summary>
     /// <param name="from">The article number to start the range from.</param>
     /// <returns>A new range containing the given article and all following.</returns>
-    public static NntpArticleRange AllFollowing(long from) => new(@from, null);
+    public static NntpArticleRange AllFollowing(long from) => new(from, null);
 
     /// <summary>
     /// Creates a range containing all articles between and including <paramref name="from"/> and <paramref name="to"/>.
@@ -55,20 +57,16 @@ public class NntpArticleRange : IEquatable<NntpArticleRange>
     /// <param name="from">The article number to start the range from.</param>
     /// <param name="to">The article number to end the range with.</param>
     /// <returns>A new range containg all articles between and including <paramref name="from"/> and <paramref name="to"/>.</returns>
-    public static NntpArticleRange Range(long from, long to) => new(@from, to);
+    public static NntpArticleRange Range(long from, long to) => new(from, to);
 
     /// <summary>
     /// Returns the text representation of the value formatted according to the NNTP specifications.
     /// </summary>
     /// <returns>The text representation of the value formatted according to the NNTP specifications</returns>
     public override string ToString() =>
-        To == null
-            ? $"{From}-"
-            : (
-                To.Value == From
-                    ? From.ToString(CultureInfo.InvariantCulture)
-                    : $"{From}-{To.Value}"
-            );
+        To == null ? $"{From}-"
+        : To.Value == From ? From.ToString(CultureInfo.InvariantCulture)
+        : $"{From}-{To.Value}";
 
     /// <summary>
     /// Returns the hash code for this instance.

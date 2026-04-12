@@ -1,6 +1,8 @@
 using Usenet.Exceptions;
 using Usenet.Extensions;
+#if NETSTANDARD2_0
 using Usenet.Util.Compatibility;
+#endif
 
 namespace Usenet.Yenc;
 
@@ -8,7 +10,7 @@ namespace Usenet.Yenc;
 /// Utiltiy class to retrieve yEnc metadata.
 /// Based on Kristian Hellang's yEnc project https://github.com/khellang/yEnc.
 /// </summary>
-internal class YencMeta
+internal static class YencMeta
 {
     private const string YBegin = $"{YencKeywords.YBegin} ";
     private const string YPart = $"{YencKeywords.YPart} ";
@@ -46,7 +48,9 @@ internal class YencMeta
 
         if (
             enumerator.MoveNext()
+#if NETSTANDARD2_0 || NETSTANDARD2_1
             && enumerator.Current != null
+#endif
             && enumerator.Current.StartsWith(YPart, StringComparison.Ordinal)
         )
         {
@@ -95,11 +99,6 @@ internal class YencMeta
 
     public static Dictionary<string, string> ParseLine(string line)
     {
-        if (line == null)
-        {
-            return new Dictionary<string, string>(0);
-        }
-
         // name is always last item on the header line
         var nameSplit = line.Split(NameSeparator, StringSplitOptions.RemoveEmptyEntries);
         if (nameSplit.Length == 0)

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -26,9 +27,7 @@ internal sealed class TestNntpServer : IDisposable
             TcpClient client;
             try
             {
-                client = await _listener
-                    .AcceptTcpClientAsync(cancellationToken)
-                    .ConfigureAwait(false);
+                client = await _listener.AcceptTcpClientAsync(cancellationToken);
             }
             catch (OperationCanceledException)
             {
@@ -45,7 +44,6 @@ internal sealed class TestNntpServer : IDisposable
     {
         try
         {
-#pragma warning disable CA2007
             var stream = client.GetStream();
             await using var writer = new StreamWriter(stream, Encoding.ASCII);
             using var reader = new StreamReader(
@@ -55,15 +53,15 @@ internal sealed class TestNntpServer : IDisposable
                 1024,
                 leaveOpen: true
             );
-#pragma warning restore CA2007
+
             writer.NewLine = "\r\n";
             writer.AutoFlush = true;
 
             // Send NNTP greeting
-            await writer.WriteLineAsync("200 Dummy server ready").ConfigureAwait(false);
+            await writer.WriteLineAsync("200 Dummy server ready");
             while (!cancellationToken.IsCancellationRequested)
             {
-                var line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+                var line = await reader.ReadLineAsync(cancellationToken);
                 if (line == null)
                     break;
 
@@ -74,7 +72,7 @@ internal sealed class TestNntpServer : IDisposable
                 switch (command)
                 {
                     case "AUTHINFO":
-                        await writer.WriteLineAsync("281 Success").ConfigureAwait(false);
+                        await writer.WriteLineAsync("281 Success");
                         break;
                     case "GROUP":
                         // Group command is used to force immediate connection reset
@@ -82,12 +80,10 @@ internal sealed class TestNntpServer : IDisposable
                         client.Client.LingerState = new LingerOption(true, 0);
                         return;
                     case "QUIT":
-                        await writer.WriteLineAsync("205 Goodbye").ConfigureAwait(false);
+                        await writer.WriteLineAsync("205 Goodbye");
                         return;
                     default:
-                        await writer
-                            .WriteLineAsync("500 Command not recognized")
-                            .ConfigureAwait(false);
+                        await writer.WriteLineAsync("500 Command not recognized");
                         break;
                 }
             }
@@ -99,6 +95,7 @@ internal sealed class TestNntpServer : IDisposable
         }
     }
 
+    [SuppressMessage("ReSharper", "UnusedTupleComponentInReturnValue")]
     private static (string? Command, string? SubCommand, string? Arguments) ParseCommand(
         string line
     )

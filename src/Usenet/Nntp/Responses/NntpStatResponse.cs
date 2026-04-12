@@ -1,4 +1,5 @@
-﻿using Usenet.Nntp.Models;
+﻿using JetBrains.Annotations;
+using Usenet.Nntp.Models;
 
 namespace Usenet.Nntp.Responses;
 
@@ -6,6 +7,7 @@ namespace Usenet.Nntp.Responses;
 /// Represents a response to the
 /// <a href="https://tools.ietf.org/html/rfc3977#section-6.2.4">STAT</a> command.
 /// </summary>
+[PublicAPI]
 public class NntpStatResponse : NntpResponse
 {
     /// <summary>
@@ -32,7 +34,7 @@ public class NntpStatResponse : NntpResponse
     /// <param name="responseType">The type of the response received from the server.</param>
     /// <param name="number">The <see cref="NntpArticle"/> number received from the server.</param>
     /// <param name="messageId">The <see cref="NntpMessageId"/> received from the server.</param>
-    public NntpStatResponse(
+    internal NntpStatResponse(
         int code,
         string message,
         bool success,
@@ -44,6 +46,6 @@ public class NntpStatResponse : NntpResponse
     {
         ResponseType = responseType;
         Number = number;
-        MessageId = messageId ?? NntpMessageId.Empty;
+        MessageId = messageId;
     }
 }

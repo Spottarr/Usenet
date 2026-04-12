@@ -1,4 +1,5 @@
 using System.Text;
+using JetBrains.Annotations;
 using Usenet.Extensions;
 using Usenet.Util;
 
@@ -9,6 +10,7 @@ namespace Usenet.Yenc;
 /// The article is decoded streaming.
 /// Based on Kristian Hellang's yEnc project https://github.com/khellang/yEnc.
 /// </summary>
+[PublicAPI]
 public static class YencStreamDecoder
 {
     private const string YEnd = YencKeywords.YEnd + " ";

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using NSubstitute;
 using Usenet.Nntp;
 using Usenet.Nntp.Contracts;
@@ -20,6 +21,7 @@ internal sealed class NntpClientPoolTests
     }
 
     [Test]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
     public async Task AllClientsBorrowed(CancellationToken cancellationToken)
     {
         using var pool = new NntpClientPool(
@@ -36,11 +38,11 @@ internal sealed class NntpClientPoolTests
         };
 
         // Get the first lease, this should succeed
-        await pool.GetLease(cancellationToken).ConfigureAwait(true);
+        await pool.GetLease(cancellationToken);
 
         // Get the second lease, should throw because the client does not become available again in time
         await Assert
-            .That(async () => await pool.GetLease(cancellationToken).ConfigureAwait(true))
+            .That(async () => await pool.GetLease(cancellationToken))
             .ThrowsExactly<InvalidOperationException>();
     }
 
@@ -61,15 +63,16 @@ internal sealed class NntpClientPoolTests
         };
 
         // Get the first lease, this should succeed
-        var lease1 = await pool.GetLease(cancellationToken).ConfigureAwait(true);
+        var lease1 = await pool.GetLease(cancellationToken);
         lease1.Dispose();
 
         // Get the second lease, this should succeed because the first client was returned to the pool
-        var lease2 = await pool.GetLease(cancellationToken).ConfigureAwait(true);
+        var lease2 = await pool.GetLease(cancellationToken);
         lease2.Dispose();
     }
 
     [Test]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
     public async Task DisposeClientAfterError(CancellationToken cancellationToken)
     {
         using var server = new TestNntpServer();
@@ -86,18 +89,14 @@ internal sealed class NntpClientPoolTests
         };
 
         // Get the first lease
-        var lease1 = await pool.GetLease(cancellationToken).ConfigureAwait(true);
+        var lease1 = await pool.GetLease(cancellationToken);
         var client1 = lease1.Client;
         try
         {
             // Group command triggers disconnect on server side - throws IOException when connection is reset
             // or NntpException when no response is received
             await Assert
-                .That(async () =>
-                    await lease1
-                        .Client.GroupAsync("some.group", cancellationToken)
-                        .ConfigureAwait(true)
-                )
+                .That(async () => await lease1.Client.GroupAsync("some.group", cancellationToken))
                 .ThrowsException();
         }
         finally
@@ -107,16 +106,14 @@ internal sealed class NntpClientPoolTests
 
         // The client should be disposed after the disconnect
         await Assert
-            .That(async () =>
-                await client1.ArticleAsync("123", cancellationToken).ConfigureAwait(true)
-            )
+            .That(async () => await client1.ArticleAsync("123", cancellationToken))
             .ThrowsExactly<ObjectDisposedException>();
 
         // Get the second lease
         // This should return a new client
-        var lease2 = await pool.GetLease(cancellationToken).ConfigureAwait(true);
+        var lease2 = await pool.GetLease(cancellationToken);
         var client2 = lease2.Client;
-        await lease2.Client.ArticleAsync("123", cancellationToken).ConfigureAwait(true);
+        await lease2.Client.ArticleAsync("123", cancellationToken);
         lease2.Dispose();
 
         await Assert.That(client2).IsNotEqualTo(client1);

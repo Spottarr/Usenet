@@ -1,1 +1,8 @@
 root = true
+
+[*.cs]
+# CSharpier expects adds trailing comma, prevent editor from cleaning it up
+trailing_comma_in_multiline_lists = true
+
+[tests/**/*.cs]
+dotnet_diagnostic.CA2007.severity = none

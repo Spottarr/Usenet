@@ -1,4 +1,5 @@
-﻿using Usenet.Nntp.Models;
+﻿using JetBrains.Annotations;
+using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
 using Usenet.Util;
 
@@ -7,6 +8,7 @@ namespace Usenet.Nntp.Builders;
 /// <summary>
 /// Represents a mutable <see cref="NntpGroups"/>.
 /// </summary>
+[PublicAPI]
 public class NntpGroupsBuilder
 {
     private readonly List<string> _groups = [];
@@ -82,11 +84,6 @@ public class NntpGroupsBuilder
 
     private void AddGroups(IEnumerable<string> values)
     {
-        if (values == null)
-        {
-            return;
-        }
-
         foreach (var group in values)
         {
             if (!_groups.Contains(group))
@@ -98,11 +95,6 @@ public class NntpGroupsBuilder
 
     private void RemoveGroups(IEnumerable<string> values)
     {
-        if (values == null)
-        {
-            return;
-        }
-
         foreach (var group in values)
         {
             _groups.RemoveAll(g => g == group);

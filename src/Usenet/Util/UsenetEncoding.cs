@@ -1,10 +1,12 @@
 ﻿using System.Text;
+using JetBrains.Annotations;
 
 namespace Usenet.Util;
 
 /// <summary>
 /// This class defines the default usenet character encoding.
 /// </summary>
+[PublicAPI]
 public static class UsenetEncoding
 {
     /// <summary>

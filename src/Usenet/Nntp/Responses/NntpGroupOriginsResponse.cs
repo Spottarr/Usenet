@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using JetBrains.Annotations;
 using Usenet.Nntp.Models;
 
 namespace Usenet.Nntp.Responses;
@@ -8,6 +9,7 @@ namespace Usenet.Nntp.Responses;
 /// <a href="https://tools.ietf.org/html/rfc3977#section-7.6.4">LIST ACTIVE.TIMES</a>
 /// (<a href="https://tools.ietf.org/html/rfc2980#section-2.1.3">ad 1</a>) command.
 /// </summary>
+[PublicAPI]
 public class NntpGroupOriginsResponse : NntpResponse
 {
     /// <summary>
@@ -22,7 +24,7 @@ public class NntpGroupOriginsResponse : NntpResponse
     /// <param name="message">The response message received from the server.</param>
     /// <param name="success">A value indicating whether the command succeeded or failed.</param>
     /// <param name="groupOrigins">The list of <see cref="NntpGroupOrigin"/> objects received from the server.</param>
-    public NntpGroupOriginsResponse(
+    internal NntpGroupOriginsResponse(
         int code,
         string message,
         bool success,
@@ -30,6 +32,6 @@ public class NntpGroupOriginsResponse : NntpResponse
     )
         : base(code, message, success)
     {
-        GroupOrigins = (groupOrigins ?? []).ToImmutableList();
+        GroupOrigins = groupOrigins.ToImmutableList();
     }
 }

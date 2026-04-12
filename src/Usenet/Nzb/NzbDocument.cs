@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Text;
+using JetBrains.Annotations;
 using Usenet.Extensions;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
@@ -10,6 +11,7 @@ namespace Usenet.Nzb;
 /// Represents a <a href="https://sabnzbd.org/wiki/extra/nzb-spec">NZB</a> document.
 /// Based on Kristian Hellang's Nzb project https://github.com/khellang/Nzb.
 /// </summary>
+[PublicAPI]
 public class NzbDocument : IEquatable<NzbDocument>
 {
     /// <summary>
@@ -32,15 +34,13 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// </summary>
     /// <param name="metaData">A collection of metadata elements found in the NZB file.</param>
     /// <param name="files">A collection of files found in the NZB file.</param>
-    public NzbDocument(
-        IDictionary<string, ICollection<string>>? metaData,
-        IEnumerable<NzbFile>? files
+    internal NzbDocument(
+        IDictionary<string, ICollection<string>> metaData,
+        IEnumerable<NzbFile> files
     )
     {
-        MetaData = (
-            metaData ?? MultiValueDictionary<string, string>.Empty
-        ).ToImmutableDictionaryWithHashSets();
-        Files = (files ?? []).OrderBy(f => f.FileName).ToImmutableList();
+        MetaData = metaData.ToImmutableDictionaryWithHashSets();
+        Files = files.OrderBy(f => f.FileName).ToImmutableList();
         Size = Files.Sum(f => f.Size);
     }
 

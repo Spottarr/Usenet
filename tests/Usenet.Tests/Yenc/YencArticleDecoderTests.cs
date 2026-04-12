@@ -77,14 +77,10 @@ internal sealed class YencArticleDecoderTests
         using var actual = new MemoryStream();
 
         actual.Seek(part1.Header.PartOffset, SeekOrigin.Begin);
-        await actual
-            .WriteAsync(part1.Data.ToArray().AsMemory(0, (int)part1.Header.PartSize))
-            .ConfigureAwait(true);
+        await actual.WriteAsync(part1.Data.ToArray().AsMemory(0, (int)part1.Header.PartSize));
 
         actual.Seek(part2.Header.PartOffset, SeekOrigin.Begin);
-        await actual
-            .WriteAsync(part2.Data.ToArray().AsMemory(0, (int)part2.Header.PartSize))
-            .ConfigureAwait(true);
+        await actual.WriteAsync(part2.Data.ToArray().AsMemory(0, (int)part2.Header.PartSize));
 
         var actualFileName = part1.Header.FileName;
 

@@ -30,7 +30,7 @@ internal static class HashCode
     /// <param name="collection">The collection.</param>
     /// <returns>A 32-bit signed integer hash code.</returns>
     public static int Hash<T>(this int hash, IEnumerable<T> collection) =>
-        collection?.Aggregate(hash, Hash) ?? hash;
+        collection.Aggregate(hash, Hash);
 
     /// <summary>
     /// Combine the current hash code with the combined hash codes of all the keys and values in the
@@ -43,6 +43,5 @@ internal static class HashCode
     /// <param name="dictionary">The dictionary.</param>
     /// <returns></returns>
     public static int Hash<TKey, TValue>(this int hash, IDictionary<TKey, TValue> dictionary) =>
-        dictionary?.Aggregate(hash, (current, pair) => current.Hash(pair.Key).Hash(pair.Value))
-        ?? hash;
+        dictionary.Aggregate(hash, (current, pair) => current.Hash(pair.Key).Hash(pair.Value));
 }

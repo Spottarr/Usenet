@@ -1,8 +1,10 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 
 namespace Usenet.Nntp.Parsers;
 
+[PublicAPI]
 public static class HeaderDateParser
 {
     private const string DateTimeRegexString =

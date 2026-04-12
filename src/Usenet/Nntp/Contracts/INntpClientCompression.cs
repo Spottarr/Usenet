@@ -1,8 +1,10 @@
+using JetBrains.Annotations;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
 
 namespace Usenet.Nntp.Contracts;
 
+[PublicAPI]
 public interface INntpClientCompression
 {
     /// <summary>

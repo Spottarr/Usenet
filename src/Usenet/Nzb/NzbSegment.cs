@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using Usenet.Nntp.Models;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
@@ -8,6 +9,7 @@ namespace Usenet.Nzb;
 /// Represents a segment of a file in a <a href="https://sabnzbd.org/wiki/extra/nzb-spec">NZB</a> document.
 /// Based on Kristian Hellang's Nzb project https://github.com/khellang/Nzb.
 /// </summary>
+[PublicAPI]
 public class NzbSegment : IEquatable<NzbSegment>
 {
     /// <summary>
@@ -38,12 +40,12 @@ public class NzbSegment : IEquatable<NzbSegment>
     /// <param name="offset">Offset of the segment in the file.</param>
     /// <param name="size">Size of the article, in bytes, as a number, with no comma separation.</param>
     /// <param name="messageId">The Message-ID of this article.</param>
-    public NzbSegment(int number, long offset, long size, NntpMessageId messageId)
+    internal NzbSegment(int number, long offset, long size, NntpMessageId messageId)
     {
         Number = number;
         Offset = offset;
         Size = size;
-        MessageId = messageId ?? NntpMessageId.Empty;
+        MessageId = messageId;
     }
 
     /// <summary>

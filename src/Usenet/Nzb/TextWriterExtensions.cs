@@ -1,8 +1,11 @@
+using JetBrains.Annotations;
+
 namespace Usenet.Nzb;
 
 /// <summary>
 /// TextWriter extension methods.
 /// </summary>
+[PublicAPI]
 public static class TextWriterExtensions
 {
     /// <summary>
@@ -12,7 +15,7 @@ public static class TextWriterExtensions
     /// <param name="nzbDocument">The <see cref="NzbDocument"/> to write.</param>
     /// <returns>A <see cref="Task"/> that can be awaited.</returns>
     public static Task WriteNzbDocumentAsync(this TextWriter textWriter, NzbDocument nzbDocument) =>
-        WriteNzbDocumentAsync(textWriter, nzbDocument, CancellationToken.None);
+        textWriter.WriteNzbDocumentAsync(nzbDocument, CancellationToken.None);
 
     /// <summary>
     /// Writes the specified <see cref="NzbDocument"/> asynchronously to the stream.

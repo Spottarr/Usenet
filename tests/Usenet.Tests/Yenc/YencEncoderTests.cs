@@ -23,9 +23,7 @@ internal sealed class YencEncoderTests
         using var stream = new MemoryStream(data);
 
         var header = new YencHeader("test (1.2).txt", data.Length, 10, 0, 1, data.Length, 0);
-        var actualText = await YencEncoder
-            .EncodeAsync(header, stream, cancellationToken)
-            .ConfigureAwait(true);
+        var actualText = await YencEncoder.EncodeAsync(header, stream, cancellationToken);
 
         await Assert.That(actualText).IsEquivalentTo(expectedText);
     }
@@ -54,9 +52,7 @@ internal sealed class YencEncoderTests
         using var stream = new MemoryStream(data);
 
         var header = new YencHeader("test (1.2).txt", 120, 10, 1, 2, data.Length, 0);
-        var actualText = await YencEncoder
-            .EncodeAsync(header, stream, cancellationToken)
-            .ConfigureAwait(true);
+        var actualText = await YencEncoder.EncodeAsync(header, stream, cancellationToken);
 
         await Assert.That(actualText).IsEquivalentTo(expectedText);
     }

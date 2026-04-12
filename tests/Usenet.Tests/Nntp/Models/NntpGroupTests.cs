@@ -7,10 +7,10 @@ namespace Usenet.Tests.Nntp.Models;
 internal sealed class NntpGroupTests
 {
     public static IEnumerable<
-        Func<(string, long, long, long, NntpPostingStatus, string?, long[]?)>
+        Func<(string, long, long, long, NntpPostingStatus, string, long[])>
     > SerializationData()
     {
-        yield return () => ("test", 10, 2, 11, NntpPostingStatus.PostingPermitted, null, null);
+        yield return () => ("test", 10, 2, 11, NntpPostingStatus.PostingPermitted, "", []);
         yield return () =>
             ("alt.rfc-writers.recovery", 0, 1, 4, NntpPostingStatus.PostingPermitted, "", []);
         yield return () =>
@@ -29,8 +29,8 @@ internal sealed class NntpGroupTests
         long lowWaterMark,
         long highWaterMark,
         NntpPostingStatus postingStatus,
-        string? otherGroup,
-        long[]? articleNumbers
+        string otherGroup,
+        long[] articleNumbers
     )
     {
         var expected = new NntpGroup(
@@ -39,8 +39,8 @@ internal sealed class NntpGroupTests
             lowWaterMark,
             highWaterMark,
             postingStatus,
-            otherGroup!,
-            articleNumbers?.ToImmutableList()!
+            otherGroup,
+            articleNumbers.ToImmutableList()
         );
 
         var json = JsonSerializer.Serialize(expected);
@@ -57,14 +57,22 @@ internal sealed class NntpGroupTests
                 1,
                 10,
                 NntpPostingStatus.PostingPermitted,
-                null!,
+                string.Empty,
                 [1, 2, 3]
             ),
-            new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, null!, [1, 2, 3])
+            new NntpGroup(
+                "group1",
+                10,
+                1,
+                10,
+                NntpPostingStatus.PostingPermitted,
+                string.Empty,
+                [1, 2, 3]
+            )
         );
         yield return (
-            new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", null!),
-            new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", null!)
+            new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", []),
+            new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", [])
         );
     }
 
@@ -207,7 +215,7 @@ internal sealed class NntpGroupTests
                 "other",
                 [1, 2, 3]
             ),
-            new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", null!)
+            new NntpGroup("group1", 10, 1, 10, NntpPostingStatus.PostingPermitted, "other", [])
         );
     }
 

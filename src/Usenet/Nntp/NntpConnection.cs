@@ -1,6 +1,7 @@
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Usenet.Exceptions;
 using Usenet.Extensions;
@@ -17,6 +18,7 @@ namespace Usenet.Nntp;
 /// </summary>
 /// <remarks>This implementation of the <see cref="INntpConnection"/> interface does support SSL encryption but
 /// does not support compressed multi-line results.</remarks>
+[PublicAPI]
 public sealed partial class NntpConnection : INntpConnection
 {
     private readonly ILogger _log = Logger.Create<NntpConnection>();
@@ -157,7 +159,7 @@ public sealed partial class NntpConnection : INntpConnection
     /// <inheritdoc/>
     public void Dispose()
     {
-        _client?.Dispose();
+        _client.Dispose();
         _writer?.Dispose();
         _reader?.Dispose();
     }

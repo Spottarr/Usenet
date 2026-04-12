@@ -17,7 +17,7 @@ internal sealed class GroupsResponseParserTests
                 (int)GroupStatusRequestType.Basic,
                 ["alt.rfc-writers.recovery 4 1 y", "tx.natives.recovery 89 56 y"],
                 [
-                    new(
+                    new NntpGroup(
                         "alt.rfc-writers.recovery",
                         0,
                         1,
@@ -26,7 +26,7 @@ internal sealed class GroupsResponseParserTests
                         string.Empty,
                         []
                     ),
-                    new(
+                    new NntpGroup(
                         "tx.natives.recovery",
                         0,
                         56,
@@ -49,7 +49,7 @@ internal sealed class GroupsResponseParserTests
                 (int)GroupStatusRequestType.Extended,
                 ["misc.test 3002322 3000234 1234 y", "rec.food.drink.tea 100 51 3 y"],
                 [
-                    new(
+                    new NntpGroup(
                         "misc.test",
                         1234,
                         3000234,
@@ -58,7 +58,7 @@ internal sealed class GroupsResponseParserTests
                         string.Empty,
                         []
                     ),
-                    new(
+                    new NntpGroup(
                         "rec.food.drink.tea",
                         3,
                         51,

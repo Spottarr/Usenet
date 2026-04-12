@@ -15,7 +15,13 @@ internal sealed class ArticleResponseParserTests
                 "123 <123@poster.com>",
                 (int)ArticleRequestType.Article,
                 [],
-                new NntpArticle(123, "<123@poster.com>", null, null, new List<string>(0))
+                new NntpArticle(
+                    123,
+                    "<123@poster.com>",
+                    NntpGroups.Empty,
+                    MultiValueDictionary<string, string>.EmptyIgnoreCase,
+                    new List<string>(0)
+                )
             );
 
         yield return () =>
@@ -33,7 +39,7 @@ internal sealed class ArticleResponseParserTests
                 new NntpArticle(
                     123,
                     "<123@poster.com>",
-                    null,
+                    NntpGroups.Empty,
                     new MultiValueDictionary<string, string>
                     {
                         { "Path", "pathost!demo!whitehouse!not-for-mail" },
@@ -52,8 +58,8 @@ internal sealed class ArticleResponseParserTests
                 new NntpArticle(
                     123,
                     "<123@poster.com>",
-                    null,
-                    null,
+                    NntpGroups.Empty,
+                    MultiValueDictionary<string, string>.EmptyIgnoreCase,
                     new List<string> { "This is just a test article (2).", "With two lines." }
                 )
             );
@@ -67,7 +73,7 @@ internal sealed class ArticleResponseParserTests
                 new NntpArticle(
                     123,
                     "<123@poster.com>",
-                    null,
+                    NntpGroups.Empty,
                     new MultiValueDictionary<string, string>
                     {
                         { "Multi", "line1 line2 line3" },
@@ -86,7 +92,7 @@ internal sealed class ArticleResponseParserTests
                 new NntpArticle(
                     123,
                     "<123@poster.com>",
-                    null,
+                    NntpGroups.Empty,
                     new MultiValueDictionary<string, string>
                     {
                         { "Path", "pathost!demo!whitehouse!not-for-mail" },
