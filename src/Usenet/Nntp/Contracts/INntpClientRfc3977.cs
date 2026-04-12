@@ -1,10 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
 
 namespace Usenet.Nntp.Contracts;
 
 [SuppressMessage("Naming", "CA1716:Identifiers should not match keywords")]
+[PublicAPI]
 public interface INntpClientRfc3977
 {
     /// <summary>

@@ -1,4 +1,5 @@
 using System.Globalization;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Usenet.Exceptions;
 using Usenet.Extensions;
@@ -10,6 +11,7 @@ namespace Usenet.Nntp.Builders;
 /// <summary>
 /// Represents a mutable <see cref="NntpArticle"/>.
 /// </summary>
+[PublicAPI]
 public class NntpArticleBuilder
 {
     private readonly ILogger _log = Logger.Create<NntpArticleBuilder>();

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using JetBrains.Annotations;
 using Usenet.Nntp.Models;
 
 namespace Usenet.Nntp.Responses;
@@ -8,6 +9,7 @@ namespace Usenet.Nntp.Responses;
 /// <a href="https://tools.ietf.org/html/rfc3977#section-7.6.4">LIST ACTIVE.TIMES</a>
 /// (<a href="https://tools.ietf.org/html/rfc2980#section-2.1.3">ad 1</a>) command.
 /// </summary>
+[PublicAPI]
 public class NntpGroupOriginsResponse : NntpResponse
 {
     /// <summary>

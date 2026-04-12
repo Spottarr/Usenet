@@ -1,4 +1,5 @@
-﻿using Usenet.Util;
+﻿using JetBrains.Annotations;
+using Usenet.Util;
 
 namespace Usenet.Yenc;
 
@@ -6,6 +7,7 @@ namespace Usenet.Yenc;
 /// Represents a decoded yEnc-encoded article as a stream.
 /// Based on Kristian Hellang's yEnc project https://github.com/khellang/yEnc.
 /// </summary>
+[PublicAPI]
 public class YencStream : EnumerableStream
 {
     /// <summary>

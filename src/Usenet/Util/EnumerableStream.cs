@@ -1,9 +1,12 @@
-﻿namespace Usenet.Util;
+﻿using JetBrains.Annotations;
+
+namespace Usenet.Util;
 
 /// <summary>
 /// Represents an enumerable stream. Can be used to stream an enumerable collection of
 /// byte buffers.
 /// </summary>
+[PublicAPI]
 public abstract class EnumerableStream : AbstractBaseStream
 {
     private readonly IEnumerator<byte[]> _enumerator;

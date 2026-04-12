@@ -1,4 +1,5 @@
 using System.Globalization;
+using JetBrains.Annotations;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
 
@@ -12,6 +13,7 @@ namespace Usenet.Nntp.Models;
 /// <a href="https://tools.ietf.org/html/rfc2980#section-2.9">XPAT</a> and
 /// <a href="https://tools.ietf.org/html/rfc2980#section-2.11">XROVER</a> commands.
 /// </summary>
+[PublicAPI]
 public class NntpArticleRange : IEquatable<NntpArticleRange>
 {
     /// <summary>

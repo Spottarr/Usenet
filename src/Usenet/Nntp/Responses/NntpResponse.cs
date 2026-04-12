@@ -1,9 +1,12 @@
-﻿namespace Usenet.Nntp.Responses;
+﻿using JetBrains.Annotations;
+
+namespace Usenet.Nntp.Responses;
 
 /// <summary>
 /// Represents a single-line response.
 /// Based on Kristian Hellang's NntpLib.Net project https://github.com/khellang/NntpLib.Net.
 /// </summary>
+[PublicAPI]
 public class NntpResponse
 {
     /// <summary>

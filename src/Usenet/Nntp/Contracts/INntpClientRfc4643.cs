@@ -1,5 +1,8 @@
+using JetBrains.Annotations;
+
 namespace Usenet.Nntp.Contracts;
 
+[PublicAPI]
 public interface INntpClientRfc4643
 {
     /// <summary>

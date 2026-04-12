@@ -1,9 +1,12 @@
-﻿namespace Usenet.Nntp.Parsers;
+﻿using JetBrains.Annotations;
+
+namespace Usenet.Nntp.Parsers;
 
 /// <summary>
 /// Represents a single-line response parser.
 /// </summary>
 /// <typeparam name="TResponse"></typeparam>
+[PublicAPI]
 public interface IResponseParser<out TResponse>
 {
     /// <summary>

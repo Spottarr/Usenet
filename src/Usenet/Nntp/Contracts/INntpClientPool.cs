@@ -1,8 +1,11 @@
+using JetBrains.Annotations;
+
 namespace Usenet.Nntp.Contracts;
 
 /// <summary>
 /// Represents a pool of authenticated NNTP clients.
 /// </summary>
+[PublicAPI]
 public interface INntpClientPool : IDisposable
 {
     /// <summary>

@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
 
@@ -9,6 +10,7 @@ namespace Usenet.Nntp.Models;
 /// <a href="https://tools.ietf.org/html/rfc3977#section-7.6.4">LIST ACTIVE.TIMES</a> command.
 /// (<a href="https://tools.ietf.org/html/rfc2980#section-2.1.3">Some older information</a>).
 /// </summary>
+[PublicAPI]
 public class NntpGroupOrigin : IEquatable<NntpGroupOrigin>
 {
     /// <summary>

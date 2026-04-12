@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Immutable;
+using JetBrains.Annotations;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Parsers;
 using Usenet.Util;
@@ -10,6 +11,7 @@ namespace Usenet.Nntp.Models;
 /// <summary>
 /// Represent a list of NNTP newsgroups.
 /// </summary>
+[PublicAPI]
 public class NntpGroups : IEnumerable<string>, IEquatable<NntpGroups>
 {
     /// <summary>

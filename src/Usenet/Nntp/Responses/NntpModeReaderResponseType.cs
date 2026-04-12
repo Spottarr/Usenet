@@ -1,10 +1,13 @@
-﻿namespace Usenet.Nntp.Responses;
+﻿using JetBrains.Annotations;
+
+namespace Usenet.Nntp.Responses;
 
 /// <summary>
 /// Represents all possible response codes for the
 /// <a href="https://tools.ietf.org/html/rfc3977#section-5.3">MODE READER</a>
 /// (<a href="https://tools.ietf.org/html/rfc2980#section-2.3">ad 1</a>) command.
 /// </summary>
+[PublicAPI]
 public enum NntpModeReaderResponseType
 {
     /// <summary>

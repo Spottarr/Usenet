@@ -1,7 +1,9 @@
+using JetBrains.Annotations;
 using Usenet.Nntp.Responses;
 
 namespace Usenet.Nntp.Contracts;
 
+[PublicAPI]
 public interface INntpClientConnection
 {
     /// <summary>

@@ -1,8 +1,11 @@
-﻿namespace Usenet.Util;
+﻿using JetBrains.Annotations;
+
+namespace Usenet.Util;
 
 /// <summary>
 /// Represents a counting stream. It can be used to count the number of bytes read and written.
 /// </summary>
+[PublicAPI]
 public class CountingStream : AbstractBaseStream
 {
     private readonly Stream _innerStream;

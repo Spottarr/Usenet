@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using JetBrains.Annotations;
 
 namespace Usenet.Nntp.Responses;
 
@@ -6,6 +7,7 @@ namespace Usenet.Nntp.Responses;
 /// Represents a generic multi-line response.
 /// Based on Kristian Hellang's NntpLib.Net project https://github.com/khellang/NntpLib.Net.
 /// </summary>
+[PublicAPI]
 public class NntpMultiLineResponse : NntpResponse
 {
     /// <summary>

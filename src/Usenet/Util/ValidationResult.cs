@@ -1,8 +1,11 @@
-﻿namespace Usenet.Util;
+﻿using JetBrains.Annotations;
+
+namespace Usenet.Util;
 
 /// <summary>
 /// Represents a validation result.
 /// </summary>
+[PublicAPI]
 public class ValidationResult
 {
     /// <summary>

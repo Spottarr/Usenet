@@ -1,10 +1,12 @@
-﻿using Usenet.Util;
+﻿using JetBrains.Annotations;
+using Usenet.Util;
 
 namespace Usenet.Yenc;
 
 /// <summary>
 /// Represents a decoded yEnc-encoded article.
 /// </summary>
+[PublicAPI]
 public class YencArticle
 {
     /// <summary>
