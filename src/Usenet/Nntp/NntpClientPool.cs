@@ -83,7 +83,7 @@ public sealed class NntpClientPool : INntpClientPool
 
         var client = BorrowClientInternal();
 
-        if (client.Connected && client.Authenticated)
+        if (client is { Connected: true, Authenticated: true })
             return client;
 
         if (!client.Connected)
