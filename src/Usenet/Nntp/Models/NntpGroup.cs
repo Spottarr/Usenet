@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using Usenet.Util;
 using Usenet.Util.Compatibility;
@@ -59,6 +60,7 @@ public class NntpGroup : IEquatable<NntpGroup>
     /// <param name="otherGroup">The name of the other <see cref="NntpGroup"/> under which the articles are filed when the
     /// <see cref="PostingStatus"/> is <see cref="NntpPostingStatus.OnlyArticlesFromPeersPermittedFiledLocally"/>.</param>
     /// <param name="articleNumbers">A list of <see cref="NntpArticle"/> numbers in the <see cref="NntpGroup"/>.</param>
+    [JsonConstructor]
     internal NntpGroup(
         string name,
         long articleCount,
