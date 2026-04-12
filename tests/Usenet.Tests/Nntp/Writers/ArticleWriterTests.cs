@@ -108,7 +108,7 @@ internal sealed class ArticleWriterTests
     )
     {
         using var connection = new MockConnection();
-        await ArticleWriter.WriteAsync(connection, article, cancellationToken).ConfigureAwait(true);
+        await ArticleWriter.WriteAsync(connection, article, cancellationToken);
         await Assert.That(connection.GetLines()).IsEquivalentTo(expectedLines);
     }
 }

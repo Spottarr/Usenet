@@ -90,10 +90,10 @@ internal sealed class YencStreamDecoderTests
         using var actual = new MemoryStream();
 
         actual.Seek(part1.Header.PartOffset, SeekOrigin.Begin);
-        await part1.CopyToAsync(actual, cancellationToken).ConfigureAwait(true);
+        await part1.CopyToAsync(actual, cancellationToken);
 
         actual.Seek(part2.Header.PartOffset, SeekOrigin.Begin);
-        await part2.CopyToAsync(actual, cancellationToken).ConfigureAwait(true);
+        await part2.CopyToAsync(actual, cancellationToken);
 
         var actualFileName = part1.Header.FileName;
 
