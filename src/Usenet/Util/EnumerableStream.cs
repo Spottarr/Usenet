@@ -4,7 +4,7 @@
 /// Represents an enumerable stream. Can be used to stream an enumerable collection of
 /// byte buffers.
 /// </summary>
-public class EnumerableStream : AbstractBaseStream
+public abstract class EnumerableStream : AbstractBaseStream
 {
     private readonly IEnumerator<byte[]> _enumerator;
     private byte[]? _currentChunk;
@@ -14,7 +14,7 @@ public class EnumerableStream : AbstractBaseStream
     /// Creates a new instance of the <see cref="EnumerableStream"/> class.
     /// </summary>
     /// <param name="input">An enumerable collection of byte buffers.</param>
-    public EnumerableStream(IEnumerable<byte[]> input)
+    protected EnumerableStream(IEnumerable<byte[]> input)
     {
         Guard.ThrowIfNull(input);
         _enumerator = input.GetEnumerator();
