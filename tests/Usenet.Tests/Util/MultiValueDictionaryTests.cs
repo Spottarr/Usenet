@@ -1,10 +1,10 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using Usenet.Util;
-
-// ReSharper disable DuplicateKeyCollectionInitialization
 
 namespace Usenet.Tests.Util;
 
+[SuppressMessage("ReSharper", "DuplicateKeyCollectionInitialization")]
 internal sealed class MultiValueDictionaryTests
 {
     [Test]
