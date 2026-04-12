@@ -355,7 +355,6 @@ Usenet.Nntp.Models.NntpGroupOrigin.CreatedAt.get -> System.DateTimeOffset
 Usenet.Nntp.Models.NntpGroupOrigin.CreatedBy.get -> string!
 Usenet.Nntp.Models.NntpGroupOrigin.Equals(Usenet.Nntp.Models.NntpGroupOrigin? other) -> bool
 Usenet.Nntp.Models.NntpGroupOrigin.Name.get -> string!
-Usenet.Nntp.Models.NntpGroupOrigin.NntpGroupOrigin(string! name, System.DateTimeOffset createdAt, string! createdBy) -> void
 Usenet.Nntp.Models.NntpGroups
 Usenet.Nntp.Models.NntpGroups.Equals(Usenet.Nntp.Models.NntpGroups? other) -> bool
 Usenet.Nntp.Models.NntpGroups.GetEnumerator() -> System.Collections.Generic.IEnumerator<string!>!

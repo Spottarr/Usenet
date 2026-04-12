@@ -6,10 +6,7 @@ internal class ResponseParser : IResponseParser<NntpResponse>
 {
     private readonly int[] _successCodes;
 
-    public ResponseParser(params int[] successCodes)
-    {
-        _successCodes = successCodes ?? [];
-    }
+    public ResponseParser(params int[] successCodes) => _successCodes = successCodes;
 
     public bool IsSuccessResponse(int code) => _successCodes.Contains(code);
 
