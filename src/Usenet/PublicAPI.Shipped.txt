@@ -545,22 +545,16 @@ Usenet.Nntp.Parsers.IResponseParser<TResponse>.IsSuccessResponse(int code) -> bo
 Usenet.Nntp.Parsers.IResponseParser<TResponse>.Parse(int code, string! message) -> TResponse
 Usenet.Nntp.Responses.NntpArticleResponse
 Usenet.Nntp.Responses.NntpArticleResponse.Article.get -> Usenet.Nntp.Models.NntpArticle?
-Usenet.Nntp.Responses.NntpArticleResponse.NntpArticleResponse(int code, string! message, bool success, Usenet.Nntp.Models.NntpArticle? article) -> void
 Usenet.Nntp.Responses.NntpDateResponse
 Usenet.Nntp.Responses.NntpDateResponse.DateTime.get -> System.DateTimeOffset
-Usenet.Nntp.Responses.NntpDateResponse.NntpDateResponse(int code, string! message, bool success, System.DateTimeOffset dateTime) -> void
 Usenet.Nntp.Responses.NntpGroupOriginsResponse
 Usenet.Nntp.Responses.NntpGroupOriginsResponse.GroupOrigins.get -> System.Collections.Immutable.IImmutableList<Usenet.Nntp.Models.NntpGroupOrigin!>!
-Usenet.Nntp.Responses.NntpGroupOriginsResponse.NntpGroupOriginsResponse(int code, string! message, bool success, System.Collections.Generic.IList<Usenet.Nntp.Models.NntpGroupOrigin!>! groupOrigins) -> void
 Usenet.Nntp.Responses.NntpGroupResponse
 Usenet.Nntp.Responses.NntpGroupResponse.Group.get -> Usenet.Nntp.Models.NntpGroup!
-Usenet.Nntp.Responses.NntpGroupResponse.NntpGroupResponse(int code, string! message, bool success, Usenet.Nntp.Models.NntpGroup! group) -> void
 Usenet.Nntp.Responses.NntpGroupsResponse
 Usenet.Nntp.Responses.NntpGroupsResponse.Groups.get -> System.Collections.Immutable.IImmutableList<Usenet.Nntp.Models.NntpGroup!>!
-Usenet.Nntp.Responses.NntpGroupsResponse.NntpGroupsResponse(int code, string! message, bool success, System.Collections.Generic.IList<Usenet.Nntp.Models.NntpGroup!>! groups) -> void
 Usenet.Nntp.Responses.NntpLastResponse
 Usenet.Nntp.Responses.NntpLastResponse.MessageId.get -> Usenet.Nntp.Models.NntpMessageId!
-Usenet.Nntp.Responses.NntpLastResponse.NntpLastResponse(int code, string! message, bool success, Usenet.Nntp.Responses.NntpLastResponseType responseType, long number, Usenet.Nntp.Models.NntpMessageId! messageId) -> void
 Usenet.Nntp.Responses.NntpLastResponse.Number.get -> long
 Usenet.Nntp.Responses.NntpLastResponse.ResponseType.get -> Usenet.Nntp.Responses.NntpLastResponseType
 Usenet.Nntp.Responses.NntpLastResponseType
@@ -570,7 +564,6 @@ Usenet.Nntp.Responses.NntpLastResponseType.NoGroupSelected = 412 -> Usenet.Nntp.
 Usenet.Nntp.Responses.NntpLastResponseType.NoPreviousArticleInGroup = 422 -> Usenet.Nntp.Responses.NntpLastResponseType
 Usenet.Nntp.Responses.NntpLastResponseType.Unknown = 0 -> Usenet.Nntp.Responses.NntpLastResponseType
 Usenet.Nntp.Responses.NntpModeReaderResponse
-Usenet.Nntp.Responses.NntpModeReaderResponse.NntpModeReaderResponse(int code, string! message, bool success, Usenet.Nntp.Responses.NntpModeReaderResponseType responseType) -> void
 Usenet.Nntp.Responses.NntpModeReaderResponse.ResponseType.get -> Usenet.Nntp.Responses.NntpModeReaderResponseType
 Usenet.Nntp.Responses.NntpModeReaderResponseType
 Usenet.Nntp.Responses.NntpModeReaderResponseType.PostingAllowed = 200 -> Usenet.Nntp.Responses.NntpModeReaderResponseType
@@ -579,10 +572,8 @@ Usenet.Nntp.Responses.NntpModeReaderResponseType.ReadingServiceUnavailable = 502
 Usenet.Nntp.Responses.NntpModeReaderResponseType.Unknown = 0 -> Usenet.Nntp.Responses.NntpModeReaderResponseType
 Usenet.Nntp.Responses.NntpMultiLineResponse
 Usenet.Nntp.Responses.NntpMultiLineResponse.Lines.get -> System.Collections.Immutable.IImmutableList<string!>!
-Usenet.Nntp.Responses.NntpMultiLineResponse.NntpMultiLineResponse(int code, string! message, bool success, System.Collections.Generic.IEnumerable<string!>! lines) -> void
 Usenet.Nntp.Responses.NntpNextResponse
 Usenet.Nntp.Responses.NntpNextResponse.MessageId.get -> Usenet.Nntp.Models.NntpMessageId!
-Usenet.Nntp.Responses.NntpNextResponse.NntpNextResponse(int code, string! message, bool success, Usenet.Nntp.Responses.NntpNextResponseType responseType, long number, Usenet.Nntp.Models.NntpMessageId! messageId) -> void
 Usenet.Nntp.Responses.NntpNextResponse.Number.get -> long
 Usenet.Nntp.Responses.NntpNextResponse.ResponseType.get -> Usenet.Nntp.Responses.NntpNextResponseType
 Usenet.Nntp.Responses.NntpNextResponseType
@@ -594,11 +585,9 @@ Usenet.Nntp.Responses.NntpNextResponseType.Unknown = 0 -> Usenet.Nntp.Responses.
 Usenet.Nntp.Responses.NntpResponse
 Usenet.Nntp.Responses.NntpResponse.Code.get -> int
 Usenet.Nntp.Responses.NntpResponse.Message.get -> string!
-Usenet.Nntp.Responses.NntpResponse.NntpResponse(int code, string! message, bool success) -> void
 Usenet.Nntp.Responses.NntpResponse.Success.get -> bool
 Usenet.Nntp.Responses.NntpStatResponse
 Usenet.Nntp.Responses.NntpStatResponse.MessageId.get -> Usenet.Nntp.Models.NntpMessageId!
-Usenet.Nntp.Responses.NntpStatResponse.NntpStatResponse(int code, string! message, bool success, Usenet.Nntp.Responses.NntpStatResponseType responseType, long number, Usenet.Nntp.Models.NntpMessageId! messageId) -> void
 Usenet.Nntp.Responses.NntpStatResponse.Number.get -> long
 Usenet.Nntp.Responses.NntpStatResponse.ResponseType.get -> Usenet.Nntp.Responses.NntpStatResponseType
 Usenet.Nntp.Responses.NntpStatResponseType
