@@ -16,16 +16,13 @@ internal class MultiSetComparer<T> : IEqualityComparer<IEnumerable<T>>
     /// using the specified <see cref="IEqualityComparer{T}"/>.
     /// </summary>
     /// <param name="comparer">The equality comparer to use.</param>
-    public MultiSetComparer(IEqualityComparer<T> comparer)
-    {
-        _comparer = comparer ?? EqualityComparer<T>.Default;
-    }
+    private MultiSetComparer(IEqualityComparer<T> comparer) => _comparer = comparer;
 
     /// <summary>
     /// Creates a new instance of the <see cref="MultiSetComparer{T}"/> class
     /// using the default <see cref="IEqualityComparer{T}"/> for the type specified by the generic argument.
     /// </summary>
-    public MultiSetComparer()
+    private MultiSetComparer()
         : this(EqualityComparer<T>.Default) { }
 
     /// <summary>

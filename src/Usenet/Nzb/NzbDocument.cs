@@ -32,15 +32,13 @@ public class NzbDocument : IEquatable<NzbDocument>
     /// </summary>
     /// <param name="metaData">A collection of metadata elements found in the NZB file.</param>
     /// <param name="files">A collection of files found in the NZB file.</param>
-    public NzbDocument(
-        IDictionary<string, ICollection<string>>? metaData,
-        IEnumerable<NzbFile>? files
+    internal NzbDocument(
+        IDictionary<string, ICollection<string>> metaData,
+        IEnumerable<NzbFile> files
     )
     {
-        MetaData = (
-            metaData ?? MultiValueDictionary<string, string>.Empty
-        ).ToImmutableDictionaryWithHashSets();
-        Files = (files ?? []).OrderBy(f => f.FileName).ToImmutableList();
+        MetaData = metaData.ToImmutableDictionaryWithHashSets();
+        Files = files.OrderBy(f => f.FileName).ToImmutableList();
         Size = Files.Sum(f => f.Size);
     }
 
