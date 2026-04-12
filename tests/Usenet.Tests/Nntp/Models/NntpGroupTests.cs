@@ -40,7 +40,7 @@ internal sealed class NntpGroupTests
             highWaterMark,
             postingStatus,
             otherGroup,
-            articleNumbers.ToImmutableList()!
+            articleNumbers.ToImmutableList()
         );
 
         var json = JsonSerializer.Serialize(expected);
