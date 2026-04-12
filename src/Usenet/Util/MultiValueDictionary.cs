@@ -60,7 +60,7 @@ internal class MultiValueDictionary<TKey, TValue>
     /// <param name="value">The value of the element to add.</param>
     public virtual void Add(TKey key, TValue value)
     {
-        if (!TryGetValue(key, out var values) || values == null)
+        if (!TryGetValue(key, out var values))
         {
             values = _collectionFactory();
             Add(key, values);
@@ -77,7 +77,7 @@ internal class MultiValueDictionary<TKey, TValue>
     /// <returns>true if the element is successfully found and removed; otherwise, false.</returns>
     public virtual bool Remove(TKey key, TValue value)
     {
-        if (!TryGetValue(key, out var values) || values == null)
+        if (!TryGetValue(key, out var values))
             return false;
         if (!values.Remove(value))
             return false;
@@ -90,10 +90,7 @@ internal class MultiValueDictionary<TKey, TValue>
 
     /// <summary>Gets the number of elements contained in the <see cref="MultiValueDictionary{TKey,TValue}" />.</summary>
     /// <returns>The number of elements contained in the <see cref="MultiValueDictionary{TKey,TValue}" />.</returns>
-    public new int Count =>
-        Values
-            .Where(valueCollection => valueCollection != null)
-            .Sum(valueCollection => valueCollection.Count);
+    public new int Count => Values.Sum(valueCollection => valueCollection.Count);
 
     /// <summary>
     /// Represents an empty <see cref="MultiValueDictionary{TKey,TValue}"/>.
