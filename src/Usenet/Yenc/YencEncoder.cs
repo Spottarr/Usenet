@@ -68,9 +68,8 @@ public static class YencEncoder
         Guard.ThrowIfNull(stream);
         Guard.ThrowIfNull(encoding);
 
-        var lines = new List<string>();
+        List<string> lines = [GetHeaderLine(header)];
 
-        lines.Add(GetHeaderLine(header));
         if (header.IsFilePart)
         {
             lines.Add(GetPartHeaderLine(header));
