@@ -8,7 +8,7 @@ namespace Usenet.Yenc;
 /// Utiltiy class to retrieve yEnc metadata.
 /// Based on Kristian Hellang's yEnc project https://github.com/khellang/yEnc.
 /// </summary>
-internal class YencMeta
+internal static class YencMeta
 {
     private const string YBegin = $"{YencKeywords.YBegin} ";
     private const string YPart = $"{YencKeywords.YPart} ";
