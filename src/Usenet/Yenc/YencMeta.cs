@@ -44,11 +44,7 @@ internal static class YencMeta
             throw new InvalidYencDataException(Resources.Yenc.MissingPartHeader);
         }
 
-        if (
-            enumerator.MoveNext()
-            && enumerator.Current != null
-            && enumerator.Current.StartsWith(YPart, StringComparison.Ordinal)
-        )
+        if (enumerator.MoveNext() && enumerator.Current.StartsWith(YPart, StringComparison.Ordinal))
         {
             return ParseLine(enumerator.Current);
         }
