@@ -22,7 +22,7 @@ public class NntpGroups : IEnumerable<string>, IEquatable<NntpGroups>
     /// <summary>
     /// Creates a new <see cref="NntpGroups"/> object.
     /// </summary>
-    public NntpGroups(string groups)
+    internal NntpGroups(string groups)
     {
         Guard.ThrowIfNull(groups);
         _groups = GroupsParser.Parse(groups).OrderBy(g => g).ToImmutableList();
@@ -31,7 +31,7 @@ public class NntpGroups : IEnumerable<string>, IEquatable<NntpGroups>
     /// <summary>
     /// Creates a new <see cref="NntpGroups"/> object.
     /// </summary>
-    public NntpGroups(IEnumerable<string> groups)
+    internal NntpGroups(IEnumerable<string> groups)
     {
         Guard.ThrowIfNull(groups);
         _groups = GroupsParser.Parse(groups).OrderBy(g => g).ToImmutableList();
