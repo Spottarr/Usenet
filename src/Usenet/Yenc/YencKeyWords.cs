@@ -4,7 +4,7 @@
 /// yEnc keywords
 /// Based on Kristian Hellang's yEnc project https://github.com/khellang/yEnc.
 /// </summary>
-internal class YencKeywords
+internal static class YencKeywords
 {
     public const string YBegin = "=ybegin";
     public const string YPart = "=ypart";
