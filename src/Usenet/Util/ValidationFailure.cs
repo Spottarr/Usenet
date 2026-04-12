@@ -28,7 +28,7 @@ public class ValidationFailure
     /// <param name="code">A code associated with the validation failure.</param>
     /// <param name="message">A message describing the validation failure.</param>
     /// <param name="data">A data object containing information about the validation failure.</param>
-    public ValidationFailure(string code, string message, object? data = null)
+    internal ValidationFailure(string code, string message, object? data = null)
     {
         Code = code.ThrowIfNullOrWhiteSpace(nameof(code));
         Message = message;
