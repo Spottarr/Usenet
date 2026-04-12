@@ -6,10 +6,7 @@ internal class MultiLineResponseParser : IMultiLineResponseParser<NntpMultiLineR
 {
     private readonly int[] _successCodes;
 
-    public MultiLineResponseParser(params int[] successCodes)
-    {
-        _successCodes = successCodes ?? [];
-    }
+    public MultiLineResponseParser(params int[] successCodes) => _successCodes = successCodes;
 
     public bool IsSuccessResponse(int code) => _successCodes.Contains(code);
 
