@@ -30,6 +30,6 @@ public class NntpGroupOriginsResponse : NntpResponse
     )
         : base(code, message, success)
     {
-        GroupOrigins = (groupOrigins ?? []).ToImmutableList();
+        GroupOrigins = groupOrigins.ToImmutableList();
     }
 }

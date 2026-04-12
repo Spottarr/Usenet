@@ -34,11 +34,11 @@ public class NntpGroupOrigin : IEquatable<NntpGroupOrigin>
     /// <param name="createdAt">The date and time the <see cref="NntpGroup"/> was created.</param>
     /// <param name="createdBy">A description of the entity that created the <see cref="NntpGroup"/>;
     /// it is often a mailbox as described in <a href="https://tools.ietf.org/html/rfc2822">RFC 2822</a>. </param>
-    public NntpGroupOrigin(string name, DateTimeOffset createdAt, string createdBy)
+    internal NntpGroupOrigin(string name, DateTimeOffset createdAt, string createdBy)
     {
-        Name = name ?? string.Empty;
+        Name = name;
         CreatedAt = createdAt;
-        CreatedBy = createdBy ?? string.Empty;
+        CreatedBy = createdBy;
     }
 
     /// <summary>
