@@ -238,15 +238,10 @@ public static class NzbParser
     private static NzbSegment GetSegment(XElement element, long offset)
     {
         if (!int.TryParse((string?)element.Attribute(NzbKeywords.Number), out var number))
-        {
             throw new InvalidNzbDataException(Resources.Nzb.InvalidOrMissingNumberAttribute);
-        }
 
-        if (!long.TryParse((string?)element.Attribute(NzbKeywords.Bytes), out var size))
-        {
-            throw new InvalidNzbDataException(Resources.Nzb.InvalidOrMissingBytesAttribute);
-        }
-
-        return new NzbSegment(number, offset, size, element.Value);
+        return !long.TryParse((string?)element.Attribute(NzbKeywords.Bytes), out var size)
+            ? throw new InvalidNzbDataException(Resources.Nzb.InvalidOrMissingBytesAttribute)
+            : new NzbSegment(number, offset, size, element.Value);
     }
 }
