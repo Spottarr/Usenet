@@ -36,7 +36,7 @@ internal static class Guard
     /// <param name="name">The name of the string</param>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
     /// <exception cref="ArgumentException">ArgumentException</exception>
-    public static void ThrowIfNullOrEmpty([NotNull] string str, string name)
+    public static void ThrowIfNullOrEmpty(string str, string name)
     {
 #if NET8_0_OR_GREATER
         ArgumentException.ThrowIfNullOrEmpty(str, name);
@@ -55,7 +55,7 @@ internal static class Guard
     /// <param name="name">The name of the string</param>
     /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
     /// <exception cref="ArgumentException">ArgumentException</exception>
-    public static void ThrowIfNullOrWhiteSpace([NotNull] string str, string name)
+    public static void ThrowIfNullOrWhiteSpace(string str, string name)
     {
 #if NET8_0_OR_GREATER
         ArgumentException.ThrowIfNullOrWhiteSpace(str, name);
