@@ -50,7 +50,7 @@ public class NntpArticleBuilder
     {
         Guard.ThrowIfNull(article);
 
-        _messageId = new(article.MessageId.Value);
+        _messageId = new NntpMessageId(article.MessageId.Value);
         _groupsBuilder = new NntpGroupsBuilder().Add(article.Groups);
         _headers = [];
         _from = string.Empty;
@@ -328,13 +328,13 @@ public class NntpArticleBuilder
         _headers.Add(NntpHeaders.From, _from);
         _headers.Add(NntpHeaders.Subject, _subject);
 
-        if (_dateTime.HasValue)
-        {
-            var formattedDate = _dateTime
-                .Value.ToUniversalTime()
-                .ToString(DateFormat, CultureInfo.InvariantCulture);
-            _headers.Add(NntpHeaders.Date, $"{formattedDate} +0000");
-        }
+        if (!_dateTime.HasValue)
+            return new NntpArticle(0, _messageId, groups, _headers, _body);
+
+        var formattedDate = _dateTime
+            .Value.ToUniversalTime()
+            .ToString(DateFormat, CultureInfo.InvariantCulture);
+        _headers.Add(NntpHeaders.Date, $"{formattedDate} +0000");
 
         return new NntpArticle(0, _messageId, groups, _headers, _body);
     }
