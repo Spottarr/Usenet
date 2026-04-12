@@ -13,7 +13,7 @@ internal sealed class NzbFileTests
                 "fileName1",
                 new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                 "group1;group2",
-                null!
+                []
             ),
             new NzbFile(
                 "poster",
@@ -21,7 +21,7 @@ internal sealed class NzbFileTests
                 "fileName1",
                 new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                 "group1;group2",
-                null!
+                []
             )
         );
 
@@ -92,7 +92,7 @@ internal sealed class NzbFileTests
                 "fileName",
                 new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                 "group1;group2",
-                null!
+                []
             ),
             new NzbFile(
                 "blabla",
@@ -100,7 +100,7 @@ internal sealed class NzbFileTests
                 "fileName",
                 new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                 "group1;group2",
-                null!
+                []
             )
         );
 
@@ -111,7 +111,7 @@ internal sealed class NzbFileTests
                 "fileName",
                 new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                 "group1;group2",
-                null!
+                []
             ),
             new NzbFile(
                 "poster",
@@ -119,7 +119,7 @@ internal sealed class NzbFileTests
                 "fileName",
                 new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                 "group1;group2",
-                null!
+                []
             )
         );
 
@@ -130,7 +130,7 @@ internal sealed class NzbFileTests
                 "fileName",
                 new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                 "group1;group2",
-                null!
+                []
             ),
             new NzbFile(
                 "poster",
@@ -138,7 +138,7 @@ internal sealed class NzbFileTests
                 "blabla",
                 new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                 "group1;group2",
-                null!
+                []
             )
         );
 
@@ -149,7 +149,7 @@ internal sealed class NzbFileTests
                 "fileName",
                 new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                 "group1;group2",
-                null!
+                []
             ),
             new NzbFile(
                 "poster",
@@ -157,7 +157,7 @@ internal sealed class NzbFileTests
                 "fileName",
                 DateTimeOffset.MinValue,
                 "group1;group2",
-                null!
+                []
             )
         );
 
@@ -168,7 +168,7 @@ internal sealed class NzbFileTests
                 "fileName",
                 new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                 "group1;group2",
-                null!
+                []
             ),
             new NzbFile(
                 "poster",
@@ -176,7 +176,7 @@ internal sealed class NzbFileTests
                 "fileName",
                 new DateTimeOffset(2017, 12, 8, 22, 44, 0, TimeSpan.Zero),
                 "blabla",
-                null!
+                []
             )
         );
 
