@@ -4,12 +4,12 @@
 /// yEnc line decoder.
 /// Based on Kristian Hellang's yEnc project https://github.com/khellang/yEnc.
 /// </summary>
-internal class YencLineDecoder
+internal static class YencLineDecoder
 {
     public static int Decode(byte[] encodedBytes, byte[] decodedBytes, int decodedOffset) =>
         Decode(encodedBytes, 0, encodedBytes.Length, decodedBytes, decodedOffset);
 
-    public static int Decode(
+    private static int Decode(
         byte[] encodedBytes,
         int encodedOffset,
         int encodedCount,
