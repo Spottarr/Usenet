@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Usenet.Extensions;
 using Usenet.Nntp.Contracts;
@@ -7,6 +8,7 @@ using Usenet.Util.Compatibility;
 namespace Usenet.Nntp;
 
 /// <inheritdoc />
+[PublicAPI]
 public sealed class NntpClientPool : INntpClientPool
 {
 #if NET9_0_OR_GREATER

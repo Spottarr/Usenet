@@ -1,8 +1,11 @@
-﻿namespace Usenet.Nntp;
+﻿using JetBrains.Annotations;
+
+namespace Usenet.Nntp;
 
 /// <summary>
 /// Defines NNTP <a href="https://tools.ietf.org/html/rfc5536#section-3">news header fields</a>.
 /// </summary>
+[PublicAPI]
 public static class NntpHeaders
 {
     /// <summary>

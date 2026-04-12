@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using Usenet.Util;
 
 namespace Usenet.Nntp.Models;
@@ -5,6 +6,7 @@ namespace Usenet.Nntp.Models;
 /// <summary>
 /// Represents an NNTP datetime object.
 /// </summary>
+[PublicAPI]
 public class NntpDateTime : IEquatable<NntpDateTime>
 {
     /// <summary>

@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using JetBrains.Annotations;
 using Usenet.Exceptions;
 using Usenet.Extensions;
 using Usenet.Nntp.Models;
@@ -13,6 +14,7 @@ namespace Usenet.Nzb;
 /// It takes an xml string as input and parses it into an instance of the <see cref="NzbDocument"/> class.
 /// Based on Kristian Hellang's Nzb project https://github.com/khellang/Nzb.
 /// </summary>
+[PublicAPI]
 public static class NzbParser
 {
     private static readonly Regex FileNameRegex = new("\"([^\"]*)\"", RegexOptions.Compiled);

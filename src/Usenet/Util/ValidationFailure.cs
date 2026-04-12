@@ -1,10 +1,12 @@
-﻿using Usenet.Extensions;
+﻿using JetBrains.Annotations;
+using Usenet.Extensions;
 
 namespace Usenet.Util;
 
 /// <summary>
 /// Represents a validation failure.
 /// </summary>
+[PublicAPI]
 public class ValidationFailure
 {
     /// <summary>

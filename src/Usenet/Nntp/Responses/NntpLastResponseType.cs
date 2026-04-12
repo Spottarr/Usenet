@@ -1,9 +1,12 @@
-﻿namespace Usenet.Nntp.Responses;
+﻿using JetBrains.Annotations;
+
+namespace Usenet.Nntp.Responses;
 
 /// <summary>
 /// Represents all possible response codes for the
 /// <a href="https://tools.ietf.org/html/rfc3977#section-6.1.3">LAST</a> command.
 /// </summary>
+[PublicAPI]
 public enum NntpLastResponseType
 {
     /// <summary>

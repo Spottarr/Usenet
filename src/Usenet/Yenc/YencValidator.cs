@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using Usenet.Util;
 
 namespace Usenet.Yenc;
@@ -6,6 +7,7 @@ namespace Usenet.Yenc;
 /// Represents a yEnc-encoded article validator.
 /// Based on Kristian Hellang's yEnc project https://github.com/khellang/yEnc.
 /// </summary>
+[PublicAPI]
 public static class YencValidator
 {
     /// <summary>

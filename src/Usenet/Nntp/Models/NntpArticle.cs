@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using JetBrains.Annotations;
 using Usenet.Util;
 using HashCode = Usenet.Util.HashCode;
 
@@ -7,6 +8,7 @@ namespace Usenet.Nntp.Models;
 /// <summary>
 /// Represents an NNTP article.
 /// </summary>
+[PublicAPI]
 public class NntpArticle : IEquatable<NntpArticle>
 {
     /// <summary>

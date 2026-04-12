@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Xml;
+using JetBrains.Annotations;
 using Usenet.Util;
 
 namespace Usenet.Nzb;
@@ -7,6 +8,7 @@ namespace Usenet.Nzb;
 /// <summary>
 /// Represents an NZB document writer.
 /// </summary>
+[PublicAPI]
 public class NzbWriter
 {
     private readonly TextWriter _textWriter;

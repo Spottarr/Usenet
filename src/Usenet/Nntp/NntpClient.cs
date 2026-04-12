@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using Usenet.Extensions;
 using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
@@ -16,6 +17,7 @@ namespace Usenet.Nntp;
 /// <a href="https://tools.ietf.org/html/rfc6048">RFC 6048</a>.
 /// Based on Kristian Hellang's NntpLib.Net project https://github.com/khellang/NntpLib.Net.
 /// </summary>
+[PublicAPI]
 public partial class NntpClient : INntpClient
 {
     private readonly INntpConnection _connection;

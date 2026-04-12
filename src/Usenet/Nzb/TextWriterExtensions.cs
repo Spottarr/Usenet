@@ -1,8 +1,11 @@
+using JetBrains.Annotations;
+
 namespace Usenet.Nzb;
 
 /// <summary>
 /// TextWriter extension methods.
 /// </summary>
+[PublicAPI]
 public static class TextWriterExtensions
 {
     /// <summary>

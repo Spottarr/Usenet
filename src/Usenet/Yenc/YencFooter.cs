@@ -1,9 +1,12 @@
-﻿namespace Usenet.Yenc;
+﻿using JetBrains.Annotations;
+
+namespace Usenet.Yenc;
 
 /// <summary>
 /// Represents the yEnc footer (=yend) line.
 /// Based on Kristian Hellang's yEnc project https://github.com/khellang/yEnc.
 /// </summary>
+[PublicAPI]
 public class YencFooter
 {
     /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using JetBrains.Annotations;
 using Usenet.Nntp.Models;
 
 namespace Usenet.Nntp.Responses;
@@ -11,6 +12,7 @@ namespace Usenet.Nntp.Responses;
 /// <a href="https://tools.ietf.org/html/rfc2980#section-2.1.2">ad 2</a>) and
 /// <a href="https://tools.ietf.org/html/rfc3977#section-7.3">NEWGROUPS</a> commands.
 /// </summary>
+[PublicAPI]
 public class NntpGroupsResponse : NntpResponse
 {
     /// <summary>

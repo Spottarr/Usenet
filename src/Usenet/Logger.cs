@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Usenet;
@@ -7,6 +8,7 @@ namespace Usenet;
 /// Host for a singleton <see cref="ILoggerFactory"/>
 /// (<a href="https://stackify.com/net-core-loggerfactory-use-correctly/">Source</a>).
 /// </summary>
+[PublicAPI]
 public static class Logger
 {
     /// <summary>
