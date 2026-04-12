@@ -650,9 +650,8 @@ Usenet.Util.ValidationFailure.Data.get -> object?
 Usenet.Util.ValidationFailure.Message.get -> string!
 Usenet.Util.ValidationFailure.ValidationFailure(string! code, string! message, object? data = null) -> void
 Usenet.Util.ValidationResult
-Usenet.Util.ValidationResult.Failures.get -> System.Collections.Generic.IList<Usenet.Util.ValidationFailure!>!
+Usenet.Util.ValidationResult.Failures.get -> System.Collections.Generic.IReadOnlyList<Usenet.Util.ValidationFailure!>!
 Usenet.Util.ValidationResult.IsValid.get -> bool
-Usenet.Util.ValidationResult.ValidationResult(System.Collections.Generic.IList<Usenet.Util.ValidationFailure!>! failures) -> void
 Usenet.Yenc.YencArticle
 Usenet.Yenc.YencArticle.Data.get -> System.Collections.Generic.IReadOnlyList<byte>!
 Usenet.Yenc.YencArticle.Footer.get -> Usenet.Yenc.YencFooter?
