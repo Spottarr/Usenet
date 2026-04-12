@@ -346,7 +346,6 @@ Usenet.Nntp.Models.NntpGroup.Equals(Usenet.Nntp.Models.NntpGroup? other) -> bool
 Usenet.Nntp.Models.NntpGroup.HighWaterMark.get -> long
 Usenet.Nntp.Models.NntpGroup.LowWaterMark.get -> long
 Usenet.Nntp.Models.NntpGroup.Name.get -> string!
-Usenet.Nntp.Models.NntpGroup.NntpGroup(string! name, long articleCount, long lowWaterMark, long highWaterMark, Usenet.Nntp.Models.NntpPostingStatus postingStatus, string! otherGroup, System.Collections.Immutable.IImmutableList<long>! articleNumbers) -> void
 Usenet.Nntp.Models.NntpGroup.OtherGroup.get -> string!
 Usenet.Nntp.Models.NntpGroup.PostingStatus.get -> Usenet.Nntp.Models.NntpPostingStatus
 Usenet.Nntp.Models.NntpGroupOrigin
@@ -358,8 +357,6 @@ Usenet.Nntp.Models.NntpGroups
 Usenet.Nntp.Models.NntpGroups.Equals(Usenet.Nntp.Models.NntpGroups? other) -> bool
 Usenet.Nntp.Models.NntpGroups.GetEnumerator() -> System.Collections.Generic.IEnumerator<string!>!
 Usenet.Nntp.Models.NntpGroups.IsEmpty.get -> bool
-Usenet.Nntp.Models.NntpGroups.NntpGroups(string! groups) -> void
-Usenet.Nntp.Models.NntpGroups.NntpGroups(System.Collections.Generic.IEnumerable<string!>! groups) -> void
 Usenet.Nntp.Models.NntpMessageId
 Usenet.Nntp.Models.NntpMessageId.Equals(Usenet.Nntp.Models.NntpMessageId? other) -> bool
 Usenet.Nntp.Models.NntpMessageId.HasValue.get -> bool
