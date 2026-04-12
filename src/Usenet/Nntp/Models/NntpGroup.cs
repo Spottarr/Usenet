@@ -57,7 +57,7 @@ public class NntpGroup : IEquatable<NntpGroup>
     /// <param name="otherGroup">The name of the other <see cref="NntpGroup"/> under which the articles are filed when the
     /// <see cref="PostingStatus"/> is <see cref="NntpPostingStatus.OnlyArticlesFromPeersPermittedFiledLocally"/>.</param>
     /// <param name="articleNumbers">A list of <see cref="NntpArticle"/> numbers in the <see cref="NntpGroup"/>.</param>
-    public NntpGroup(
+    internal NntpGroup(
         string name,
         long articleCount,
         long lowWaterMark,
@@ -67,15 +67,15 @@ public class NntpGroup : IEquatable<NntpGroup>
         IImmutableList<long> articleNumbers
     )
     {
-        Name = name ?? string.Empty;
+        Name = name;
         ArticleCount = articleCount;
         LowWaterMark = lowWaterMark;
         HighWaterMark = highWaterMark;
         PostingStatus = EnumShim.IsDefined(postingStatus)
             ? postingStatus
             : NntpPostingStatus.Unknown;
-        OtherGroup = otherGroup ?? string.Empty;
-        ArticleNumbers = (articleNumbers ?? []).OrderBy(n => n).ToImmutableList();
+        OtherGroup = otherGroup;
+        ArticleNumbers = articleNumbers.OrderBy(n => n).ToImmutableList();
     }
 
     /// <summary>
