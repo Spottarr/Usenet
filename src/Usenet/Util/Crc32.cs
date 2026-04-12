@@ -14,11 +14,10 @@ internal static class Crc32
     {
         Guard.ThrowIfNull(buffer);
 
-        var value = Seed;
-        foreach (var b in buffer)
-        {
-            value = (value >> 8) ^ LookupTable[(value & 0xFF) ^ b];
-        }
+        var value = buffer.Aggregate(
+            Seed,
+            (current, b) => (current >> 8) ^ LookupTable[(current & 0xFF) ^ b]
+        );
 
         return value ^ Seed;
     }
