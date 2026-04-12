@@ -42,25 +42,23 @@ public class NntpArticle : IEquatable<NntpArticle>
     /// <param name="groups">The NNTP newsgroups this <see cref="NntpArticle"/> is posted in.</param>
     /// <param name="headers">The headers of the <see cref="NntpArticle"/>.</param>
     /// <param name="body">The body of the <see cref="NntpArticle"/>.</param>
-    public NntpArticle(
+    internal NntpArticle(
         long number,
-        NntpMessageId? messageId,
-        NntpGroups? groups,
-        IDictionary<string, ICollection<string>>? headers,
-        IList<string>? body
+        NntpMessageId messageId,
+        NntpGroups groups,
+        IDictionary<string, ICollection<string>> headers,
+        IList<string> body
     )
     {
         Number = number;
-        MessageId = messageId ?? NntpMessageId.Empty;
-        Groups = groups ?? NntpGroups.Empty;
-        Headers = (
-            headers ?? MultiValueDictionary<string, string>.EmptyIgnoreCase
-        ).ToImmutableDictionary(
+        MessageId = messageId;
+        Groups = groups;
+        Headers = headers.ToImmutableDictionary(
             x => x.Key,
             x => x.Value.ToImmutableList(),
             keyComparer: StringComparer.OrdinalIgnoreCase
         );
-        Body = (body ?? []).ToImmutableList();
+        Body = body.ToImmutableList();
     }
 
     /// <summary>
