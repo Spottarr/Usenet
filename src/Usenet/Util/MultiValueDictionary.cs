@@ -5,7 +5,7 @@ namespace Usenet.Util;
 /// </summary>
 /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
 /// <typeparam name="TValue">The type of values in the dictionary.</typeparam>
-internal class MultiValueDictionary<TKey, TValue>
+internal sealed class MultiValueDictionary<TKey, TValue>
     : Dictionary<TKey, ICollection<TValue>>,
         IEquatable<MultiValueDictionary<TKey, TValue>>
     where TKey : notnull
@@ -58,7 +58,7 @@ internal class MultiValueDictionary<TKey, TValue>
     /// </summary>
     /// <param name="key">The key of the element to add.</param>
     /// <param name="value">The value of the element to add.</param>
-    public virtual void Add(TKey key, TValue value)
+    public void Add(TKey key, TValue value)
     {
         if (!TryGetValue(key, out var values))
         {
@@ -75,7 +75,7 @@ internal class MultiValueDictionary<TKey, TValue>
     /// <param name="key">The key of the element to remove.</param>
     /// <param name="value">The value of the element to remove.</param>
     /// <returns>true if the element is successfully found and removed; otherwise, false.</returns>
-    public virtual bool Remove(TKey key, TValue value)
+    public bool Remove(TKey key, TValue value)
     {
         if (!TryGetValue(key, out var values))
             return false;
