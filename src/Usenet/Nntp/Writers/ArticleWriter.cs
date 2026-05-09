@@ -4,7 +4,7 @@ using Usenet.Util.Compatibility;
 
 namespace Usenet.Nntp.Writers;
 
-internal class ArticleWriter
+internal static class ArticleWriter
 {
     private const int MaxHeaderLength = 998;
 
