@@ -163,7 +163,8 @@ public class NntpArticleBuilder
     /// <returns>The <see cref="NntpArticleBuilder"/> so that additional calls can be chained.</returns>
     public NntpArticleBuilder SetFrom(string value)
     {
-        _from = value.ThrowIfNullOrWhiteSpace(nameof(value));
+        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+        _from = value;
         return this;
     }
 
@@ -174,7 +175,8 @@ public class NntpArticleBuilder
     /// <returns>The <see cref="NntpArticleBuilder"/> so that additional calls can be chained.</returns>
     public NntpArticleBuilder SetSubject(string value)
     {
-        _subject = value.ThrowIfNullOrWhiteSpace(nameof(value));
+        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+        _subject = value;
         return this;
     }
 

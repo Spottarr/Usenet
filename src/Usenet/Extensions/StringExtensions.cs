@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Usenet.Util;
 
 namespace Usenet.Extensions;
 
@@ -9,20 +8,6 @@ namespace Usenet.Extensions;
 internal static class StringExtensions
 {
     private static readonly Regex WhitespaceRegex = new(@"\s+", RegexOptions.Compiled);
-
-    /// <summary>
-    /// Throws an <exception cref="ArgumentNullException">ArgumentNullException</exception> if the specified string is null.
-    /// Throws an <exception cref="ArgumentException">ArgumentException</exception> if the specified string is empty or if it consists only of white-space characters.
-    /// </summary>
-    /// <param name="str">The string to check</param>
-    /// <param name="name">The name of the string</param>
-    /// <exception cref="ArgumentNullException">ArgumentNullException</exception>
-    /// <exception cref="ArgumentException">ArgumentException</exception>
-    public static string ThrowIfNullOrWhiteSpace(this string str, string name)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(str, name);
-        return str;
-    }
 
     /// <summary>
     /// Converts a string safely to an integer. If the string does not represent a valid integer the result is null.
