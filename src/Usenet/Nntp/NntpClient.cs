@@ -149,10 +149,7 @@ public partial class NntpClient : INntpClient
     }
 
     /// <inheritdoc />
-    public Task<NntpGroupResponse> ListGroupAsync(
-        string group,
-        CancellationToken cancellationToken
-    )
+    public Task<NntpGroupResponse> ListGroupAsync(string group, CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(group);
         return Connection.MultiLineCommandAsync(
