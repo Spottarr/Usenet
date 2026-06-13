@@ -5,7 +5,6 @@ using Usenet.Exceptions;
 using Usenet.Extensions;
 using Usenet.Nntp.Models;
 using Usenet.Util;
-using Usenet.Util.Compatibility;
 
 namespace Usenet.Nzb;
 
@@ -44,8 +43,8 @@ public static class NzbParser
     {
         Guard.ThrowIfNull(text);
 
-        var doc = await XDocumentShims
-            .LoadAsync(new StringReader(text), cancellationToken)
+        var doc = await XDocument
+            .LoadAsync(new StringReader(text), LoadOptions.None, cancellationToken)
             .ConfigureAwait(false);
         return ParseDocument(doc);
     }
@@ -75,7 +74,9 @@ public static class NzbParser
     {
         Guard.ThrowIfNull(stream);
 
-        var doc = await XDocumentShims.LoadAsync(stream, cancellationToken).ConfigureAwait(false);
+        var doc = await XDocument
+            .LoadAsync(stream, LoadOptions.None, cancellationToken)
+            .ConfigureAwait(false);
         return ParseDocument(doc);
     }
 
@@ -104,7 +105,9 @@ public static class NzbParser
     {
         Guard.ThrowIfNull(reader);
 
-        var doc = await XDocumentShims.LoadAsync(reader, cancellationToken).ConfigureAwait(false);
+        var doc = await XDocument
+            .LoadAsync(reader, LoadOptions.None, cancellationToken)
+            .ConfigureAwait(false);
         return ParseDocument(doc);
     }
 

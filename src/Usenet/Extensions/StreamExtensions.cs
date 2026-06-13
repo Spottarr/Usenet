@@ -29,11 +29,6 @@ internal static class StreamExtensions
         CancellationToken cancellationToken
     )
     {
-#if NETSTANDARD2_0
-        cancellationToken.ThrowIfCancellationRequested();
-        return new ValueTask<int>(stream.ReadAsync(buffer, 0, 1, cancellationToken));
-#else
         return stream.ReadAsync(buffer.AsMemory(0, 1), cancellationToken);
-#endif
     }
 }

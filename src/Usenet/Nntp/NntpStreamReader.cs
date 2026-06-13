@@ -56,20 +56,11 @@ internal class NntpStreamReader : StreamReader
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>The next line from the input stream, or null if the end of the input stream is reached.</returns>
-#if NET8_0_OR_GREATER
     public override async ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
     {
         var line = await base.ReadLineAsync(cancellationToken).ConfigureAwait(false);
         return ProcessLine(line);
     }
-#else
-    public async Task<string?> ReadLineAsync(CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        var line = await base.ReadLineAsync().ConfigureAwait(false);
-        return ProcessLine(line);
-    }
-#endif
 
     private static string? ProcessLine(string? line)
     {

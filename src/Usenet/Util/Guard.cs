@@ -20,12 +20,7 @@ internal static class Guard
         [CallerArgumentExpression(nameof(obj))] string? name = null
     )
     {
-#if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(obj, name);
-#else
-        if (obj == null)
-            throw new ArgumentNullException(name, Resources.Util.NullValueNotAllowed);
-#endif
     }
 
     /// <summary>
@@ -38,13 +33,7 @@ internal static class Guard
     /// <exception cref="ArgumentException">ArgumentException</exception>
     public static void ThrowIfNullOrEmpty(string str, string name)
     {
-#if NET8_0_OR_GREATER
         ArgumentException.ThrowIfNullOrEmpty(str, name);
-#else
-        ThrowIfNull(str, name);
-        if (str.Length == 0)
-            throw new ArgumentException(Resources.Util.EmptyStringNotAllowed, name);
-#endif
     }
 
     /// <summary>
@@ -57,13 +46,7 @@ internal static class Guard
     /// <exception cref="ArgumentException">ArgumentException</exception>
     public static void ThrowIfNullOrWhiteSpace(string str, string name)
     {
-#if NET8_0_OR_GREATER
         ArgumentException.ThrowIfNullOrWhiteSpace(str, name);
-#else
-        ThrowIfNullOrEmpty(str, name);
-        if (string.IsNullOrWhiteSpace(str))
-            throw new ArgumentException(Resources.Util.OnlyWhiteSpaceCharactersNotAllowed, name);
-#endif
     }
 
     /// <summary>
@@ -74,11 +57,6 @@ internal static class Guard
     /// <exception cref="ArgumentOutOfRangeException">ArgumentOutOfRangeException</exception>
     public static void ThrowIfNegativeOrZero(long value, string paramName)
     {
-#if NET8_0_OR_GREATER
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value, paramName);
-#else
-        if (value <= 0)
-            throw new ArgumentOutOfRangeException(paramName);
-#endif
     }
 }

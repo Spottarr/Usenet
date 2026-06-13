@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Usenet.Extensions;
 using Usenet.Nntp.Contracts;
 using Usenet.Util;
-using Usenet.Util.Compatibility;
 
 namespace Usenet.Nntp;
 
@@ -75,7 +74,7 @@ public sealed class NntpClientPool : INntpClientPool
 
     private async Task<IInternalPooledNntpClient> BorrowClient(CancellationToken cancellationToken)
     {
-        ObjectDisposedExceptionShims.ThrowIf(_disposed, this);
+        ObjectDisposedException.ThrowIf(_disposed, this);
 
         var success = await _semaphore
             .WaitAsync(WaitTimeout, cancellationToken)
@@ -108,7 +107,7 @@ public sealed class NntpClientPool : INntpClientPool
     internal void ReturnClient(IInternalPooledNntpClient client)
     {
         Guard.ThrowIfNull(client);
-        ObjectDisposedExceptionShims.ThrowIf(_disposed, this);
+        ObjectDisposedException.ThrowIf(_disposed, this);
 
         lock (_lock)
         {

@@ -8,11 +8,6 @@ internal static class StreamWriterExtensions
         CancellationToken cancellationToken
     )
     {
-#if NETSTANDARD2_0
-        cancellationToken.ThrowIfCancellationRequested();
-        await writer.WriteLineAsync(value).ConfigureAwait(false);
-#else
         await writer.WriteLineAsync(value.AsMemory(), cancellationToken).ConfigureAwait(false);
-#endif
     }
 }

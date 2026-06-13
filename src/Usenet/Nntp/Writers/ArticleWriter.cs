@@ -1,6 +1,5 @@
 using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
-using Usenet.Util.Compatibility;
 
 namespace Usenet.Nntp.Writers;
 
@@ -84,7 +83,7 @@ internal static class ArticleWriter
         {
             await connection
                 .WriteLineAsync(
-                    StringShims.Concat("\t".AsSpan(), line.AsSpan(0, MaxHeaderLength - 1)),
+                    string.Concat("\t".AsSpan(), line.AsSpan(0, MaxHeaderLength - 1)),
                     cancellationToken
                 )
                 .ConfigureAwait(false);
