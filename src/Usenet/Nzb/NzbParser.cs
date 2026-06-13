@@ -41,7 +41,7 @@ public static class NzbParser
         CancellationToken cancellationToken
     )
     {
-        Guard.ThrowIfNull(text);
+        ArgumentNullException.ThrowIfNull(text);
 
         var doc = await XDocument
             .LoadAsync(new StringReader(text), LoadOptions.None, cancellationToken)
@@ -72,7 +72,7 @@ public static class NzbParser
         CancellationToken cancellationToken
     )
     {
-        Guard.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(stream);
 
         var doc = await XDocument
             .LoadAsync(stream, LoadOptions.None, cancellationToken)
@@ -103,7 +103,7 @@ public static class NzbParser
         CancellationToken cancellationToken
     )
     {
-        Guard.ThrowIfNull(reader);
+        ArgumentNullException.ThrowIfNull(reader);
 
         var doc = await XDocument
             .LoadAsync(reader, LoadOptions.None, cancellationToken)

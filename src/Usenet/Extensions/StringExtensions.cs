@@ -20,7 +20,7 @@ internal static class StringExtensions
     /// <exception cref="ArgumentException">ArgumentException</exception>
     public static string ThrowIfNullOrWhiteSpace(this string str, string name)
     {
-        Guard.ThrowIfNullOrWhiteSpace(str, name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(str, name);
         return str;
     }
 

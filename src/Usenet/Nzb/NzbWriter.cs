@@ -20,7 +20,7 @@ public class NzbWriter
     /// <param name="textWriter">The <see cref="TextWriter"/> to use for writing.</param>
     public NzbWriter(TextWriter textWriter)
     {
-        Guard.ThrowIfNull(textWriter);
+        ArgumentNullException.ThrowIfNull(textWriter);
 
         _textWriter = textWriter;
     }
@@ -41,7 +41,7 @@ public class NzbWriter
     /// <returns>A <see cref="Task"/> that can be awaited.</returns>
     public async Task WriteAsync(NzbDocument nzbDocument, CancellationToken cancellationToken)
     {
-        Guard.ThrowIfNull(nzbDocument);
+        ArgumentNullException.ThrowIfNull(nzbDocument);
 
         cancellationToken.ThrowIfCancellationRequested();
 

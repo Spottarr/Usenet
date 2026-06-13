@@ -66,9 +66,9 @@ public static class YencEncoder
         CancellationToken cancellationToken
     )
     {
-        Guard.ThrowIfNull(header);
-        Guard.ThrowIfNull(stream);
-        Guard.ThrowIfNull(encoding);
+        ArgumentNullException.ThrowIfNull(header);
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(encoding);
 
         List<string> lines = [GetHeaderLine(header)];
 

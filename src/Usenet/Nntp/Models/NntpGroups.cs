@@ -26,7 +26,7 @@ public class NntpGroups : IEnumerable<string>, IEquatable<NntpGroups>
     /// </summary>
     internal NntpGroups(string groups)
     {
-        Guard.ThrowIfNull(groups);
+        ArgumentNullException.ThrowIfNull(groups);
         _groups = GroupsParser.Parse(groups).OrderBy(g => g).ToImmutableList();
     }
 
@@ -35,7 +35,7 @@ public class NntpGroups : IEnumerable<string>, IEquatable<NntpGroups>
     /// </summary>
     internal NntpGroups(IEnumerable<string> groups)
     {
-        Guard.ThrowIfNull(groups);
+        ArgumentNullException.ThrowIfNull(groups);
         _groups = GroupsParser.Parse(groups).OrderBy(g => g).ToImmutableList();
     }
 

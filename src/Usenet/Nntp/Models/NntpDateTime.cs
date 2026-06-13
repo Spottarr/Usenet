@@ -44,7 +44,7 @@ public class NntpDateTime : IEquatable<NntpDateTime>
     /// <param name="dateTime">The <see cref="NntpDateTime"/> to convert.</param>
     public static implicit operator string(NntpDateTime dateTime)
     {
-        Guard.ThrowIfNull(dateTime);
+        ArgumentNullException.ThrowIfNull(dateTime);
         return dateTime.ToString();
     }
 

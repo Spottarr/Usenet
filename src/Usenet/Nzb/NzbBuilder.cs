@@ -32,7 +32,7 @@ public class NzbBuilder
     /// <returns>The <see cref="NzbBuilder"/> so that additional calls can be chained.</returns>
     public NzbBuilder SetPoster(string value)
     {
-        Guard.ThrowIfNullOrWhiteSpace(value, nameof(value));
+        ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(value));
         _documentPoster = value;
         return this;
     }
@@ -44,7 +44,7 @@ public class NzbBuilder
     /// <returns>The <see cref="NzbBuilder"/> so that additional calls can be chained.</returns>
     public NzbBuilder SetPartSize(long value)
     {
-        Guard.ThrowIfNegativeOrZero(value, nameof(value));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value, nameof(value));
         _partSize = value;
         return this;
     }
@@ -58,7 +58,7 @@ public class NzbBuilder
     /// <returns>The <see cref="NzbBuilder"/> so that additional calls can be chained.</returns>
     public NzbBuilder SetMessageBase(string value)
     {
-        Guard.ThrowIfNullOrWhiteSpace(value, nameof(value));
+        ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(value));
         _messageBase = value;
         return this;
     }
@@ -73,7 +73,7 @@ public class NzbBuilder
     /// <returns>The <see cref="NzbBuilder"/> so that additional calls can be chained.</returns>
     public NzbBuilder AddFile(IFileInfo fileInfo, NntpGroups? groups = null, string? poster = null)
     {
-        Guard.ThrowIfNull(fileInfo);
+        ArgumentNullException.ThrowIfNull(fileInfo);
         _files.Add(new File(fileInfo, groups ?? NntpGroups.Empty, poster));
         return this;
     }
@@ -85,7 +85,7 @@ public class NzbBuilder
     /// <returns>The <see cref="NzbBuilder"/> so that additional calls can be chained.</returns>
     public NzbBuilder AddGroups(params NntpGroups[] groups)
     {
-        Guard.ThrowIfNull(groups);
+        ArgumentNullException.ThrowIfNull(groups);
         foreach (var group in groups)
         {
             _groupsBuilder.Add(group);

@@ -26,7 +26,7 @@ public class CountingStream : AbstractBaseStream
     /// <param name="innerStream">The stream on which counting needs to be enabled.</param>
     public CountingStream(Stream innerStream)
     {
-        Guard.ThrowIfNull(innerStream);
+        ArgumentNullException.ThrowIfNull(innerStream);
 
         _innerStream = innerStream;
     }
