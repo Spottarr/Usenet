@@ -33,8 +33,8 @@ public class YencArticle
     /// <param name="data">The binary data obtained by decoding the yEnc-encoded article.</param>
     public YencArticle(YencHeader header, YencFooter? footer, byte[] data)
     {
-        Guard.ThrowIfNull(header);
-        Guard.ThrowIfNull(data);
+        ArgumentNullException.ThrowIfNull(header);
+        ArgumentNullException.ThrowIfNull(data);
 
         Header = header;
         Footer = footer;

@@ -12,7 +12,7 @@ internal static class Crc32
 
     public static uint CalculateChecksum(IEnumerable<byte> buffer)
     {
-        Guard.ThrowIfNull(buffer);
+        ArgumentNullException.ThrowIfNull(buffer);
 
         var value = buffer.Aggregate(
             Seed,

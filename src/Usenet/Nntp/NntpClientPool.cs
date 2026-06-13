@@ -49,7 +49,7 @@ public sealed class NntpClientPool : INntpClientPool
         string password
     )
     {
-        Guard.ThrowIfNegativeOrZero(maxPoolSize, nameof(maxPoolSize));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxPoolSize, nameof(maxPoolSize));
 
         _semaphore = new SemaphoreSlim(maxPoolSize, maxPoolSize);
 
@@ -106,7 +106,7 @@ public sealed class NntpClientPool : INntpClientPool
 
     internal void ReturnClient(IInternalPooledNntpClient client)
     {
-        Guard.ThrowIfNull(client);
+        ArgumentNullException.ThrowIfNull(client);
         ObjectDisposedException.ThrowIf(_disposed, this);
 
         lock (_lock)

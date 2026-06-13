@@ -20,8 +20,8 @@ internal static class NntpMessageIdExtensions
     /// <exception cref="ArgumentException"></exception>
     public static NntpMessageId ThrowIfNullOrWhiteSpace(this NntpMessageId messageId, string name)
     {
-        Guard.ThrowIfNull(messageId, name);
-        Guard.ThrowIfNullOrWhiteSpace(messageId.Value, name);
+        ArgumentNullException.ThrowIfNull(messageId, name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(messageId.Value, name);
         return messageId;
     }
 }

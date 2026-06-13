@@ -28,7 +28,7 @@ public partial class NntpClient : INntpClient
     /// <param name="connection">The connection to use.</param>
     public NntpClient(INntpConnection connection)
     {
-        Guard.ThrowIfNull(connection);
+        ArgumentNullException.ThrowIfNull(connection);
         Connection = connection;
     }
 
@@ -58,7 +58,7 @@ public partial class NntpClient : INntpClient
         CancellationToken cancellationToken
     )
     {
-        Guard.ThrowIfNullOrWhiteSpace(hostname, nameof(hostname));
+        ArgumentException.ThrowIfNullOrWhiteSpace(hostname, nameof(hostname));
         var response = await Connection
             .ConnectAsync(hostname, port, useSsl, new ResponseParser(200, 201), cancellationToken)
             .ConfigureAwait(false);
@@ -72,7 +72,7 @@ public partial class NntpClient : INntpClient
         CancellationToken cancellationToken
     )
     {
-        Guard.ThrowIfNullOrWhiteSpace(username, nameof(username));
+        ArgumentException.ThrowIfNullOrWhiteSpace(username, nameof(username));
         var userResponse = await Connection
             .CommandAsync($"AUTHINFO USER {username}", new ResponseParser(281), cancellationToken)
             .ConfigureAwait(false);

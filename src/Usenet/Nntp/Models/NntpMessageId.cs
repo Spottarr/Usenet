@@ -23,7 +23,7 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// Wrapping characters "&lt;" and "&gt;" will be stripped.</param>
     public NntpMessageId(string value)
     {
-        Guard.ThrowIfNull(value);
+        ArgumentNullException.ThrowIfNull(value);
         Value = value.TrimStart('<').TrimEnd('>').Pack();
     }
 
@@ -49,7 +49,7 @@ public class NntpMessageId : IEquatable<NntpMessageId>
     /// <param name="messageId">The <see cref="NntpMessageId"/> to convert.</param>
     public static implicit operator string(NntpMessageId messageId)
     {
-        Guard.ThrowIfNull(messageId);
+        ArgumentNullException.ThrowIfNull(messageId);
         return messageId.ToString();
     }
 

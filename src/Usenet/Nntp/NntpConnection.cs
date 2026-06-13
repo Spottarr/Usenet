@@ -54,7 +54,7 @@ public sealed partial class NntpConnection : INntpConnection
     )
     {
         ThrowIfNotConnected();
-        Guard.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(command);
 
         var logCommand = command.StartsWith(AuthInfoPass, StringComparison.Ordinal)
             ? $"{AuthInfoPass} [REDACTED]"
@@ -72,7 +72,7 @@ public sealed partial class NntpConnection : INntpConnection
     )
     {
         ThrowIfNotConnected();
-        Guard.ThrowIfNull(parser);
+        ArgumentNullException.ThrowIfNull(parser);
 
         var response = await CommandAsync(command, new ResponseParser(), cancellationToken)
             .ConfigureAwait(false);
@@ -93,7 +93,7 @@ public sealed partial class NntpConnection : INntpConnection
     )
     {
         ThrowIfNotConnected();
-        Guard.ThrowIfNull(parser);
+        ArgumentNullException.ThrowIfNull(parser);
 
         var responseText = await _reader!.ReadLineAsync(cancellationToken).ConfigureAwait(false);
         _log.ReceivedResponse(responseText ?? "");

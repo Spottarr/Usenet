@@ -24,9 +24,9 @@ internal static class DictionaryExtensions
         Func<string, TValue> converter
     )
     {
-        Guard.ThrowIfNull(dictionary);
-        Guard.ThrowIfNullOrEmpty(key, nameof(key));
-        Guard.ThrowIfNull(converter);
+        ArgumentNullException.ThrowIfNull(dictionary);
+        ArgumentException.ThrowIfNullOrEmpty(key, nameof(key));
+        ArgumentNullException.ThrowIfNull(converter);
 
         return dictionary.TryGetValue(key, out var stringValue) ? converter(stringValue) : default;
     }
@@ -43,8 +43,8 @@ internal static class DictionaryExtensions
         string key
     )
     {
-        Guard.ThrowIfNull(dictionary);
-        Guard.ThrowIfNullOrEmpty(key, nameof(key));
+        ArgumentNullException.ThrowIfNull(dictionary);
+        ArgumentException.ThrowIfNullOrEmpty(key, nameof(key));
 
         return dictionary.TryGetValue(key, out var value) ? value : default;
     }
@@ -64,8 +64,8 @@ internal static class DictionaryExtensions
         bool overwriteExistingKeys
     )
     {
-        Guard.ThrowIfNull(target);
-        Guard.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentNullException.ThrowIfNull(source);
 
         foreach (var item in source)
         {

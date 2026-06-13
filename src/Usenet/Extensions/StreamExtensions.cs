@@ -6,7 +6,7 @@ internal static class StreamExtensions
 {
     public static byte[] ReadAllBytes(this Stream stream)
     {
-        Guard.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(stream);
 
         if (stream.CanSeek)
         {

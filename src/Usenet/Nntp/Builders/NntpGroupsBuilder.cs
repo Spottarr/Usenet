@@ -35,7 +35,7 @@ public class NntpGroupsBuilder
     /// <returns>The <see cref="NntpGroups"/> object so that additional calls can be chained.</returns>
     public NntpGroupsBuilder Add(string value)
     {
-        Guard.ThrowIfNull(value);
+        ArgumentNullException.ThrowIfNull(value);
         AddGroups(GroupsParser.Parse(value));
         return this;
     }
@@ -47,7 +47,7 @@ public class NntpGroupsBuilder
     /// <returns>The <see cref="NntpGroups"/> object so that additional calls can be chained.</returns>
     public NntpGroupsBuilder Add(IEnumerable<string> values)
     {
-        Guard.ThrowIfNull(values);
+        ArgumentNullException.ThrowIfNull(values);
         AddGroups(GroupsParser.Parse(values));
         return this;
     }
@@ -59,7 +59,7 @@ public class NntpGroupsBuilder
     /// <returns>The <see cref="NntpGroups"/> object so that additional calls can be chained.</returns>
     public NntpGroupsBuilder Remove(string value)
     {
-        Guard.ThrowIfNull(value);
+        ArgumentNullException.ThrowIfNull(value);
         RemoveGroups(GroupsParser.Parse(value));
         return this;
     }
@@ -71,7 +71,7 @@ public class NntpGroupsBuilder
     /// <returns>The <see cref="NntpGroups"/> object so that additional calls can be chained.</returns>
     public NntpGroupsBuilder Remove(IEnumerable<string> values)
     {
-        Guard.ThrowIfNull(values);
+        ArgumentNullException.ThrowIfNull(values);
         RemoveGroups(GroupsParser.Parse(values));
         return this;
     }

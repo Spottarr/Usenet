@@ -91,8 +91,8 @@ public class NzbDocument : IEquatable<NzbDocument>
         CancellationToken cancellationToken
     )
     {
-        Guard.ThrowIfNull(stream);
-        Guard.ThrowIfNull(encoding);
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(encoding);
 
         using var reader = new StreamReader(stream, encoding);
         return await NzbParser.ParseAsync(reader, cancellationToken).ConfigureAwait(false);
