@@ -49,7 +49,7 @@ public sealed class NntpClientPool : INntpClientPool
         string password
     )
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxPoolSize, nameof(maxPoolSize));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxPoolSize);
 
         _semaphore = new SemaphoreSlim(maxPoolSize, maxPoolSize);
 

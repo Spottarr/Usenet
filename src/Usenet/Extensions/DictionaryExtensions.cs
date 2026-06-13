@@ -25,7 +25,7 @@ internal static class DictionaryExtensions
     )
     {
         ArgumentNullException.ThrowIfNull(dictionary);
-        ArgumentException.ThrowIfNullOrEmpty(key, nameof(key));
+        ArgumentException.ThrowIfNullOrEmpty(key);
         ArgumentNullException.ThrowIfNull(converter);
 
         return dictionary.TryGetValue(key, out var stringValue) ? converter(stringValue) : default;
@@ -44,7 +44,7 @@ internal static class DictionaryExtensions
     )
     {
         ArgumentNullException.ThrowIfNull(dictionary);
-        ArgumentException.ThrowIfNullOrEmpty(key, nameof(key));
+        ArgumentException.ThrowIfNullOrEmpty(key);
 
         return dictionary.TryGetValue(key, out var value) ? value : default;
     }

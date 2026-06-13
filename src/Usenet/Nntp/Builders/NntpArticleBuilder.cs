@@ -241,7 +241,7 @@ public class NntpArticleBuilder
     /// <returns>The <see cref="NntpArticleBuilder"/> so that additional calls can be chained.</returns>
     public NntpArticleBuilder AddHeader(string key, string value)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(key, nameof(key));
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
         ArgumentNullException.ThrowIfNull(value);
         if (ReservedHeaderKeys.Contains(key))
         {
@@ -261,7 +261,7 @@ public class NntpArticleBuilder
     /// <returns>The <see cref="NntpArticleBuilder"/> so that additional calls can be chained.</returns>
     public NntpArticleBuilder RemoveHeader(string key, string value)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(key, nameof(key));
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
         if (ReservedHeaderKeys.Contains(key))
         {
             throw new NntpException(Resources.Nntp.ReservedHeaderKeyNotAllowed);
