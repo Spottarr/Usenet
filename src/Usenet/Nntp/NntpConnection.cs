@@ -8,7 +8,6 @@ using Usenet.Extensions;
 using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Parsers;
 using Usenet.Util;
-using Usenet.Util.Compatibility;
 
 namespace Usenet.Nntp;
 
@@ -104,7 +103,7 @@ public sealed partial class NntpConnection : INntpConnection
             throw new NntpException("Received no response.");
         }
 
-        if (responseText.Length < 3 || !IntShims.TryParse(responseText.AsSpan(0, 3), out var code))
+        if (responseText.Length < 3 || !int.TryParse(responseText.AsSpan(0, 3), out var code))
         {
             throw new NntpException("Received invalid response.");
         }

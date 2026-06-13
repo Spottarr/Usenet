@@ -1,7 +1,6 @@
 using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
-using Usenet.Util.Compatibility;
 
 namespace Usenet.Nntp;
 
@@ -345,7 +344,7 @@ internal sealed partial class PooledNntpClient : IInternalPooledNntpClient
     {
         get
         {
-            ObjectDisposedExceptionShims.ThrowIf(_disposed, _client);
+            ObjectDisposedException.ThrowIf(_disposed, _client);
 
             if (!Connected || !Authenticated)
                 throw new InvalidOperationException("Client not connected or authenticated");

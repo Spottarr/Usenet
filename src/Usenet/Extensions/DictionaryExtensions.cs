@@ -90,21 +90,4 @@ internal static class DictionaryExtensions
     )
         where TKey : notnull =>
         multiValueDictionary.ToImmutableDictionary(x => x.Key, x => x.Value.ToImmutableHashSet());
-
-    public static bool Remove<TKey, TValue>(
-        this Dictionary<TKey, TValue> source,
-        TKey key,
-        [MaybeNullWhen(false)] out TValue value
-    )
-        where TKey : notnull
-    {
-#if NETSTANDARD2_0
-        var result = source.TryGetValue(key, out value);
-        if (result)
-            source.Remove(key);
-        return result;
-#else
-        return source.Remove(key, out value);
-#endif
-    }
 }

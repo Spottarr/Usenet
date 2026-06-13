@@ -2,7 +2,6 @@ using System.Collections.Immutable;
 using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using Usenet.Util;
-using Usenet.Util.Compatibility;
 using HashCode = Usenet.Util.HashCode;
 
 namespace Usenet.Nntp.Models;
@@ -75,9 +74,7 @@ public class NntpGroup : IEquatable<NntpGroup>
         ArticleCount = articleCount;
         LowWaterMark = lowWaterMark;
         HighWaterMark = highWaterMark;
-        PostingStatus = EnumShim.IsDefined(postingStatus)
-            ? postingStatus
-            : NntpPostingStatus.Unknown;
+        PostingStatus = Enum.IsDefined(postingStatus) ? postingStatus : NntpPostingStatus.Unknown;
         OtherGroup = otherGroup;
         ArticleNumbers = articleNumbers.OrderBy(n => n).ToImmutableList();
     }
