@@ -104,12 +104,15 @@ public partial class NntpClient : INntpClient
     public Task<NntpMultiLineResponse> CapabilitiesAsync(
         string keyword,
         CancellationToken cancellationToken
-    ) =>
-        Connection.MultiLineCommandAsync(
-            $"CAPABILITIES {keyword.ThrowIfNullOrWhiteSpace(nameof(keyword))}",
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(keyword);
+        return Connection.MultiLineCommandAsync(
+            $"CAPABILITIES {keyword}",
             new MultiLineResponseParser(101),
             cancellationToken
         );
+    }
 
     /// <inheritdoc />
     public Task<NntpModeReaderResponse> ModeReaderAsync(CancellationToken cancellationToken) =>
@@ -120,35 +123,44 @@ public partial class NntpClient : INntpClient
         Connection.CommandAsync("QUIT", new ResponseParser(205), cancellationToken);
 
     /// <inheritdoc />
-    public Task<NntpGroupResponse> GroupAsync(string group, CancellationToken cancellationToken) =>
-        Connection.CommandAsync(
-            $"GROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))}",
+    public Task<NntpGroupResponse> GroupAsync(string group, CancellationToken cancellationToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(group);
+        return Connection.CommandAsync(
+            $"GROUP {group}",
             new GroupResponseParser(),
             cancellationToken
         );
+    }
 
     /// <inheritdoc />
     public Task<NntpGroupResponse> ListGroupAsync(
         string group,
         NntpArticleRange range,
         CancellationToken cancellationToken
-    ) =>
-        Connection.MultiLineCommandAsync(
-            $"LISTGROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))} {range}",
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(group);
+        return Connection.MultiLineCommandAsync(
+            $"LISTGROUP {group} {range}",
             new ListGroupResponseParser(),
             cancellationToken
         );
+    }
 
     /// <inheritdoc />
     public Task<NntpGroupResponse> ListGroupAsync(
         string group,
         CancellationToken cancellationToken
-    ) =>
-        Connection.MultiLineCommandAsync(
-            $"LISTGROUP {group.ThrowIfNullOrWhiteSpace(nameof(group))}",
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(group);
+        return Connection.MultiLineCommandAsync(
+            $"LISTGROUP {group}",
             new ListGroupResponseParser(),
             cancellationToken
         );
+    }
 
     /// <inheritdoc />
     public Task<NntpGroupResponse> ListGroupAsync(CancellationToken cancellationToken) =>

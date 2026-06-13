@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using Usenet.Extensions;
 
 namespace Usenet.Util;
 
@@ -32,7 +31,8 @@ public class ValidationFailure
     /// <param name="data">A data object containing information about the validation failure.</param>
     internal ValidationFailure(string code, string message, object? data = null)
     {
-        Code = code.ThrowIfNullOrWhiteSpace(nameof(code));
+        ArgumentException.ThrowIfNullOrWhiteSpace(code);
+        Code = code;
         Message = message;
         Data = data;
     }
