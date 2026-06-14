@@ -41,6 +41,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Collections.Immutable" />
+    <PackageReference Include="System.IO.Hashing" />
     <PackageReference Include="System.Linq.Async" Condition="'$(TargetFramework)' == 'net8.0'" />
     <PackageReference Include="System.Text.Json" />
   </ItemGroup>
