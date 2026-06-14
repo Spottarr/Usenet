@@ -56,3 +56,24 @@ segment-loop level — one part in memory at a time, never a whole multi-segment
 - `PipeReader` drives the underlying stream's `ReadAsync`, so byte-counting can no longer
   rely on a sync-`Read`-only `CountingStream` wrapper; counting moves to the pipe layer or
   gains proper async overrides.
+
+## Measured outcomes
+
+Recorded after the rebuild landed (#122). BenchmarkDotNet `ShortRun`, .NET 10, on a single
+64 KiB part; allocations are deterministic across runs, the times are indicative (dev
+hardware, noisy short job). The allocation win — not the wall-clock time — is the point.
+
+| Path | Method | Allocated | vs baseline |
+|------|--------|----------:|------------:|
+| yEnc decode (text, baseline) | `YencArticleDecoder.Decode(lines)` | 143.29 KB | 1.00× |
+| yEnc decode (bytes → pooled `Data`) | `YencDecoder.Decode(bytes)` | **2.19 KB** | 0.02× |
+| yEnc encode (text, baseline) | `EncodeAsync` → `List<string>` | 416.2 KB | 1.00× |
+| yEnc encode (bytes → `IBufferWriter`) | `EncodeAsync` → sink | **920 B** | 0.002× |
+
+The decoded `Data` and the encode sink draw from `ArrayPool<byte>`, so the residual managed
+allocation is just per-call objects, not the payload. The byte decode path is *slower* in
+wall-clock (~171 µs vs ~63 µs) because it also verifies the part `pcrc32` in the same pass;
+that is an accepted trade for the ~98% allocation drop and is dwarfed by network cost.
+
+A `GC.GetAllocatedBytesForCurrentThread()` ceiling on a full part decode is wired into the
+TUnit suite (`YencDecoderAllocationTests`) so a regression back to per-line strings fails CI.
