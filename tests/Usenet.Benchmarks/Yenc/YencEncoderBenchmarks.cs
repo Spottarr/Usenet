@@ -1,17 +1,16 @@
 using System.Buffers;
 using BenchmarkDotNet.Attributes;
-using Usenet.Util;
 using Usenet.Yenc;
 
 namespace Usenet.Benchmarks.Yenc;
 
 /// <summary>
-/// Benchmarks the yEnc encode and decode hot paths. Both operate on a single
-/// in-memory part so the numbers reflect raw codec throughput and allocations,
-/// not stream or socket overhead.
+/// Benchmarks the yEnc encode hot path. Both methods operate on a single in-memory
+/// part so the numbers reflect raw codec throughput and allocations, not stream or
+/// socket overhead.
 /// </summary>
 [MemoryDiagnoser]
-public class YencBenchmarks
+public class YencEncoderBenchmarks
 {
     private const int LineLength = 128;
 
@@ -20,12 +19,10 @@ public class YencBenchmarks
 
     private byte[] _data = [];
     private YencHeader _header = null!;
-    private List<string> _encodedLines = [];
     private ArrayBufferWriter<byte> _writer = null!;
-    private byte[] _encodedBytes = [];
 
     [GlobalSetup]
-    public async Task Setup()
+    public void Setup()
     {
         _data = new byte[PartSize];
         // Deterministic, reasonably "binary looking" payload so the encoder hits
@@ -36,18 +33,11 @@ public class YencBenchmarks
         }
 
         _header = new YencHeader("benchmark.bin", PartSize, LineLength, 0, 1, PartSize, 0);
-
-        using var stream = new MemoryStream(_data);
-        _encodedLines = [.. await YencEncoder.EncodeAsync(_header, stream)];
-
         _writer = new ArrayBufferWriter<byte>(_data.Length * 2);
-        // The byte-input path consumes the encoded body as raw CRLF-terminated bytes,
-        // exactly as it arrives off the wire.
-        _encodedBytes = UsenetEncoding.Default.GetBytes(string.Join("\r\n", _encodedLines));
     }
 
     [Benchmark(Baseline = true)]
-    public async Task<int> Encode()
+    public async Task<int> EncodeToLines()
     {
         using var stream = new MemoryStream(_data);
         var lines = await YencEncoder.EncodeAsync(_header, stream);
@@ -61,19 +51,5 @@ public class YencBenchmarks
         _writer.ResetWrittenCount();
         await YencEncoder.EncodeAsync(_header, stream, _writer);
         return _writer.WrittenCount;
-    }
-
-    [Benchmark(Baseline = true)]
-    public int Decode()
-    {
-        var article = YencArticleDecoder.Decode(_encodedLines);
-        return article.Data.Count;
-    }
-
-    [Benchmark]
-    public int DecodeBytes()
-    {
-        using var part = YencDecoder.Decode(_encodedBytes);
-        return part.Data.Length;
     }
 }
