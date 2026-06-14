@@ -17,6 +17,7 @@ internal sealed partial class PooledNntpClient : IInternalPooledNntpClient
     public bool Connected => TcpConnected && NntpConnected;
     public bool Authenticated { get; private set; }
     public bool HasError { get; private set; }
+    public bool HasPendingStream => _connection.HasPendingStream;
 
     public PooledNntpClient(ILoggerFactory? loggerFactory = null)
     {

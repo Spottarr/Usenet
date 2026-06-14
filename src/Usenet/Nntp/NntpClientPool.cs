@@ -126,8 +126,9 @@ public sealed class NntpClientPool : INntpClientPool
                 throw new InvalidOperationException("Client not borrowed from this pool.");
 
             // If the client has encountered an error (e.g. broken pipe) during the most recent
-            // operation, drop it from the pool instead of handing it back out.
-            dispose = client.HasError;
+            // operation, or a streamed response was returned without being fully drained, drop it
+            // from the pool instead of handing back a connection with unread bytes on the wire.
+            dispose = client.HasError || client.HasPendingStream;
             if (dispose)
             {
                 _currentPoolSize--;
