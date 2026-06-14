@@ -165,11 +165,11 @@ public static class YencDecoder
             if (isEscaped)
             {
                 isEscaped = false;
-                decoded = (byte)(@byte - 106);
+                decoded = (byte)(@byte - YencCharacters.EncodeOffset - YencCharacters.EscapeOffset);
             }
             else
             {
-                decoded = (byte)(@byte - 42);
+                decoded = (byte)(@byte - YencCharacters.EncodeOffset);
             }
 
             output[written++] = decoded;
@@ -216,7 +216,7 @@ public static class YencDecoder
             while (_position < data.Length)
             {
                 var rest = data.Span[_position..];
-                var newline = rest.IndexOf((byte)YencCharacters.Lf);
+                var newline = rest.IndexOf(YencCharacters.Lf);
 
                 int length;
                 int advance;
