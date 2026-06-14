@@ -11,10 +11,10 @@ All benchmarks use `[MemoryDiagnoser]`, so allocations are reported alongside ti
 
 | Benchmark                            | Hot path                                                                  |
 | ------------------------------------ | ------------------------------------------------------------------------- |
-| `YencBenchmarks.Decode`              | yEnc decode of a single in-memory part (`YencArticleDecoder.Decode`)      |
-| `YencBenchmarks.DecodeBytes`         | yEnc byte-input decode of a single part into pooled Data (`YencDecoder.Decode`) |
-| `YencBenchmarks.EncodeToWriter`      | yEnc encode of a part into an `IBufferWriter<byte>` sink (block reads)    |
-| `YencBenchmarks.Encode`              | yEnc encode of a single in-memory part (`YencEncoder.EncodeAsync`)        |
+| `YencDecoderBenchmarks.DecodeFromLines` | yEnc decode of a single in-memory part (`YencArticleDecoder.Decode`)   |
+| `YencDecoderBenchmarks.DecodeFromBytes` | yEnc byte-input decode of a single part into pooled Data (`YencDecoder.Decode`) |
+| `YencEncoderBenchmarks.EncodeToLines`   | yEnc encode of a single in-memory part (`YencEncoder.EncodeAsync`)      |
+| `YencEncoderBenchmarks.EncodeToWriter`  | yEnc encode of a part into an `IBufferWriter<byte>` sink (block reads)  |
 | `HeaderParseBenchmarks.ParseHeaders` | Parsing one NNTP article header block (`HEAD`), with a folded header line |
 | `NntpBenchmarks.ArticleRead`         | A single-article read over a loopback socket (`ARTICLE`)                   |
 | `NntpBenchmarks.XoverRange`          | A streamed `XOVER` range over a loopback socket                           |
@@ -56,22 +56,22 @@ Job=ShortRun  IterationCount=3  LaunchCount=1  WarmupCount=3
 
 ### yEnc codec (64 KiB part)
 
-| Method      | PartSize | Mean      | Allocated |
-| ----------- | -------- | --------: | --------: |
-| Encode      | 65536    | 577.30 us | 160.49 KB |
-| EncodeToWriter | 65536    | 179.6 us  |    920 B  |
-| Decode      | 65536    |  64.76 us | 143.29 KB |
-| DecodeBytes | 65536    | 178.87 us |   2.19 KB |
+| Method          | PartSize | Mean      | Allocated |
+| --------------- | -------- | --------: | --------: |
+| EncodeToLines   | 65536    | 577.30 us | 160.49 KB |
+| EncodeToWriter  | 65536    | 179.6 us  |    920 B  |
+| DecodeFromLines | 65536    |  64.76 us | 143.29 KB |
+| DecodeFromBytes | 65536    | 178.87 us |   2.19 KB |
 
 `EncodeToWriter` streams the part into a reused `IBufferWriter<byte>` via block reads and a
 precomputed escape table, replacing the per-byte `ReadAsync` and the `List<string>` of all
-lines. The `Encode` row is the back-compat text adapter over the same byte sink.
+lines. The `EncodeToLines` row is the back-compat text adapter over the same byte sink.
 
-`DecodeBytes` is the byte-input path added in 6.0.0: it decodes straight from the body bytes
+`DecodeFromBytes` is the byte-input path added in 6.0.0: it decodes straight from the body bytes
 into a single pooled `Data` buffer, dropping per-part allocations from ~143 KB to ~2 KB
 (the decoded buffer is rented from `ArrayPool`, so it does not show as a managed allocation).
-It does more CPU work per call than the string-based `Decode` because it also verifies the
-per-part `pcrc32` in the same pass, which the older decoder skips entirely.
+It does more CPU work per call than the string-based `DecodeFromLines` because it also verifies
+the per-part `pcrc32` in the same pass, which the older decoder skips entirely.
 
 ### NNTP header parse (single article header block)
 
