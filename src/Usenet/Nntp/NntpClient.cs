@@ -24,6 +24,7 @@ public partial class NntpClient : INntpClient
     protected INntpConnection Connection { get; }
 
     private readonly ILoggerFactory _loggerFactory;
+    private readonly NntpStreamLineParsers _streamLineParsers;
 
     /// <summary>
     /// Creates a new instance of the <see cref="NntpClient"/> class.
@@ -38,6 +39,7 @@ public partial class NntpClient : INntpClient
         ArgumentNullException.ThrowIfNull(connection);
         Connection = connection;
         _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
+        _streamLineParsers = new NntpStreamLineParsers(_loggerFactory);
     }
 
     /// <summary>
@@ -657,7 +659,7 @@ public partial class NntpClient : INntpClient
         Connection.MultiLineStreamCommandAsync<NntpGroup>(
             "LIST ACTIVE",
             215,
-            NntpStreamLineParsers.BasicGroup,
+            _streamLineParsers.BasicGroup,
             cancellationToken
         );
 
@@ -669,7 +671,7 @@ public partial class NntpClient : INntpClient
         Connection.MultiLineStreamCommandAsync<NntpGroup>(
             $"LIST ACTIVE {wildmat}",
             215,
-            NntpStreamLineParsers.BasicGroup,
+            _streamLineParsers.BasicGroup,
             cancellationToken
         );
 
