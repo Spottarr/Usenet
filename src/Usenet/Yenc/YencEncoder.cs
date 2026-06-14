@@ -1,5 +1,6 @@
 using System.Buffers;
 using System.Globalization;
+using System.IO.Hashing;
 using System.Text;
 using JetBrains.Annotations;
 using Usenet.Util;
@@ -98,7 +99,7 @@ public static class YencEncoder
             WriteLine(writer, GetPartHeaderLine(header), encoding);
         }
 
-        var checksum = Crc32.Initialize();
+        var checksum = new Crc32();
         var column = 0;
         var lastColumn = header.LineLength - 1;
         var remaining = header.PartSize;
@@ -119,14 +120,11 @@ public static class YencEncoder
                 }
 
                 remaining -= bytesRead;
-                EncodeBlock(
-                    readBuffer.AsSpan(0, bytesRead),
-                    writer,
-                    header.LineLength,
-                    lastColumn,
-                    ref column,
-                    ref checksum
-                );
+                var block = readBuffer.AsSpan(0, bytesRead);
+
+                // Hash the source block in one accelerated pass rather than per byte while encoding.
+                checksum.Append(block);
+                EncodeBlock(block, writer, header.LineLength, lastColumn, ref column);
             }
         }
         finally
@@ -140,8 +138,7 @@ public static class YencEncoder
             WriteCrlf(writer);
         }
 
-        checksum = Crc32.Finalize(checksum);
-        WriteLine(writer, GetFooterLine(header, checksum), encoding);
+        WriteLine(writer, GetFooterLine(header, checksum.GetCurrentHashAsUInt32()), encoding);
     }
 
     private static void EncodeBlock(
@@ -149,8 +146,7 @@ public static class YencEncoder
         IBufferWriter<byte> writer,
         int lineLength,
         int lastColumn,
-        ref int column,
-        ref uint checksum
+        ref int column
     )
     {
         // Worst case (line=1): every source byte escapes to two bytes and wraps, costing the
@@ -162,11 +158,9 @@ public static class YencEncoder
         // The yEnc line length counts encoded output bytes, so an escape pair advances the
         // column by two. The escaping of a dot or whitespace depends on that column.
         var col = column;
-        var crc = checksum;
 
         foreach (var @byte in source)
         {
-            crc = Crc32.Calculate(crc, @byte);
             var val = (byte)((@byte + YencCharacters.EncodeOffset) % 256);
 
             var flags = EscapeTable[val];
@@ -194,7 +188,6 @@ public static class YencEncoder
 
         writer.Advance(written);
         column = col;
-        checksum = crc;
     }
 
     private static void WriteLine(IBufferWriter<byte> writer, string line, Encoding encoding)

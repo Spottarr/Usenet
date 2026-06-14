@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.IO.Hashing;
 using System.Text;
 using JetBrains.Annotations;
 using Usenet.Exceptions;
@@ -51,7 +52,6 @@ public static class YencDecoder
         try
         {
             var decoded = 0;
-            var crc = Crc32.Initialize();
             YencFooter? footer = null;
 
             while (reader.MoveNext())
@@ -63,10 +63,12 @@ public static class YencDecoder
                     break;
                 }
 
-                decoded += DecodeLine(line, buffer.AsSpan(decoded), ref crc);
+                decoded += DecodeLine(line, buffer.AsSpan(decoded));
             }
 
-            VerifyChecksum(header, footer, Crc32.Finalize(crc));
+            // Verify the part checksum in one accelerated pass over the whole decoded buffer
+            // rather than folding a scalar CRC into the per-byte decode loop.
+            VerifyChecksum(header, footer, Crc32.HashToUInt32(buffer.AsSpan(0, decoded)));
             return new YencPart(header, footer, buffer, decoded);
         }
         catch
@@ -149,7 +151,7 @@ public static class YencDecoder
         throw new InvalidYencDataException(Resources.Yenc.MissingPartHeader);
     }
 
-    private static int DecodeLine(ReadOnlySpan<byte> line, Span<byte> output, ref uint crc)
+    private static int DecodeLine(ReadOnlySpan<byte> line, Span<byte> output)
     {
         var written = 0;
         var isEscaped = false;
@@ -173,7 +175,6 @@ public static class YencDecoder
             }
 
             output[written++] = decoded;
-            crc = Crc32.Calculate(crc, decoded);
         }
 
         return written;
