@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Usenet.Extensions;
 using Usenet.Nntp.Responses;
 
@@ -6,7 +7,12 @@ namespace Usenet.Nntp.Parsers;
 
 internal class ModeReaderResponseParser : IResponseParser<NntpModeReaderResponse>
 {
-    private readonly ILogger _log = Logger.Create<ModeReaderResponseParser>();
+    private readonly ILogger _log;
+
+    public ModeReaderResponseParser(ILoggerFactory? loggerFactory = null) =>
+        _log = (
+            loggerFactory ?? NullLoggerFactory.Instance
+        ).CreateLogger<ModeReaderResponseParser>();
 
     public bool IsSuccessResponse(int code) =>
         GetResponseType(code) != NntpModeReaderResponseType.Unknown;

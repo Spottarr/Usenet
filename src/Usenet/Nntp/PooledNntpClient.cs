@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
@@ -17,10 +18,10 @@ internal sealed partial class PooledNntpClient : IInternalPooledNntpClient
     public bool Authenticated { get; private set; }
     public bool HasError { get; private set; }
 
-    public PooledNntpClient()
+    public PooledNntpClient(ILoggerFactory? loggerFactory = null)
     {
-        _connection = new NntpConnection();
-        _client = new NntpClient(_connection);
+        _connection = new NntpConnection(loggerFactory);
+        _client = new NntpClient(_connection, loggerFactory);
     }
 
     #region INntpClient

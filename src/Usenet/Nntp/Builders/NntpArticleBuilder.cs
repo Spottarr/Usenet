@@ -1,6 +1,7 @@
 using System.Globalization;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Usenet.Exceptions;
 using Usenet.Extensions;
 using Usenet.Nntp.Models;
@@ -14,7 +15,7 @@ namespace Usenet.Nntp.Builders;
 [PublicAPI]
 public class NntpArticleBuilder
 {
-    private readonly ILogger _log = Logger.Create<NntpArticleBuilder>();
+    private readonly ILogger _log;
 
     private const string DateFormat = "dd MMM yyyy HH:mm:ss";
 
@@ -38,7 +39,12 @@ public class NntpArticleBuilder
     /// <summary>
     /// Creates a new instance of the <see cref="NntpArticleBuilder"/> class.
     /// </summary>
-    public NntpArticleBuilder() { }
+    /// <param name="loggerFactory">
+    /// An optional <see cref="ILoggerFactory"/> used to create the builder's logger.
+    /// When <see langword="null"/>, logging is disabled via <see cref="NullLoggerFactory"/>.
+    /// </param>
+    public NntpArticleBuilder(ILoggerFactory? loggerFactory = null) =>
+        _log = (loggerFactory ?? NullLoggerFactory.Instance).CreateLogger<NntpArticleBuilder>();
 
     /// <summary>
     /// Initialize the <see cref="NntpArticleBuilder"/> from the given <see cref="NntpArticle"/>.

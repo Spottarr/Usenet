@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Usenet.Extensions;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Models;
@@ -17,12 +18,16 @@ internal enum ArticleRequestType
 
 internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleResponse>
 {
-    private readonly ILogger _log = Logger.Create<ArticleResponseParser>();
+    private readonly ILogger _log;
     private readonly ArticleRequestType _requestType;
     private readonly int _successCode;
 
-    public ArticleResponseParser(ArticleRequestType requestType)
+    public ArticleResponseParser(
+        ArticleRequestType requestType,
+        ILoggerFactory? loggerFactory = null
+    )
     {
+        _log = (loggerFactory ?? NullLoggerFactory.Instance).CreateLogger<ArticleResponseParser>();
         _successCode = (_requestType = requestType) switch
         {
             ArticleRequestType.Head => 221,

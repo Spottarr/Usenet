@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Usenet.Extensions;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
@@ -15,12 +16,17 @@ internal class GroupsResponseParser : IMultiLineResponseParser<NntpGroupsRespons
 {
     private readonly int _successCode;
     private readonly GroupStatusRequestType _requestType;
-    private readonly ILogger _log = Logger.Create<GroupsResponseParser>();
+    private readonly ILogger _log;
 
-    public GroupsResponseParser(int successCode, GroupStatusRequestType requestType)
+    public GroupsResponseParser(
+        int successCode,
+        GroupStatusRequestType requestType,
+        ILoggerFactory? loggerFactory = null
+    )
     {
         _successCode = successCode;
         _requestType = requestType;
+        _log = (loggerFactory ?? NullLoggerFactory.Instance).CreateLogger<GroupsResponseParser>();
     }
 
     public bool IsSuccessResponse(int code) => code == _successCode;
