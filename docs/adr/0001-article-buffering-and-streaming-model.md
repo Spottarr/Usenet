@@ -2,7 +2,9 @@
 
 ## Status
 
-accepted
+accepted (reaffirmed by [ADR-0002](0002-byte-oriented-article-bodies.md) in 6.0.0: the
+whole-part buffering model is kept; only the body's representation changes from `string`
+lines to pooled bytes)
 
 ## Decision
 
