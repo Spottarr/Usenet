@@ -63,7 +63,6 @@ Usenet.Nntp.Responses.NntpArticleResponse.MessageId.get -> Usenet.Nntp.Models.Nn
 Usenet.Nntp.Responses.NntpArticleResponse.Number.get -> long
 Usenet.Nntp.Responses.NntpArticleResponse.ReadBodyLines() -> System.Collections.Generic.IEnumerable<string!>!
 Usenet.Nntp.Responses.NntpArticleResponse.ReadBodyLines(System.Text.Encoding! encoding) -> System.Collections.Generic.IEnumerable<string!>!
-static Usenet.Nntp.Responses.NntpArticleResponse.LeakedBufferCount.get -> long
 Usenet.Nntp.NntpConnection.BufferLine(string! line) -> void
 *REMOVED*Usenet.Nntp.Contracts.INntpConnection.Stream.get -> Usenet.Util.CountingStream?
 *REMOVED*Usenet.Nntp.NntpConnection.Stream.get -> Usenet.Util.CountingStream?
@@ -78,44 +77,44 @@ Usenet.Nntp.NntpConnection.BufferLine(string! line) -> void
 *REMOVED*override Usenet.Util.CountingStream.Flush() -> void
 *REMOVED*override Usenet.Util.CountingStream.Read(byte[]! buffer, int offset, int count) -> int
 *REMOVED*override Usenet.Util.CountingStream.Write(byte[]! buffer, int offset, int count) -> void
-Usenet.Nntp.Contracts.INntpClientRfc2980.XhdrAsync(string! field) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc2980.XhdrAsync(string! field, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc2980.XhdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc2980.XhdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc2980.XhdrAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc2980.XhdrAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc2980.XoverAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc2980.XoverAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc2980.XoverAsync(Usenet.Nntp.Models.NntpArticleRange! range) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc2980.XoverAsync(Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc3977.HdrAsync(string! field) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc3977.HdrAsync(string! field, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc3977.HdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc3977.HdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc3977.HdrAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc3977.HdrAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc2980.XhdrAsync(string! field) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc2980.XhdrAsync(string! field, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc2980.XhdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc2980.XhdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc2980.XhdrAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc2980.XhdrAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc2980.XoverAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpArticleOverview!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc2980.XoverAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpArticleOverview!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc2980.XoverAsync(Usenet.Nntp.Models.NntpArticleRange! range) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpArticleOverview!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc2980.XoverAsync(Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpArticleOverview!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc3977.HdrAsync(string! field) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc3977.HdrAsync(string! field, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc3977.HdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc3977.HdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc3977.HdrAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc3977.HdrAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
 Usenet.Nntp.Contracts.INntpClientRfc3977.ListGroupAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<long>!>!
 Usenet.Nntp.Contracts.INntpClientRfc3977.ListGroupAsync(string! group) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<long>!>!
 Usenet.Nntp.Contracts.INntpClientRfc3977.ListGroupAsync(string! group, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<long>!>!
 Usenet.Nntp.Contracts.INntpClientRfc3977.ListGroupAsync(string! group, Usenet.Nntp.Models.NntpArticleRange! range) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<long>!>!
 Usenet.Nntp.Contracts.INntpClientRfc3977.ListGroupAsync(string! group, Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<long>!>!
 Usenet.Nntp.Contracts.INntpClientRfc3977.ListGroupAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<long>!>!
-Usenet.Nntp.Contracts.INntpClientRfc3977.ListNewsgroupsAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc3977.ListNewsgroupsAsync(string! wildmat) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc3977.ListNewsgroupsAsync(string! wildmat, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc3977.ListNewsgroupsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc3977.NewNewsAsync(string! wildmat, Usenet.Nntp.Models.NntpDateTime! sinceDateTime) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc3977.NewNewsAsync(string! wildmat, Usenet.Nntp.Models.NntpDateTime! sinceDateTime, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc3977.ListNewsgroupsAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpNewsgroupDescription!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc3977.ListNewsgroupsAsync(string! wildmat) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpNewsgroupDescription!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc3977.ListNewsgroupsAsync(string! wildmat, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpNewsgroupDescription!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc3977.ListNewsgroupsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpNewsgroupDescription!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc3977.NewNewsAsync(string! wildmat, Usenet.Nntp.Models.NntpDateTime! sinceDateTime) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpMessageId!>!>!
+Usenet.Nntp.Contracts.INntpClientRfc3977.NewNewsAsync(string! wildmat, Usenet.Nntp.Models.NntpDateTime! sinceDateTime, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpMessageId!>!>!
 Usenet.Nntp.Contracts.INntpClientRfc6048.ListActiveAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpGroup!>!>!
 Usenet.Nntp.Contracts.INntpClientRfc6048.ListActiveAsync(string! wildmat) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpGroup!>!>!
 Usenet.Nntp.Contracts.INntpClientRfc6048.ListActiveAsync(string! wildmat, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpGroup!>!>!
 Usenet.Nntp.Contracts.INntpClientRfc6048.ListActiveAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpGroup!>!>!
-Usenet.Nntp.NntpClient.HdrAsync(string! field) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.HdrAsync(string! field, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.HdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.HdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.HdrAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.HdrAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
+Usenet.Nntp.NntpClient.HdrAsync(string! field) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.NntpClient.HdrAsync(string! field, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.NntpClient.HdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.NntpClient.HdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.NntpClient.HdrAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.NntpClient.HdrAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
 Usenet.Nntp.NntpClient.ListActiveAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpGroup!>!>!
 Usenet.Nntp.NntpClient.ListActiveAsync(string! wildmat) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpGroup!>!>!
 Usenet.Nntp.NntpClient.ListActiveAsync(string! wildmat, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpGroup!>!>!
@@ -126,22 +125,22 @@ Usenet.Nntp.NntpClient.ListGroupAsync(string! group, System.Threading.Cancellati
 Usenet.Nntp.NntpClient.ListGroupAsync(string! group, Usenet.Nntp.Models.NntpArticleRange! range) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<long>!>!
 Usenet.Nntp.NntpClient.ListGroupAsync(string! group, Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<long>!>!
 Usenet.Nntp.NntpClient.ListGroupAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<long>!>!
-Usenet.Nntp.NntpClient.ListNewsgroupsAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.ListNewsgroupsAsync(string! wildmat) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.ListNewsgroupsAsync(string! wildmat, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.ListNewsgroupsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.NewNewsAsync(string! wildmat, Usenet.Nntp.Models.NntpDateTime! sinceDateTime) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.NewNewsAsync(string! wildmat, Usenet.Nntp.Models.NntpDateTime! sinceDateTime, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.XhdrAsync(string! field) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.XhdrAsync(string! field, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.XhdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.XhdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.XhdrAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.XhdrAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.XoverAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.XoverAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.XoverAsync(Usenet.Nntp.Models.NntpArticleRange! range) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
-Usenet.Nntp.NntpClient.XoverAsync(Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<string!>!>!
+Usenet.Nntp.NntpClient.ListNewsgroupsAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpNewsgroupDescription!>!>!
+Usenet.Nntp.NntpClient.ListNewsgroupsAsync(string! wildmat) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpNewsgroupDescription!>!>!
+Usenet.Nntp.NntpClient.ListNewsgroupsAsync(string! wildmat, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpNewsgroupDescription!>!>!
+Usenet.Nntp.NntpClient.ListNewsgroupsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpNewsgroupDescription!>!>!
+Usenet.Nntp.NntpClient.NewNewsAsync(string! wildmat, Usenet.Nntp.Models.NntpDateTime! sinceDateTime) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpMessageId!>!>!
+Usenet.Nntp.NntpClient.NewNewsAsync(string! wildmat, Usenet.Nntp.Models.NntpDateTime! sinceDateTime, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpMessageId!>!>!
+Usenet.Nntp.NntpClient.XhdrAsync(string! field) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.NntpClient.XhdrAsync(string! field, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.NntpClient.XhdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.NntpClient.XhdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.NntpClient.XhdrAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.NntpClient.XhdrAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
+Usenet.Nntp.NntpClient.XoverAsync() -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpArticleOverview!>!>!
+Usenet.Nntp.NntpClient.XoverAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpArticleOverview!>!>!
+Usenet.Nntp.NntpClient.XoverAsync(Usenet.Nntp.Models.NntpArticleRange! range) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpArticleOverview!>!>!
+Usenet.Nntp.NntpClient.XoverAsync(Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpArticleOverview!>!>!
 *REMOVED*Usenet.Nntp.Contracts.INntpClientRfc2980.XhdrAsync(string! field) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
 *REMOVED*Usenet.Nntp.Contracts.INntpClientRfc2980.XhdrAsync(string! field, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
 *REMOVED*Usenet.Nntp.Contracts.INntpClientRfc2980.XhdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
@@ -220,3 +219,36 @@ static Usenet.DependencyInjection.UsenetServiceCollectionExtensions.AddUsenet(th
 *REMOVED*Usenet.Nntp.NntpClient.NntpClient(Usenet.Nntp.Contracts.INntpConnection! connection) -> void
 *REMOVED*Usenet.Nntp.NntpClientPool.NntpClientPool(int maxPoolSize, string! hostname, int port, bool useSsl, string! username, string! password) -> void
 *REMOVED*Usenet.Nntp.NntpConnection.NntpConnection() -> void
+Usenet.Nntp.Models.NntpArticleOverview
+Usenet.Nntp.Models.NntpArticleOverview.NntpArticleOverview() -> void
+Usenet.Nntp.Models.NntpArticleOverview.Bytes.get -> long
+Usenet.Nntp.Models.NntpArticleOverview.Bytes.init -> void
+Usenet.Nntp.Models.NntpArticleOverview.Date.get -> System.DateTimeOffset
+Usenet.Nntp.Models.NntpArticleOverview.Date.init -> void
+Usenet.Nntp.Models.NntpArticleOverview.From.get -> string!
+Usenet.Nntp.Models.NntpArticleOverview.From.init -> void
+Usenet.Nntp.Models.NntpArticleOverview.Lines.get -> int
+Usenet.Nntp.Models.NntpArticleOverview.Lines.init -> void
+Usenet.Nntp.Models.NntpArticleOverview.MessageId.get -> Usenet.Nntp.Models.NntpMessageId!
+Usenet.Nntp.Models.NntpArticleOverview.MessageId.init -> void
+Usenet.Nntp.Models.NntpArticleOverview.Number.get -> long
+Usenet.Nntp.Models.NntpArticleOverview.Number.init -> void
+Usenet.Nntp.Models.NntpArticleOverview.References.get -> string!
+Usenet.Nntp.Models.NntpArticleOverview.References.init -> void
+Usenet.Nntp.Models.NntpArticleOverview.Subject.get -> string!
+Usenet.Nntp.Models.NntpArticleOverview.Subject.init -> void
+Usenet.Nntp.Models.NntpHeaderField
+Usenet.Nntp.Models.NntpHeaderField.NntpHeaderField() -> void
+Usenet.Nntp.Models.NntpHeaderField.ArticleNumber.get -> long
+Usenet.Nntp.Models.NntpHeaderField.ArticleNumber.init -> void
+Usenet.Nntp.Models.NntpHeaderField.Value.get -> string!
+Usenet.Nntp.Models.NntpHeaderField.Value.init -> void
+Usenet.Nntp.Models.NntpNewsgroupDescription
+Usenet.Nntp.Models.NntpNewsgroupDescription.NntpNewsgroupDescription() -> void
+Usenet.Nntp.Models.NntpNewsgroupDescription.Description.get -> string!
+Usenet.Nntp.Models.NntpNewsgroupDescription.Description.init -> void
+Usenet.Nntp.Models.NntpNewsgroupDescription.Newsgroup.get -> string!
+Usenet.Nntp.Models.NntpNewsgroupDescription.Newsgroup.init -> void
+Usenet.Util.PooledBufferDiagnostics
+static Usenet.Util.PooledBufferDiagnostics.LeakedBufferCount.get -> long
+Usenet.Yenc.YencPart.DisposeAsync() -> System.Threading.Tasks.ValueTask

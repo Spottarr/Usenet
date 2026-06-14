@@ -366,15 +366,15 @@ public partial class NntpClient : INntpClient
         );
 
     /// <inheritdoc />
-    public Task<NntpStreamResponse<string>> NewNewsAsync(
+    public Task<NntpStreamResponse<NntpMessageId>> NewNewsAsync(
         string wildmat,
         NntpDateTime sinceDateTime,
         CancellationToken cancellationToken
     ) =>
-        Connection.MultiLineStreamCommandAsync<string>(
+        Connection.MultiLineStreamCommandAsync<NntpMessageId>(
             $"NEWNEWS {wildmat} {sinceDateTime}",
             230,
-            NntpStreamLineParsers.Line,
+            NntpStreamLineParsers.MessageId,
             cancellationToken
         );
 
@@ -408,25 +408,25 @@ public partial class NntpClient : INntpClient
         );
 
     /// <inheritdoc />
-    public Task<NntpStreamResponse<string>> ListNewsgroupsAsync(
+    public Task<NntpStreamResponse<NntpNewsgroupDescription>> ListNewsgroupsAsync(
         CancellationToken cancellationToken
     ) =>
-        Connection.MultiLineStreamCommandAsync<string>(
+        Connection.MultiLineStreamCommandAsync<NntpNewsgroupDescription>(
             "LIST NEWSGROUPS",
             215,
-            NntpStreamLineParsers.Line,
+            _streamLineParsers.NewsgroupDescription,
             cancellationToken
         );
 
     /// <inheritdoc />
-    public Task<NntpStreamResponse<string>> ListNewsgroupsAsync(
+    public Task<NntpStreamResponse<NntpNewsgroupDescription>> ListNewsgroupsAsync(
         string wildmat,
         CancellationToken cancellationToken
     ) =>
-        Connection.MultiLineStreamCommandAsync<string>(
+        Connection.MultiLineStreamCommandAsync<NntpNewsgroupDescription>(
             $"LIST NEWSGROUPS {wildmat}",
             215,
-            NntpStreamLineParsers.Line,
+            _streamLineParsers.NewsgroupDescription,
             cancellationToken
         );
 
@@ -471,40 +471,40 @@ public partial class NntpClient : INntpClient
         );
 
     /// <inheritdoc />
-    public Task<NntpStreamResponse<string>> HdrAsync(
+    public Task<NntpStreamResponse<NntpHeaderField>> HdrAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken
     ) =>
-        Connection.MultiLineStreamCommandAsync<string>(
+        Connection.MultiLineStreamCommandAsync<NntpHeaderField>(
             $"HDR {field} {messageId}",
             225,
-            NntpStreamLineParsers.Line,
+            _streamLineParsers.HeaderField,
             cancellationToken
         );
 
     /// <inheritdoc />
-    public Task<NntpStreamResponse<string>> HdrAsync(
+    public Task<NntpStreamResponse<NntpHeaderField>> HdrAsync(
         string field,
         NntpArticleRange range,
         CancellationToken cancellationToken
     ) =>
-        Connection.MultiLineStreamCommandAsync<string>(
+        Connection.MultiLineStreamCommandAsync<NntpHeaderField>(
             $"HDR {field} {range}",
             225,
-            NntpStreamLineParsers.Line,
+            _streamLineParsers.HeaderField,
             cancellationToken
         );
 
     /// <inheritdoc />
-    public Task<NntpStreamResponse<string>> HdrAsync(
+    public Task<NntpStreamResponse<NntpHeaderField>> HdrAsync(
         string field,
         CancellationToken cancellationToken
     ) =>
-        Connection.MultiLineStreamCommandAsync<string>(
+        Connection.MultiLineStreamCommandAsync<NntpHeaderField>(
             $"HDR {field}",
             225,
-            NntpStreamLineParsers.Line,
+            _streamLineParsers.HeaderField,
             cancellationToken
         );
 
@@ -539,61 +539,63 @@ public partial class NntpClient : INntpClient
         );
 
     /// <inheritdoc />
-    public Task<NntpStreamResponse<string>> XhdrAsync(
+    public Task<NntpStreamResponse<NntpHeaderField>> XhdrAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken
     ) =>
-        Connection.MultiLineStreamCommandAsync<string>(
+        Connection.MultiLineStreamCommandAsync<NntpHeaderField>(
             $"XHDR {field} {messageId}",
             221,
-            NntpStreamLineParsers.Line,
+            _streamLineParsers.HeaderField,
             cancellationToken
         );
 
     /// <inheritdoc />
-    public Task<NntpStreamResponse<string>> XhdrAsync(
+    public Task<NntpStreamResponse<NntpHeaderField>> XhdrAsync(
         string field,
         NntpArticleRange range,
         CancellationToken cancellationToken
     ) =>
-        Connection.MultiLineStreamCommandAsync<string>(
+        Connection.MultiLineStreamCommandAsync<NntpHeaderField>(
             $"XHDR {field} {range}",
             221,
-            NntpStreamLineParsers.Line,
+            _streamLineParsers.HeaderField,
             cancellationToken
         );
 
     /// <inheritdoc />
-    public Task<NntpStreamResponse<string>> XhdrAsync(
+    public Task<NntpStreamResponse<NntpHeaderField>> XhdrAsync(
         string field,
         CancellationToken cancellationToken
     ) =>
-        Connection.MultiLineStreamCommandAsync<string>(
+        Connection.MultiLineStreamCommandAsync<NntpHeaderField>(
             $"XHDR {field}",
             221,
-            NntpStreamLineParsers.Line,
+            _streamLineParsers.HeaderField,
             cancellationToken
         );
 
     /// <inheritdoc />
-    public Task<NntpStreamResponse<string>> XoverAsync(
+    public Task<NntpStreamResponse<NntpArticleOverview>> XoverAsync(
         NntpArticleRange range,
         CancellationToken cancellationToken
     ) =>
-        Connection.MultiLineStreamCommandAsync<string>(
+        Connection.MultiLineStreamCommandAsync<NntpArticleOverview>(
             $"XOVER {range}",
             224,
-            NntpStreamLineParsers.Line,
+            _streamLineParsers.Overview,
             cancellationToken
         );
 
     /// <inheritdoc />
-    public Task<NntpStreamResponse<string>> XoverAsync(CancellationToken cancellationToken) =>
-        Connection.MultiLineStreamCommandAsync<string>(
+    public Task<NntpStreamResponse<NntpArticleOverview>> XoverAsync(
+        CancellationToken cancellationToken
+    ) =>
+        Connection.MultiLineStreamCommandAsync<NntpArticleOverview>(
             "XOVER",
             224,
-            NntpStreamLineParsers.Line,
+            _streamLineParsers.Overview,
             cancellationToken
         );
 

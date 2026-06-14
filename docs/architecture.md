@@ -52,8 +52,8 @@ flowchart LR
 ## Bulk read path (XOVER, HDR, LISTGROUP, NEWNEWS)
 
 - Unbounded results stream as `IAsyncEnumerable<T>` of library-parsed **typed rows**
-  (`XOVER` → `NntpArticleOverview`, etc.), parsed off the framed bytes as they arrive. The
-  consumer never supplies a parser; the line parser is internal. Malformed rows are skipped.
+  (`XOVER` → `NntpArticleOverview`, etc.), parsed per line as they arrive. The consumer never
+  supplies a parser for the standard commands. Malformed rows are skipped.
 - Memory stays flat regardless of range size; the consumer starts on the first row.
 - Drain contract: enumerate fully, or dispose the enumerator, before the next command on
   that lease. On early-exit the connection is reclaimed by draining while a small budget

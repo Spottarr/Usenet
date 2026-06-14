@@ -86,30 +86,31 @@ internal sealed partial class PooledNntpClient : IInternalPooledNntpClient
 
     public void ResetCounters() => _client.ResetCounters();
 
-    public Task<NntpStreamResponse<string>> XhdrAsync(
+    public Task<NntpStreamResponse<NntpHeaderField>> XhdrAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.XhdrAsync(field, messageId, cancellationToken));
 
-    public Task<NntpStreamResponse<string>> XhdrAsync(
+    public Task<NntpStreamResponse<NntpHeaderField>> XhdrAsync(
         string field,
         NntpArticleRange range,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.XhdrAsync(field, range, cancellationToken));
 
-    public Task<NntpStreamResponse<string>> XhdrAsync(
+    public Task<NntpStreamResponse<NntpHeaderField>> XhdrAsync(
         string field,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.XhdrAsync(field, cancellationToken));
 
-    public Task<NntpStreamResponse<string>> XoverAsync(
+    public Task<NntpStreamResponse<NntpArticleOverview>> XoverAsync(
         NntpArticleRange range,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.XoverAsync(range, cancellationToken));
 
-    public Task<NntpStreamResponse<string>> XoverAsync(CancellationToken cancellationToken) =>
-        ExecuteCommandAsync(c => c.XoverAsync(cancellationToken));
+    public Task<NntpStreamResponse<NntpArticleOverview>> XoverAsync(
+        CancellationToken cancellationToken
+    ) => ExecuteCommandAsync(c => c.XoverAsync(cancellationToken));
 
     public Task<NntpMultiLineResponse> CapabilitiesAsync(CancellationToken cancellationToken) =>
         ExecuteCommandAsync(c => c.CapabilitiesAsync(cancellationToken));
@@ -211,7 +212,7 @@ internal sealed partial class PooledNntpClient : IInternalPooledNntpClient
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.NewGroupsAsync(sinceDateTime, cancellationToken));
 
-    public Task<NntpStreamResponse<string>> NewNewsAsync(
+    public Task<NntpStreamResponse<NntpMessageId>> NewNewsAsync(
         string wildmat,
         NntpDateTime sinceDateTime,
         CancellationToken cancellationToken
@@ -229,11 +230,11 @@ internal sealed partial class PooledNntpClient : IInternalPooledNntpClient
     public Task<NntpMultiLineResponse> ListDistribPatsAsync(CancellationToken cancellationToken) =>
         ExecuteCommandAsync(c => c.ListDistribPatsAsync(cancellationToken));
 
-    public Task<NntpStreamResponse<string>> ListNewsgroupsAsync(
+    public Task<NntpStreamResponse<NntpNewsgroupDescription>> ListNewsgroupsAsync(
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.ListNewsgroupsAsync(cancellationToken));
 
-    public Task<NntpStreamResponse<string>> ListNewsgroupsAsync(
+    public Task<NntpStreamResponse<NntpNewsgroupDescription>> ListNewsgroupsAsync(
         string wildmat,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.ListNewsgroupsAsync(wildmat, cancellationToken));
@@ -255,19 +256,19 @@ internal sealed partial class PooledNntpClient : IInternalPooledNntpClient
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.ListOverviewFormatAsync(cancellationToken));
 
-    public Task<NntpStreamResponse<string>> HdrAsync(
+    public Task<NntpStreamResponse<NntpHeaderField>> HdrAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.HdrAsync(field, messageId, cancellationToken));
 
-    public Task<NntpStreamResponse<string>> HdrAsync(
+    public Task<NntpStreamResponse<NntpHeaderField>> HdrAsync(
         string field,
         NntpArticleRange range,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.HdrAsync(field, range, cancellationToken));
 
-    public Task<NntpStreamResponse<string>> HdrAsync(
+    public Task<NntpStreamResponse<NntpHeaderField>> HdrAsync(
         string field,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.HdrAsync(field, cancellationToken));

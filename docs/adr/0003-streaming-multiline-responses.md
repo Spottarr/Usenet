@@ -48,12 +48,18 @@ release so consumers get ergonomics without bringing their own machinery:
 
 - **Library-parsed typed rows, not raw strings.** Each streamed command yields a ready-to-use
   typed row, parsed once inside the library: `XOVER` yields `NntpArticleOverview` (the RFC 3977
-  OVER fields — number, subject, `From`, date, message-id, references, bytes, lines), `HDR`,
-  `NEWNEWS` and `LIST NEWSGROUPS` yield their own small row types, and `LISTGROUP`/`LIST ACTIVE`
-  keep their existing typed results. The per-line parse reads straight off the framed bytes; the
-  consumer never supplies a parser. The `NntpStreamLineParser<T>` delegate is therefore an
-  **internal** implementation detail, not public surface. A malformed row (e.g. an unparseable
+  OVER fields — number, subject, `From`, date, message-id, references, bytes, lines), `HDR`/`XHDR`
+  yield `NntpHeaderField`, `NEWNEWS` yields `NntpMessageId`, `LIST NEWSGROUPS` yields
+  `NntpNewsgroupDescription`, and `LISTGROUP`/`LIST ACTIVE` keep their existing typed results. The
+  consumer never supplies a parser for these commands; the per-line `NntpStreamLineParser<T>`
+  delegate is now a library-internal concern (it stays public only as the low-level
+  `INntpConnection` streaming seam for advanced/custom flows). A malformed row (e.g. an unparseable
   date) is skipped rather than aborting an enumeration that may span millions of rows.
+
+  The per-line parse decodes one line to text before building the row; this keeps the change small
+  and reuses the existing framing. Because the delegate is no longer something consumers wire up for
+  the standard commands, parsing straight off the framed bytes is a later, **non-breaking** internal
+  optimization (it would mainly benefit the numeric commands such as `LISTGROUP`).
 - **Bounded drain on early-exit.** Stopping a streamed enumerator early (`break`, dispose, or an
   exception) must reclaim the connection, and NNTP offers no mid-block "stop sending" — the only
   options are drain-to-dot (pay the remaining transfer) or close the socket (pay a reconnect).

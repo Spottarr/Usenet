@@ -60,7 +60,7 @@ internal sealed class NntpArticleResponseTests
     [Test]
     public async Task ForgottenResponseIsReclaimedByFinalizer()
     {
-        var before = NntpArticleResponse.LeakedBufferCount;
+        var before = PooledBufferDiagnostics.LeakedBufferCount;
 
         AbandonResponse();
 
@@ -68,7 +68,7 @@ internal sealed class NntpArticleResponseTests
         GC.WaitForPendingFinalizers();
         GC.Collect();
 
-        await Assert.That(NntpArticleResponse.LeakedBufferCount).IsGreaterThan(before);
+        await Assert.That(PooledBufferDiagnostics.LeakedBufferCount).IsGreaterThan(before);
 
         // A reference must not be kept on the stack, or the finalizer never runs.
         [MethodImpl(MethodImplOptions.NoInlining)]

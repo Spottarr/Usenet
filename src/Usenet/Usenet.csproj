@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <!-- Required for the idiomatic MemoryManager<byte>.Pin implementation in PooledBuffer. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <NeutralLanguage>en</NeutralLanguage>
     <Authors>Spotarr</Authors>
     <PackageDescription>A library for working with Usenet. It offers an NNTP client, an NZB file parser, builder, writer, a yEnc encoder and decoder. It is mainly focused on keeping memory usage low. Server responses can be enumerated as they come in. Binary messages will be encoded to yEnc format streaming and yEnc-encoded data will be decoded to binary data streaming.</PackageDescription>

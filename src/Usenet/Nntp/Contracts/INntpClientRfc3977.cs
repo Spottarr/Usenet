@@ -563,7 +563,10 @@ public interface INntpClientRfc3977
     /// <param name="sinceDateTime">List all newsgroups that have new articles
     /// posted or received since this date and time.</param>
     /// <returns>A multi-line response containing a list of message-ids.</returns>
-    Task<NntpStreamResponse<string>> NewNewsAsync(string wildmat, NntpDateTime sinceDateTime);
+    Task<NntpStreamResponse<NntpMessageId>> NewNewsAsync(
+        string wildmat,
+        NntpDateTime sinceDateTime
+    );
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.4">NEWNEWS</a>
@@ -576,7 +579,7 @@ public interface INntpClientRfc3977
     /// posted or received since this date and time.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing a list of message-ids.</returns>
-    Task<NntpStreamResponse<string>> NewNewsAsync(
+    Task<NntpStreamResponse<NntpMessageId>> NewNewsAsync(
         string wildmat,
         NntpDateTime sinceDateTime,
         CancellationToken cancellationToken
@@ -654,7 +657,7 @@ public interface INntpClientRfc3977
     /// description about the purpose of the group.
     /// </summary>
     /// <returns>A multi-line response containing a list of newsgroups available on the server.</returns>
-    Task<NntpStreamResponse<string>> ListNewsgroupsAsync();
+    Task<NntpStreamResponse<NntpNewsgroupDescription>> ListNewsgroupsAsync();
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.6">newsgroups list</a>
@@ -665,7 +668,9 @@ public interface INntpClientRfc3977
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing a list of newsgroups available on the server.</returns>
-    Task<NntpStreamResponse<string>> ListNewsgroupsAsync(CancellationToken cancellationToken);
+    Task<NntpStreamResponse<NntpNewsgroupDescription>> ListNewsgroupsAsync(
+        CancellationToken cancellationToken
+    );
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.6">newsgroups list</a>
@@ -676,7 +681,7 @@ public interface INntpClientRfc3977
     /// </summary>
     /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
     /// <returns>A multi-line response containing a list of newsgroups available on the server.</returns>
-    Task<NntpStreamResponse<string>> ListNewsgroupsAsync(string wildmat);
+    Task<NntpStreamResponse<NntpNewsgroupDescription>> ListNewsgroupsAsync(string wildmat);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.6">newsgroups list</a>
@@ -688,7 +693,7 @@ public interface INntpClientRfc3977
     /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing a list of newsgroups available on the server.</returns>
-    Task<NntpStreamResponse<string>> ListNewsgroupsAsync(
+    Task<NntpStreamResponse<NntpNewsgroupDescription>> ListNewsgroupsAsync(
         string wildmat,
         CancellationToken cancellationToken
     );
@@ -790,7 +795,7 @@ public interface INntpClientRfc3977
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    Task<NntpStreamResponse<string>> HdrAsync(string field, NntpMessageId messageId);
+    Task<NntpStreamResponse<NntpHeaderField>> HdrAsync(string field, NntpMessageId messageId);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a>
@@ -802,7 +807,7 @@ public interface INntpClientRfc3977
     /// <param name="messageId">The message-id of the article to received from the server.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    Task<NntpStreamResponse<string>> HdrAsync(
+    Task<NntpStreamResponse<NntpHeaderField>> HdrAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken
@@ -817,7 +822,7 @@ public interface INntpClientRfc3977
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="range">Only include article numbers within this range in the list.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    Task<NntpStreamResponse<string>> HdrAsync(string field, NntpArticleRange range);
+    Task<NntpStreamResponse<NntpHeaderField>> HdrAsync(string field, NntpArticleRange range);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a>
@@ -829,7 +834,7 @@ public interface INntpClientRfc3977
     /// <param name="range">Only include article numbers within this range in the list.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    Task<NntpStreamResponse<string>> HdrAsync(
+    Task<NntpStreamResponse<NntpHeaderField>> HdrAsync(
         string field,
         NntpArticleRange range,
         CancellationToken cancellationToken
@@ -843,7 +848,7 @@ public interface INntpClientRfc3977
     /// </summary>
     /// <param name="field">The header field to retrieve.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    Task<NntpStreamResponse<string>> HdrAsync(string field);
+    Task<NntpStreamResponse<NntpHeaderField>> HdrAsync(string field);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a>
@@ -854,7 +859,10 @@ public interface INntpClientRfc3977
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    Task<NntpStreamResponse<string>> HdrAsync(string field, CancellationToken cancellationToken);
+    Task<NntpStreamResponse<NntpHeaderField>> HdrAsync(
+        string field,
+        CancellationToken cancellationToken
+    );
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.6">LIST HEADERS</a>

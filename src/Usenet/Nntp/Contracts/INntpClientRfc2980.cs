@@ -14,7 +14,7 @@ public interface INntpClientRfc2980
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="messageId">The message-id of the article to retrieve the header for.</param>
     /// <returns>A multi-line response object containing the header.</returns>
-    Task<NntpStreamResponse<string>> XhdrAsync(string field, NntpMessageId messageId);
+    Task<NntpStreamResponse<NntpHeaderField>> XhdrAsync(string field, NntpMessageId messageId);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc2980#section-2.6">XHDR</a>
@@ -24,7 +24,7 @@ public interface INntpClientRfc2980
     /// <param name="messageId">The message-id of the article to retrieve the header for.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response object containing the header.</returns>
-    Task<NntpStreamResponse<string>> XhdrAsync(
+    Task<NntpStreamResponse<NntpHeaderField>> XhdrAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken
@@ -37,7 +37,7 @@ public interface INntpClientRfc2980
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="range">The range of articles to retrieve the header for.</param>
     /// <returns>A multi-line response object containing the headers.</returns>
-    Task<NntpStreamResponse<string>> XhdrAsync(string field, NntpArticleRange range);
+    Task<NntpStreamResponse<NntpHeaderField>> XhdrAsync(string field, NntpArticleRange range);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc2980#section-2.6">XHDR</a>
@@ -47,7 +47,7 @@ public interface INntpClientRfc2980
     /// <param name="range">The range of articles to retrieve the header for.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response object containing the headers.</returns>
-    Task<NntpStreamResponse<string>> XhdrAsync(
+    Task<NntpStreamResponse<NntpHeaderField>> XhdrAsync(
         string field,
         NntpArticleRange range,
         CancellationToken cancellationToken
@@ -59,7 +59,7 @@ public interface INntpClientRfc2980
     /// </summary>
     /// <param name="field">The header field to retrieve.</param>
     /// <returns>A multi-line response object containing the headers.</returns>
-    Task<NntpStreamResponse<string>> XhdrAsync(string field);
+    Task<NntpStreamResponse<NntpHeaderField>> XhdrAsync(string field);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc2980#section-2.6">XHDR</a>
@@ -68,7 +68,10 @@ public interface INntpClientRfc2980
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response object containing the headers.</returns>
-    Task<NntpStreamResponse<string>> XhdrAsync(string field, CancellationToken cancellationToken);
+    Task<NntpStreamResponse<NntpHeaderField>> XhdrAsync(
+        string field,
+        CancellationToken cancellationToken
+    );
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc2980#section-2.8">XOVER</a>
@@ -76,7 +79,7 @@ public interface INntpClientRfc2980
     /// </summary>
     /// <param name="range">The range of articles to retrieve the overview information for.</param>
     /// <returns>A multi-line response object containing the overview database information.</returns>
-    Task<NntpStreamResponse<string>> XoverAsync(NntpArticleRange range);
+    Task<NntpStreamResponse<NntpArticleOverview>> XoverAsync(NntpArticleRange range);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc2980#section-2.8">XOVER</a>
@@ -85,7 +88,7 @@ public interface INntpClientRfc2980
     /// <param name="range">The range of articles to retrieve the overview information for.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response object containing the overview database information.</returns>
-    Task<NntpStreamResponse<string>> XoverAsync(
+    Task<NntpStreamResponse<NntpArticleOverview>> XoverAsync(
         NntpArticleRange range,
         CancellationToken cancellationToken
     );
@@ -95,7 +98,7 @@ public interface INntpClientRfc2980
     /// command returns information from the overview database for the current article.
     /// </summary>
     /// <returns>A multi-line response object containing the overview database information.</returns>
-    Task<NntpStreamResponse<string>> XoverAsync();
+    Task<NntpStreamResponse<NntpArticleOverview>> XoverAsync();
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc2980#section-2.8">XOVER</a>
@@ -103,5 +106,5 @@ public interface INntpClientRfc2980
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response object containing the overview database information.</returns>
-    Task<NntpStreamResponse<string>> XoverAsync(CancellationToken cancellationToken);
+    Task<NntpStreamResponse<NntpArticleOverview>> XoverAsync(CancellationToken cancellationToken);
 }

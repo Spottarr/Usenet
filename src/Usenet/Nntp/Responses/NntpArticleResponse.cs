@@ -17,23 +17,15 @@ namespace Usenet.Nntp.Responses;
 /// buffer rented from <see cref="ArrayPool{T}"/>. The response owns that buffer: the <see cref="Body"/>
 /// view and the lines returned by <see cref="ReadBodyLines()"/> are only valid until the response is
 /// disposed, after which the buffer is returned to the pool. Always dispose the response (preferably
-/// with <c>using</c>/<c>await using</c>); a forgotten response is recovered by a finalizer that returns
-/// the buffer and increments <see cref="LeakedBufferCount"/>.
+/// with <c>using</c>/<c>await using</c>); reading a view after disposal throws
+/// <see cref="ObjectDisposedException"/> rather than returning recycled bytes, and a forgotten response
+/// is recovered by a finalizer that returns the buffer and increments
+/// <see cref="PooledBufferDiagnostics.LeakedBufferCount"/>.
 /// </remarks>
 [PublicAPI]
 public sealed class NntpArticleResponse : NntpResponse, IDisposable, IAsyncDisposable
 {
-    private static long _leakedBufferCount;
-
-    /// <summary>
-    /// The number of pooled buffers reclaimed by the finalizer because a response was not disposed.
-    /// A non-zero value is a diagnostic signal that a caller forgot to dispose an article response.
-    /// </summary>
-    public static long LeakedBufferCount => Interlocked.Read(ref _leakedBufferCount);
-
-    private byte[]? _buffer;
-    private readonly int _bodyOffset;
-    private readonly int _length;
+    private readonly PooledBuffer? _buffer;
     private bool _disposed;
 
     /// <summary>
@@ -59,16 +51,15 @@ public sealed class NntpArticleResponse : NntpResponse, IDisposable, IAsyncDispo
     /// <summary>
     /// The article body as the raw bytes transmitted by the server, with dot-stuffing undone and the
     /// terminating dot removed. The memory is backed by a pooled buffer and is only valid until this
-    /// response is disposed. Empty for a <c>HEAD</c> response or a failure response.
+    /// response is disposed; reading it afterwards throws <see cref="ObjectDisposedException"/>. Empty
+    /// for a <c>HEAD</c> response or a failure response.
     /// </summary>
     public ReadOnlyMemory<byte> Body
     {
         get
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
-            return _buffer is null
-                ? ReadOnlyMemory<byte>.Empty
-                : _buffer.AsMemory(_bodyOffset, _length - _bodyOffset);
+            return _buffer?.Content ?? ReadOnlyMemory<byte>.Empty;
         }
     }
 
@@ -107,23 +98,21 @@ public sealed class NntpArticleResponse : NntpResponse, IDisposable, IAsyncDispo
         MessageId = messageId;
         Groups = groups;
         Headers = headers;
-        _buffer = buffer;
-        _bodyOffset = bodyOffset;
-        _length = length;
+        _buffer = new PooledBuffer(buffer, bodyOffset, length - bodyOffset);
     }
 
     /// <summary>
     /// Reads the article body as text lines on demand, using the default Usenet character encoding.
-    /// Each line is decoded from the pooled buffer when enumerated; the result is only valid until
-    /// this response is disposed.
+    /// Each line is decoded from the pooled buffer when enumerated; enumerating after this response is
+    /// disposed throws <see cref="ObjectDisposedException"/>.
     /// </summary>
     /// <returns>The body lines, with their CRLF terminators stripped.</returns>
     public IEnumerable<string> ReadBodyLines() => ReadBodyLines(UsenetEncoding.Default);
 
     /// <summary>
     /// Reads the article body as text lines on demand, using the specified character encoding.
-    /// Each line is decoded from the pooled buffer when enumerated; the result is only valid until
-    /// this response is disposed.
+    /// Each line is decoded from the pooled buffer when enumerated; enumerating after this response is
+    /// disposed throws <see cref="ObjectDisposedException"/>.
     /// </summary>
     /// <param name="encoding">The character encoding used to decode the body lines.</param>
     /// <returns>The body lines, with their CRLF terminators stripped.</returns>
@@ -132,33 +121,49 @@ public sealed class NntpArticleResponse : NntpResponse, IDisposable, IAsyncDispo
         ArgumentNullException.ThrowIfNull(encoding);
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        var buffer = _buffer;
-        return buffer is null ? [] : EnumerateLines(buffer, _bodyOffset, _length, encoding);
+        return _buffer is null ? [] : EnumerateLines(_buffer, encoding);
     }
 
-    private static IEnumerable<string> EnumerateLines(
-        byte[] buffer,
-        int offset,
-        int length,
-        Encoding encoding
+    private static IEnumerable<string> EnumerateLines(PooledBuffer buffer, Encoding encoding)
+    {
+        var position = 0;
+        // Re-acquire the span per line so a disposal between lines fails fast instead of reading a
+        // recycled buffer. The span scan lives in a non-iterator helper because an iterator cannot
+        // hold a ref struct local across a yield.
+        while (TryReadLine(buffer, encoding, ref position, out var line))
+        {
+            yield return line;
+        }
+    }
+
+    private static bool TryReadLine(
+        PooledBuffer buffer,
+        Encoding encoding,
+        ref int position,
+        out string line
     )
     {
-        var position = offset;
-        while (position < length)
+        var span = buffer.GetSpan();
+        if (position >= span.Length)
         {
-            var newline = Array.IndexOf(buffer, (byte)'\n', position, length - position);
-            var lineEnd = newline < 0 ? length : newline;
-            var next = newline < 0 ? length : newline + 1;
-
-            var contentEnd = lineEnd;
-            if (contentEnd > position && buffer[contentEnd - 1] == (byte)'\r')
-            {
-                contentEnd--;
-            }
-
-            yield return encoding.GetString(buffer, position, contentEnd - position);
-            position = next;
+            line = string.Empty;
+            return false;
         }
+
+        var rest = span[position..];
+        var newline = rest.IndexOf((byte)'\n');
+        var lineEnd = newline < 0 ? rest.Length : newline;
+        var advance = newline < 0 ? rest.Length : newline + 1;
+
+        var contentEnd = lineEnd;
+        if (contentEnd > 0 && rest[contentEnd - 1] == (byte)'\r')
+        {
+            contentEnd--;
+        }
+
+        line = encoding.GetString(rest[..contentEnd]);
+        position += advance;
+        return true;
     }
 
     /// <summary>
@@ -174,13 +179,7 @@ public sealed class NntpArticleResponse : NntpResponse, IDisposable, IAsyncDispo
         }
 
         _disposed = true;
-        var buffer = _buffer;
-        _buffer = null;
-        if (buffer is not null)
-        {
-            ArrayPool<byte>.Shared.Return(buffer);
-        }
-
+        ((IDisposable?)_buffer)?.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -194,18 +193,8 @@ public sealed class NntpArticleResponse : NntpResponse, IDisposable, IAsyncDispo
 
     /// <summary>
     /// Safety net for a response that was never disposed: returns the pooled buffer and increments
-    /// <see cref="LeakedBufferCount"/> so a forgotten response cannot permanently starve the pool.
+    /// <see cref="PooledBufferDiagnostics.LeakedBufferCount"/> so a forgotten response cannot
+    /// permanently starve the pool.
     /// </summary>
-    ~NntpArticleResponse()
-    {
-        var buffer = _buffer;
-        if (buffer is null)
-        {
-            return;
-        }
-
-        _buffer = null;
-        ArrayPool<byte>.Shared.Return(buffer);
-        Interlocked.Increment(ref _leakedBufferCount);
-    }
+    ~NntpArticleResponse() => _buffer?.ReturnLeaked();
 }

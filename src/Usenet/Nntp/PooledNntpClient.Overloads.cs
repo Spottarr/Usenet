@@ -6,23 +6,28 @@ namespace Usenet.Nntp;
 internal sealed partial class PooledNntpClient
 {
     /// <inheritdoc/>
-    public Task<NntpStreamResponse<string>> XhdrAsync(string field, NntpMessageId messageId) =>
-        XhdrAsync(field, messageId, CancellationToken.None);
+    public Task<NntpStreamResponse<NntpHeaderField>> XhdrAsync(
+        string field,
+        NntpMessageId messageId
+    ) => XhdrAsync(field, messageId, CancellationToken.None);
 
     /// <inheritdoc/>
-    public Task<NntpStreamResponse<string>> XhdrAsync(string field, NntpArticleRange range) =>
-        XhdrAsync(field, range, CancellationToken.None);
+    public Task<NntpStreamResponse<NntpHeaderField>> XhdrAsync(
+        string field,
+        NntpArticleRange range
+    ) => XhdrAsync(field, range, CancellationToken.None);
 
     /// <inheritdoc/>
-    public Task<NntpStreamResponse<string>> XhdrAsync(string field) =>
+    public Task<NntpStreamResponse<NntpHeaderField>> XhdrAsync(string field) =>
         XhdrAsync(field, CancellationToken.None);
 
     /// <inheritdoc/>
-    public Task<NntpStreamResponse<string>> XoverAsync(NntpArticleRange range) =>
+    public Task<NntpStreamResponse<NntpArticleOverview>> XoverAsync(NntpArticleRange range) =>
         XoverAsync(range, CancellationToken.None);
 
     /// <inheritdoc/>
-    public Task<NntpStreamResponse<string>> XoverAsync() => XoverAsync(CancellationToken.None);
+    public Task<NntpStreamResponse<NntpArticleOverview>> XoverAsync() =>
+        XoverAsync(CancellationToken.None);
 
     /// <inheritdoc/>
     public Task<NntpMultiLineResponse> CapabilitiesAsync() =>
@@ -120,7 +125,7 @@ internal sealed partial class PooledNntpClient
         NewGroupsAsync(sinceDateTime, CancellationToken.None);
 
     /// <inheritdoc/>
-    public Task<NntpStreamResponse<string>> NewNewsAsync(
+    public Task<NntpStreamResponse<NntpMessageId>> NewNewsAsync(
         string wildmat,
         NntpDateTime sinceDateTime
     ) => NewNewsAsync(wildmat, sinceDateTime, CancellationToken.None);
@@ -138,11 +143,11 @@ internal sealed partial class PooledNntpClient
         ListDistribPatsAsync(CancellationToken.None);
 
     /// <inheritdoc/>
-    public Task<NntpStreamResponse<string>> ListNewsgroupsAsync() =>
+    public Task<NntpStreamResponse<NntpNewsgroupDescription>> ListNewsgroupsAsync() =>
         ListNewsgroupsAsync(CancellationToken.None);
 
     /// <inheritdoc/>
-    public Task<NntpStreamResponse<string>> ListNewsgroupsAsync(string wildmat) =>
+    public Task<NntpStreamResponse<NntpNewsgroupDescription>> ListNewsgroupsAsync(string wildmat) =>
         ListNewsgroupsAsync(wildmat, CancellationToken.None);
 
     /// <inheritdoc/>
@@ -161,15 +166,19 @@ internal sealed partial class PooledNntpClient
         ListOverviewFormatAsync(CancellationToken.None);
 
     /// <inheritdoc/>
-    public Task<NntpStreamResponse<string>> HdrAsync(string field, NntpMessageId messageId) =>
-        HdrAsync(field, messageId, CancellationToken.None);
+    public Task<NntpStreamResponse<NntpHeaderField>> HdrAsync(
+        string field,
+        NntpMessageId messageId
+    ) => HdrAsync(field, messageId, CancellationToken.None);
 
     /// <inheritdoc/>
-    public Task<NntpStreamResponse<string>> HdrAsync(string field, NntpArticleRange range) =>
-        HdrAsync(field, range, CancellationToken.None);
+    public Task<NntpStreamResponse<NntpHeaderField>> HdrAsync(
+        string field,
+        NntpArticleRange range
+    ) => HdrAsync(field, range, CancellationToken.None);
 
     /// <inheritdoc/>
-    public Task<NntpStreamResponse<string>> HdrAsync(string field) =>
+    public Task<NntpStreamResponse<NntpHeaderField>> HdrAsync(string field) =>
         HdrAsync(field, CancellationToken.None);
 
     /// <inheritdoc/>
