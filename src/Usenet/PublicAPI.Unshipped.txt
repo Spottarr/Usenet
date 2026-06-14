@@ -13,3 +13,22 @@ Usenet.Yenc.YencPart.Data.get -> System.ReadOnlyMemory<byte>
 Usenet.Yenc.YencPart.Dispose() -> void
 Usenet.Yenc.YencPart.Footer.get -> Usenet.Yenc.YencFooter?
 Usenet.Yenc.YencPart.Header.get -> Usenet.Yenc.YencHeader!
+Usenet.Nntp.Contracts.INntpConnection.BytesRead.get -> long
+Usenet.Nntp.Contracts.INntpConnection.BytesWritten.get -> long
+Usenet.Nntp.Contracts.INntpConnection.ResetCounters() -> void
+Usenet.Nntp.NntpConnection.BytesRead.get -> long
+Usenet.Nntp.NntpConnection.BytesWritten.get -> long
+Usenet.Nntp.NntpConnection.ResetCounters() -> void
+*REMOVED*Usenet.Nntp.Contracts.INntpConnection.Stream.get -> Usenet.Util.CountingStream?
+*REMOVED*Usenet.Nntp.NntpConnection.Stream.get -> Usenet.Util.CountingStream?
+*REMOVED*Usenet.Util.CountingStream
+*REMOVED*Usenet.Util.CountingStream.BytesRead.get -> long
+*REMOVED*Usenet.Util.CountingStream.BytesWritten.get -> long
+*REMOVED*Usenet.Util.CountingStream.CountingStream(System.IO.Stream! innerStream) -> void
+*REMOVED*Usenet.Util.CountingStream.ResetCounters() -> void
+*REMOVED*override Usenet.Util.CountingStream.CanRead.get -> bool
+*REMOVED*override Usenet.Util.CountingStream.CanWrite.get -> bool
+*REMOVED*override Usenet.Util.CountingStream.Dispose(bool disposing) -> void
+*REMOVED*override Usenet.Util.CountingStream.Flush() -> void
+*REMOVED*override Usenet.Util.CountingStream.Read(byte[]! buffer, int offset, int count) -> int
+*REMOVED*override Usenet.Util.CountingStream.Write(byte[]! buffer, int offset, int count) -> void

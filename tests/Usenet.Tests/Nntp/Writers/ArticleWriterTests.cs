@@ -172,7 +172,11 @@ internal sealed class MockConnection : INntpConnection
         return Task.CompletedTask;
     }
 
-    public CountingStream Stream => throw new NotImplementedException();
+    public long BytesRead => throw new NotImplementedException();
+
+    public long BytesWritten => throw new NotImplementedException();
+
+    public void ResetCounters() => throw new NotImplementedException();
 
     public string[] GetLines() => _lines.ToArray();
 }

@@ -1,6 +1,5 @@
 using JetBrains.Annotations;
 using Usenet.Nntp.Parsers;
-using Usenet.Util;
 
 namespace Usenet.Nntp.Contracts;
 
@@ -130,7 +129,17 @@ public interface INntpConnection : IDisposable
     Task WriteLineAsync(string line, CancellationToken cancellationToken);
 
     /// <summary>
-    /// The stream used by the connection.
+    /// The number of bytes read from the connection.
     /// </summary>
-    CountingStream? Stream { get; }
+    long BytesRead { get; }
+
+    /// <summary>
+    /// The number of bytes written to the connection.
+    /// </summary>
+    long BytesWritten { get; }
+
+    /// <summary>
+    /// Resets the <see cref="BytesRead"/> and <see cref="BytesWritten"/> counters.
+    /// </summary>
+    void ResetCounters();
 }

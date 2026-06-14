@@ -5,7 +5,6 @@ using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Responses;
 using Usenet.Nntp.Writers;
-using Usenet.Util;
 
 namespace Usenet.Nntp;
 
@@ -35,19 +34,19 @@ public partial class NntpClient : INntpClient
     /// <summary>
     /// The number of bytes read.
     /// </summary>
-    public long BytesRead => Connection.Stream?.BytesRead ?? 0;
+    public long BytesRead => Connection.BytesRead;
 
     /// <summary>
     /// The number of bytes written.
     /// </summary>
-    public long BytesWritten => Connection.Stream?.BytesWritten ?? 0;
+    public long BytesWritten => Connection.BytesWritten;
 
     /// <summary>
     /// Resets the counters.
     /// </summary>
     public void ResetCounters()
     {
-        Connection.Stream?.ResetCounters();
+        Connection.ResetCounters();
     }
 
     /// <inheritdoc />

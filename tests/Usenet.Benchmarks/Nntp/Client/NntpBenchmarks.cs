@@ -9,7 +9,7 @@ namespace Usenet.Benchmarks.Nntp.Client;
 /// End-to-end NNTP read benchmarks over a loopback socket served by
 /// <see cref="BenchmarkNntpServer"/>. These cover a single-article read and a
 /// streamed <c>XOVER</c> range, so the numbers include socket reads, the
-/// dot-unstuffing stream reader, and response parsing.
+/// pipe-based line framing and dot-unstuffing, and response parsing.
 /// </summary>
 [MemoryDiagnoser]
 public class NntpBenchmarks
