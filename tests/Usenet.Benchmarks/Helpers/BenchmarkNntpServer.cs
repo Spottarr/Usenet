@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace Usenet.Benchmarks;
+namespace Usenet.Benchmarks.Helpers;
 
 /// <summary>
 /// A minimal in-process NNTP server bound to the loopback interface. It serves
