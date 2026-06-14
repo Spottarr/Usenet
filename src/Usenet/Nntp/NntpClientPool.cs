@@ -19,6 +19,7 @@ public sealed class NntpClientPool : INntpClientPool
     private readonly Queue<IInternalPooledNntpClient> _availableClients = [];
     private readonly HashSet<IInternalPooledNntpClient> _usedClients = [];
     private readonly CancellationTokenSource _cts = new();
+    private readonly Task _monitorTask;
 
     private readonly ILogger _logger = Logger.Create<NntpConnection>();
     private readonly SemaphoreSlim _semaphore;
@@ -60,8 +61,9 @@ public sealed class NntpClientPool : INntpClientPool
         _username = username;
         _password = password;
 
-        // Start the background monitoring task
-        Task.Run(() => MonitorIdleClients(_cts.Token));
+        // Start the background idle-monitor. The task is tracked so it can be awaited
+        // to a clean stop on dispose, leaving no orphaned task or timer behind.
+        _monitorTask = MonitorIdleClientsAsync(_cts.Token);
     }
 
     public Task<IPooledNntpClientLease> GetLease() => GetLease(CancellationToken.None);
@@ -109,17 +111,19 @@ public sealed class NntpClientPool : INntpClientPool
         ArgumentNullException.ThrowIfNull(client);
         ObjectDisposedException.ThrowIf(_disposed, this);
 
+        _logger.ReturningNntpClient();
+
+        bool dispose;
         lock (_lock)
         {
-            _logger.ReturningNntpClient();
-
             if (!_usedClients.Remove(client))
                 throw new InvalidOperationException("Client not borrowed from this pool.");
 
-            // If the client has encountered an error (e.g. broken pipe) during the most recent operation, dispose it instead of returning it to the pool
-            if (client.HasError)
+            // If the client has encountered an error (e.g. broken pipe) during the most recent
+            // operation, drop it from the pool instead of handing it back out.
+            dispose = client.HasError;
+            if (dispose)
             {
-                client.Dispose();
                 _currentPoolSize--;
                 _logger.DisposingErroredNntpClient(_currentPoolSize, _maxPoolSize);
             }
@@ -127,9 +131,13 @@ public sealed class NntpClientPool : INntpClientPool
             {
                 _availableClients.Enqueue(client);
             }
-
-            _semaphore.Release();
         }
+
+        // Disposing closes the underlying connection, which may block, so keep it out of the lock.
+        if (dispose)
+            client.Dispose();
+
+        _semaphore.Release();
     }
 
     private IInternalPooledNntpClient BorrowClientInternal()
@@ -157,60 +165,80 @@ public sealed class NntpClientPool : INntpClientPool
         }
     }
 
-    private async Task MonitorIdleClients(CancellationToken ct)
+    private async Task MonitorIdleClientsAsync(CancellationToken cancellationToken)
     {
-        while (!ct.IsCancellationRequested)
+        // Yield out of the constructor so init-only properties (e.g. MonitorInterval) are
+        // assigned by the object initializer before the timer reads them.
+        await Task.Yield();
+
+        using var timer = new PeriodicTimer(MonitorInterval);
+        try
         {
-            await Task.Delay(MonitorInterval, ct).ConfigureAwait(false);
-            var now = DateTimeOffset.Now;
-
-            lock (_lock)
+            while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false))
             {
-                var count = _availableClients.Count;
-                for (var i = 0; i < count; i++)
-                {
-                    var client = _availableClients.Dequeue();
-                    if (now - client.LastActivity > IdleTimeout)
-                    {
-                        client.Dispose();
-                        _currentPoolSize--;
-                        _logger.DisposingIdleNntpClient(_currentPoolSize, _maxPoolSize);
-                        continue;
-                    }
-
-                    _availableClients.Enqueue(client);
-                }
+                EvictIdleClients();
             }
         }
+        catch (OperationCanceledException)
+        {
+            // Expected when the pool is disposed and the monitor is cancelled.
+        }
+    }
+
+    private void EvictIdleClients()
+    {
+        var now = DateTimeOffset.Now;
+        List<IInternalPooledNntpClient>? idleClients = null;
+
+        lock (_lock)
+        {
+            var count = _availableClients.Count;
+            for (var i = 0; i < count; i++)
+            {
+                var client = _availableClients.Dequeue();
+                if (now - client.LastActivity > IdleTimeout)
+                {
+                    (idleClients ??= []).Add(client);
+                    _currentPoolSize--;
+                    _logger.DisposingIdleNntpClient(_currentPoolSize, _maxPoolSize);
+                    continue;
+                }
+
+                _availableClients.Enqueue(client);
+            }
+        }
+
+        if (idleClients is null)
+            return;
+
+        // Disposing closes the underlying connection, which may block, so keep it out of the lock.
+        foreach (var client in idleClients)
+            client.Dispose();
     }
 
     public void Dispose()
     {
         if (_disposed)
             return;
+        _disposed = true;
 
+        // Stop the idle monitor and wait for it to unwind before tearing down the clients it
+        // would otherwise touch. The monitor swallows the cancellation, so this will not throw.
         _cts.Cancel();
+        _monitorTask.GetAwaiter().GetResult();
 
+        List<IInternalPooledNntpClient> clients;
         lock (_lock)
         {
-            // Clean up any clients available in the pool
-            foreach (var client in _availableClients)
-            {
-                client.Dispose();
-            }
+            clients = [.. _availableClients, .. _usedClients];
             _availableClients.Clear();
-
-            // Clean up any clients borrowed from the pool but not yet returned
-            foreach (var client in _usedClients)
-            {
-                client.Dispose();
-            }
             _usedClients.Clear();
         }
 
+        foreach (var client in clients)
+            client.Dispose();
+
         _semaphore.Dispose();
         _cts.Dispose();
-
-        _disposed = true;
     }
 }
