@@ -23,71 +23,6 @@ public static class YencEncoder
     private static readonly byte[] EscapeTable = CreateEscapeTable();
 
     /// <summary>
-    /// Encodes the binary data in the specified stream into yEnc-encoded text
-    /// using the default Usenet character encoding.
-    /// </summary>
-    /// <param name="header">The yEnc header.</param>
-    /// <param name="stream">The stream containing the binary data to encode.</param>
-    /// <returns>A task containing the yEnc-encoded text lines.</returns>
-    public static Task<IReadOnlyList<string>> EncodeAsync(YencHeader header, Stream stream) =>
-        EncodeAsync(header, stream, UsenetEncoding.Default, CancellationToken.None);
-
-    /// <summary>
-    /// Encodes the binary data in the specified stream into yEnc-encoded text
-    /// using the default Usenet character encoding.
-    /// </summary>
-    /// <param name="header">The yEnc header.</param>
-    /// <param name="stream">The stream containing the binary data to encode.</param>
-    /// <param name="encoding">The character encoding to use.</param>
-    /// <returns>A task containing the yEnc-encoded text lines.</returns>
-    public static Task<IReadOnlyList<string>> EncodeAsync(
-        YencHeader header,
-        Stream stream,
-        Encoding encoding
-    ) => EncodeAsync(header, stream, encoding, CancellationToken.None);
-
-    /// <summary>
-    /// Encodes the binary data in the specified stream into yEnc-encoded text
-    /// using the default Usenet character encoding.
-    /// </summary>
-    /// <param name="header">The yEnc header.</param>
-    /// <param name="stream">The stream containing the binary data to encode.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task containing the yEnc-encoded text lines.</returns>
-    public static Task<IReadOnlyList<string>> EncodeAsync(
-        YencHeader header,
-        Stream stream,
-        CancellationToken cancellationToken
-    ) => EncodeAsync(header, stream, UsenetEncoding.Default, cancellationToken);
-
-    /// <summary>
-    /// Encodes the binary data in the specified stream into yEnc-encoded text
-    /// using the specified character encoding.
-    /// </summary>
-    /// <param name="header">The yEnc header.</param>
-    /// <param name="stream">The stream containing the binary data to encode.</param>
-    /// <param name="encoding">The character encoding to use.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task containing the yEnc-encoded text lines.</returns>
-    public static async Task<IReadOnlyList<string>> EncodeAsync(
-        YencHeader header,
-        Stream stream,
-        Encoding encoding,
-        CancellationToken cancellationToken
-    )
-    {
-        ArgumentNullException.ThrowIfNull(encoding);
-
-        // Back-compat text adapter over the streaming byte sink: encode into a growable
-        // buffer, then split the framed bytes back into the historical list of lines.
-        var writer = new ArrayBufferWriter<byte>();
-        await EncodeAsync(header, stream, writer, encoding, cancellationToken)
-            .ConfigureAwait(false);
-
-        return SplitLines(writer.WrittenSpan, encoding);
-    }
-
-    /// <summary>
     /// Encodes the binary data in the specified stream as yEnc-encoded bytes,
     /// streaming the result into the specified <see cref="IBufferWriter{T}"/>
     /// using the default Usenet character encoding.
@@ -278,25 +213,6 @@ public static class YencEncoder
         span[0] = YencCharacters.Cr;
         span[1] = YencCharacters.Lf;
         writer.Advance(2);
-    }
-
-    private static List<string> SplitLines(ReadOnlySpan<byte> bytes, Encoding encoding)
-    {
-        var lines = new List<string>();
-        var start = 0;
-        for (var i = 0; i < bytes.Length - 1; i++)
-        {
-            if (bytes[i] != YencCharacters.Cr || bytes[i + 1] != YencCharacters.Lf)
-            {
-                continue;
-            }
-
-            lines.Add(encoding.GetString(bytes[start..i]));
-            i++;
-            start = i + 1;
-        }
-
-        return lines;
     }
 
     private static byte[] CreateEscapeTable()

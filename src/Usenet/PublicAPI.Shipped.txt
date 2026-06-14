@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 const Usenet.Nntp.Models.NntpGroups.GroupSeparator = ";" -> string!
 const Usenet.Nntp.NntpHeaders.Approved = "Approved" -> string!
 const Usenet.Nntp.NntpHeaders.Archive = "Archive" -> string!
@@ -44,26 +44,12 @@ override Usenet.Nzb.NzbFile.Equals(object? obj) -> bool
 override Usenet.Nzb.NzbFile.GetHashCode() -> int
 override Usenet.Nzb.NzbSegment.Equals(object? obj) -> bool
 override Usenet.Nzb.NzbSegment.GetHashCode() -> int
-override Usenet.Util.AbstractBaseStream.CanRead.get -> bool
-override Usenet.Util.AbstractBaseStream.CanSeek.get -> bool
-override Usenet.Util.AbstractBaseStream.CanWrite.get -> bool
-override Usenet.Util.AbstractBaseStream.Flush() -> void
-override Usenet.Util.AbstractBaseStream.Length.get -> long
-override Usenet.Util.AbstractBaseStream.Position.get -> long
-override Usenet.Util.AbstractBaseStream.Position.set -> void
-override Usenet.Util.AbstractBaseStream.Read(byte[]! buffer, int offset, int count) -> int
-override Usenet.Util.AbstractBaseStream.Seek(long offset, System.IO.SeekOrigin origin) -> long
-override Usenet.Util.AbstractBaseStream.SetLength(long value) -> void
-override Usenet.Util.AbstractBaseStream.Write(byte[]! buffer, int offset, int count) -> void
 override Usenet.Util.CountingStream.CanRead.get -> bool
 override Usenet.Util.CountingStream.CanWrite.get -> bool
 override Usenet.Util.CountingStream.Dispose(bool disposing) -> void
 override Usenet.Util.CountingStream.Flush() -> void
 override Usenet.Util.CountingStream.Read(byte[]! buffer, int offset, int count) -> int
 override Usenet.Util.CountingStream.Write(byte[]! buffer, int offset, int count) -> void
-override Usenet.Util.EnumerableStream.CanRead.get -> bool
-override Usenet.Util.EnumerableStream.Dispose(bool disposing) -> void
-override Usenet.Util.EnumerableStream.Read(byte[]! buffer, int offset, int count) -> int
 static Usenet.Logger.Create<T>() -> Microsoft.Extensions.Logging.ILogger!
 static Usenet.Logger.Factory.get -> Microsoft.Extensions.Logging.ILoggerFactory!
 static Usenet.Logger.Factory.set -> void
@@ -116,17 +102,6 @@ static Usenet.Nzb.NzbSegment.operator ==(Usenet.Nzb.NzbSegment? first, Usenet.Nz
 static Usenet.Nzb.TextWriterExtensions.WriteNzbDocumentAsync(this System.IO.TextWriter! textWriter, Usenet.Nzb.NzbDocument! nzbDocument) -> System.Threading.Tasks.Task!
 static Usenet.Nzb.TextWriterExtensions.WriteNzbDocumentAsync(this System.IO.TextWriter! textWriter, Usenet.Nzb.NzbDocument! nzbDocument, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
 static Usenet.Util.UsenetEncoding.Default.get -> System.Text.Encoding!
-static Usenet.Yenc.YencArticleDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines) -> Usenet.Yenc.YencArticle!
-static Usenet.Yenc.YencArticleDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines, System.Text.Encoding! encoding) -> Usenet.Yenc.YencArticle!
-static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string!>!>!
-static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Text.Encoding! encoding) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string!>!>!
-static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string!>!>!
-static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string!>!>!
-static Usenet.Yenc.YencStreamDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines) -> Usenet.Yenc.YencStream!
-static Usenet.Yenc.YencStreamDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines, System.Text.Encoding! encoding) -> Usenet.Yenc.YencStream!
-static Usenet.Yenc.YencStreamDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken) -> Usenet.Yenc.YencStream!
-static Usenet.Yenc.YencStreamDecoder.Decode(System.Collections.Generic.IEnumerable<string!>! encodedLines, System.Threading.CancellationToken cancellationToken) -> Usenet.Yenc.YencStream!
-static Usenet.Yenc.YencValidator.Validate(Usenet.Yenc.YencArticle! article) -> Usenet.Util.ValidationResult!
 Usenet.Exceptions.InvalidNzbDataException
 Usenet.Exceptions.InvalidNzbDataException.InvalidNzbDataException() -> void
 Usenet.Exceptions.InvalidNzbDataException.InvalidNzbDataException(string! message) -> void
@@ -626,29 +601,12 @@ Usenet.Nzb.NzbWriter.NzbWriter(System.IO.TextWriter! textWriter) -> void
 Usenet.Nzb.NzbWriter.WriteAsync(Usenet.Nzb.NzbDocument! nzbDocument) -> System.Threading.Tasks.Task!
 Usenet.Nzb.NzbWriter.WriteAsync(Usenet.Nzb.NzbDocument! nzbDocument, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
 Usenet.Nzb.TextWriterExtensions
-Usenet.Util.AbstractBaseStream
-Usenet.Util.AbstractBaseStream.AbstractBaseStream() -> void
 Usenet.Util.CountingStream
 Usenet.Util.CountingStream.BytesRead.get -> long
 Usenet.Util.CountingStream.BytesWritten.get -> long
 Usenet.Util.CountingStream.CountingStream(System.IO.Stream! innerStream) -> void
 Usenet.Util.CountingStream.ResetCounters() -> void
-Usenet.Util.EnumerableStream
-Usenet.Util.EnumerableStream.EnumerableStream(System.Collections.Generic.IEnumerable<byte[]!>! input) -> void
 Usenet.Util.UsenetEncoding
-Usenet.Util.ValidationFailure
-Usenet.Util.ValidationFailure.Code.get -> string!
-Usenet.Util.ValidationFailure.Data.get -> object?
-Usenet.Util.ValidationFailure.Message.get -> string!
-Usenet.Util.ValidationResult
-Usenet.Util.ValidationResult.Failures.get -> System.Collections.Generic.IReadOnlyList<Usenet.Util.ValidationFailure!>!
-Usenet.Util.ValidationResult.IsValid.get -> bool
-Usenet.Yenc.YencArticle
-Usenet.Yenc.YencArticle.Data.get -> System.Collections.Generic.IReadOnlyList<byte>!
-Usenet.Yenc.YencArticle.Footer.get -> Usenet.Yenc.YencFooter?
-Usenet.Yenc.YencArticle.Header.get -> Usenet.Yenc.YencHeader!
-Usenet.Yenc.YencArticle.YencArticle(Usenet.Yenc.YencHeader! header, Usenet.Yenc.YencFooter? footer, byte[]! data) -> void
-Usenet.Yenc.YencArticleDecoder
 Usenet.Yenc.YencEncoder
 Usenet.Yenc.YencFooter
 Usenet.Yenc.YencFooter.Crc32.get -> uint?
@@ -666,8 +624,3 @@ Usenet.Yenc.YencHeader.PartOffset.get -> long
 Usenet.Yenc.YencHeader.PartSize.get -> long
 Usenet.Yenc.YencHeader.TotalParts.get -> int
 Usenet.Yenc.YencHeader.YencHeader(string! fileName, long fileSize, int lineLength, int partNumber, int totalParts, long partSize, long partOffset) -> void
-Usenet.Yenc.YencStream
-Usenet.Yenc.YencStream.Header.get -> Usenet.Yenc.YencHeader!
-Usenet.Yenc.YencStream.YencStream(Usenet.Yenc.YencHeader! header, System.Collections.Generic.IEnumerable<byte[]!>! input) -> void
-Usenet.Yenc.YencStreamDecoder
-Usenet.Yenc.YencValidator

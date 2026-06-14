@@ -5,9 +5,9 @@ using Usenet.Yenc;
 namespace Usenet.Benchmarks.Yenc;
 
 /// <summary>
-/// Benchmarks the yEnc encode hot path. Both methods operate on a single in-memory
-/// part so the numbers reflect raw codec throughput and allocations, not stream or
-/// socket overhead.
+/// Benchmarks the yEnc encode hot path. The encoder streams a single in-memory part into an
+/// <see cref="ArrayBufferWriter{T}"/> so the numbers reflect raw codec throughput and
+/// allocations, not stream or socket overhead.
 /// </summary>
 [MemoryDiagnoser]
 public class YencEncoderBenchmarks
@@ -34,14 +34,6 @@ public class YencEncoderBenchmarks
 
         _header = new YencHeader("benchmark.bin", PartSize, LineLength, 0, 1, PartSize, 0);
         _writer = new ArrayBufferWriter<byte>(_data.Length * 2);
-    }
-
-    [Benchmark(Baseline = true)]
-    public async Task<int> EncodeToLines()
-    {
-        using var stream = new MemoryStream(_data);
-        var lines = await YencEncoder.EncodeAsync(_header, stream);
-        return lines.Count;
     }
 
     [Benchmark]

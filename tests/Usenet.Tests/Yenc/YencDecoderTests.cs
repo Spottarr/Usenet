@@ -4,7 +4,6 @@ using Microsoft.Extensions.FileProviders;
 using Usenet.Exceptions;
 using Usenet.Tests.Extensions;
 using Usenet.Tests.TestHelpers;
-using Usenet.Util;
 using Usenet.Yenc;
 
 namespace Usenet.Tests.Yenc;
@@ -98,17 +97,6 @@ internal sealed class YencDecoderTests
                 EmbeddedResourceHelper.GetFileInfo("yenc.multipart.00000020.ntx"),
                 EmbeddedResourceHelper.GetFileInfo("yenc.multipart.00000021.ntx")
             );
-    }
-
-    [Test]
-    [MethodDataSource(nameof(GetSinglePartData))]
-    internal async Task DataShouldMatchStringBasedDecoder(IFileInfo _, IFileInfo actual)
-    {
-        var expected = YencArticleDecoder.Decode(actual.ReadAllLines(UsenetEncoding.Default));
-
-        using var part = YencDecoder.Decode(actual.ReadAllBytes());
-
-        await Assert.That(part.Data.ToArray()).IsEquivalentTo(expected.Data);
     }
 
     [Test]
