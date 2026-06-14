@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
 using Usenet.Tests.TestHelpers;
 
 namespace Usenet.Tests.Util;
@@ -21,8 +20,8 @@ internal sealed class LoggerTests
     [Test]
     public async Task ShouldUseSetLogger()
     {
-        var loggerFactory = Substitute.For<ILoggerFactory>();
-        loggerFactory.CreateLogger(Arg.Any<string>()).Returns(new InMemoryLogger());
+        var loggerFactory = ILoggerFactory.Mock();
+        loggerFactory.CreateLogger(Any<string>()).Returns(new InMemoryLogger());
 
         Logger.Factory = loggerFactory;
         var logger = Logger.Create<LoggerTests>();
