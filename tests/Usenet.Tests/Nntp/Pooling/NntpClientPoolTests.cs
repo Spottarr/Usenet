@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Usenet.Nntp;
 using Usenet.Nntp.Contracts;
+using Usenet.Nntp.Models;
 using Usenet.Tests.TestHelpers;
 
 namespace Usenet.Tests.Nntp.Pooling;
@@ -153,6 +154,104 @@ internal sealed class NntpClientPoolTests
         // still be able to lease a client once the storm has settled.
         var lease = await pool.GetLease(cancellationToken);
         lease.Dispose();
+    }
+
+    [Test]
+    public async Task ReuseConnectionAfterFullyDrainedStream(CancellationToken cancellationToken)
+    {
+        await using var server = new StreamingNntpServer();
+        using var pool = new NntpClientPool(
+            1,
+            "127.0.0.1",
+            server.Port,
+            false,
+            "example.user",
+            "example.pass"
+        )
+        {
+            WaitTimeout = TimeSpan.Zero,
+            MonitorInterval = TimeSpan.FromMinutes(1),
+        };
+
+        var lease1 = await pool.GetLease(cancellationToken);
+        var client1 = lease1.Client;
+        await using (
+            var response = await client1.XoverAsync(NntpArticleRange.Range(1, 5), cancellationToken)
+        )
+        {
+            await foreach (var _ in response.WithCancellation(cancellationToken)) { }
+        }
+
+        lease1.Dispose();
+
+        // The stream was fully drained, so the same connection is handed back out and still works.
+        var lease2 = await pool.GetLease(cancellationToken);
+        await Assert.That(ReferenceEquals(lease2.Client, client1)).IsTrue();
+
+        await using (
+            var response = await lease2.Client.XoverAsync(
+                NntpArticleRange.Range(1, 3),
+                cancellationToken
+            )
+        )
+        {
+            var count = 0;
+            await foreach (var _ in response.WithCancellation(cancellationToken))
+            {
+                count++;
+            }
+
+            await Assert.That(count).IsEqualTo(3);
+        }
+
+        lease2.Dispose();
+    }
+
+    [Test]
+    public async Task DiscardConnectionWithUndrainedStream(CancellationToken cancellationToken)
+    {
+        await using var server = new StreamingNntpServer();
+        using var pool = new NntpClientPool(
+            1,
+            "127.0.0.1",
+            server.Port,
+            false,
+            "example.user",
+            "example.pass"
+        )
+        {
+            WaitTimeout = TimeSpan.Zero,
+            MonitorInterval = TimeSpan.FromMinutes(1),
+        };
+
+        var lease1 = await pool.GetLease(cancellationToken);
+        var client1 = lease1.Client;
+
+        // Start a stream but never enumerate or dispose it: the data block is left on the wire.
+        _ = await client1.XoverAsync(NntpArticleRange.Range(1, 100), cancellationToken);
+        lease1.Dispose();
+
+        // The connection had unread bytes, so it is discarded and the next lease is a fresh client.
+        var lease2 = await pool.GetLease(cancellationToken);
+        await Assert.That(ReferenceEquals(lease2.Client, client1)).IsFalse();
+
+        await using (
+            var response = await lease2.Client.XoverAsync(
+                NntpArticleRange.Range(1, 3),
+                cancellationToken
+            )
+        )
+        {
+            var count = 0;
+            await foreach (var _ in response.WithCancellation(cancellationToken))
+            {
+                count++;
+            }
+
+            await Assert.That(count).IsEqualTo(3);
+        }
+
+        lease2.Dispose();
     }
 
     [SuppressMessage(
