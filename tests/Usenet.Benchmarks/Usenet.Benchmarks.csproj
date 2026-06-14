@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- Multi-target in line with the library so a baseline can be captured on either runtime. -->
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+
+    <!--
+      BenchmarkDotNet requires public benchmark classes/methods and the benchmark bodies
+      intentionally allocate (that is what we measure), so the library's strict
+      AnalysisMode=All / warnings-as-errors would fight the harness. Relax just for this
+      project; it is not part of the shipped package nor the CI build.
+    -->
+    <AnalysisMode>Default</AnalysisMode>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Usenet\Usenet.csproj" />
+  </ItemGroup>
+</Project>
