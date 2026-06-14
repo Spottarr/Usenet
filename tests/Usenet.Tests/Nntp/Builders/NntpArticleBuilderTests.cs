@@ -1,9 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Usenet.Exceptions;
+﻿using Usenet.Exceptions;
 using Usenet.Nntp;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Models;
-using Usenet.Util;
 
 namespace Usenet.Tests.Nntp.Builders;
 
@@ -141,20 +139,18 @@ internal sealed class NntpArticleBuilderTests
     }
 
     [Test]
-    [SuppressMessage("ReSharper", "DuplicateKeyCollectionInitialization")]
     public async Task BuildShouldBuildArticle()
     {
         var expected = new NntpArticle(
             0,
             "123@hhh.net",
             "alt.test;alt.testclient",
-            new MultiValueDictionary<string, string>
-            {
-                { NntpHeaders.Subject, "subject" },
-                { NntpHeaders.From, "superuser" },
-                { "Header1", "Value1" },
-                { "Header1", "Value2" },
-            },
+            new NntpHeaderCollection([
+                new(NntpHeaders.Subject, "subject"),
+                new(NntpHeaders.From, "superuser"),
+                new("Header1", "Value1"),
+                new("Header1", "Value2"),
+            ]),
             []
         );
 
@@ -174,20 +170,18 @@ internal sealed class NntpArticleBuilderTests
     }
 
     [Test]
-    [SuppressMessage("ReSharper", "DuplicateKeyCollectionInitialization")]
     public async Task BuildInitializedFromExistingArticleShouldBuildSameArticle()
     {
         var expected = new NntpArticle(
             0,
             "123@hhh.net",
             "alt.test;alt.testclient",
-            new MultiValueDictionary<string, string>
-            {
-                { NntpHeaders.Subject, "subject" },
-                { NntpHeaders.From, "superuser" },
-                { "Header1", "Value1" },
-                { "Header1", "Value2" },
-            },
+            new NntpHeaderCollection([
+                new(NntpHeaders.Subject, "subject"),
+                new(NntpHeaders.From, "superuser"),
+                new("Header1", "Value1"),
+                new("Header1", "Value2"),
+            ]),
             []
         );
 

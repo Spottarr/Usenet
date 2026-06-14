@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
-using Usenet.Util;
 
 namespace Usenet.Tests.Nntp.Parsers;
 
@@ -19,7 +18,7 @@ internal sealed class ArticleResponseParserTests
                     123,
                     "<123@poster.com>",
                     NntpGroups.Empty,
-                    MultiValueDictionary<string, string>.EmptyIgnoreCase,
+                    NntpHeaderCollection.Empty,
                     new List<string>(0)
                 )
             );
@@ -40,11 +39,10 @@ internal sealed class ArticleResponseParserTests
                     123,
                     "<123@poster.com>",
                     NntpGroups.Empty,
-                    new MultiValueDictionary<string, string>
-                    {
-                        { "Path", "pathost!demo!whitehouse!not-for-mail" },
-                        { "From", "\"Demo User\" <nobody@example.net>" },
-                    },
+                    new NntpHeaderCollection([
+                        new("Path", "pathost!demo!whitehouse!not-for-mail"),
+                        new("From", "\"Demo User\" <nobody@example.net>"),
+                    ]),
                     new List<string> { "This is just a test article (1).", "With two lines." }
                 )
             );
@@ -59,7 +57,7 @@ internal sealed class ArticleResponseParserTests
                     123,
                     "<123@poster.com>",
                     NntpGroups.Empty,
-                    MultiValueDictionary<string, string>.EmptyIgnoreCase,
+                    NntpHeaderCollection.Empty,
                     new List<string> { "This is just a test article (2).", "With two lines." }
                 )
             );
@@ -74,11 +72,10 @@ internal sealed class ArticleResponseParserTests
                     123,
                     "<123@poster.com>",
                     NntpGroups.Empty,
-                    new MultiValueDictionary<string, string>
-                    {
-                        { "Multi", "line1 line2 line3" },
-                        { "Path", "pathost!demo!whitehouse!not-for-mail" },
-                    },
+                    new NntpHeaderCollection([
+                        new("Multi", "line1 line2 line3"),
+                        new("Path", "pathost!demo!whitehouse!not-for-mail"),
+                    ]),
                     new List<string>(0)
                 )
             );
@@ -93,10 +90,7 @@ internal sealed class ArticleResponseParserTests
                     123,
                     "<123@poster.com>",
                     NntpGroups.Empty,
-                    new MultiValueDictionary<string, string>
-                    {
-                        { "Path", "pathost!demo!whitehouse!not-for-mail" },
-                    },
+                    new NntpHeaderCollection([new("Path", "pathost!demo!whitehouse!not-for-mail")]),
                     new List<string>(0)
                 )
             );

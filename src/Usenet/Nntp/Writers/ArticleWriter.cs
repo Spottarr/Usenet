@@ -39,19 +39,15 @@ internal static class ArticleWriter
                 cancellationToken
             )
             .ConfigureAwait(false);
-        foreach (var header in article.Headers)
+        foreach (var (key, value) in article.Headers)
         {
-            if (header.Key is NntpHeaders.MessageId or NntpHeaders.Newsgroups)
+            if (key is NntpHeaders.MessageId or NntpHeaders.Newsgroups)
             {
                 // skip message-id and newsgroups, they are already written
                 continue;
             }
 
-            foreach (var value in header.Value)
-            {
-                await WriteHeaderAsync(connection, header.Key, value, cancellationToken)
-                    .ConfigureAwait(false);
-            }
+            await WriteHeaderAsync(connection, key, value, cancellationToken).ConfigureAwait(false);
         }
     }
 
