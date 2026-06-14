@@ -40,3 +40,16 @@ connection), before issuing the next command on that lease.
   enumerator on return to avoid leaving unread bytes on a reused connection.
 - This is the same framing discipline [ADR-0001](0001-article-buffering-and-streaming-model.md)
   established for bodies, now applied to multi-line results.
+
+## Measured outcomes
+
+Recorded after the rebuild landed (#122). The `XOVER` read over a loopback connection
+(BenchmarkDotNet `ShortRun`, .NET 10) allocates ~642 KB to frame and materialize 1000
+overview rows, i.e. **~0.64 KB per row** — dominated by the decoded line `string` and its
+slot in the result list, with the pipe's read buffers drawn from the pool rather than the
+managed heap.
+
+The TUnit suite (`XoverAllocationTests`) measures the *marginal* allocation of a single
+streamed row by reading two ranges and dividing the allocation delta by the row delta, so
+fixed per-command overhead cancels out. That marginal cost measures ~590 B/row and is held
+under a 896 B/row ceiling so a per-row regression (extra copies, boxing) fails CI.
