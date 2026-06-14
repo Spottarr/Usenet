@@ -2,7 +2,6 @@ using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Writers;
-using Usenet.Util;
 
 namespace Usenet.Tests.Nntp.Writers;
 
@@ -16,7 +15,7 @@ internal sealed class ArticleWriterTests
                     0,
                     "1@example.com",
                     "group",
-                    MultiValueDictionary<string, string>.EmptyIgnoreCase,
+                    NntpHeaderCollection.Empty,
                     new List<string>(0)
                 ),
                 ["Message-ID: <1@example.com>", "Newsgroups: group", "", "."]
@@ -28,7 +27,7 @@ internal sealed class ArticleWriterTests
                     0,
                     "<2@example.com>",
                     "group",
-                    MultiValueDictionary<string, string>.EmptyIgnoreCase,
+                    NntpHeaderCollection.Empty,
                     new List<string>(0)
                 ),
                 ["Message-ID: <2@example.com>", "Newsgroups: group", "", "."]
@@ -40,10 +39,7 @@ internal sealed class ArticleWriterTests
                     0,
                     "3@example.com",
                     "group",
-                    new MultiValueDictionary<string, string>
-                    {
-                        { "From", "\"Demo User\" <nobody@example.net>" },
-                    },
+                    new NntpHeaderCollection([new("From", "\"Demo User\" <nobody@example.net>")]),
                     new List<string> { "This is just a test article." }
                 ),
                 [
@@ -62,10 +58,7 @@ internal sealed class ArticleWriterTests
                     0,
                     "4@example.com",
                     "group",
-                    new MultiValueDictionary<string, string>
-                    {
-                        { "Message-ID", "<9999@example.com>" },
-                    },
+                    new NntpHeaderCollection([new("Message-ID", "<9999@example.com>")]),
                     new List<string> { "This is just a test article." }
                 ),
                 [
@@ -83,10 +76,7 @@ internal sealed class ArticleWriterTests
                     0,
                     "5@example.com",
                     "group",
-                    new MultiValueDictionary<string, string>
-                    {
-                        { "Message-ID", "9999@example.com" },
-                    },
+                    new NntpHeaderCollection([new("Message-ID", "9999@example.com")]),
                     new List<string> { "This is just a test article." }
                 ),
                 [

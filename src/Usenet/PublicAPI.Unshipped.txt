@@ -1,4 +1,19 @@
 #nullable enable
+*REMOVED*Usenet.Nntp.Models.NntpArticle.Headers.get -> System.Collections.Immutable.ImmutableDictionary<string!, System.Collections.Immutable.ImmutableList<string!>!>!
+Usenet.Nntp.Models.NntpArticle.Headers.get -> Usenet.Nntp.Models.NntpHeaderCollection!
+Usenet.Nntp.Models.NntpHeaderCollection
+Usenet.Nntp.Models.NntpHeaderCollection.Contains(string! key) -> bool
+Usenet.Nntp.Models.NntpHeaderCollection.Count.get -> int
+Usenet.Nntp.Models.NntpHeaderCollection.Equals(Usenet.Nntp.Models.NntpHeaderCollection? other) -> bool
+Usenet.Nntp.Models.NntpHeaderCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<string!, string!>>!
+Usenet.Nntp.Models.NntpHeaderCollection.GetValues(string! key) -> System.Collections.Generic.IEnumerable<string!>!
+Usenet.Nntp.Models.NntpHeaderCollection.this[int index].get -> System.Collections.Generic.KeyValuePair<string!, string!>
+Usenet.Nntp.Models.NntpHeaderCollection.TryGetValue(string! key, out string! value) -> bool
+override Usenet.Nntp.Models.NntpHeaderCollection.Equals(object? obj) -> bool
+override Usenet.Nntp.Models.NntpHeaderCollection.GetHashCode() -> int
+static Usenet.Nntp.Models.NntpHeaderCollection.Empty.get -> Usenet.Nntp.Models.NntpHeaderCollection!
+static Usenet.Nntp.Models.NntpHeaderCollection.operator !=(Usenet.Nntp.Models.NntpHeaderCollection? first, Usenet.Nntp.Models.NntpHeaderCollection? second) -> bool
+static Usenet.Nntp.Models.NntpHeaderCollection.operator ==(Usenet.Nntp.Models.NntpHeaderCollection? first, Usenet.Nntp.Models.NntpHeaderCollection? second) -> bool
 static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Buffers.IBufferWriter<byte>! writer) -> System.Threading.Tasks.Task!
 static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Buffers.IBufferWriter<byte>! writer, System.Text.Encoding! encoding) -> System.Threading.Tasks.Task!
 static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Buffers.IBufferWriter<byte>! writer, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Usenet.Exceptions;
 using Usenet.Extensions;
 using Usenet.Nntp.Models;
-using Usenet.Util;
 
 namespace Usenet.Nntp.Builders;
 
@@ -27,7 +26,7 @@ public class NntpArticleBuilder
         NntpHeaders.Newsgroups,
     ];
 
-    private MultiValueDictionary<string, string> _headers = [];
+    private List<KeyValuePair<string, string>> _headers = [];
     private NntpGroupsBuilder _groupsBuilder = new();
     private NntpMessageId _messageId = NntpMessageId.Empty;
     private string _from = string.Empty;
@@ -58,84 +57,81 @@ public class NntpArticleBuilder
         _dateTime = null;
         _body = [];
 
-        foreach (var header in article.Headers)
+        foreach (var (key, value) in article.Headers)
         {
-            foreach (var value in header.Value)
+            switch (key)
             {
-                switch (header.Key)
-                {
-                    case NntpHeaders.MessageId:
-                        if (!_messageId.HasValue)
-                        {
-                            _messageId = value;
-                        }
-                        else
-                        {
-                            _log.HeaderOccursMoreThanOnce(NntpHeaders.MessageId);
-                        }
+                case NntpHeaders.MessageId:
+                    if (!_messageId.HasValue)
+                    {
+                        _messageId = value;
+                    }
+                    else
+                    {
+                        _log.HeaderOccursMoreThanOnce(NntpHeaders.MessageId);
+                    }
 
-                        break;
+                    break;
 
-                    case NntpHeaders.From:
-                        if (string.IsNullOrEmpty(_from))
-                        {
-                            _from = value;
-                        }
-                        else
-                        {
-                            _log.HeaderOccursMoreThanOnce(NntpHeaders.From);
-                        }
+                case NntpHeaders.From:
+                    if (string.IsNullOrEmpty(_from))
+                    {
+                        _from = value;
+                    }
+                    else
+                    {
+                        _log.HeaderOccursMoreThanOnce(NntpHeaders.From);
+                    }
 
-                        break;
+                    break;
 
-                    case NntpHeaders.Subject:
-                        if (string.IsNullOrEmpty(_subject))
-                        {
-                            _subject = value;
-                        }
-                        else
-                        {
-                            _log.HeaderOccursMoreThanOnce(NntpHeaders.Subject);
-                        }
+                case NntpHeaders.Subject:
+                    if (string.IsNullOrEmpty(_subject))
+                    {
+                        _subject = value;
+                    }
+                    else
+                    {
+                        _log.HeaderOccursMoreThanOnce(NntpHeaders.Subject);
+                    }
 
-                        break;
+                    break;
 
-                    case NntpHeaders.Date:
-                        if (_dateTime == null)
-                        {
-                            if (
-                                DateTimeOffset.TryParseExact(
-                                    value,
-                                    DateFormat,
-                                    CultureInfo.InvariantCulture,
-                                    DateTimeStyles.None,
-                                    out var headerDateTime
-                                )
+                case NntpHeaders.Date:
+                    if (_dateTime == null)
+                    {
+                        if (
+                            DateTimeOffset.TryParseExact(
+                                value,
+                                DateFormat,
+                                CultureInfo.InvariantCulture,
+                                DateTimeStyles.None,
+                                out var headerDateTime
                             )
-                            {
-                                _dateTime = headerDateTime;
-                            }
-                            else
-                            {
-                                _log.InvalidHeader(NntpHeaders.Date, value);
-                            }
+                        )
+                        {
+                            _dateTime = headerDateTime;
                         }
                         else
                         {
-                            _log.HeaderOccursMoreThanOnce(NntpHeaders.Date);
+                            _log.InvalidHeader(NntpHeaders.Date, value);
                         }
+                    }
+                    else
+                    {
+                        _log.HeaderOccursMoreThanOnce(NntpHeaders.Date);
+                    }
 
-                        break;
+                    break;
 
-                    case NntpHeaders.Newsgroups:
-                        // convert group header to list of groups, do not add as header
-                        _groupsBuilder.Add(value);
-                        break;
+                case NntpHeaders.Newsgroups:
+                    // convert group header to list of groups, do not add as header
+                    _groupsBuilder.Add(value);
+                    break;
 
-                    default:
-                        _headers.Add(header.Key, value);
-                        break;
-                }
+                default:
+                    _headers.Add(new(key, value));
+                    break;
             }
         }
 
@@ -250,7 +246,7 @@ public class NntpArticleBuilder
             throw new NntpException(Resources.Nntp.ReservedHeaderKeyNotAllowed);
         }
 
-        _headers.Add(key, value);
+        _headers.Add(new(key, value));
         return this;
     }
 
@@ -269,7 +265,15 @@ public class NntpArticleBuilder
             throw new NntpException(Resources.Nntp.ReservedHeaderKeyNotAllowed);
         }
 
-        _headers.Remove(key, value);
+        var index = _headers.FindIndex(h =>
+            StringComparer.OrdinalIgnoreCase.Equals(h.Key, key)
+            && StringComparer.Ordinal.Equals(h.Value, value)
+        );
+        if (index >= 0)
+        {
+            _headers.RemoveAt(index);
+        }
+
         return this;
     }
 
@@ -327,17 +331,23 @@ public class NntpArticleBuilder
 
         var groups = _groupsBuilder.Build();
 
-        _headers.Add(NntpHeaders.From, _from);
-        _headers.Add(NntpHeaders.Subject, _subject);
+        _headers.Add(new(NntpHeaders.From, _from));
+        _headers.Add(new(NntpHeaders.Subject, _subject));
 
         if (!_dateTime.HasValue)
-            return new NntpArticle(0, _messageId, groups, _headers, _body);
+            return new NntpArticle(
+                0,
+                _messageId,
+                groups,
+                new NntpHeaderCollection(_headers),
+                _body
+            );
 
         var formattedDate = _dateTime
             .Value.ToUniversalTime()
             .ToString(DateFormat, CultureInfo.InvariantCulture);
-        _headers.Add(NntpHeaders.Date, $"{formattedDate} +0000");
+        _headers.Add(new(NntpHeaders.Date, $"{formattedDate} +0000"));
 
-        return new NntpArticle(0, _messageId, groups, _headers, _body);
+        return new NntpArticle(0, _messageId, groups, new NntpHeaderCollection(_headers), _body);
     }
 }

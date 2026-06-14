@@ -3,7 +3,6 @@ using Usenet.Extensions;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
-using Usenet.Util;
 
 namespace Usenet.Nntp.Parsers;
 
@@ -57,11 +56,11 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
         var headers =
             (_requestType & ArticleRequestType.Head) == ArticleRequestType.Head
                 ? GetHeaders(enumerator)
-                : MultiValueDictionary<string, string>.EmptyIgnoreCase;
+                : NntpHeaderCollection.Empty;
 
         // get groups
-        var groups = headers.TryGetValue(NntpHeaders.Newsgroups, out var values)
-            ? new NntpGroupsBuilder().Add(values).Build()
+        var groups = headers.Contains(NntpHeaders.Newsgroups)
+            ? new NntpGroupsBuilder().Add(headers.GetValues(NntpHeaders.Newsgroups)).Build()
             : NntpGroups.Empty;
 
         // get body if requested
@@ -78,10 +77,11 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
         );
     }
 
-    private MultiValueDictionary<string, string> GetHeaders(IEnumerator<string> enumerator)
+    private NntpHeaderCollection GetHeaders(IEnumerator<string> enumerator)
     {
-        var headers = new List<Header>();
-        Header? prevHeader = null;
+        // Parse each header line once into a flat list of key/value pairs, preserving order.
+        // Folded continuation lines are appended onto the previous pair's value in place.
+        var headers = new List<KeyValuePair<string, string>>();
         while (enumerator.MoveNext())
         {
             var line = enumerator.Current;
@@ -91,9 +91,13 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
                 break;
             }
 
-            if (char.IsWhiteSpace(line[0]) && prevHeader != null)
+            if (char.IsWhiteSpace(line[0]) && headers.Count > 0)
             {
-                prevHeader.Value += " " + line.Trim();
+                var previous = headers[^1];
+                headers[^1] = new KeyValuePair<string, string>(
+                    previous.Key,
+                    previous.Value + " " + line.Trim()
+                );
             }
             else
             {
@@ -104,19 +108,12 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
                 }
                 else
                 {
-                    prevHeader = new Header(line[..splitPos], line[(splitPos + 1)..].Trim());
-                    headers.Add(prevHeader);
+                    headers.Add(new(line[..splitPos], line[(splitPos + 1)..].Trim()));
                 }
             }
         }
 
-        var dict = MultiValueDictionary<string, string>.EmptyIgnoreCase;
-        foreach (var header in headers)
-        {
-            dict.Add(header.Key, header.Value);
-        }
-
-        return dict;
+        return headers.Count == 0 ? NntpHeaderCollection.Empty : new NntpHeaderCollection(headers);
     }
 
     private static IEnumerable<string> GetBody(IEnumerator<string> enumerator)
@@ -125,18 +122,6 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
         {
             if (enumerator.Current is not null)
                 yield return enumerator.Current;
-        }
-    }
-
-    private class Header
-    {
-        public string Key { get; }
-        public string Value { get; set; }
-
-        public Header(string key, string value)
-        {
-            Key = key;
-            Value = value;
         }
     }
 }

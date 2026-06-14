@@ -27,9 +27,9 @@ public class NntpArticle : IEquatable<NntpArticle>
     public NntpGroups Groups { get; }
 
     /// <summary>
-    /// The header dictionary of the <see cref="NntpArticle"/>.
+    /// The headers of the <see cref="NntpArticle"/>.
     /// </summary>
-    public ImmutableDictionary<string, ImmutableList<string>> Headers { get; }
+    public NntpHeaderCollection Headers { get; }
 
     /// <summary>
     /// The body of the <see cref="NntpArticle"/>.
@@ -48,18 +48,14 @@ public class NntpArticle : IEquatable<NntpArticle>
         long number,
         NntpMessageId messageId,
         NntpGroups groups,
-        IDictionary<string, ICollection<string>> headers,
+        NntpHeaderCollection headers,
         IList<string> body
     )
     {
         Number = number;
         MessageId = messageId;
         Groups = groups;
-        Headers = headers.ToImmutableDictionary(
-            x => x.Key,
-            x => x.Value.ToImmutableList(),
-            keyComparer: StringComparer.OrdinalIgnoreCase
-        );
+        Headers = headers;
         Body = body.ToImmutableList();
     }
 
@@ -82,23 +78,12 @@ public class NntpArticle : IEquatable<NntpArticle>
         var equals =
             Number.Equals(other.Number)
             && MessageId.Equals(other.MessageId)
-            && Groups.Equals(other.Groups);
+            && Groups.Equals(other.Groups)
+            && Headers.Equals(other.Headers);
 
         if (!equals)
         {
             return false;
-        }
-
-        // compare headers
-        foreach (var pair in Headers)
-        {
-            if (
-                !other.Headers.TryGetValue(pair.Key, out var value)
-                || !pair.Value.ToImmutableHashSet().SetEquals(value)
-            )
-            {
-                return false;
-            }
         }
 
         // compare body
