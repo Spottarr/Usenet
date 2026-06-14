@@ -12,9 +12,6 @@ namespace Usenet.Yenc;
 [PublicAPI]
 public static class YencEncoder
 {
-    private const byte Cr = 13;
-    private const byte Lf = 10;
-
     // Number of source bytes read from the stream per block.
     private const int ReadBlockSize = 64 * 1024;
 
@@ -235,7 +232,7 @@ public static class YencEncoder
         foreach (var @byte in source)
         {
             crc = Crc32.Calculate(crc, @byte);
-            var val = (byte)((@byte + 42) % 256);
+            var val = (byte)((@byte + YencCharacters.EncodeOffset) % 256);
 
             var flags = EscapeTable[val];
             if (
@@ -246,7 +243,7 @@ public static class YencEncoder
             {
                 destination[written++] = YencCharacters.Equal;
                 col++;
-                val = (byte)((val + 64) % 256);
+                val = (byte)((val + YencCharacters.EscapeOffset) % 256);
             }
 
             destination[written++] = val;
@@ -255,8 +252,8 @@ public static class YencEncoder
                 continue;
             }
 
-            destination[written++] = Cr;
-            destination[written++] = Lf;
+            destination[written++] = YencCharacters.Cr;
+            destination[written++] = YencCharacters.Lf;
             col = 0;
         }
 
@@ -270,16 +267,16 @@ public static class YencEncoder
         var byteCount = encoding.GetByteCount(line);
         var span = writer.GetSpan(byteCount + 2);
         var written = encoding.GetBytes(line, span);
-        span[written++] = Cr;
-        span[written++] = Lf;
+        span[written++] = YencCharacters.Cr;
+        span[written++] = YencCharacters.Lf;
         writer.Advance(written);
     }
 
     private static void WriteCrlf(IBufferWriter<byte> writer)
     {
         var span = writer.GetSpan(2);
-        span[0] = Cr;
-        span[1] = Lf;
+        span[0] = YencCharacters.Cr;
+        span[1] = YencCharacters.Lf;
         writer.Advance(2);
     }
 
@@ -289,7 +286,7 @@ public static class YencEncoder
         var start = 0;
         for (var i = 0; i < bytes.Length - 1; i++)
         {
-            if (bytes[i] != Cr || bytes[i + 1] != Lf)
+            if (bytes[i] != YencCharacters.Cr || bytes[i + 1] != YencCharacters.Lf)
             {
                 continue;
             }
