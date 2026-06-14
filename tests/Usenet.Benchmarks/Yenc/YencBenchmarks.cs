@@ -1,3 +1,4 @@
+using System.Buffers;
 using BenchmarkDotNet.Attributes;
 using Usenet.Util;
 using Usenet.Yenc;
@@ -20,6 +21,7 @@ public class YencBenchmarks
     private byte[] _data = [];
     private YencHeader _header = null!;
     private List<string> _encodedLines = [];
+    private ArrayBufferWriter<byte> _writer = null!;
     private byte[] _encodedBytes = [];
 
     [GlobalSetup]
@@ -38,17 +40,27 @@ public class YencBenchmarks
         using var stream = new MemoryStream(_data);
         _encodedLines = [.. await YencEncoder.EncodeAsync(_header, stream)];
 
+        _writer = new ArrayBufferWriter<byte>(_data.Length * 2);
         // The byte-input path consumes the encoded body as raw CRLF-terminated bytes,
         // exactly as it arrives off the wire.
         _encodedBytes = UsenetEncoding.Default.GetBytes(string.Join("\r\n", _encodedLines));
     }
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public async Task<int> Encode()
     {
         using var stream = new MemoryStream(_data);
         var lines = await YencEncoder.EncodeAsync(_header, stream);
         return lines.Count;
+    }
+
+    [Benchmark]
+    public async Task<int> EncodeToWriter()
+    {
+        using var stream = new MemoryStream(_data);
+        _writer.ResetWrittenCount();
+        await YencEncoder.EncodeAsync(_header, stream, _writer);
+        return _writer.WrittenCount;
     }
 
     [Benchmark(Baseline = true)]
