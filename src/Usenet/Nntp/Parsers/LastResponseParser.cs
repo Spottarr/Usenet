@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Usenet.Extensions;
 using Usenet.Nntp.Responses;
 
@@ -6,7 +7,10 @@ namespace Usenet.Nntp.Parsers;
 
 internal class LastResponseParser : IResponseParser<NntpLastResponse>
 {
-    private readonly ILogger _log = Logger.Create<LastResponseParser>();
+    private readonly ILogger _log;
+
+    public LastResponseParser(ILoggerFactory? loggerFactory = null) =>
+        _log = (loggerFactory ?? NullLoggerFactory.Instance).CreateLogger<LastResponseParser>();
 
     public bool IsSuccessResponse(int code) => code == (int)NntpLastResponseType.ArticleExists;
 

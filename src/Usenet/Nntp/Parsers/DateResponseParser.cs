@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Usenet.Extensions;
 using Usenet.Nntp.Responses;
 
@@ -7,7 +8,10 @@ namespace Usenet.Nntp.Parsers;
 
 internal class DateResponseParser : IResponseParser<NntpDateResponse>
 {
-    private readonly ILogger _log = Logger.Create<DateResponseParser>();
+    private readonly ILogger _log;
+
+    public DateResponseParser(ILoggerFactory? loggerFactory = null) =>
+        _log = (loggerFactory ?? NullLoggerFactory.Instance).CreateLogger<DateResponseParser>();
 
     public bool IsSuccessResponse(int code) => code == 111;
 

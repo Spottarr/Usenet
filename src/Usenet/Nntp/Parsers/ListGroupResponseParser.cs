@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Usenet.Extensions;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
@@ -8,7 +9,12 @@ namespace Usenet.Nntp.Parsers;
 
 internal class ListGroupResponseParser : IMultiLineResponseParser<NntpGroupResponse>
 {
-    private readonly ILogger _log = Logger.Create<ListGroupResponseParser>();
+    private readonly ILogger _log;
+
+    public ListGroupResponseParser(ILoggerFactory? loggerFactory = null) =>
+        _log = (
+            loggerFactory ?? NullLoggerFactory.Instance
+        ).CreateLogger<ListGroupResponseParser>();
 
     public bool IsSuccessResponse(int code) => code == 211;
 

@@ -32,3 +32,17 @@ Usenet.Nntp.NntpConnection.ResetCounters() -> void
 *REMOVED*override Usenet.Util.CountingStream.Flush() -> void
 *REMOVED*override Usenet.Util.CountingStream.Read(byte[]! buffer, int offset, int count) -> int
 *REMOVED*override Usenet.Util.CountingStream.Write(byte[]! buffer, int offset, int count) -> void
+Usenet.DependencyInjection.UsenetServiceCollectionExtensions
+Usenet.Nntp.Builders.NntpArticleBuilder.NntpArticleBuilder(Microsoft.Extensions.Logging.ILoggerFactory? loggerFactory = null) -> void
+Usenet.Nntp.NntpClient.NntpClient(Usenet.Nntp.Contracts.INntpConnection! connection, Microsoft.Extensions.Logging.ILoggerFactory? loggerFactory = null) -> void
+Usenet.Nntp.NntpClientPool.NntpClientPool(int maxPoolSize, string! hostname, int port, bool useSsl, string! username, string! password, Microsoft.Extensions.Logging.ILoggerFactory? loggerFactory = null) -> void
+Usenet.Nntp.NntpConnection.NntpConnection(Microsoft.Extensions.Logging.ILoggerFactory? loggerFactory = null) -> void
+static Usenet.DependencyInjection.UsenetServiceCollectionExtensions.AddUsenet(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+*REMOVED*static Usenet.Logger.Create<T>() -> Microsoft.Extensions.Logging.ILogger!
+*REMOVED*static Usenet.Logger.Factory.get -> Microsoft.Extensions.Logging.ILoggerFactory!
+*REMOVED*static Usenet.Logger.Factory.set -> void
+*REMOVED*Usenet.Logger
+*REMOVED*Usenet.Nntp.Builders.NntpArticleBuilder.NntpArticleBuilder() -> void
+*REMOVED*Usenet.Nntp.NntpClient.NntpClient(Usenet.Nntp.Contracts.INntpConnection! connection) -> void
+*REMOVED*Usenet.Nntp.NntpClientPool.NntpClientPool(int maxPoolSize, string! hostname, int port, bool useSsl, string! username, string! password) -> void
+*REMOVED*Usenet.Nntp.NntpConnection.NntpConnection() -> void

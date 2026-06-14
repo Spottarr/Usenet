@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Usenet.Exceptions;
 using Usenet.Extensions;
 using Usenet.Nntp.Contracts;
@@ -27,13 +28,23 @@ public sealed partial class NntpConnection : INntpConnection
     private const int StackAllocThreshold = 256;
     private const string AuthInfoPass = "AUTHINFO PASS";
 
-    private readonly ILogger _log = Logger.Create<NntpConnection>();
+    private readonly ILogger _log;
     private readonly TcpClient _client = new();
     private Stream? _stream;
     private PipeReader? _reader;
     private PipeWriter? _writer;
     private long _bytesRead;
     private long _bytesWritten;
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="NntpConnection"/> class.
+    /// </summary>
+    /// <param name="loggerFactory">
+    /// An optional <see cref="ILoggerFactory"/> used to create the connection's logger.
+    /// When <see langword="null"/>, logging is disabled via <see cref="NullLoggerFactory"/>.
+    /// </param>
+    public NntpConnection(ILoggerFactory? loggerFactory = null) =>
+        _log = (loggerFactory ?? NullLoggerFactory.Instance).CreateLogger<NntpConnection>();
 
     /// <inheritdoc/>
     public long BytesRead => _bytesRead;

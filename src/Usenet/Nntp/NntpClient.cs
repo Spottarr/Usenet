@@ -1,4 +1,6 @@
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Usenet.Extensions;
 using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
@@ -21,14 +23,21 @@ public partial class NntpClient : INntpClient
 {
     protected INntpConnection Connection { get; }
 
+    private readonly ILoggerFactory _loggerFactory;
+
     /// <summary>
     /// Creates a new instance of the <see cref="NntpClient"/> class.
     /// </summary>
     /// <param name="connection">The connection to use.</param>
-    public NntpClient(INntpConnection connection)
+    /// <param name="loggerFactory">
+    /// An optional <see cref="ILoggerFactory"/> threaded through to the response parsers.
+    /// When <see langword="null"/>, logging is disabled via <see cref="NullLoggerFactory"/>.
+    /// </param>
+    public NntpClient(INntpConnection connection, ILoggerFactory? loggerFactory = null)
     {
         ArgumentNullException.ThrowIfNull(connection);
         Connection = connection;
+        _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
     }
 
     /// <summary>
@@ -115,7 +124,11 @@ public partial class NntpClient : INntpClient
 
     /// <inheritdoc />
     public Task<NntpModeReaderResponse> ModeReaderAsync(CancellationToken cancellationToken) =>
-        Connection.CommandAsync("MODE READER", new ModeReaderResponseParser(), cancellationToken);
+        Connection.CommandAsync(
+            "MODE READER",
+            new ModeReaderResponseParser(_loggerFactory),
+            cancellationToken
+        );
 
     /// <inheritdoc />
     public Task<NntpResponse> QuitAsync(CancellationToken cancellationToken) =>
@@ -127,7 +140,7 @@ public partial class NntpClient : INntpClient
         ArgumentException.ThrowIfNullOrWhiteSpace(group);
         return Connection.CommandAsync(
             $"GROUP {group}",
-            new GroupResponseParser(),
+            new GroupResponseParser(_loggerFactory),
             cancellationToken
         );
     }
@@ -142,7 +155,7 @@ public partial class NntpClient : INntpClient
         ArgumentException.ThrowIfNullOrWhiteSpace(group);
         return Connection.MultiLineCommandAsync(
             $"LISTGROUP {group} {range}",
-            new ListGroupResponseParser(),
+            new ListGroupResponseParser(_loggerFactory),
             cancellationToken
         );
     }
@@ -153,7 +166,7 @@ public partial class NntpClient : INntpClient
         ArgumentException.ThrowIfNullOrWhiteSpace(group);
         return Connection.MultiLineCommandAsync(
             $"LISTGROUP {group}",
-            new ListGroupResponseParser(),
+            new ListGroupResponseParser(_loggerFactory),
             cancellationToken
         );
     }
@@ -162,17 +175,17 @@ public partial class NntpClient : INntpClient
     public Task<NntpGroupResponse> ListGroupAsync(CancellationToken cancellationToken) =>
         Connection.MultiLineCommandAsync(
             "LISTGROUP",
-            new ListGroupResponseParser(),
+            new ListGroupResponseParser(_loggerFactory),
             cancellationToken
         );
 
     /// <inheritdoc />
     public Task<NntpLastResponse> LastAsync(CancellationToken cancellationToken) =>
-        Connection.CommandAsync("LAST", new LastResponseParser(), cancellationToken);
+        Connection.CommandAsync("LAST", new LastResponseParser(_loggerFactory), cancellationToken);
 
     /// <inheritdoc />
     public Task<NntpNextResponse> NextAsync(CancellationToken cancellationToken) =>
-        Connection.CommandAsync("NEXT", new NextResponseParser(), cancellationToken);
+        Connection.CommandAsync("NEXT", new NextResponseParser(_loggerFactory), cancellationToken);
 
     /// <inheritdoc />
     public Task<NntpArticleResponse> ArticleAsync(
@@ -181,7 +194,7 @@ public partial class NntpClient : INntpClient
     ) =>
         Connection.MultiLineCommandAsync(
             $"ARTICLE {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}",
-            new ArticleResponseParser(ArticleRequestType.Article),
+            new ArticleResponseParser(ArticleRequestType.Article, _loggerFactory),
             cancellationToken
         );
 
@@ -192,7 +205,7 @@ public partial class NntpClient : INntpClient
     ) =>
         Connection.MultiLineCommandAsync(
             $"ARTICLE {number}",
-            new ArticleResponseParser(ArticleRequestType.Article),
+            new ArticleResponseParser(ArticleRequestType.Article, _loggerFactory),
             cancellationToken
         );
 
@@ -200,7 +213,7 @@ public partial class NntpClient : INntpClient
     public Task<NntpArticleResponse> ArticleAsync(CancellationToken cancellationToken) =>
         Connection.MultiLineCommandAsync(
             "ARTICLE",
-            new ArticleResponseParser(ArticleRequestType.Article),
+            new ArticleResponseParser(ArticleRequestType.Article, _loggerFactory),
             cancellationToken
         );
 
@@ -211,7 +224,7 @@ public partial class NntpClient : INntpClient
     ) =>
         Connection.MultiLineCommandAsync(
             $"HEAD {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}",
-            new ArticleResponseParser(ArticleRequestType.Head),
+            new ArticleResponseParser(ArticleRequestType.Head, _loggerFactory),
             cancellationToken
         );
 
@@ -219,7 +232,7 @@ public partial class NntpClient : INntpClient
     public Task<NntpArticleResponse> HeadAsync(long number, CancellationToken cancellationToken) =>
         Connection.MultiLineCommandAsync(
             $"HEAD {number}",
-            new ArticleResponseParser(ArticleRequestType.Head),
+            new ArticleResponseParser(ArticleRequestType.Head, _loggerFactory),
             cancellationToken
         );
 
@@ -227,7 +240,7 @@ public partial class NntpClient : INntpClient
     public Task<NntpArticleResponse> HeadAsync(CancellationToken cancellationToken) =>
         Connection.MultiLineCommandAsync(
             "HEAD",
-            new ArticleResponseParser(ArticleRequestType.Head),
+            new ArticleResponseParser(ArticleRequestType.Head, _loggerFactory),
             cancellationToken
         );
 
@@ -238,7 +251,7 @@ public partial class NntpClient : INntpClient
     ) =>
         Connection.MultiLineCommandAsync(
             $"BODY {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}",
-            new ArticleResponseParser(ArticleRequestType.Body),
+            new ArticleResponseParser(ArticleRequestType.Body, _loggerFactory),
             cancellationToken
         );
 
@@ -246,7 +259,7 @@ public partial class NntpClient : INntpClient
     public Task<NntpArticleResponse> BodyAsync(long number, CancellationToken cancellationToken) =>
         Connection.MultiLineCommandAsync(
             $"BODY {number}",
-            new ArticleResponseParser(ArticleRequestType.Body),
+            new ArticleResponseParser(ArticleRequestType.Body, _loggerFactory),
             cancellationToken
         );
 
@@ -254,7 +267,7 @@ public partial class NntpClient : INntpClient
     public Task<NntpArticleResponse> BodyAsync(CancellationToken cancellationToken) =>
         Connection.MultiLineCommandAsync(
             "BODY",
-            new ArticleResponseParser(ArticleRequestType.Body),
+            new ArticleResponseParser(ArticleRequestType.Body, _loggerFactory),
             cancellationToken
         );
 
@@ -265,17 +278,21 @@ public partial class NntpClient : INntpClient
     ) =>
         Connection.CommandAsync(
             $"STAT {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}",
-            new StatResponseParser(),
+            new StatResponseParser(_loggerFactory),
             cancellationToken
         );
 
     /// <inheritdoc />
     public Task<NntpStatResponse> StatAsync(long number, CancellationToken cancellationToken) =>
-        Connection.CommandAsync($"STAT {number}", new StatResponseParser(), cancellationToken);
+        Connection.CommandAsync(
+            $"STAT {number}",
+            new StatResponseParser(_loggerFactory),
+            cancellationToken
+        );
 
     /// <inheritdoc />
     public Task<NntpStatResponse> StatAsync(CancellationToken cancellationToken) =>
-        Connection.CommandAsync("STAT", new StatResponseParser(), cancellationToken);
+        Connection.CommandAsync("STAT", new StatResponseParser(_loggerFactory), cancellationToken);
 
     /// <inheritdoc />
     public async Task<bool> PostAsync(NntpArticle article, CancellationToken cancellationToken)
@@ -319,7 +336,7 @@ public partial class NntpClient : INntpClient
 
     /// <inheritdoc />
     public Task<NntpDateResponse> DateAsync(CancellationToken cancellationToken) =>
-        Connection.CommandAsync("DATE", new DateResponseParser(), cancellationToken);
+        Connection.CommandAsync("DATE", new DateResponseParser(_loggerFactory), cancellationToken);
 
     /// <inheritdoc />
     public Task<NntpMultiLineResponse> HelpAsync(CancellationToken cancellationToken) =>
@@ -336,7 +353,7 @@ public partial class NntpClient : INntpClient
     ) =>
         Connection.MultiLineCommandAsync(
             $"NEWGROUPS {sinceDateTime}",
-            new GroupsResponseParser(231, GroupStatusRequestType.Basic),
+            new GroupsResponseParser(231, GroupStatusRequestType.Basic, _loggerFactory),
             cancellationToken
         );
 
@@ -358,7 +375,7 @@ public partial class NntpClient : INntpClient
     ) =>
         Connection.MultiLineCommandAsync(
             "LIST ACTIVE.TIMES",
-            new GroupOriginsResponseParser(),
+            new GroupOriginsResponseParser(_loggerFactory),
             cancellationToken
         );
 
@@ -369,7 +386,7 @@ public partial class NntpClient : INntpClient
     ) =>
         Connection.MultiLineCommandAsync(
             $"LIST ACTIVE.TIMES {wildmat}",
-            new GroupOriginsResponseParser(),
+            new GroupOriginsResponseParser(_loggerFactory),
             cancellationToken
         );
 
@@ -563,7 +580,7 @@ public partial class NntpClient : INntpClient
     public Task<NntpGroupsResponse> ListCountsAsync(CancellationToken cancellationToken) =>
         Connection.MultiLineCommandAsync(
             "LIST COUNTS",
-            new GroupsResponseParser(215, GroupStatusRequestType.Extended),
+            new GroupsResponseParser(215, GroupStatusRequestType.Extended, _loggerFactory),
             cancellationToken
         );
 
@@ -574,7 +591,7 @@ public partial class NntpClient : INntpClient
     ) =>
         Connection.MultiLineCommandAsync(
             $"LIST COUNTS {wildmat}",
-            new GroupsResponseParser(215, GroupStatusRequestType.Extended),
+            new GroupsResponseParser(215, GroupStatusRequestType.Extended, _loggerFactory),
             cancellationToken
         );
 
@@ -618,7 +635,7 @@ public partial class NntpClient : INntpClient
     public Task<NntpGroupsResponse> ListActiveAsync(CancellationToken cancellationToken) =>
         Connection.MultiLineCommandAsync(
             "LIST ACTIVE",
-            new GroupsResponseParser(215, GroupStatusRequestType.Basic),
+            new GroupsResponseParser(215, GroupStatusRequestType.Basic, _loggerFactory),
             cancellationToken
         );
 
@@ -629,7 +646,7 @@ public partial class NntpClient : INntpClient
     ) =>
         Connection.MultiLineCommandAsync(
             $"LIST ACTIVE {wildmat}",
-            new GroupsResponseParser(215, GroupStatusRequestType.Basic),
+            new GroupsResponseParser(215, GroupStatusRequestType.Basic, _loggerFactory),
             cancellationToken
         );
 

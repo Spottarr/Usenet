@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Usenet.Extensions;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
@@ -8,7 +9,12 @@ namespace Usenet.Nntp.Parsers;
 
 internal class GroupOriginsResponseParser : IMultiLineResponseParser<NntpGroupOriginsResponse>
 {
-    private static readonly ILogger Log = Logger.Create<GroupOriginsResponseParser>();
+    private readonly ILogger _log;
+
+    public GroupOriginsResponseParser(ILoggerFactory? loggerFactory = null) =>
+        _log = (
+            loggerFactory ?? NullLoggerFactory.Instance
+        ).CreateLogger<GroupOriginsResponseParser>();
 
     public bool IsSuccessResponse(int code) => code == 215;
 
@@ -24,14 +30,14 @@ internal class GroupOriginsResponseParser : IMultiLineResponseParser<NntpGroupOr
         return new NntpGroupOriginsResponse(code, message, true, groupOrigins);
     }
 
-    private static IEnumerable<NntpGroupOrigin> EnumerateGroupOrigins(IEnumerable<string> dataBlock)
+    private IEnumerable<NntpGroupOrigin> EnumerateGroupOrigins(IEnumerable<string> dataBlock)
     {
         foreach (var line in dataBlock)
         {
             var lineSplit = line.Split(' ');
             if (lineSplit.Length < 3)
             {
-                Log.InvalidGroupOriginLine(line);
+                _log.InvalidGroupOriginLine(line);
                 continue;
             }
 

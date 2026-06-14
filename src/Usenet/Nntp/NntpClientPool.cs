@@ -1,5 +1,6 @@
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Usenet.Extensions;
 using Usenet.Nntp.Contracts;
 using Usenet.Util;
@@ -21,7 +22,8 @@ public sealed class NntpClientPool : INntpClientPool
     private readonly CancellationTokenSource _cts = new();
     private readonly Task _monitorTask;
 
-    private readonly ILogger _logger = Logger.Create<NntpConnection>();
+    private readonly ILogger _logger;
+    private readonly ILoggerFactory _loggerFactory;
     private readonly SemaphoreSlim _semaphore;
 
     private readonly int _maxPoolSize;
@@ -38,8 +40,7 @@ public sealed class NntpClientPool : INntpClientPool
     public TimeSpan IdleTimeout { get; init; } = TimeSpan.FromSeconds(30);
     public TimeSpan WaitTimeout { get; init; } = TimeSpan.FromSeconds(60);
 
-    internal Func<IInternalPooledNntpClient> ClientFactory { get; init; } =
-        () => new PooledNntpClient();
+    internal Func<IInternalPooledNntpClient> ClientFactory { get; init; }
 
     public NntpClientPool(
         int maxPoolSize,
@@ -47,10 +48,15 @@ public sealed class NntpClientPool : INntpClientPool
         int port,
         bool useSsl,
         string username,
-        string password
+        string password,
+        ILoggerFactory? loggerFactory = null
     )
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxPoolSize);
+
+        _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
+        _logger = _loggerFactory.CreateLogger<NntpClientPool>();
+        ClientFactory = () => new PooledNntpClient(_loggerFactory);
 
         _semaphore = new SemaphoreSlim(maxPoolSize, maxPoolSize);
 
