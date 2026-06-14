@@ -30,6 +30,13 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
     private const int InitialDataBlockBufferSize = 4096;
     private const string AuthInfoPass = "AUTHINFO PASS";
 
+    // NNTP cannot tell the server to stop sending mid-data-block, so reclaiming a connection from a
+    // partially-consumed streamed response means either draining to the terminating dot (paying the
+    // remaining transfer) or abandoning the connection (paying a reconnect). On early-exit we drain
+    // only while this little remains on the wire and otherwise abandon, so `break` stays cheap over
+    // large ranges while a small remainder keeps the pooled connection. See ADR-0003.
+    private const int StreamDrainBudgetBytes = 64 * 1024;
+
     private readonly ILogger _log;
     private readonly TcpClient _client = new();
     private Stream? _stream;
@@ -182,15 +189,33 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
 
     async ValueTask INntpStreamSource.DrainStreamAsync(CancellationToken cancellationToken)
     {
+        var budgetStart = _bytesRead;
         while (_streaming)
         {
             var line = await ReadLineAsync(cancellationToken).ConfigureAwait(false);
             if (ProcessLine(line) == null)
             {
                 _streaming = false;
+                return;
+            }
+
+            // Past the drain budget the remainder is too large to skip cheaply, so abandon the
+            // connection instead of reading it all off the wire (ADR-0003).
+            if (_bytesRead - budgetStart > StreamDrainBudgetBytes)
+            {
+                AbandonStream();
+                return;
             }
         }
     }
+
+    /// <summary>
+    /// Tears down the transport for a streamed response whose remaining data block exceeded the drain
+    /// budget. <see cref="_streaming"/> is left set so <see cref="HasPendingStream"/> tells the pool to
+    /// discard this connection and establish a fresh one, and so a non-pooled connection cannot be
+    /// reused with unread bytes still on the wire.
+    /// </summary>
+    private void AbandonStream() => Dispose();
 
     /// <summary>
     /// Indicates that a streamed multi-line data block is still on the wire and must be drained
