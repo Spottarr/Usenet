@@ -1,12 +1,16 @@
+using System.Buffers;
 using Usenet.Nntp.Parsers;
 using Usenet.Tests.TestHelpers;
+using Usenet.Util;
 
 namespace Usenet.Tests.Nntp.Parsers;
 
 /// <summary>
 /// Allocation-regression guard for parsing a single article header block (as returned by
-/// <c>HEAD</c>). This isolates the header-folding and dictionary-building cost from any
+/// <c>HEAD</c>). This isolates the header-folding and collection-building cost from any
 /// network I/O, so a regression in the parse path shows up as extra per-parse allocation.
+/// The working buffer is rented from the pool (ADR-0002) and is not counted by the
+/// measurement, so the bytes measured are the per-parse object/string churn.
 /// </summary>
 internal sealed class ArticleResponseParserAllocationTests
 {
@@ -30,10 +34,12 @@ internal sealed class ArticleResponseParserAllocationTests
         "\tpart-two-folded",
     ];
 
-    // Parsing this twelve-line block allocates ~9.6 KB: the header records and folded-value
-    // strings, the backing dictionary and the article/groups objects. The ceiling sits ~50%
-    // above the measured cost for runtime variation while still tripping if the parse regresses
-    // (e.g. extra copies of the header block or repeated splits).
+    // Parsing this twelve-line block decodes each header line off the pooled buffer and folds the
+    // continuation onto its predecessor, producing the per-line key/value strings, the flat
+    // key/value list wrapped in an NntpHeaderCollection, the groups and the response object. The
+    // pooled working buffer is not counted (ADR-0002). The ceiling sits ~50% above the measured
+    // cost for runtime variation while still tripping if the parse regresses (e.g. extra copies of
+    // the header block or repeated splits).
     private const long MaxBytesPerParse = 14_336;
     private const int Iterations = 200;
 
@@ -42,8 +48,17 @@ internal sealed class ArticleResponseParserAllocationTests
     {
         var parser = new ArticleResponseParser(ArticleRequestType.Head);
 
+        // Build the contiguous, CRLF-terminated data block once; each parse copies it into a freshly
+        // rented buffer and the response returns that buffer to the pool when disposed.
+        var block = UsenetEncoding.Default.GetBytes(string.Join("\r\n", HeaderBlock) + "\r\n");
+
         var perParse = AllocationMeasurement.PerIteration(
-            () => parser.Parse(221, Message, HeaderBlock),
+            () =>
+            {
+                var buffer = ArrayPool<byte>.Shared.Rent(block.Length);
+                block.CopyTo(buffer, 0);
+                using var response = parser.Parse(221, Message, buffer, block.Length);
+            },
             Iterations
         );
 
