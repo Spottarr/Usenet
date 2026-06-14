@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Usenet.Extensions;
 using Usenet.Nntp.Models;
-using Usenet.Nntp.Responses;
 
 namespace Usenet.Nntp.Parsers;
 
@@ -9,9 +9,12 @@ namespace Usenet.Nntp.Parsers;
 /// Per-line parsers for the streamed unbounded multi-line commands. Each parser turns a single
 /// data-block line into a typed value (or skips it), so the range is never materialized.
 /// </summary>
-internal static class NntpStreamLineParsers
+internal sealed class NntpStreamLineParsers
 {
-    private static readonly ILogger Log = Logger.Create<NntpClient>();
+    private readonly ILogger _log;
+
+    public NntpStreamLineParsers(ILoggerFactory? loggerFactory = null) =>
+        _log = (loggerFactory ?? NullLoggerFactory.Instance).CreateLogger<NntpStreamLineParsers>();
 
     /// <summary>
     /// Yields each data-block line verbatim. Used for commands whose lines are consumed as raw text
@@ -31,12 +34,12 @@ internal static class NntpStreamLineParsers
     /// <summary>
     /// Parses a basic group information line (LIST ACTIVE) into an <see cref="NntpGroup"/>.
     /// </summary>
-    public static bool BasicGroup(string line, out NntpGroup value)
+    public bool BasicGroup(string line, out NntpGroup value)
     {
         var lineSplit = line.Split(' ');
         if (lineSplit.Length < 4)
         {
-            Log.InvalidGroupBasicInformationLine(line);
+            _log.InvalidGroupBasicInformationLine(line);
             value = null!;
             return false;
         }
@@ -47,7 +50,7 @@ internal static class NntpStreamLineParsers
         var postingStatus = PostingStatusParser.Parse(lineSplit[3], out var otherGroup);
         if (postingStatus == NntpPostingStatus.Unknown)
         {
-            Log.InvalidPostingStatus(lineSplit[3], line);
+            _log.InvalidPostingStatus(lineSplit[3], line);
         }
 
         value = new NntpGroup(
