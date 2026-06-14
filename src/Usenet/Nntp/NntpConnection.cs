@@ -10,6 +10,7 @@ using Usenet.Exceptions;
 using Usenet.Extensions;
 using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Parsers;
+using Usenet.Nntp.Responses;
 using Usenet.Util;
 
 namespace Usenet.Nntp;
@@ -23,7 +24,7 @@ namespace Usenet.Nntp;
 /// <see cref="System.IO.Pipelines"/>: lines are framed off the raw byte stream, dot-stuffing is undone and the
 /// terminating dot is detected without transcoding the whole stream to <see cref="string"/>.</remarks>
 [PublicAPI]
-public sealed partial class NntpConnection : INntpConnection
+public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
 {
     private const int StackAllocThreshold = 256;
     private const string AuthInfoPass = "AUTHINFO PASS";
@@ -35,6 +36,7 @@ public sealed partial class NntpConnection : INntpConnection
     private PipeWriter? _writer;
     private long _bytesRead;
     private long _bytesWritten;
+    private bool _streaming;
 
     /// <summary>
     /// Creates a new instance of the <see cref="NntpConnection"/> class.
@@ -84,6 +86,7 @@ public sealed partial class NntpConnection : INntpConnection
     )
     {
         ThrowIfNotConnected();
+        ThrowIfStreaming();
         ArgumentNullException.ThrowIfNull(command);
 
         var logCommand = command.StartsWith(AuthInfoPass, StringComparison.Ordinal)
@@ -115,6 +118,67 @@ public sealed partial class NntpConnection : INntpConnection
 
         return parser.Parse(response.Code, response.Message, dataBlock);
     }
+
+    /// <inheritdoc/>
+    public async Task<NntpStreamResponse<T>> MultiLineStreamCommandAsync<T>(
+        string command,
+        int successCode,
+        NntpStreamLineParser<T> lineParser,
+        CancellationToken cancellationToken
+    )
+    {
+        ThrowIfNotConnected();
+        ArgumentNullException.ThrowIfNull(lineParser);
+
+        var response = await CommandAsync(command, new ResponseParser(), cancellationToken)
+            .ConfigureAwait(false);
+
+        if (response.Code != successCode)
+        {
+            return new NntpStreamResponse<T>(response.Code, response.Message, lineParser);
+        }
+
+        // The data block stays on the wire until the caller enumerates or disposes the response.
+        _streaming = true;
+        return new NntpStreamResponse<T>(response.Code, response.Message, this, lineParser);
+    }
+
+    async ValueTask<string?> INntpStreamSource.ReadStreamLineAsync(
+        CancellationToken cancellationToken
+    )
+    {
+        if (!_streaming)
+        {
+            return null;
+        }
+
+        var line = await ReadLineAsync(cancellationToken).ConfigureAwait(false);
+        var processed = ProcessLine(line);
+        if (processed == null)
+        {
+            _streaming = false;
+        }
+
+        return processed;
+    }
+
+    async ValueTask INntpStreamSource.DrainStreamAsync(CancellationToken cancellationToken)
+    {
+        while (_streaming)
+        {
+            var line = await ReadLineAsync(cancellationToken).ConfigureAwait(false);
+            if (ProcessLine(line) == null)
+            {
+                _streaming = false;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Indicates that a streamed multi-line data block is still on the wire and must be drained
+    /// before the connection can serve another command.
+    /// </summary>
+    internal bool HasPendingStream => _streaming;
 
     /// <inheritdoc/>
     public async Task<TResponse> GetResponseAsync<TResponse>(
@@ -155,6 +219,14 @@ public sealed partial class NntpConnection : INntpConnection
     {
         if (!_client.Connected || _reader == null || _writer == null)
             throw new NntpException("Client not connected.");
+    }
+
+    private void ThrowIfStreaming()
+    {
+        if (_streaming)
+            throw new NntpException(
+                "A streamed multi-line response must be fully enumerated or disposed before issuing another command."
+            );
     }
 
     private async Task<Stream> GetStreamAsync(string hostname, bool useSsl)

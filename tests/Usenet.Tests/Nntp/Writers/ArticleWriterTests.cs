@@ -1,6 +1,7 @@
 using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
+using Usenet.Nntp.Responses;
 using Usenet.Nntp.Writers;
 
 namespace Usenet.Tests.Nntp.Writers;
@@ -143,6 +144,19 @@ internal sealed class MockConnection : INntpConnection
     public Task<TResponse> MultiLineCommandAsync<TResponse>(
         string command,
         IMultiLineResponseParser<TResponse> parser,
+        CancellationToken cancellationToken
+    ) => throw new NotImplementedException();
+
+    public Task<NntpStreamResponse<T>> MultiLineStreamCommandAsync<T>(
+        string command,
+        int successCode,
+        NntpStreamLineParser<T> lineParser
+    ) => throw new NotImplementedException();
+
+    public Task<NntpStreamResponse<T>> MultiLineStreamCommandAsync<T>(
+        string command,
+        int successCode,
+        NntpStreamLineParser<T> lineParser,
         CancellationToken cancellationToken
     ) => throw new NotImplementedException();
 

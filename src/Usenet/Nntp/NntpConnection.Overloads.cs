@@ -1,4 +1,5 @@
 using Usenet.Nntp.Parsers;
+using Usenet.Nntp.Responses;
 
 namespace Usenet.Nntp;
 
@@ -23,6 +24,13 @@ public sealed partial class NntpConnection
         string command,
         IMultiLineResponseParser<TResponse> parser
     ) => MultiLineCommandAsync(command, parser, CancellationToken.None);
+
+    /// <inheritdoc/>
+    public Task<NntpStreamResponse<T>> MultiLineStreamCommandAsync<T>(
+        string command,
+        int successCode,
+        NntpStreamLineParser<T> lineParser
+    ) => MultiLineStreamCommandAsync(command, successCode, lineParser, CancellationToken.None);
 
     /// <inheritdoc/>
     public Task<TResponse> GetResponseAsync<TResponse>(IResponseParser<TResponse> parser) =>

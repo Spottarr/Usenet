@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
 
 namespace Usenet.Nntp.Contracts;
@@ -132,7 +133,7 @@ public interface INntpClientRfc6048
     /// information.
     /// </summary>
     /// <returns>A groups response object containing a list of valid newsgroups and associated information.</returns>
-    Task<NntpGroupsResponse> ListActiveAsync();
+    Task<NntpStreamResponse<NntpGroup>> ListActiveAsync();
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-3">LIST ACTIVE</a>
@@ -143,7 +144,7 @@ public interface INntpClientRfc6048
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A groups response object containing a list of valid newsgroups and associated information.</returns>
-    Task<NntpGroupsResponse> ListActiveAsync(CancellationToken cancellationToken);
+    Task<NntpStreamResponse<NntpGroup>> ListActiveAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-3">LIST ACTIVE</a>
@@ -154,7 +155,7 @@ public interface INntpClientRfc6048
     /// </summary>
     /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
     /// <returns>A groups response object containing a list of valid newsgroups and associated information.</returns>
-    Task<NntpGroupsResponse> ListActiveAsync(string wildmat);
+    Task<NntpStreamResponse<NntpGroup>> ListActiveAsync(string wildmat);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-3">LIST ACTIVE</a>
@@ -166,5 +167,8 @@ public interface INntpClientRfc6048
     /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A groups response object containing a list of valid newsgroups and associated information.</returns>
-    Task<NntpGroupsResponse> ListActiveAsync(string wildmat, CancellationToken cancellationToken);
+    Task<NntpStreamResponse<NntpGroup>> ListActiveAsync(
+        string wildmat,
+        CancellationToken cancellationToken
+    );
 }

@@ -88,6 +88,95 @@ internal sealed class NntpConnectionTests
         await Assert.That(connection.BytesWritten).IsEqualTo(0);
     }
 
+    [Test]
+    public async Task ShouldStreamMultiLineBlockPerLine(CancellationToken cancellationToken)
+    {
+        await using var server = new ScriptedNntpServer();
+        using var connection = new NntpConnection();
+
+        await connection.ConnectAsync(
+            IPAddress.Loopback.ToString(),
+            server.Port,
+            false,
+            new ResponseParser(200),
+            cancellationToken
+        );
+
+        await using var response = await connection.MultiLineStreamCommandAsync<string>(
+            "XOVER 1-3",
+            224,
+            Identity,
+            cancellationToken
+        );
+
+        await Assert.That(response.Success).IsTrue();
+        await Assert.That(response.Code).IsEqualTo(224);
+
+        var lines = new List<string>();
+        await foreach (var item in response.WithCancellation(cancellationToken))
+        {
+            lines.Add(item);
+        }
+
+        await Assert.That(lines).IsEquivalentTo(["1\tsubject 1", "2\tsubject 2", "3\tsubject 3"]);
+    }
+
+    [Test]
+    public async Task ShouldDrainPartiallyConsumedStreamForReuse(
+        CancellationToken cancellationToken
+    )
+    {
+        await using var server = new ScriptedNntpServer();
+        using var connection = new NntpConnection();
+
+        await connection.ConnectAsync(
+            IPAddress.Loopback.ToString(),
+            server.Port,
+            false,
+            new ResponseParser(200),
+            cancellationToken
+        );
+
+        // Consume only the first line, then dispose without enumerating the rest.
+        await using (
+            var response = await connection.MultiLineStreamCommandAsync<string>(
+                "XOVER 1-3",
+                224,
+                Identity,
+                cancellationToken
+            )
+        )
+        {
+            await foreach (var item in response.WithCancellation(cancellationToken))
+            {
+                await Assert.That(item).IsEqualTo("1\tsubject 1");
+                break;
+            }
+        }
+
+        // The connection must be clean: a subsequent command round-trips correctly.
+        await using var second = await connection.MultiLineStreamCommandAsync<string>(
+            "XOVER 1-3",
+            224,
+            Identity,
+            cancellationToken
+        );
+
+        var count = 0;
+        await foreach (var _ in second.WithCancellation(cancellationToken))
+        {
+            count++;
+        }
+
+        await Assert.That(count).IsEqualTo(3);
+    }
+
+    private static bool Identity(string line, out string value)
+    {
+        value = line;
+        return true;
+    }
+
     private sealed class CollectingParser : IMultiLineResponseParser<IReadOnlyList<string>>
     {
         public bool IsSuccessResponse(int code) => code is >= 200 and < 300;
@@ -168,6 +257,15 @@ internal sealed class NntpConnectionTests
                         await writer.WriteLineAsync("");
                         await writer.WriteLineAsync("..dot-stuffed line");
                         await writer.WriteLineAsync("last body line");
+                        await writer.WriteLineAsync(".");
+                    }
+                    else if (line.StartsWith("XOVER", StringComparison.OrdinalIgnoreCase))
+                    {
+                        await writer.WriteLineAsync("224 overview follows");
+                        for (var i = 1; i <= 3; i++)
+                        {
+                            await writer.WriteLineAsync($"{i}\tsubject {i}");
+                        }
                         await writer.WriteLineAsync(".");
                     }
                     else if (line.StartsWith("QUIT", StringComparison.OrdinalIgnoreCase))

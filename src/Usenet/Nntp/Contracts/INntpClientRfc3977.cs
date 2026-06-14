@@ -87,7 +87,7 @@ public interface INntpClientRfc3977
     /// <param name="group">The name of the group to select.</param>
     /// <param name="range">Only include article numbers within this range in the list.</param>
     /// <returns>A group response object.</returns>
-    Task<NntpGroupResponse> ListGroupAsync(string group, NntpArticleRange range);
+    Task<NntpStreamResponse<long>> ListGroupAsync(string group, NntpArticleRange range);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a>
@@ -99,7 +99,7 @@ public interface INntpClientRfc3977
     /// <param name="range">Only include article numbers within this range in the list.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A group response object.</returns>
-    Task<NntpGroupResponse> ListGroupAsync(
+    Task<NntpStreamResponse<long>> ListGroupAsync(
         string group,
         NntpArticleRange range,
         CancellationToken cancellationToken
@@ -113,7 +113,7 @@ public interface INntpClientRfc3977
     /// </summary>
     /// <param name="group">The name of the group to select.</param>
     /// <returns>A group response object.</returns>
-    Task<NntpGroupResponse> ListGroupAsync(string group);
+    Task<NntpStreamResponse<long>> ListGroupAsync(string group);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a>
@@ -124,7 +124,10 @@ public interface INntpClientRfc3977
     /// <param name="group">The name of the group to select.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A group response object.</returns>
-    Task<NntpGroupResponse> ListGroupAsync(string group, CancellationToken cancellationToken);
+    Task<NntpStreamResponse<long>> ListGroupAsync(
+        string group,
+        CancellationToken cancellationToken
+    );
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a>
@@ -132,7 +135,7 @@ public interface INntpClientRfc3977
     /// numbers in the newsgroup.
     /// </summary>
     /// <returns>A group response object.</returns>
-    Task<NntpGroupResponse> ListGroupAsync();
+    Task<NntpStreamResponse<long>> ListGroupAsync();
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.2">LISTGROUP</a>
@@ -141,7 +144,7 @@ public interface INntpClientRfc3977
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A group response object.</returns>
-    Task<NntpGroupResponse> ListGroupAsync(CancellationToken cancellationToken);
+    Task<NntpStreamResponse<long>> ListGroupAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-6.1.3">LAST</a> command.
@@ -560,7 +563,7 @@ public interface INntpClientRfc3977
     /// <param name="sinceDateTime">List all newsgroups that have new articles
     /// posted or received since this date and time.</param>
     /// <returns>A multi-line response containing a list of message-ids.</returns>
-    Task<NntpMultiLineResponse> NewNewsAsync(string wildmat, NntpDateTime sinceDateTime);
+    Task<NntpStreamResponse<string>> NewNewsAsync(string wildmat, NntpDateTime sinceDateTime);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.4">NEWNEWS</a>
@@ -573,7 +576,7 @@ public interface INntpClientRfc3977
     /// posted or received since this date and time.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing a list of message-ids.</returns>
-    Task<NntpMultiLineResponse> NewNewsAsync(
+    Task<NntpStreamResponse<string>> NewNewsAsync(
         string wildmat,
         NntpDateTime sinceDateTime,
         CancellationToken cancellationToken
@@ -651,7 +654,7 @@ public interface INntpClientRfc3977
     /// description about the purpose of the group.
     /// </summary>
     /// <returns>A multi-line response containing a list of newsgroups available on the server.</returns>
-    Task<NntpMultiLineResponse> ListNewsgroupsAsync();
+    Task<NntpStreamResponse<string>> ListNewsgroupsAsync();
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.6">newsgroups list</a>
@@ -662,7 +665,7 @@ public interface INntpClientRfc3977
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing a list of newsgroups available on the server.</returns>
-    Task<NntpMultiLineResponse> ListNewsgroupsAsync(CancellationToken cancellationToken);
+    Task<NntpStreamResponse<string>> ListNewsgroupsAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.6">newsgroups list</a>
@@ -673,7 +676,7 @@ public interface INntpClientRfc3977
     /// </summary>
     /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
     /// <returns>A multi-line response containing a list of newsgroups available on the server.</returns>
-    Task<NntpMultiLineResponse> ListNewsgroupsAsync(string wildmat);
+    Task<NntpStreamResponse<string>> ListNewsgroupsAsync(string wildmat);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.6">newsgroups list</a>
@@ -685,7 +688,7 @@ public interface INntpClientRfc3977
     /// <param name="wildmat">The wildmat to use for filtering the group names.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing a list of newsgroups available on the server.</returns>
-    Task<NntpMultiLineResponse> ListNewsgroupsAsync(
+    Task<NntpStreamResponse<string>> ListNewsgroupsAsync(
         string wildmat,
         CancellationToken cancellationToken
     );
@@ -787,7 +790,7 @@ public interface INntpClientRfc3977
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    Task<NntpMultiLineResponse> HdrAsync(string field, NntpMessageId messageId);
+    Task<NntpStreamResponse<string>> HdrAsync(string field, NntpMessageId messageId);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a>
@@ -799,7 +802,7 @@ public interface INntpClientRfc3977
     /// <param name="messageId">The message-id of the article to received from the server.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    Task<NntpMultiLineResponse> HdrAsync(
+    Task<NntpStreamResponse<string>> HdrAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken
@@ -814,7 +817,7 @@ public interface INntpClientRfc3977
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="range">Only include article numbers within this range in the list.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    Task<NntpMultiLineResponse> HdrAsync(string field, NntpArticleRange range);
+    Task<NntpStreamResponse<string>> HdrAsync(string field, NntpArticleRange range);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a>
@@ -826,7 +829,7 @@ public interface INntpClientRfc3977
     /// <param name="range">Only include article numbers within this range in the list.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    Task<NntpMultiLineResponse> HdrAsync(
+    Task<NntpStreamResponse<string>> HdrAsync(
         string field,
         NntpArticleRange range,
         CancellationToken cancellationToken
@@ -840,7 +843,7 @@ public interface INntpClientRfc3977
     /// </summary>
     /// <param name="field">The header field to retrieve.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    Task<NntpMultiLineResponse> HdrAsync(string field);
+    Task<NntpStreamResponse<string>> HdrAsync(string field);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a>
@@ -851,7 +854,7 @@ public interface INntpClientRfc3977
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A multi-line response containing the specfied header fields.</returns>
-    Task<NntpMultiLineResponse> HdrAsync(string field, CancellationToken cancellationToken);
+    Task<NntpStreamResponse<string>> HdrAsync(string field, CancellationToken cancellationToken);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.6">LIST HEADERS</a>

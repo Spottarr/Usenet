@@ -85,29 +85,29 @@ internal sealed partial class PooledNntpClient : IInternalPooledNntpClient
 
     public void ResetCounters() => _client.ResetCounters();
 
-    public Task<NntpMultiLineResponse> XhdrAsync(
+    public Task<NntpStreamResponse<string>> XhdrAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.XhdrAsync(field, messageId, cancellationToken));
 
-    public Task<NntpMultiLineResponse> XhdrAsync(
+    public Task<NntpStreamResponse<string>> XhdrAsync(
         string field,
         NntpArticleRange range,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.XhdrAsync(field, range, cancellationToken));
 
-    public Task<NntpMultiLineResponse> XhdrAsync(
+    public Task<NntpStreamResponse<string>> XhdrAsync(
         string field,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.XhdrAsync(field, cancellationToken));
 
-    public Task<NntpMultiLineResponse> XoverAsync(
+    public Task<NntpStreamResponse<string>> XoverAsync(
         NntpArticleRange range,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.XoverAsync(range, cancellationToken));
 
-    public Task<NntpMultiLineResponse> XoverAsync(CancellationToken cancellationToken) =>
+    public Task<NntpStreamResponse<string>> XoverAsync(CancellationToken cancellationToken) =>
         ExecuteCommandAsync(c => c.XoverAsync(cancellationToken));
 
     public Task<NntpMultiLineResponse> CapabilitiesAsync(CancellationToken cancellationToken) =>
@@ -127,18 +127,18 @@ internal sealed partial class PooledNntpClient : IInternalPooledNntpClient
     public Task<NntpGroupResponse> GroupAsync(string group, CancellationToken cancellationToken) =>
         ExecuteCommandAsync(c => c.GroupAsync(group, cancellationToken));
 
-    public Task<NntpGroupResponse> ListGroupAsync(
+    public Task<NntpStreamResponse<long>> ListGroupAsync(
         string group,
         NntpArticleRange range,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.ListGroupAsync(group, range, cancellationToken));
 
-    public Task<NntpGroupResponse> ListGroupAsync(
+    public Task<NntpStreamResponse<long>> ListGroupAsync(
         string group,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.ListGroupAsync(group, cancellationToken));
 
-    public Task<NntpGroupResponse> ListGroupAsync(CancellationToken cancellationToken) =>
+    public Task<NntpStreamResponse<long>> ListGroupAsync(CancellationToken cancellationToken) =>
         ExecuteCommandAsync(c => c.ListGroupAsync(cancellationToken));
 
     public Task<NntpLastResponse> LastAsync(CancellationToken cancellationToken) =>
@@ -210,7 +210,7 @@ internal sealed partial class PooledNntpClient : IInternalPooledNntpClient
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.NewGroupsAsync(sinceDateTime, cancellationToken));
 
-    public Task<NntpMultiLineResponse> NewNewsAsync(
+    public Task<NntpStreamResponse<string>> NewNewsAsync(
         string wildmat,
         NntpDateTime sinceDateTime,
         CancellationToken cancellationToken
@@ -228,10 +228,11 @@ internal sealed partial class PooledNntpClient : IInternalPooledNntpClient
     public Task<NntpMultiLineResponse> ListDistribPatsAsync(CancellationToken cancellationToken) =>
         ExecuteCommandAsync(c => c.ListDistribPatsAsync(cancellationToken));
 
-    public Task<NntpMultiLineResponse> ListNewsgroupsAsync(CancellationToken cancellationToken) =>
-        ExecuteCommandAsync(c => c.ListNewsgroupsAsync(cancellationToken));
+    public Task<NntpStreamResponse<string>> ListNewsgroupsAsync(
+        CancellationToken cancellationToken
+    ) => ExecuteCommandAsync(c => c.ListNewsgroupsAsync(cancellationToken));
 
-    public Task<NntpMultiLineResponse> ListNewsgroupsAsync(
+    public Task<NntpStreamResponse<string>> ListNewsgroupsAsync(
         string wildmat,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.ListNewsgroupsAsync(wildmat, cancellationToken));
@@ -253,19 +254,19 @@ internal sealed partial class PooledNntpClient : IInternalPooledNntpClient
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.ListOverviewFormatAsync(cancellationToken));
 
-    public Task<NntpMultiLineResponse> HdrAsync(
+    public Task<NntpStreamResponse<string>> HdrAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.HdrAsync(field, messageId, cancellationToken));
 
-    public Task<NntpMultiLineResponse> HdrAsync(
+    public Task<NntpStreamResponse<string>> HdrAsync(
         string field,
         NntpArticleRange range,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.HdrAsync(field, range, cancellationToken));
 
-    public Task<NntpMultiLineResponse> HdrAsync(
+    public Task<NntpStreamResponse<string>> HdrAsync(
         string field,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.HdrAsync(field, cancellationToken));
@@ -305,10 +306,11 @@ internal sealed partial class PooledNntpClient : IInternalPooledNntpClient
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.ListSubscriptionsAsync(cancellationToken));
 
-    public Task<NntpGroupsResponse> ListActiveAsync(CancellationToken cancellationToken) =>
-        ExecuteCommandAsync(c => c.ListActiveAsync(cancellationToken));
+    public Task<NntpStreamResponse<NntpGroup>> ListActiveAsync(
+        CancellationToken cancellationToken
+    ) => ExecuteCommandAsync(c => c.ListActiveAsync(cancellationToken));
 
-    public Task<NntpGroupsResponse> ListActiveAsync(
+    public Task<NntpStreamResponse<NntpGroup>> ListActiveAsync(
         string wildmat,
         CancellationToken cancellationToken
     ) => ExecuteCommandAsync(c => c.ListActiveAsync(wildmat, cancellationToken));
