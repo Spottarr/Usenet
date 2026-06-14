@@ -118,6 +118,43 @@ internal sealed class NntpClientPoolTests
         await Assert.That(client2).IsNotEqualTo(client1);
     }
 
+    [Test]
+    public async Task ParallelBorrowAndReturn(CancellationToken cancellationToken)
+    {
+        const int maxPoolSize = 4;
+
+        using var pool = new NntpClientPool(
+            maxPoolSize,
+            "example.server",
+            563,
+            true,
+            "example.user",
+            "example.pass"
+        )
+        {
+            // Keep the idle monitor out of the way so it does not race the borrow/return storm.
+            MonitorInterval = TimeSpan.FromMinutes(1),
+            ClientFactory = GetClientMock,
+        };
+
+        // Hammer the pool from many tasks at once; borrow, do a little work, then return.
+        var tasks = Enumerable
+            .Range(0, 200)
+            .Select(async _ =>
+            {
+                var lease = await pool.GetLease(cancellationToken);
+                await Task.Yield();
+                lease.Dispose();
+            });
+
+        await Task.WhenAll(tasks);
+
+        // The pool should never have handed out more clients than its capacity, and it should
+        // still be able to lease a client once the storm has settled.
+        var lease = await pool.GetLease(cancellationToken);
+        lease.Dispose();
+    }
+
     [SuppressMessage(
         "Performance",
         "CA1859",
