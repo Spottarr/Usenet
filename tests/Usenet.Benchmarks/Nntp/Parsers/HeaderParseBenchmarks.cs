@@ -2,7 +2,7 @@ using BenchmarkDotNet.Attributes;
 using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Responses;
 
-namespace Usenet.Benchmarks;
+namespace Usenet.Benchmarks.Nntp.Parsers;
 
 /// <summary>
 /// Benchmarks parsing of a single NNTP article header block (as returned by

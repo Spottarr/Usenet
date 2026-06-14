@@ -1,8 +1,9 @@
 using BenchmarkDotNet.Attributes;
+using Usenet.Benchmarks.Helpers;
 using Usenet.Nntp;
 using Usenet.Nntp.Models;
 
-namespace Usenet.Benchmarks;
+namespace Usenet.Benchmarks.Nntp.Client;
 
 /// <summary>
 /// End-to-end NNTP read benchmarks over a loopback socket served by

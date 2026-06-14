@@ -12,5 +12,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Usenet.Tests/Usenet.Tests.csproj" />
+    <Project Path="tests/Usenet.Benchmarks/Usenet.Benchmarks.csproj" />
   </Folder>
 </Solution>

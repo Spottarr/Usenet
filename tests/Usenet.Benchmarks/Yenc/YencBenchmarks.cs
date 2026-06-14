@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Attributes;
 using Usenet.Yenc;
 
-namespace Usenet.Benchmarks;
+namespace Usenet.Benchmarks.Yenc;
 
 /// <summary>
 /// Benchmarks the yEnc encode and decode hot paths. Both operate on a single
