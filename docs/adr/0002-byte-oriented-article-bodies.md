@@ -80,26 +80,29 @@ byte-oriented decision:
   the SIMD/hardware-accelerated first-party `System.IO.Hashing.Crc32`, computing the same
   ISO-HDLC CRC-32 yEnc uses. The decoder now fills the pooled buffer first and hashes the
   contiguous span in one accelerated pass (the encoder `Append`s each block) rather than
-  interleaving a scalar CRC per byte. This addresses the wall-clock caveat below; the
-  measured-outcomes table is re-measured after the swap lands.
+  interleaving a scalar CRC per byte, which removes the wall-clock caveat noted below.
 
 ## Measured outcomes
 
-Recorded after the rebuild landed (#122). BenchmarkDotNet `ShortRun`, .NET 10, on a single
-64 KiB part; allocations are deterministic across runs, the times are indicative (dev
-hardware, noisy short job). The allocation win — not the wall-clock time — is the point.
+The text baselines below were the pre-6.0 path; that path has since been **removed** (only the
+byte-oriented codec ships), so the comparison is historical — kept to record the allocation win
+that motivated the rebuild. Numbers from BenchmarkDotNet `ShortRun`, .NET 10, on a single 64 KiB
+part (#122); allocations are deterministic, times were indicative (noisy dev hardware).
 
-| Path | Method | Allocated | vs baseline |
+| Path | Method | Allocated | vs (removed) text baseline |
 |------|--------|----------:|------------:|
-| yEnc decode (text, baseline) | `YencArticleDecoder.Decode(lines)` | 143.29 KB | 1.00× |
+| yEnc decode (text, removed baseline) | `YencArticleDecoder.Decode(lines)` | 143.29 KB | 1.00× |
 | yEnc decode (bytes → pooled `Data`) | `YencDecoder.Decode(bytes)` | **2.19 KB** | 0.02× |
-| yEnc encode (text, baseline) | `EncodeAsync` → `List<string>` | 416.2 KB | 1.00× |
+| yEnc encode (text, removed baseline) | text `EncodeAsync` → `List<string>` | 416.2 KB | 1.00× |
 | yEnc encode (bytes → `IBufferWriter`) | `EncodeAsync` → sink | **920 B** | 0.002× |
 
 The decoded `Data` and the encode sink draw from `ArrayPool<byte>`, so the residual managed
-allocation is just per-call objects, not the payload. The byte decode path is *slower* in
-wall-clock (~171 µs vs ~63 µs) because it also verifies the part `pcrc32` in the same pass;
-that is an accepted trade for the ~98% allocation drop and is dwarfed by network cost.
+allocation is just per-call objects, not the payload; the CRC swap does not change these
+allocation figures. The earlier byte-decode wall-clock penalty (~171 µs vs ~63 µs) came from the
+scalar per-byte CRC verifying the part `pcrc32` in the decode loop; moving to the
+SIMD/hardware-accelerated `System.IO.Hashing.Crc32` over the contiguous decoded span removes that
+penalty. Re-run `YencDecoderBenchmarks`/`YencEncoderBenchmarks` on release hardware to refresh the
+times; the allocation win is the durable result.
 
 A `GC.GetAllocatedBytesForCurrentThread()` ceiling on a full part decode is wired into the
 TUnit suite (`YencDecoderAllocationTests`) so a regression back to per-line strings fails CI.
