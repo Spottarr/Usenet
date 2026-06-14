@@ -9,8 +9,17 @@ internal sealed class TestNntpServer : IDisposable
 {
     private readonly TcpListener _listener;
     private readonly CancellationTokenSource _cts = new();
+    private readonly TaskCompletionSource<IReadOnlyList<string>> _postedArticle = new(
+        TaskCreationOptions.RunContinuationsAsynchronously
+    );
 
     public int Port => ((IPEndPoint)_listener.LocalEndpoint).Port;
+
+    /// <summary>
+    /// Completes with the data block (dot-unstuffed, without the terminating dot) of the first
+    /// article posted via POST or IHAVE.
+    /// </summary>
+    public Task<IReadOnlyList<string>> PostedArticle => _postedArticle.Task;
 
     public TestNntpServer()
     {
@@ -37,10 +46,7 @@ internal sealed class TestNntpServer : IDisposable
         }
     }
 
-    private static async Task HandleClientAsync(
-        TcpClient client,
-        CancellationToken cancellationToken
-    )
+    private async Task HandleClientAsync(TcpClient client, CancellationToken cancellationToken)
     {
         try
         {
@@ -74,6 +80,16 @@ internal sealed class TestNntpServer : IDisposable
                     case "AUTHINFO":
                         await writer.WriteLineAsync("281 Success");
                         break;
+                    case "POST":
+                        await writer.WriteLineAsync("340 Send article");
+                        await ReceiveArticleAsync(reader, cancellationToken);
+                        await writer.WriteLineAsync("240 Article received");
+                        break;
+                    case "IHAVE":
+                        await writer.WriteLineAsync("335 Send article");
+                        await ReceiveArticleAsync(reader, cancellationToken);
+                        await writer.WriteLineAsync("235 Article transferred");
+                        break;
                     case "GROUP":
                         // Group command is used to force immediate connection reset
                         // so next write on client side breaks.
@@ -93,6 +109,24 @@ internal sealed class TestNntpServer : IDisposable
             client.Close();
             client.Dispose();
         }
+    }
+
+    private async Task ReceiveArticleAsync(StreamReader reader, CancellationToken cancellationToken)
+    {
+        var lines = new List<string>();
+        while (true)
+        {
+            var line = await reader.ReadLineAsync(cancellationToken);
+            if (line == null || line == ".")
+            {
+                break;
+            }
+
+            // undo dot-stuffing
+            lines.Add(line.StartsWith("..", StringComparison.Ordinal) ? line[1..] : line);
+        }
+
+        _postedArticle.TrySetResult(lines);
     }
 
     [SuppressMessage("ReSharper", "UnusedTupleComponentInReturnValue")]

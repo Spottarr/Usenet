@@ -91,6 +91,12 @@ internal sealed class BenchmarkNntpServer : IDisposable
                     case "GROUP":
                         await writer.WriteLineAsync("211 1000 1 1000 alt.binaries.benchmark");
                         break;
+                    case "POST":
+                        await writer.WriteLineAsync("340 Send article");
+                        await writer.FlushAsync(cancellationToken);
+                        await DrainArticleAsync(reader, cancellationToken);
+                        await writer.WriteLineAsync("240 Article received");
+                        break;
                     case "ARTICLE":
                         await WriteArticleAsync(writer, argument, includeBody: true);
                         break;
@@ -125,6 +131,21 @@ internal sealed class BenchmarkNntpServer : IDisposable
         {
             client.Close();
             client.Dispose();
+        }
+    }
+
+    private static async Task DrainArticleAsync(
+        StreamReader reader,
+        CancellationToken cancellationToken
+    )
+    {
+        while (true)
+        {
+            var line = await reader.ReadLineAsync(cancellationToken);
+            if (line == null || line == ".")
+            {
+                break;
+            }
         }
     }
 
