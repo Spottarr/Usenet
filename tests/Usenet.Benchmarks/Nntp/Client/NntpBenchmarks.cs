@@ -48,7 +48,15 @@ public class NntpBenchmarks
     [Benchmark]
     public async Task<int> XoverRange()
     {
-        var response = await _client.XoverAsync(NntpArticleRange.Range(1, OverviewCount));
-        return response.Lines.Count;
+        var count = 0;
+        await using var response = await _client.XoverAsync(
+            NntpArticleRange.Range(1, OverviewCount)
+        );
+        await foreach (var _ in response)
+        {
+            count++;
+        }
+
+        return count;
     }
 }

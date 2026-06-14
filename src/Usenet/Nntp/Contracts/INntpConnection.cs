@@ -1,5 +1,6 @@
 using JetBrains.Annotations;
 using Usenet.Nntp.Parsers;
+using Usenet.Nntp.Responses;
 
 namespace Usenet.Nntp.Contracts;
 
@@ -90,6 +91,38 @@ public interface INntpConnection : IDisposable
     Task<TResponse> MultiLineCommandAsync<TResponse>(
         string command,
         IMultiLineResponseParser<TResponse> parser,
+        CancellationToken cancellationToken
+    );
+
+    /// <summary>
+    /// Sends a command to the usenet server asynchronously and streams the multi-line data block,
+    /// parsing each line as it arrives instead of materializing the whole range.
+    /// </summary>
+    /// <typeparam name="T">The type each data-block line is parsed into.</typeparam>
+    /// <param name="command">The command to send to the server.</param>
+    /// <param name="successCode">The response code that indicates a data block follows.</param>
+    /// <param name="lineParser">The per-line parser to use.</param>
+    /// <returns>A streamed response that must be fully enumerated or disposed before the next command.</returns>
+    Task<NntpStreamResponse<T>> MultiLineStreamCommandAsync<T>(
+        string command,
+        int successCode,
+        NntpStreamLineParser<T> lineParser
+    );
+
+    /// <summary>
+    /// Sends a command to the usenet server asynchronously and streams the multi-line data block,
+    /// parsing each line as it arrives instead of materializing the whole range.
+    /// </summary>
+    /// <typeparam name="T">The type each data-block line is parsed into.</typeparam>
+    /// <param name="command">The command to send to the server.</param>
+    /// <param name="successCode">The response code that indicates a data block follows.</param>
+    /// <param name="lineParser">The per-line parser to use.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A streamed response that must be fully enumerated or disposed before the next command.</returns>
+    Task<NntpStreamResponse<T>> MultiLineStreamCommandAsync<T>(
+        string command,
+        int successCode,
+        NntpStreamLineParser<T> lineParser,
         CancellationToken cancellationToken
     );
 
