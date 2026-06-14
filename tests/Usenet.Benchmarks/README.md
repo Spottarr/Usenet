@@ -12,6 +12,7 @@ All benchmarks use `[MemoryDiagnoser]`, so allocations are reported alongside ti
 | Benchmark                            | Hot path                                                                  |
 | ------------------------------------ | ------------------------------------------------------------------------- |
 | `YencBenchmarks.Decode`              | yEnc decode of a single in-memory part (`YencArticleDecoder.Decode`)      |
+| `YencBenchmarks.DecodeBytes`         | yEnc byte-input decode of a single part into pooled Data (`YencDecoder.Decode`) |
 | `YencBenchmarks.Encode`              | yEnc encode of a single in-memory part (`YencEncoder.EncodeAsync`)        |
 | `HeaderParseBenchmarks.ParseHeaders` | Parsing one NNTP article header block (`HEAD`), with a folded header line |
 | `NntpBenchmarks.ArticleRead`         | A single-article read over a loopback socket (`ARTICLE`)                   |
@@ -54,10 +55,17 @@ Job=ShortRun  IterationCount=3  LaunchCount=1  WarmupCount=3
 
 ### yEnc codec (64 KiB part)
 
-| Method | PartSize | Mean      | Allocated |
-| ------ | -------- | --------: | --------: |
-| Encode | 65536    | 577.30 us | 160.49 KB |
-| Decode | 65536    |  64.76 us | 143.29 KB |
+| Method      | PartSize | Mean      | Allocated |
+| ----------- | -------- | --------: | --------: |
+| Encode      | 65536    | 577.30 us | 160.49 KB |
+| Decode      | 65536    |  64.76 us | 143.29 KB |
+| DecodeBytes | 65536    | 178.87 us |   2.19 KB |
+
+`DecodeBytes` is the byte-input path added in 6.0.0: it decodes straight from the body bytes
+into a single pooled `Data` buffer, dropping per-part allocations from ~143 KB to ~2 KB
+(the decoded buffer is rented from `ArrayPool`, so it does not show as a managed allocation).
+It does more CPU work per call than the string-based `Decode` because it also verifies the
+per-part `pcrc32` in the same pass, which the older decoder skips entirely.
 
 ### NNTP header parse (single article header block)
 
