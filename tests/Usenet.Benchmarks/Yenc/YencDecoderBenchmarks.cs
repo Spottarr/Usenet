@@ -1,12 +1,13 @@
+using System.Buffers;
 using BenchmarkDotNet.Attributes;
-using Usenet.Util;
 using Usenet.Yenc;
 
 namespace Usenet.Benchmarks.Yenc;
 
 /// <summary>
-/// Benchmarks the yEnc decode hot path. Both methods decode a single in-memory part so
-/// the numbers reflect raw codec throughput and allocations, not stream or socket overhead.
+/// Benchmarks the yEnc decode hot path. The decoder consumes a single in-memory part as the
+/// raw CRLF-terminated bytes it arrives as off the wire, so the numbers reflect raw codec
+/// throughput and allocations, not stream or socket overhead.
 /// </summary>
 [MemoryDiagnoser]
 public class YencDecoderBenchmarks
@@ -16,7 +17,6 @@ public class YencDecoderBenchmarks
     [Params(64 * 1024)]
     public int PartSize { get; set; }
 
-    private List<string> _encodedLines = [];
     private byte[] _encodedBytes = [];
 
     [GlobalSetup]
@@ -33,18 +33,9 @@ public class YencDecoderBenchmarks
         var header = new YencHeader("benchmark.bin", PartSize, LineLength, 0, 1, PartSize, 0);
 
         using var stream = new MemoryStream(data);
-        _encodedLines = [.. await YencEncoder.EncodeAsync(header, stream)];
-
-        // The byte-input path consumes the encoded body as raw CRLF-terminated bytes,
-        // exactly as it arrives off the wire.
-        _encodedBytes = UsenetEncoding.Default.GetBytes(string.Join("\r\n", _encodedLines));
-    }
-
-    [Benchmark(Baseline = true)]
-    public int DecodeFromLines()
-    {
-        var article = YencArticleDecoder.Decode(_encodedLines);
-        return article.Data.Count;
+        var writer = new ArrayBufferWriter<byte>(PartSize * 2);
+        await YencEncoder.EncodeAsync(header, stream, writer);
+        _encodedBytes = writer.WrittenSpan.ToArray();
     }
 
     [Benchmark]
