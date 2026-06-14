@@ -48,14 +48,40 @@ segment-loop level — one part in memory at a time, never a whole multi-segment
 ## Consequences
 
 - **Caller-owned lifetime is a behavioral break.** A body is backed by a pooled buffer, so
-  the response must be disposed; reading a view after disposal is use-after-free and
-  forgetting to dispose leaks a pooled buffer (or falls back to GC pressure). This is new —
-  the old `IImmutableList<string>` was GC-owned with no lifetime contract.
+  the response must be disposed; forgetting to dispose leaks a pooled buffer (or falls back to
+  GC pressure). This is new — the old `IImmutableList<string>` was GC-owned with no lifetime
+  contract.
 - A contiguous-buffer-returning sink path (`IBufferWriter<byte>`/`Stream`) is a later
   **additive** addition, not a breaking one, so it is deferred.
 - `PipeReader` drives the underlying stream's `ReadAsync`, so byte-counting can no longer
   rely on a sync-`Read`-only `CountingStream` wrapper; counting moves to the pipe layer or
   gains proper async overrides.
+
+## Refinement (6.0.0 finalization)
+
+Two refinements were made while hardening the path for release, neither changing the core
+byte-oriented decision:
+
+- **Fail-fast views.** `Body` and the yEnc `Data` view are backed by a `MemoryManager<byte>`
+  that the owning response/part invalidates on dispose, so a use-after-dispose read throws
+  `ObjectDisposedException` instead of silently reading a recycled buffer — even when the
+  `ReadOnlyMemory<byte>` was captured before disposal. The earlier framing ("reading a view
+  after disposal is use-after-free") described undefined behavior; it is now a defined,
+  immediate error. Cost is one small manager object per body, negligible against the body
+  buffer and the network round-trip.
+- **One disposal contract.** Every public pooled-buffer owner (`NntpArticleResponse`,
+  `YencPart`) now shares the same shape — `IDisposable` + `IAsyncDisposable`, a finalizer that
+  returns the buffer as a safety net, and a single shared
+  `PooledBufferDiagnostics.LeakedBufferCount` incremented only when the finalizer (not
+  `Dispose`) reclaims a leaked buffer. The rent/return/leak-count logic lives in one internal
+  `PooledBuffer` helper; the finalizer stays on each owning type (it cannot be factored out).
+
+- **CRC moved to `System.IO.Hashing.Crc32`.** The hand-rolled scalar `Crc32` was replaced by
+  the SIMD/hardware-accelerated first-party `System.IO.Hashing.Crc32`, computing the same
+  ISO-HDLC CRC-32 yEnc uses. The decoder now fills the pooled buffer first and hashes the
+  contiguous span in one accelerated pass (the encoder `Append`s each block) rather than
+  interleaving a scalar CRC per byte. This addresses the wall-clock caveat below; the
+  measured-outcomes table is re-measured after the swap lands.
 
 ## Measured outcomes
 
