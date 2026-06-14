@@ -48,6 +48,24 @@ internal static partial class LogExtensions
     public static partial void InvalidGroupBasicInformationLine(this ILogger logger, string line);
 
     [LoggerMessage(
+        Level = LogLevel.Warning,
+        Message = "Invalid overview line, skipping it: {Line} Expected at least 8 tab-separated fields"
+    )]
+    public static partial void InvalidOverviewLine(this ILogger logger, string line);
+
+    [LoggerMessage(
+        Level = LogLevel.Warning,
+        Message = "Invalid header field line, skipping it: {Line} Expected: {{articlenumber}} {{value}}"
+    )]
+    public static partial void InvalidHeaderFieldLine(this ILogger logger, string line);
+
+    [LoggerMessage(
+        Level = LogLevel.Warning,
+        Message = "Invalid newsgroup description line, skipping it: {Line} Expected: {{group}} {{description}}"
+    )]
+    public static partial void InvalidNewsgroupDescriptionLine(this ILogger logger, string line);
+
+    [LoggerMessage(
         Level = LogLevel.Error,
         Message = "Invalid newsgroup information line: {Line} Expected: {{group}} {{high}} {{low}} {{count}} {{status}}"
     )]

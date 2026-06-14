@@ -37,14 +37,16 @@ internal sealed class NntpClientStreamingTests
 
         await Assert.That(response.Success).IsTrue();
 
-        var rows = new List<string>();
+        var rows = new List<NntpArticleOverview>();
         await foreach (var row in response.WithCancellation(cancellationToken))
         {
             rows.Add(row);
         }
 
         await Assert.That(rows.Count).IsEqualTo(5);
-        await Assert.That(rows[0].StartsWith("1\tSubject 1", StringComparison.Ordinal)).IsTrue();
+        await Assert.That(rows[0].Number).IsEqualTo(1L);
+        await Assert.That(rows[0].Subject).IsEqualTo("Subject 1");
+        await Assert.That(rows[0].MessageId.Value).IsEqualTo("1@example.com");
     }
 
     [Test]

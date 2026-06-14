@@ -1,19 +1,23 @@
 using System.Buffers;
 using JetBrains.Annotations;
+using Usenet.Util;
 
 namespace Usenet.Yenc;
 
 /// <summary>
 /// Represents a single yEnc-encoded part decoded into a pooled <c>Data</c> buffer.
 /// The decoded data is backed by a buffer rented from <see cref="ArrayPool{T}"/>; the
-/// <see cref="Data"/> view is only valid until the part is disposed, after which the
-/// buffer is returned to the pool. Reading <see cref="Data"/> after disposal is undefined.
+/// <see cref="Data"/> view is only valid until the part is disposed, after which the buffer is
+/// returned to the pool. Always dispose the part (preferably with <c>using</c>/<c>await using</c>);
+/// reading <see cref="Data"/> after disposal throws <see cref="ObjectDisposedException"/> rather than
+/// returning recycled bytes, and a forgotten part is recovered by a finalizer that returns the buffer
+/// and increments <see cref="PooledBufferDiagnostics.LeakedBufferCount"/>.
 /// </summary>
 [PublicAPI]
-public sealed class YencPart : IDisposable
+public sealed class YencPart : IDisposable, IAsyncDisposable
 {
-    private byte[]? _buffer;
-    private readonly int _length;
+    private readonly PooledBuffer _buffer;
+    private bool _disposed;
 
     /// <summary>
     /// Contains the information obtained from the =ybegin header line and =ypart part-header
@@ -27,13 +31,18 @@ public sealed class YencPart : IDisposable
     public YencFooter? Footer { get; }
 
     /// <summary>
-    /// The binary data obtained by decoding the yEnc-encoded part. The returned memory is
-    /// backed by a pooled buffer and is only valid until this <see cref="YencPart"/> is disposed.
+    /// The binary data obtained by decoding the yEnc-encoded part. The returned memory is backed by a
+    /// pooled buffer and is only valid until this <see cref="YencPart"/> is disposed; reading it
+    /// afterwards throws <see cref="ObjectDisposedException"/>.
     /// </summary>
-    public ReadOnlyMemory<byte> Data =>
-        _buffer is null
-            ? throw new ObjectDisposedException(nameof(YencPart))
-            : _buffer.AsMemory(0, _length);
+    public ReadOnlyMemory<byte> Data
+    {
+        get
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+            return _buffer.Content;
+        }
+    }
 
     internal YencPart(YencHeader header, YencFooter? footer, byte[] buffer, int length)
     {
@@ -42,8 +51,7 @@ public sealed class YencPart : IDisposable
 
         Header = header;
         Footer = footer;
-        _buffer = buffer;
-        _length = length;
+        _buffer = new PooledBuffer(buffer, 0, length);
     }
 
     /// <summary>
@@ -52,13 +60,28 @@ public sealed class YencPart : IDisposable
     /// </summary>
     public void Dispose()
     {
-        var buffer = _buffer;
-        if (buffer is null)
+        if (_disposed)
         {
             return;
         }
 
-        _buffer = null;
-        ArrayPool<byte>.Shared.Return(buffer);
+        _disposed = true;
+        ((IDisposable)_buffer).Dispose();
+        GC.SuppressFinalize(this);
     }
+
+    /// <inheritdoc cref="Dispose"/>
+    public ValueTask DisposeAsync()
+    {
+        Dispose();
+        GC.SuppressFinalize(this);
+        return ValueTask.CompletedTask;
+    }
+
+    /// <summary>
+    /// Safety net for a part that was never disposed: returns the pooled buffer and increments
+    /// <see cref="PooledBufferDiagnostics.LeakedBufferCount"/> so a forgotten part cannot permanently
+    /// starve the pool.
+    /// </summary>
+    ~YencPart() => _buffer.ReturnLeaked();
 }
