@@ -6,6 +6,7 @@
 _UpgradeReport_Files/
 [Pp]ackages/
 artifacts/
+BenchmarkDotNet.Artifacts/
 
 Thumbs.db
 Desktop.ini
