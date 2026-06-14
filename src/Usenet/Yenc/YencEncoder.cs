@@ -1,7 +1,7 @@
+using System.Buffers;
 using System.Globalization;
 using System.Text;
 using JetBrains.Annotations;
-using Usenet.Extensions;
 using Usenet.Util;
 
 namespace Usenet.Yenc;
@@ -12,6 +12,19 @@ namespace Usenet.Yenc;
 [PublicAPI]
 public static class YencEncoder
 {
+    private const byte Cr = 13;
+    private const byte Lf = 10;
+
+    // Number of source bytes read from the stream per block.
+    private const int ReadBlockSize = 64 * 1024;
+
+    // Precomputed table flagging which encoded values are critical characters that must
+    // be escaped, and under which column condition. Indexed by the encoded value (0-255).
+    private const byte EscapeAlways = 1;
+    private const byte EscapeFirstColumn = 2;
+    private const byte EscapeLastColumn = 4;
+    private static readonly byte[] EscapeTable = CreateEscapeTable();
+
     /// <summary>
     /// Encodes the binary data in the specified stream into yEnc-encoded text
     /// using the default Usenet character encoding.
@@ -66,82 +79,240 @@ public static class YencEncoder
         CancellationToken cancellationToken
     )
     {
-        ArgumentNullException.ThrowIfNull(header);
-        ArgumentNullException.ThrowIfNull(stream);
         ArgumentNullException.ThrowIfNull(encoding);
 
-        List<string> lines = [GetHeaderLine(header)];
+        // Back-compat text adapter over the streaming byte sink: encode into a growable
+        // buffer, then split the framed bytes back into the historical list of lines.
+        var writer = new ArrayBufferWriter<byte>();
+        await EncodeAsync(header, stream, writer, encoding, cancellationToken)
+            .ConfigureAwait(false);
 
+        return SplitLines(writer.WrittenSpan, encoding);
+    }
+
+    /// <summary>
+    /// Encodes the binary data in the specified stream as yEnc-encoded bytes,
+    /// streaming the result into the specified <see cref="IBufferWriter{T}"/>
+    /// using the default Usenet character encoding.
+    /// </summary>
+    /// <param name="header">The yEnc header.</param>
+    /// <param name="stream">The stream containing the binary data to encode.</param>
+    /// <param name="writer">The buffer writer that receives the yEnc-encoded bytes.</param>
+    /// <returns>A task that completes once the data has been encoded.</returns>
+    public static Task EncodeAsync(YencHeader header, Stream stream, IBufferWriter<byte> writer) =>
+        EncodeAsync(header, stream, writer, UsenetEncoding.Default, CancellationToken.None);
+
+    /// <summary>
+    /// Encodes the binary data in the specified stream as yEnc-encoded bytes,
+    /// streaming the result into the specified <see cref="IBufferWriter{T}"/>
+    /// using the default Usenet character encoding.
+    /// </summary>
+    /// <param name="header">The yEnc header.</param>
+    /// <param name="stream">The stream containing the binary data to encode.</param>
+    /// <param name="writer">The buffer writer that receives the yEnc-encoded bytes.</param>
+    /// <param name="encoding">The character encoding to use.</param>
+    /// <returns>A task that completes once the data has been encoded.</returns>
+    public static Task EncodeAsync(
+        YencHeader header,
+        Stream stream,
+        IBufferWriter<byte> writer,
+        Encoding encoding
+    ) => EncodeAsync(header, stream, writer, encoding, CancellationToken.None);
+
+    /// <summary>
+    /// Encodes the binary data in the specified stream as yEnc-encoded bytes,
+    /// streaming the result into the specified <see cref="IBufferWriter{T}"/>
+    /// using the default Usenet character encoding.
+    /// </summary>
+    /// <param name="header">The yEnc header.</param>
+    /// <param name="stream">The stream containing the binary data to encode.</param>
+    /// <param name="writer">The buffer writer that receives the yEnc-encoded bytes.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that completes once the data has been encoded.</returns>
+    public static Task EncodeAsync(
+        YencHeader header,
+        Stream stream,
+        IBufferWriter<byte> writer,
+        CancellationToken cancellationToken
+    ) => EncodeAsync(header, stream, writer, UsenetEncoding.Default, cancellationToken);
+
+    /// <summary>
+    /// Encodes the binary data in the specified stream as yEnc-encoded bytes,
+    /// streaming the result into the specified <see cref="IBufferWriter{T}"/>
+    /// using the specified character encoding.
+    /// </summary>
+    /// <param name="header">The yEnc header.</param>
+    /// <param name="stream">The stream containing the binary data to encode.</param>
+    /// <param name="writer">The buffer writer that receives the yEnc-encoded bytes.</param>
+    /// <param name="encoding">The character encoding to use.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that completes once the data has been encoded.</returns>
+    public static async Task EncodeAsync(
+        YencHeader header,
+        Stream stream,
+        IBufferWriter<byte> writer,
+        Encoding encoding,
+        CancellationToken cancellationToken
+    )
+    {
+        ArgumentNullException.ThrowIfNull(header);
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(writer);
+        ArgumentNullException.ThrowIfNull(encoding);
+
+        WriteLine(writer, GetHeaderLine(header), encoding);
         if (header.IsFilePart)
         {
-            lines.Add(GetPartHeaderLine(header));
+            WriteLine(writer, GetPartHeaderLine(header), encoding);
         }
 
-        var encodedBytes = new byte[1024];
-        var encodedOffset = 0;
-        var lastCol = header.LineLength - 1;
         var checksum = Crc32.Initialize();
-        var readBuffer = new byte[1];
+        var column = 0;
+        var lastColumn = header.LineLength - 1;
+        var remaining = header.PartSize;
 
-        for (var offset = 0; offset < header.PartSize; offset++)
+        var readBuffer = ArrayPool<byte>.Shared.Rent(ReadBlockSize);
+        try
         {
-            var bytesRead = await stream
-                .ReadByteAsync(readBuffer, cancellationToken)
-                .ConfigureAwait(false);
-            if (bytesRead == 0)
+            while (remaining > 0)
             {
-                // end of stream
-                break;
+                var toRead = (int)Math.Min(readBuffer.Length, remaining);
+                var bytesRead = await stream
+                    .ReadAsync(readBuffer.AsMemory(0, toRead), cancellationToken)
+                    .ConfigureAwait(false);
+                if (bytesRead == 0)
+                {
+                    // end of stream
+                    break;
+                }
+
+                remaining -= bytesRead;
+                EncodeBlock(
+                    readBuffer.AsSpan(0, bytesRead),
+                    writer,
+                    header.LineLength,
+                    lastColumn,
+                    ref column,
+                    ref checksum
+                );
             }
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(readBuffer);
+        }
 
-            var @byte = readBuffer[0];
-            checksum = Crc32.Calculate(checksum, @byte);
-            var val = (@byte + 42) % 256;
+        if (column > 0)
+        {
+            // terminate the last body line
+            WriteCrlf(writer);
+        }
 
-            // encode dot only in first column
-            var encodeDot = encodedOffset == 0;
+        checksum = Crc32.Finalize(checksum);
+        WriteLine(writer, GetFooterLine(header, checksum), encoding);
+    }
 
-            // encode white space only in first and last column
-            var encodeWhitespace = encodedOffset == 0 || encodedOffset == lastCol;
+    private static void EncodeBlock(
+        ReadOnlySpan<byte> source,
+        IBufferWriter<byte> writer,
+        int lineLength,
+        int lastColumn,
+        ref int column,
+        ref uint checksum
+    )
+    {
+        // Worst case (line=1): every source byte escapes to two bytes and wraps, costing the
+        // escape, the value and a CRLF. Requesting the upper bound up front lets the whole
+        // block be written into a single contiguous span without re-checking capacity per byte.
+        var destination = writer.GetSpan(source.Length * 4 + 4);
+        var written = 0;
 
-            // encode critical characters
+        // The yEnc line length counts encoded output bytes, so an escape pair advances the
+        // column by two. The escaping of a dot or whitespace depends on that column.
+        var col = column;
+        var crc = checksum;
+
+        foreach (var @byte in source)
+        {
+            crc = Crc32.Calculate(crc, @byte);
+            var val = (byte)((@byte + 42) % 256);
+
+            var flags = EscapeTable[val];
             if (
-                val == YencCharacters.Null
-                || val == YencCharacters.Lf
-                || val == YencCharacters.Cr
-                || val == YencCharacters.Equal
-                || val == YencCharacters.Dot && encodeDot
-                || val == YencCharacters.Space && encodeWhitespace
-                || val == YencCharacters.Tab && encodeWhitespace
+                (flags & EscapeAlways) != 0
+                || ((flags & EscapeFirstColumn) != 0 && col == 0)
+                || ((flags & EscapeLastColumn) != 0 && col == lastColumn)
             )
             {
-                encodedBytes[encodedOffset++] = YencCharacters.Equal;
-                val = (val + 64) % 256;
+                destination[written++] = YencCharacters.Equal;
+                col++;
+                val = (byte)((val + 64) % 256);
             }
 
-            encodedBytes[encodedOffset++] = (byte)val;
-            if (encodedOffset < header.LineLength)
+            destination[written++] = val;
+            if (++col < lineLength)
             {
                 continue;
             }
 
-            // return encoded line
-            lines.Add(encoding.GetString(encodedBytes, 0, encodedOffset));
-
-            // reset offset
-            encodedOffset = 0;
+            destination[written++] = Cr;
+            destination[written++] = Lf;
+            col = 0;
         }
 
-        if (encodedOffset > 0)
+        writer.Advance(written);
+        column = col;
+        checksum = crc;
+    }
+
+    private static void WriteLine(IBufferWriter<byte> writer, string line, Encoding encoding)
+    {
+        var byteCount = encoding.GetByteCount(line);
+        var span = writer.GetSpan(byteCount + 2);
+        var written = encoding.GetBytes(line, span);
+        span[written++] = Cr;
+        span[written++] = Lf;
+        writer.Advance(written);
+    }
+
+    private static void WriteCrlf(IBufferWriter<byte> writer)
+    {
+        var span = writer.GetSpan(2);
+        span[0] = Cr;
+        span[1] = Lf;
+        writer.Advance(2);
+    }
+
+    private static List<string> SplitLines(ReadOnlySpan<byte> bytes, Encoding encoding)
+    {
+        var lines = new List<string>();
+        var start = 0;
+        for (var i = 0; i < bytes.Length - 1; i++)
         {
-            // return remainder
-            lines.Add(encoding.GetString(encodedBytes, 0, encodedOffset));
-        }
+            if (bytes[i] != Cr || bytes[i + 1] != Lf)
+            {
+                continue;
+            }
 
-        checksum = Crc32.Finalize(checksum);
-        lines.Add(GetFooterLine(header, checksum));
+            lines.Add(encoding.GetString(bytes[start..i]));
+            i++;
+            start = i + 1;
+        }
 
         return lines;
+    }
+
+    private static byte[] CreateEscapeTable()
+    {
+        var table = new byte[256];
+        table[YencCharacters.Null] = EscapeAlways;
+        table[YencCharacters.Lf] = EscapeAlways;
+        table[YencCharacters.Cr] = EscapeAlways;
+        table[YencCharacters.Equal] = EscapeAlways;
+        table[YencCharacters.Dot] = EscapeFirstColumn;
+        table[YencCharacters.Space] = EscapeFirstColumn | EscapeLastColumn;
+        table[YencCharacters.Tab] = EscapeFirstColumn | EscapeLastColumn;
+        return table;
     }
 
     private static string GetHeaderLine(YencHeader header)

@@ -22,13 +22,4 @@ internal static class StreamExtensions
         stream.CopyTo(ms);
         return ms.ToArray();
     }
-
-    public static ValueTask<int> ReadByteAsync(
-        this Stream stream,
-        byte[] buffer,
-        CancellationToken cancellationToken
-    )
-    {
-        return stream.ReadAsync(buffer.AsMemory(0, 1), cancellationToken);
-    }
 }

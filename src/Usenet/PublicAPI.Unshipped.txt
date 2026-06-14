@@ -1,4 +1,8 @@
 #nullable enable
+static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Buffers.IBufferWriter<byte>! writer) -> System.Threading.Tasks.Task!
+static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Buffers.IBufferWriter<byte>! writer, System.Text.Encoding! encoding) -> System.Threading.Tasks.Task!
+static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Buffers.IBufferWriter<byte>! writer, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Buffers.IBufferWriter<byte>! writer, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
 static Usenet.Yenc.YencDecoder.Decode(System.Buffers.ReadOnlySequence<byte> encoded) -> Usenet.Yenc.YencPart!
 static Usenet.Yenc.YencDecoder.Decode(System.Buffers.ReadOnlySequence<byte> encoded, System.Text.Encoding! encoding) -> Usenet.Yenc.YencPart!
 static Usenet.Yenc.YencDecoder.Decode(System.ReadOnlyMemory<byte> encoded) -> Usenet.Yenc.YencPart!
