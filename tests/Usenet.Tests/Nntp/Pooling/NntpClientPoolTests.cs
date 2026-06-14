@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using NSubstitute;
 using Usenet.Nntp;
 using Usenet.Nntp.Contracts;
 using Usenet.Tests.TestHelpers;
@@ -119,9 +118,14 @@ internal sealed class NntpClientPoolTests
         await Assert.That(client2).IsNotEqualTo(client1);
     }
 
+    [SuppressMessage(
+        "Performance",
+        "CA1859",
+        Justification = "Must return the interface type to match the pool's ClientFactory delegate."
+    )]
     private static IInternalPooledNntpClient GetClientMock()
     {
-        var client = Substitute.For<IInternalPooledNntpClient>();
+        var client = IInternalPooledNntpClient.Mock();
         client.Connected.Returns(true);
         client.Authenticated.Returns(true);
         return client;
