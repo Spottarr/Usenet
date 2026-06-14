@@ -59,6 +59,35 @@ internal sealed class NntpConnectionTests
         await Assert.That(lines).IsEquivalentTo(ExpectedDataBlock);
     }
 
+    private static readonly string[] ExpectedBodyLines = [".dot-stuffed line", "last body line"];
+
+    [Test]
+    public async Task ShouldBufferArticleBodyAsBytesAndUndoDotStuffing(
+        CancellationToken cancellationToken
+    )
+    {
+        await using var server = new ScriptedNntpServer();
+        using var connection = new NntpConnection();
+
+        await connection.ConnectAsync(
+            IPAddress.Loopback.ToString(),
+            server.Port,
+            false,
+            new ResponseParser(200),
+            cancellationToken
+        );
+
+        using var response = await connection.BufferedMultiLineCommandAsync(
+            "ARTICLE 1",
+            new ArticleResponseParser(ArticleRequestType.Article),
+            cancellationToken
+        );
+
+        await Assert.That(response.Success).IsTrue();
+        await Assert.That(response.Headers["Subject"]).Contains("test");
+        await Assert.That(response.ReadBodyLines()).IsEquivalentTo(ExpectedBodyLines);
+    }
+
     [Test]
     public async Task ShouldCountBytesReadAndWritten(CancellationToken cancellationToken)
     {
