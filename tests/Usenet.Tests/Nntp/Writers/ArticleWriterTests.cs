@@ -102,11 +102,32 @@ internal sealed class ArticleWriterTests
         await ArticleWriter.WriteAsync(connection, article, cancellationToken);
         await Assert.That(connection.GetLines()).IsEquivalentTo(expectedLines);
     }
+
+    [Test]
+    internal async Task ArticleShouldBeFlushedExactlyOnce(CancellationToken cancellationToken)
+    {
+        var article = new NntpArticle(
+            0,
+            "1@example.com",
+            "group",
+            new NntpHeaderCollection([new("From", "\"Demo User\" <nobody@example.net>")]),
+            new List<string> { "line one", ".line two", "line three" }
+        );
+
+        using var connection = new MockConnection();
+        await ArticleWriter.WriteAsync(connection, article, cancellationToken);
+
+        // The whole article must be batched into a single flush per command.
+        await Assert.That(connection.FlushCount).IsEqualTo(1);
+    }
 }
 
 internal sealed class MockConnection : INntpConnection
 {
+    private readonly System.Buffers.ArrayBufferWriter<byte> _output = new();
     private readonly List<string> _lines = [];
+
+    public int FlushCount { get; private set; }
 
     public void Dispose() { }
 
@@ -178,9 +199,19 @@ internal sealed class MockConnection : INntpConnection
 
     public Task WriteLineAsync(string line, CancellationToken cancellationToken)
     {
-        _lines.Add(line);
+        BufferLine(line);
+        return FlushAsync(cancellationToken);
+    }
+
+    public void BufferLine(string line) => _lines.Add(line);
+
+    public Task FlushAsync(CancellationToken cancellationToken)
+    {
+        FlushCount++;
         return Task.CompletedTask;
     }
+
+    public System.Buffers.IBufferWriter<byte> Output => _output;
 
     public long BytesRead => throw new NotImplementedException();
 

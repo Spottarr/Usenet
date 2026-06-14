@@ -38,9 +38,14 @@ Usenet.Nntp.Responses.NntpStreamResponse<T>.DisposeAsync() -> System.Threading.T
 Usenet.Nntp.Responses.NntpStreamResponse<T>.GetAsyncEnumerator(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Collections.Generic.IAsyncEnumerator<T>!
 Usenet.Nntp.Contracts.INntpConnection.BytesRead.get -> long
 Usenet.Nntp.Contracts.INntpConnection.BytesWritten.get -> long
+Usenet.Nntp.Contracts.INntpConnection.FlushAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+Usenet.Nntp.Contracts.INntpConnection.Output.get -> System.Buffers.IBufferWriter<byte>!
 Usenet.Nntp.Contracts.INntpConnection.ResetCounters() -> void
+Usenet.Nntp.Contracts.INntpConnection.BufferLine(string! line) -> void
 Usenet.Nntp.NntpConnection.BytesRead.get -> long
 Usenet.Nntp.NntpConnection.BytesWritten.get -> long
+Usenet.Nntp.NntpConnection.FlushAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+Usenet.Nntp.NntpConnection.Output.get -> System.Buffers.IBufferWriter<byte>!
 Usenet.Nntp.NntpConnection.ResetCounters() -> void
 Usenet.Nntp.Parsers.IBufferedMultiLineResponseParser<TResponse>
 Usenet.Nntp.Parsers.IBufferedMultiLineResponseParser<TResponse>.IsSuccessResponse(int code) -> bool
@@ -59,6 +64,7 @@ Usenet.Nntp.Responses.NntpArticleResponse.Number.get -> long
 Usenet.Nntp.Responses.NntpArticleResponse.ReadBodyLines() -> System.Collections.Generic.IEnumerable<string!>!
 Usenet.Nntp.Responses.NntpArticleResponse.ReadBodyLines(System.Text.Encoding! encoding) -> System.Collections.Generic.IEnumerable<string!>!
 static Usenet.Nntp.Responses.NntpArticleResponse.LeakedBufferCount.get -> long
+Usenet.Nntp.NntpConnection.BufferLine(string! line) -> void
 *REMOVED*Usenet.Nntp.Contracts.INntpConnection.Stream.get -> Usenet.Util.CountingStream?
 *REMOVED*Usenet.Nntp.NntpConnection.Stream.get -> Usenet.Util.CountingStream?
 *REMOVED*Usenet.Util.CountingStream

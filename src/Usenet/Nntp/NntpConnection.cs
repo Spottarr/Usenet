@@ -35,6 +35,7 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
     private Stream? _stream;
     private PipeReader? _reader;
     private PipeWriter? _writer;
+    private CountingBufferWriter? _output;
     private long _bytesRead;
     private long _bytesWritten;
     private bool _streaming;
@@ -48,6 +49,16 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
     /// </param>
     public NntpConnection(ILoggerFactory? loggerFactory = null) =>
         _log = (loggerFactory ?? NullLoggerFactory.Instance).CreateLogger<NntpConnection>();
+
+    /// <inheritdoc/>
+    public IBufferWriter<byte> Output
+    {
+        get
+        {
+            ThrowIfNotConnected();
+            return _output!;
+        }
+    }
 
     /// <inheritdoc/>
     public long BytesRead => _bytesRead;
@@ -73,9 +84,15 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
     {
         _log.Connecting(hostname, port, useSsl);
         await _client.ConnectAsync(hostname, port, cancellationToken).ConfigureAwait(false);
+        // Disable Nagle's algorithm: now that a command is sent as a single batched flush, the
+        // final sub-MSS segment would otherwise stall ~40ms against the server's delayed ACK
+        // before the response can be read. NNTP is a request/response protocol that wants the
+        // bytes on the wire immediately.
+        _client.NoDelay = true;
         _stream = await GetStreamAsync(hostname, useSsl).ConfigureAwait(false);
         _reader = PipeReader.Create(_stream, new StreamPipeReaderOptions(leaveOpen: true));
         _writer = PipeWriter.Create(_stream, new StreamPipeWriterOptions(leaveOpen: true));
+        _output = new CountingBufferWriter(_writer, this);
         return await GetResponseAsync(parser, cancellationToken).ConfigureAwait(false);
     }
 
@@ -242,8 +259,14 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
     /// <inheritdoc/>
     public async Task WriteLineAsync(string line, CancellationToken cancellationToken)
     {
+        BufferLine(line);
+        await FlushAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task FlushAsync(CancellationToken cancellationToken)
+    {
         ThrowIfNotConnected();
-        WriteLine(line);
         await _writer!.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 
@@ -535,16 +558,19 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
         return UsenetEncoding.Default.GetString(span);
     }
 
-    private void WriteLine(string line)
+    /// <inheritdoc/>
+    public void BufferLine(string line)
     {
+        ThrowIfNotConnected();
+        ArgumentNullException.ThrowIfNull(line);
+
         var encoding = UsenetEncoding.Default;
         var byteCount = encoding.GetByteCount(line);
-        var span = _writer!.GetSpan(byteCount + 2);
+        var span = _output!.GetSpan(byteCount + 2);
         var written = encoding.GetBytes(line, span);
         span[written] = (byte)'\r';
         span[written + 1] = (byte)'\n';
-        _writer.Advance(written + 2);
-        AddBytesWritten(written + 2);
+        _output.Advance(written + 2);
     }
 
     /// <summary>
@@ -603,6 +629,24 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
         CompleteWriter();
         _stream?.Dispose();
         _client.Dispose();
+    }
+
+    /// <summary>
+    /// An <see cref="IBufferWriter{T}"/> over the connection's <see cref="PipeWriter"/> that counts the
+    /// bytes advanced into <see cref="BytesWritten"/>. Buffered bytes are sent on the next flush.
+    /// </summary>
+    private sealed class CountingBufferWriter(PipeWriter writer, NntpConnection owner)
+        : IBufferWriter<byte>
+    {
+        public void Advance(int count)
+        {
+            writer.Advance(count);
+            owner.AddBytesWritten(count);
+        }
+
+        public Memory<byte> GetMemory(int sizeHint = 0) => writer.GetMemory(sizeHint);
+
+        public Span<byte> GetSpan(int sizeHint = 0) => writer.GetSpan(sizeHint);
     }
 
     private void CompleteWriter()
