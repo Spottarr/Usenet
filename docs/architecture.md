@@ -51,10 +51,14 @@ flowchart LR
 
 ## Bulk read path (XOVER, HDR, LISTGROUP, NEWNEWS)
 
-- Unbounded results stream as `IAsyncEnumerable<T>`, parsed per line as they arrive.
+- Unbounded results stream as `IAsyncEnumerable<T>` of library-parsed **typed rows**
+  (`XOVER` → `NntpArticleOverview`, etc.), parsed off the framed bytes as they arrive. The
+  consumer never supplies a parser; the line parser is internal. Malformed rows are skipped.
 - Memory stays flat regardless of range size; the consumer starts on the first row.
 - Drain contract: enumerate fully, or dispose the enumerator, before the next command on
-  that lease. The pooled lease drains or discards a partial enumerator on return.
+  that lease. On early-exit the connection is reclaimed by draining while a small budget
+  remains (64 KB) and otherwise abandoned so the pool reconnects, keeping `break` cheap over
+  large ranges. The pooled lease discards a still-pending enumerator on return.
 
 ```mermaid
 sequenceDiagram
@@ -96,10 +100,16 @@ flowchart LR
 
 ## Buffer lifetime
 
-- Pooled buffers are rented from `ArrayPool` per in-flight article.
+- Pooled buffers are rented from `ArrayPool` per in-flight article. Every public pooled
+  owner (`NntpArticleResponse`, `YencPart`) shares one contract via an internal `PooledBuffer`
+  helper: `IDisposable` + `IAsyncDisposable` and a finalizer safety net.
+- `Body`/`Data` are handed out over a `MemoryManager<byte>` that is invalidated on dispose, so
+  a view read after disposal — even a captured copy — throws rather than reading a recycled
+  buffer.
 - Correct disposal returns the buffer and suppresses the finalizer.
-- A leaked (undisposed) response is recovered by a finalizer that returns the buffer and
-  raises a diagnostic, so a forgotten `await using` cannot permanently starve the pool.
+- A leaked (undisposed) owner is recovered by a finalizer that returns the buffer and raises a
+  shared `PooledBufferDiagnostics.LeakedBufferCount`, so a forgotten `await using` cannot
+  permanently starve the pool.
 
 ```mermaid
 stateDiagram-v2

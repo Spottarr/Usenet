@@ -60,3 +60,11 @@ The article body as transmitted — a list of text lines, often still yEnc-encod
 
 **Data**:
 The decoded binary bytes obtained after yEnc-decoding an article body. _Avoid_: using "data" for the raw transmitted body.
+
+### Streamed results
+
+**Overview**:
+The summary metadata for an article from the NNTP `OVER`/`XOVER` database — article number, subject, poster, date, message-id, references, byte count and line count. The canonical term for an `XOVER` result. _Avoid_: calling an overview record a "header" — the article's actual headers are the `NntpHeaderCollection`; an overview is derived metadata, not the headers themselves.
+
+**Row**:
+A single parsed entry of a streamed multi-line result — one overview, one article number, one newsgroup. The unit yielded by a streamed `IAsyncEnumerable` result. _Avoid_: "line" when you mean the parsed value (a line is the raw on-the-wire text; a row is the typed result parsed from it).

@@ -41,6 +41,28 @@ connection), before issuing the next command on that lease.
 - This is the same framing discipline [ADR-0001](0001-article-buffering-and-streaming-model.md)
   established for bodies, now applied to multi-line results.
 
+## Refinement (6.0.0 finalization)
+
+The streaming decision held; the result *shape* and the drain *contract* were sharpened for
+release so consumers get ergonomics without bringing their own machinery:
+
+- **Library-parsed typed rows, not raw strings.** Each streamed command yields a ready-to-use
+  typed row, parsed once inside the library: `XOVER` yields `NntpArticleOverview` (the RFC 3977
+  OVER fields — number, subject, `From`, date, message-id, references, bytes, lines), `HDR`,
+  `NEWNEWS` and `LIST NEWSGROUPS` yield their own small row types, and `LISTGROUP`/`LIST ACTIVE`
+  keep their existing typed results. The per-line parse reads straight off the framed bytes; the
+  consumer never supplies a parser. The `NntpStreamLineParser<T>` delegate is therefore an
+  **internal** implementation detail, not public surface. A malformed row (e.g. an unparseable
+  date) is skipped rather than aborting an enumeration that may span millions of rows.
+- **Bounded drain on early-exit.** Stopping a streamed enumerator early (`break`, dispose, or an
+  exception) must reclaim the connection, and NNTP offers no mid-block "stop sending" — the only
+  options are drain-to-dot (pay the remaining transfer) or close the socket (pay a reconnect).
+  Unconditional draining contradicts this ADR's own goal: a consumer who stops a millions-of-rows
+  `XOVER` after a few rows would pay the full transfer at the `break`. So early-exit drains only
+  while a small budget remains (a 64 KB hardcoded byte budget, ~100 overview rows) and otherwise
+  abandons the connection so the pool discards and reconnects it. Small remainders keep the pooled
+  connection; large ones make `break` cheap. The budget can become a public knob later, additively.
+
 ## Measured outcomes
 
 Recorded after the rebuild landed (#122). The `XOVER` read over a loopback connection
