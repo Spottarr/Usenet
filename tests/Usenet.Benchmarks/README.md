@@ -20,7 +20,8 @@ All benchmarks use `[MemoryDiagnoser]`, so allocations are reported alongside ti
 | `NntpBenchmarks.XoverRange`          | A streamed `XOVER` range over a loopback socket                           |
 
 `NntpBenchmarks` drives a real socket served in-process by `BenchmarkNntpServer`, so its
-numbers include socket reads, the dot-unstuffing `NntpStreamReader`, and response parsing.
+numbers include socket reads, the pipe-based line framing and dot-unstuffing, and response
+parsing.
 
 ## Running
 
