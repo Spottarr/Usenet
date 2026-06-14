@@ -41,8 +41,8 @@ public class NntpBenchmarks
     [Benchmark]
     public async Task<int> ArticleRead()
     {
-        var response = await _client.ArticleAsync(123);
-        return response.Article?.Body.Count ?? 0;
+        using var response = await _client.ArticleAsync(123);
+        return response.Body.Length;
     }
 
     [Benchmark]

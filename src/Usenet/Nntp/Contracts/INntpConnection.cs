@@ -127,6 +127,21 @@ public interface INntpConnection : IDisposable
     );
 
     /// <summary>
+    /// Sends a command to the usenet server asynchronously and materializes the multi-line data block
+    /// into a single contiguous, pooled byte buffer instead of decoding it into <see cref="string"/> lines.
+    /// </summary>
+    /// <typeparam name="TResponse">The type of the parsed response.</typeparam>
+    /// <param name="command">The command to send to the server.</param>
+    /// <param name="parser">The buffered multi-line response parser to use.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A response object of type <typeparamref name="TResponse"/>.</returns>
+    Task<TResponse> BufferedMultiLineCommandAsync<TResponse>(
+        string command,
+        IBufferedMultiLineResponseParser<TResponse> parser,
+        CancellationToken cancellationToken
+    );
+
+    /// <summary>
     /// Gets a single-line response from the usenet server asynchronously.
     /// </summary>
     /// <typeparam name="TResponse">The type of the parsed response.</typeparam>

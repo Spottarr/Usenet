@@ -27,6 +27,7 @@ namespace Usenet.Nntp;
 public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
 {
     private const int StackAllocThreshold = 256;
+    private const int InitialDataBlockBufferSize = 4096;
     private const string AuthInfoPass = "AUTHINFO PASS";
 
     private readonly ILogger _log;
@@ -181,6 +182,39 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
     internal bool HasPendingStream => _streaming;
 
     /// <inheritdoc/>
+    public async Task<TResponse> BufferedMultiLineCommandAsync<TResponse>(
+        string command,
+        IBufferedMultiLineResponseParser<TResponse> parser,
+        CancellationToken cancellationToken
+    )
+    {
+        ThrowIfNotConnected();
+        ArgumentNullException.ThrowIfNull(parser);
+
+        var response = await CommandAsync(command, new ResponseParser(), cancellationToken)
+            .ConfigureAwait(false);
+
+        if (!parser.IsSuccessResponse(response.Code))
+        {
+            return parser.ParseError(response.Code, response.Message);
+        }
+
+        var (buffer, length) = await ReadDataBlockToBufferAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        try
+        {
+            // The parser takes ownership of the pooled buffer on the success path.
+            return parser.Parse(response.Code, response.Message, buffer, length);
+        }
+        catch
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+            throw;
+        }
+    }
+
+    /// <inheritdoc/>
     public async Task<TResponse> GetResponseAsync<TResponse>(
         IResponseParser<TResponse> parser,
         CancellationToken cancellationToken
@@ -257,6 +291,148 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
 
             yield return processed;
         }
+    }
+
+    /// <summary>
+    /// Reads a complete multi-line data block off the byte stream into a single contiguous buffer
+    /// rented from <see cref="ArrayPool{T}"/>. Dot-stuffing is undone and the terminating dot is
+    /// detected on the raw bytes, without transcoding the body to <see cref="string"/>. Each line is
+    /// stored with a normalized CRLF terminator. The caller takes ownership of the returned buffer.
+    /// </summary>
+    private async Task<(byte[] Buffer, int Length)> ReadDataBlockToBufferAsync(
+        CancellationToken cancellationToken
+    )
+    {
+        var buffer = ArrayPool<byte>.Shared.Rent(InitialDataBlockBufferSize);
+        var length = 0;
+        try
+        {
+            while (true)
+            {
+                var result = await _reader!.ReadAsync(cancellationToken).ConfigureAwait(false);
+                var segment = result.Buffer;
+
+                var consumed = AppendLines(segment, ref buffer, ref length, out var completed);
+                AddBytesRead(consumed);
+                var consumedPosition = segment.GetPosition(consumed);
+
+                if (completed || result.IsCompleted)
+                {
+                    _reader.AdvanceTo(consumedPosition);
+                    return (buffer, length);
+                }
+
+                _reader.AdvanceTo(consumedPosition, segment.End);
+            }
+        }
+        catch
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+            throw;
+        }
+    }
+
+    private static long AppendLines(
+        in ReadOnlySequence<byte> segment,
+        ref byte[] buffer,
+        ref int length,
+        out bool completed
+    )
+    {
+        completed = false;
+        var reader = new SequenceReader<byte>(segment);
+        while (
+            reader.TryReadTo(
+                out ReadOnlySequence<byte> lineSequence,
+                (byte)'\n',
+                advancePastDelimiter: true
+            )
+        )
+        {
+            if (AppendLine(lineSequence, ref buffer, ref length))
+            {
+                completed = true;
+                break;
+            }
+        }
+
+        return reader.Consumed;
+    }
+
+    /// <summary>
+    /// Appends a single framed line to the data block buffer, returning <see langword="true"/> when the
+    /// line is the terminating dot of the data block.
+    /// </summary>
+    private static bool AppendLine(
+        in ReadOnlySequence<byte> lineSequence,
+        ref byte[] buffer,
+        ref int length
+    )
+    {
+        if (lineSequence.IsSingleSegment)
+        {
+            return AppendLine(lineSequence.FirstSpan, ref buffer, ref length);
+        }
+
+        var lineLength = (int)lineSequence.Length;
+        byte[]? rented = null;
+        var line =
+            lineLength <= StackAllocThreshold
+                ? stackalloc byte[StackAllocThreshold]
+                : (rented = ArrayPool<byte>.Shared.Rent(lineLength));
+        try
+        {
+            lineSequence.CopyTo(line);
+            return AppendLine(line[..lineLength], ref buffer, ref length);
+        }
+        finally
+        {
+            if (rented != null)
+            {
+                ArrayPool<byte>.Shared.Return(rented);
+            }
+        }
+    }
+
+    private static bool AppendLine(ReadOnlySpan<byte> line, ref byte[] buffer, ref int length)
+    {
+        // Strip the trailing CR of the CRLF terminator.
+        if (line.Length > 0 && line[^1] == (byte)'\r')
+        {
+            line = line[..^1];
+        }
+
+        // A line containing only "." terminates the data block.
+        if (line.Length == 1 && line[0] == (byte)'.')
+        {
+            return true;
+        }
+
+        // Undo dot-stuffing of a line that begins with ".".
+        if (line.Length > 0 && line[0] == (byte)'.')
+        {
+            line = line[1..];
+        }
+
+        EnsureCapacity(ref buffer, length, length + line.Length + 2);
+        line.CopyTo(buffer.AsSpan(length));
+        length += line.Length;
+        buffer[length++] = (byte)'\r';
+        buffer[length++] = (byte)'\n';
+        return false;
+    }
+
+    private static void EnsureCapacity(ref byte[] buffer, int length, int required)
+    {
+        if (buffer.Length >= required)
+        {
+            return;
+        }
+
+        var next = ArrayPool<byte>.Shared.Rent(Math.Max(buffer.Length * 2, required));
+        buffer.AsSpan(0, length).CopyTo(next);
+        ArrayPool<byte>.Shared.Return(buffer);
+        buffer = next;
     }
 
     /// <summary>
