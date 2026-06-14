@@ -58,9 +58,11 @@ internal sealed class ArticleResponseParserTests
         await Assert.That(response.Number).IsEqualTo(123L);
         await Assert.That(response.MessageId.ToString()).IsEqualTo("<123@poster.com>");
         await Assert
-            .That(response.Headers["Path"])
+            .That(response.Headers.GetValues("Path"))
             .Contains("pathost!demo!whitehouse!not-for-mail");
-        await Assert.That(response.Headers["From"]).Contains("\"Demo User\" <nobody@example.net>");
+        await Assert
+            .That(response.Headers.GetValues("From"))
+            .Contains("\"Demo User\" <nobody@example.net>");
         await Assert.That(response.ReadBodyLines()).IsEquivalentTo(ArticleBodyLines);
     }
 
@@ -103,9 +105,9 @@ internal sealed class ArticleResponseParserTests
             length
         );
 
-        await Assert.That(response.Headers["Multi"]).Contains("line1 line2 line3");
+        await Assert.That(response.Headers.GetValues("Multi")).Contains("line1 line2 line3");
         await Assert
-            .That(response.Headers["Path"])
+            .That(response.Headers.GetValues("Path"))
             .Contains("pathost!demo!whitehouse!not-for-mail");
         await Assert.That(response.Body.Length).IsEqualTo(0);
         await Assert.That(response.ReadBodyLines()).IsEmpty();
@@ -124,9 +126,9 @@ internal sealed class ArticleResponseParserTests
             length
         );
 
-        await Assert.That(response.Headers.ContainsKey("Invalid header line")).IsFalse();
+        await Assert.That(response.Headers.Contains("Invalid header line")).IsFalse();
         await Assert
-            .That(response.Headers["Path"])
+            .That(response.Headers.GetValues("Path"))
             .Contains("pathost!demo!whitehouse!not-for-mail");
     }
 

@@ -53,7 +53,7 @@ Usenet.Nntp.Responses.NntpArticleResponse.Body.get -> System.ReadOnlyMemory<byte
 Usenet.Nntp.Responses.NntpArticleResponse.Dispose() -> void
 Usenet.Nntp.Responses.NntpArticleResponse.DisposeAsync() -> System.Threading.Tasks.ValueTask
 Usenet.Nntp.Responses.NntpArticleResponse.Groups.get -> Usenet.Nntp.Models.NntpGroups!
-Usenet.Nntp.Responses.NntpArticleResponse.Headers.get -> System.Collections.Immutable.ImmutableDictionary<string!, System.Collections.Immutable.ImmutableList<string!>!>!
+Usenet.Nntp.Responses.NntpArticleResponse.Headers.get -> Usenet.Nntp.Models.NntpHeaderCollection!
 Usenet.Nntp.Responses.NntpArticleResponse.MessageId.get -> Usenet.Nntp.Models.NntpMessageId!
 Usenet.Nntp.Responses.NntpArticleResponse.Number.get -> long
 Usenet.Nntp.Responses.NntpArticleResponse.ReadBodyLines() -> System.Collections.Generic.IEnumerable<string!>!

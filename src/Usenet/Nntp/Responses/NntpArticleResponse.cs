@@ -1,5 +1,4 @@
 using System.Buffers;
-using System.Collections.Immutable;
 using System.Text;
 using JetBrains.Annotations;
 using Usenet.Nntp.Models;
@@ -53,9 +52,9 @@ public sealed class NntpArticleResponse : NntpResponse, IDisposable, IAsyncDispo
     public NntpGroups Groups { get; }
 
     /// <summary>
-    /// The header dictionary of the article. Empty for a <c>BODY</c> response or a failure response.
+    /// The headers of the article. Empty for a <c>BODY</c> response or a failure response.
     /// </summary>
-    public ImmutableDictionary<string, ImmutableList<string>> Headers { get; }
+    public NntpHeaderCollection Headers { get; }
 
     /// <summary>
     /// The article body as the raw bytes transmitted by the server, with dot-stuffing undone and the
@@ -79,9 +78,7 @@ public sealed class NntpArticleResponse : NntpResponse, IDisposable, IAsyncDispo
     internal NntpArticleResponse(int code, string message, bool success)
         : base(code, message, success)
     {
-        Headers = ImmutableDictionary<string, ImmutableList<string>>.Empty.WithComparers(
-            StringComparer.OrdinalIgnoreCase
-        );
+        Headers = NntpHeaderCollection.Empty;
         MessageId = NntpMessageId.Empty;
         Groups = NntpGroups.Empty;
 
@@ -99,7 +96,7 @@ public sealed class NntpArticleResponse : NntpResponse, IDisposable, IAsyncDispo
         long number,
         NntpMessageId messageId,
         NntpGroups groups,
-        ImmutableDictionary<string, ImmutableList<string>> headers,
+        NntpHeaderCollection headers,
         byte[] buffer,
         int bodyOffset,
         int length
