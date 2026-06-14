@@ -200,7 +200,7 @@ public partial class NntpClient : INntpClient
         NntpMessageId messageId,
         CancellationToken cancellationToken
     ) =>
-        Connection.MultiLineCommandAsync(
+        Connection.BufferedMultiLineCommandAsync(
             $"ARTICLE {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}",
             new ArticleResponseParser(ArticleRequestType.Article, _loggerFactory),
             cancellationToken
@@ -211,7 +211,7 @@ public partial class NntpClient : INntpClient
         long number,
         CancellationToken cancellationToken
     ) =>
-        Connection.MultiLineCommandAsync(
+        Connection.BufferedMultiLineCommandAsync(
             $"ARTICLE {number}",
             new ArticleResponseParser(ArticleRequestType.Article, _loggerFactory),
             cancellationToken
@@ -219,7 +219,7 @@ public partial class NntpClient : INntpClient
 
     /// <inheritdoc />
     public Task<NntpArticleResponse> ArticleAsync(CancellationToken cancellationToken) =>
-        Connection.MultiLineCommandAsync(
+        Connection.BufferedMultiLineCommandAsync(
             "ARTICLE",
             new ArticleResponseParser(ArticleRequestType.Article, _loggerFactory),
             cancellationToken
@@ -230,7 +230,7 @@ public partial class NntpClient : INntpClient
         NntpMessageId messageId,
         CancellationToken cancellationToken
     ) =>
-        Connection.MultiLineCommandAsync(
+        Connection.BufferedMultiLineCommandAsync(
             $"HEAD {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}",
             new ArticleResponseParser(ArticleRequestType.Head, _loggerFactory),
             cancellationToken
@@ -238,7 +238,7 @@ public partial class NntpClient : INntpClient
 
     /// <inheritdoc />
     public Task<NntpArticleResponse> HeadAsync(long number, CancellationToken cancellationToken) =>
-        Connection.MultiLineCommandAsync(
+        Connection.BufferedMultiLineCommandAsync(
             $"HEAD {number}",
             new ArticleResponseParser(ArticleRequestType.Head, _loggerFactory),
             cancellationToken
@@ -246,7 +246,7 @@ public partial class NntpClient : INntpClient
 
     /// <inheritdoc />
     public Task<NntpArticleResponse> HeadAsync(CancellationToken cancellationToken) =>
-        Connection.MultiLineCommandAsync(
+        Connection.BufferedMultiLineCommandAsync(
             "HEAD",
             new ArticleResponseParser(ArticleRequestType.Head, _loggerFactory),
             cancellationToken
@@ -257,7 +257,7 @@ public partial class NntpClient : INntpClient
         NntpMessageId messageId,
         CancellationToken cancellationToken
     ) =>
-        Connection.MultiLineCommandAsync(
+        Connection.BufferedMultiLineCommandAsync(
             $"BODY {messageId.ThrowIfNullOrWhiteSpace(nameof(messageId))}",
             new ArticleResponseParser(ArticleRequestType.Body, _loggerFactory),
             cancellationToken
@@ -265,7 +265,7 @@ public partial class NntpClient : INntpClient
 
     /// <inheritdoc />
     public Task<NntpArticleResponse> BodyAsync(long number, CancellationToken cancellationToken) =>
-        Connection.MultiLineCommandAsync(
+        Connection.BufferedMultiLineCommandAsync(
             $"BODY {number}",
             new ArticleResponseParser(ArticleRequestType.Body, _loggerFactory),
             cancellationToken
@@ -273,7 +273,7 @@ public partial class NntpClient : INntpClient
 
     /// <inheritdoc />
     public Task<NntpArticleResponse> BodyAsync(CancellationToken cancellationToken) =>
-        Connection.MultiLineCommandAsync(
+        Connection.BufferedMultiLineCommandAsync(
             "BODY",
             new ArticleResponseParser(ArticleRequestType.Body, _loggerFactory),
             cancellationToken

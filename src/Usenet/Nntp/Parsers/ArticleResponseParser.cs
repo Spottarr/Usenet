@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Usenet.Extensions;
@@ -15,7 +16,7 @@ internal enum ArticleRequestType
     Article = 0x03,
 }
 
-internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleResponse>
+internal sealed class ArticleResponseParser : IBufferedMultiLineResponseParser<NntpArticleResponse>
 {
     private readonly ILogger _log;
     private readonly ArticleRequestType _requestType;
@@ -38,14 +39,55 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
 
     public bool IsSuccessResponse(int code) => code == _successCode;
 
-    public NntpArticleResponse Parse(int code, string message, IEnumerable<string> dataBlock)
+    public NntpArticleResponse ParseError(int code, string message) => new(code, message, false);
+
+    public NntpArticleResponse Parse(int code, string message, byte[] buffer, int length)
     {
-        if (!IsSuccessResponse(code))
+        var (number, messageId) = ParseResponseLine(message);
+
+        var bodyOffset = length;
+        var headers = ImmutableDictionary<string, ImmutableList<string>>.Empty.WithComparers(
+            StringComparer.OrdinalIgnoreCase
+        );
+        var groups = NntpGroups.Empty;
+
+        // The headers and the empty line separating them from the body are decoded as text; the body
+        // bytes are left untouched in the pooled buffer (see ADR-0002).
+        if ((_requestType & ArticleRequestType.Head) == ArticleRequestType.Head)
         {
-            return new NntpArticleResponse(code, message, false, null);
+            var parsed = ParseHeaders(buffer.AsSpan(0, length), out bodyOffset);
+            headers = parsed.ToImmutableDictionary(
+                x => x.Key,
+                x => x.Value.ToImmutableList(),
+                keyComparer: StringComparer.OrdinalIgnoreCase
+            );
+
+            if (parsed.TryGetValue(NntpHeaders.Newsgroups, out var values))
+            {
+                groups = new NntpGroupsBuilder().Add(values).Build();
+            }
+        }
+        else
+        {
+            // A BODY response is body bytes only.
+            bodyOffset = 0;
         }
 
-        // get response line
+        return new NntpArticleResponse(
+            code,
+            message,
+            number,
+            messageId,
+            groups,
+            headers,
+            buffer,
+            bodyOffset,
+            length
+        );
+    }
+
+    private (long Number, NntpMessageId MessageId) ParseResponseLine(string message)
+    {
         var responseSplit = message.Split(' ');
         if (responseSplit.Length < 2)
         {
@@ -54,49 +96,40 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
 
         _ = long.TryParse(responseSplit.Length > 0 ? responseSplit[0] : null, out var number);
         NntpMessageId messageId = responseSplit.Length > 1 ? responseSplit[1] : NntpMessageId.Empty;
-
-        using var enumerator = dataBlock.GetEnumerator();
-
-        // get headers if requested
-        var headers =
-            (_requestType & ArticleRequestType.Head) == ArticleRequestType.Head
-                ? GetHeaders(enumerator)
-                : NntpHeaderCollection.Empty;
-
-        // get groups
-        var groups = headers.Contains(NntpHeaders.Newsgroups)
-            ? new NntpGroupsBuilder().Add(headers.GetValues(NntpHeaders.Newsgroups)).Build()
-            : NntpGroups.Empty;
-
-        // get body if requested
-        var bodyLines =
-            (_requestType & ArticleRequestType.Body) == ArticleRequestType.Body
-                ? GetBody(enumerator).ToList()
-                : [];
-
-        return new NntpArticleResponse(
-            code,
-            message,
-            true,
-            new NntpArticle(number, messageId, groups, headers, bodyLines)
-        );
+        return (number, messageId);
     }
 
-    private NntpHeaderCollection GetHeaders(IEnumerator<string> enumerator)
+    private MultiValueDictionary<string, string> ParseHeaders(
+        ReadOnlySpan<byte> span,
+        out int bodyOffset
+    )
     {
-        // Parse each header line once into a flat list of key/value pairs, preserving order.
-        // Folded continuation lines are appended onto the previous pair's value in place.
-        var headers = new List<KeyValuePair<string, string>>();
-        while (enumerator.MoveNext())
+        var headers = new List<Header>();
+        Header? prevHeader = null;
+        var position = 0;
+        bodyOffset = span.Length;
+
+        while (position < span.Length)
         {
-            var line = enumerator.Current;
-            if (string.IsNullOrEmpty(line))
+            var newline = span[position..].IndexOf((byte)'\n');
+            var lineEnd = newline < 0 ? span.Length : position + newline;
+            var next = newline < 0 ? span.Length : lineEnd + 1;
+
+            var contentEnd = lineEnd;
+            if (contentEnd > position && span[contentEnd - 1] == (byte)'\r')
             {
-                // no more headers (skip empty line)
+                contentEnd--;
+            }
+
+            if (contentEnd == position)
+            {
+                // The empty line separates the headers from the body.
+                bodyOffset = next;
                 break;
             }
 
-            if (char.IsWhiteSpace(line[0]) && headers.Count > 0)
+            var line = UsenetEncoding.Default.GetString(span[position..contentEnd]);
+            if (char.IsWhiteSpace(line[0]) && prevHeader != null)
             {
                 var previous = headers[^1];
                 headers[^1] = new KeyValuePair<string, string>(
@@ -116,17 +149,22 @@ internal class ArticleResponseParser : IMultiLineResponseParser<NntpArticleRespo
                     headers.Add(new(line[..splitPos], line[(splitPos + 1)..].Trim()));
                 }
             }
+
+            position = next;
         }
 
         return headers.Count == 0 ? NntpHeaderCollection.Empty : new NntpHeaderCollection(headers);
     }
 
-    private static IEnumerable<string> GetBody(IEnumerator<string> enumerator)
+    private sealed class Header
     {
-        while (enumerator.MoveNext())
+        public string Key { get; }
+        public string Value { get; set; }
+
+        public Header(string key, string value)
         {
-            if (enumerator.Current is not null)
-                yield return enumerator.Current;
+            Key = key;
+            Value = value;
         }
     }
 }

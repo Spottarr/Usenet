@@ -1,189 +1,174 @@
-﻿using System.Text;
-using Usenet.Nntp.Models;
+using System.Buffers;
 using Usenet.Nntp.Parsers;
+using Usenet.Util;
 
 namespace Usenet.Tests.Nntp.Parsers;
 
 internal sealed class ArticleResponseParserTests
 {
-    public static IEnumerable<Func<(int, string, int, string[], NntpArticle)>> MultiLineParseData()
+    private static readonly string[] ArticleBodyLines =
+    [
+        "This is just a test article (1).",
+        "With two lines.",
+    ];
+
+    private static readonly string[] BodyLines =
+    [
+        "This is just a test article (2).",
+        "With two lines.",
+    ];
+
+    /// <summary>
+    /// Builds the contiguous, CRLF-terminated, pool-rented byte buffer the connection materializes for
+    /// the byte-oriented read path (dot-stuffing already undone, terminating dot already removed). The
+    /// parser takes ownership and the response returns the buffer to the pool when disposed.
+    /// </summary>
+    private static (byte[] Buffer, int Length) BuildDataBlock(string[] lines)
     {
-        yield return () =>
-            (
-                220,
-                "123 <123@poster.com>",
-                (int)ArticleRequestType.Article,
-                [],
-                new NntpArticle(
-                    123,
-                    "<123@poster.com>",
-                    NntpGroups.Empty,
-                    NntpHeaderCollection.Empty,
-                    new List<string>(0)
-                )
-            );
-
-        yield return () =>
-            (
-                220,
-                "123 <123@poster.com>",
-                (int)ArticleRequestType.Article,
-                [
-                    "Path: pathost!demo!whitehouse!not-for-mail",
-                    "From: \"Demo User\" <nobody@example.net>",
-                    "",
-                    "This is just a test article (1).",
-                    "With two lines.",
-                ],
-                new NntpArticle(
-                    123,
-                    "<123@poster.com>",
-                    NntpGroups.Empty,
-                    new NntpHeaderCollection([
-                        new("Path", "pathost!demo!whitehouse!not-for-mail"),
-                        new("From", "\"Demo User\" <nobody@example.net>"),
-                    ]),
-                    new List<string> { "This is just a test article (1).", "With two lines." }
-                )
-            );
-
-        yield return () =>
-            (
-                222,
-                "123 <123@poster.com>",
-                (int)ArticleRequestType.Body,
-                ["This is just a test article (2).", "With two lines."],
-                new NntpArticle(
-                    123,
-                    "<123@poster.com>",
-                    NntpGroups.Empty,
-                    NntpHeaderCollection.Empty,
-                    new List<string> { "This is just a test article (2).", "With two lines." }
-                )
-            );
-
-        yield return () =>
-            (
-                221,
-                "123 <123@poster.com>",
-                (int)ArticleRequestType.Head,
-                ["Multi: line1", " line2", " line3", "Path: pathost!demo!whitehouse!not-for-mail"],
-                new NntpArticle(
-                    123,
-                    "<123@poster.com>",
-                    NntpGroups.Empty,
-                    new NntpHeaderCollection([
-                        new("Multi", "line1 line2 line3"),
-                        new("Path", "pathost!demo!whitehouse!not-for-mail"),
-                    ]),
-                    new List<string>(0)
-                )
-            );
-
-        yield return () =>
-            (
-                221,
-                "123 <123@poster.com>",
-                (int)ArticleRequestType.Head,
-                ["Invalid header line", "Path: pathost!demo!whitehouse!not-for-mail"],
-                new NntpArticle(
-                    123,
-                    "<123@poster.com>",
-                    NntpGroups.Empty,
-                    new NntpHeaderCollection([new("Path", "pathost!demo!whitehouse!not-for-mail")]),
-                    new List<string>(0)
-                )
-            );
+        var bytes =
+            lines.Length == 0
+                ? []
+                : UsenetEncoding.Default.GetBytes(string.Join("\r\n", lines) + "\r\n");
+        var buffer = ArrayPool<byte>.Shared.Rent(Math.Max(bytes.Length, 1));
+        bytes.CopyTo(buffer, 0);
+        return (buffer, bytes.Length);
     }
 
     [Test]
-    [MethodDataSource(nameof(MultiLineParseData))]
-    internal async Task MultiLineResponseShouldBeParsedCorrectly(
-        int responseCode,
-        string responseMessage,
-        int requestType,
-        string[] lines,
-        NntpArticle expectedArticle
-    )
+    public async Task ArticleShouldExposeHeadersAndBody()
     {
-        var articleResponse = new ArticleResponseParser((ArticleRequestType)requestType).Parse(
-            responseCode,
-            responseMessage,
-            lines.ToList()
+        string[] lines =
+        [
+            "Path: pathost!demo!whitehouse!not-for-mail",
+            "From: \"Demo User\" <nobody@example.net>",
+            "",
+            "This is just a test article (1).",
+            "With two lines.",
+        ];
+        var (buffer, length) = BuildDataBlock(lines);
+
+        using var response = new ArticleResponseParser(ArticleRequestType.Article).Parse(
+            220,
+            "123 <123@poster.com>",
+            buffer,
+            length
         );
-        var actualArticle = articleResponse.Article;
-        await Assert.That(actualArticle).IsEqualTo(expectedArticle);
+
+        await Assert.That(response.Success).IsTrue();
+        await Assert.That(response.Number).IsEqualTo(123L);
+        await Assert.That(response.MessageId.ToString()).IsEqualTo("<123@poster.com>");
+        await Assert
+            .That(response.Headers["Path"])
+            .Contains("pathost!demo!whitehouse!not-for-mail");
+        await Assert.That(response.Headers["From"]).Contains("\"Demo User\" <nobody@example.net>");
+        await Assert.That(response.ReadBodyLines()).IsEquivalentTo(ArticleBodyLines);
     }
 
-    public static IEnumerable<Func<(int, string, int, string[])>> InvalidMultiLineParseData()
+    [Test]
+    public async Task BodyShouldExposeBytesAndLines()
     {
-        yield return () => (412, "No newsgroup selected", (int)ArticleRequestType.Article, []);
-        yield return () =>
-            (420, "No current article selected", (int)ArticleRequestType.Article, []);
-        yield return () =>
-            (423, "No article with that number", (int)ArticleRequestType.Article, []);
-        yield return () => (430, "No such article found", (int)ArticleRequestType.Article, []);
+        string[] lines = ["This is just a test article (2).", "With two lines."];
+        var (buffer, length) = BuildDataBlock(lines);
+
+        using var response = new ArticleResponseParser(ArticleRequestType.Body).Parse(
+            222,
+            "123 <123@poster.com>",
+            buffer,
+            length
+        );
+
+        await Assert.That(response.Headers).IsEmpty();
+        await Assert
+            .That(UsenetEncoding.Default.GetString(response.Body.Span))
+            .IsEqualTo("This is just a test article (2).\r\nWith two lines.\r\n");
+        await Assert.That(response.ReadBodyLines()).IsEquivalentTo(BodyLines);
+    }
+
+    [Test]
+    public async Task HeadShouldFoldContinuationLinesAndHaveEmptyBody()
+    {
+        string[] lines =
+        [
+            "Multi: line1",
+            " line2",
+            " line3",
+            "Path: pathost!demo!whitehouse!not-for-mail",
+        ];
+        var (buffer, length) = BuildDataBlock(lines);
+
+        using var response = new ArticleResponseParser(ArticleRequestType.Head).Parse(
+            221,
+            "123 <123@poster.com>",
+            buffer,
+            length
+        );
+
+        await Assert.That(response.Headers["Multi"]).Contains("line1 line2 line3");
+        await Assert
+            .That(response.Headers["Path"])
+            .Contains("pathost!demo!whitehouse!not-for-mail");
+        await Assert.That(response.Body.Length).IsEqualTo(0);
+        await Assert.That(response.ReadBodyLines()).IsEmpty();
+    }
+
+    [Test]
+    public async Task HeadShouldSkipInvalidHeaderLine()
+    {
+        string[] lines = ["Invalid header line", "Path: pathost!demo!whitehouse!not-for-mail"];
+        var (buffer, length) = BuildDataBlock(lines);
+
+        using var response = new ArticleResponseParser(ArticleRequestType.Head).Parse(
+            221,
+            "123 <123@poster.com>",
+            buffer,
+            length
+        );
+
+        await Assert.That(response.Headers.ContainsKey("Invalid header line")).IsFalse();
+        await Assert
+            .That(response.Headers["Path"])
+            .Contains("pathost!demo!whitehouse!not-for-mail");
+    }
+
+    [Test]
+    public async Task ArticleShouldParseNewsgroupsHeaderIntoGroups()
+    {
+        string[] lines = ["Newsgroups: alt.test,alt.demo", "", "body"];
+        var (buffer, length) = BuildDataBlock(lines);
+
+        using var response = new ArticleResponseParser(ArticleRequestType.Article).Parse(
+            220,
+            "123 <123@poster.com>",
+            buffer,
+            length
+        );
+
+        await Assert.That(response.Groups.ToString()).Contains("alt.test");
+        await Assert.That(response.Groups.ToString()).Contains("alt.demo");
+    }
+
+    public static IEnumerable<Func<(int, string, int)>> InvalidMultiLineParseData()
+    {
+        yield return () => (412, "No newsgroup selected", (int)ArticleRequestType.Article);
+        yield return () => (420, "No current article selected", (int)ArticleRequestType.Article);
+        yield return () => (423, "No article with that number", (int)ArticleRequestType.Article);
+        yield return () => (430, "No such article found", (int)ArticleRequestType.Article);
     }
 
     [Test]
     [MethodDataSource(nameof(InvalidMultiLineParseData))]
-    internal async Task InvalidMultiLineResponseShouldBeParsedCorrectly(
+    internal async Task InvalidResponseShouldNotBeSuccessful(
         int responseCode,
         string responseMessage,
-        int requestType,
-        string[] lines
+        int requestType
     )
     {
-        var articleResponse = new ArticleResponseParser((ArticleRequestType)requestType).Parse(
-            responseCode,
-            responseMessage,
-            lines.ToList()
-        );
-        await Assert.That(articleResponse.Article).IsNull();
-    }
+        var parser = new ArticleResponseParser((ArticleRequestType)requestType);
 
-    /// <summary>
-    /// While headers are being read eagerly, the body is lazily enumerated.
-    /// This means that the body is not read from the stream until it is actually needed.
-    /// Previously, the IEnumerator reading the response data was disposed.
-    /// This causes the IEnumerable to return no data while the underlying stream still contains it.
-    /// Any subsequent command would then receive this data that was still in the stream, causing them to fail.
-    /// </summary>
-    [Test]
-    public async Task LazyEnumerationOfBodyShouldReadFromSourceStream()
-    {
-        const string response = """
-            FirstHeader: FirstValue
-            SecondHeader: SecondValue
+        await Assert.That(parser.IsSuccessResponse(responseCode)).IsFalse();
 
-            This is an
-             example of some
-             body text
-             as returned by
-             the server.
-            """;
-
-        using var stream = new MemoryStream(Encoding.ASCII.GetBytes(response));
-        using var reader = new StreamReader(stream, Encoding.ASCII);
-
-        var data = ReadMultiLineDataBlock(reader);
-        var parser = new ArticleResponseParser(ArticleRequestType.Article);
-        var articleResponse = parser.Parse(220, "", data);
-
-        await Assert.That(articleResponse.Article).IsNotNull();
-        var body = string.Concat(articleResponse.Article!.Body);
-
-        await Assert.That(body).IsNotEmpty();
-    }
-
-    /// <summary>
-    /// Mimics <see cref="Usenet.Nntp.NntpConnection.ReadMultiLineDataBlockAsync"/>
-    /// </summary>
-    private static IEnumerable<string> ReadMultiLineDataBlock(StreamReader reader)
-    {
-        while (reader.ReadLine() is { } line)
-        {
-            yield return line;
-        }
+        using var response = parser.ParseError(responseCode, responseMessage);
+        await Assert.That(response.Success).IsFalse();
+        await Assert.That(response.Body.Length).IsEqualTo(0);
     }
 }

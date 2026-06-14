@@ -42,6 +42,23 @@ Usenet.Nntp.Contracts.INntpConnection.ResetCounters() -> void
 Usenet.Nntp.NntpConnection.BytesRead.get -> long
 Usenet.Nntp.NntpConnection.BytesWritten.get -> long
 Usenet.Nntp.NntpConnection.ResetCounters() -> void
+Usenet.Nntp.Parsers.IBufferedMultiLineResponseParser<TResponse>
+Usenet.Nntp.Parsers.IBufferedMultiLineResponseParser<TResponse>.IsSuccessResponse(int code) -> bool
+Usenet.Nntp.Parsers.IBufferedMultiLineResponseParser<TResponse>.Parse(int code, string! message, byte[]! buffer, int length) -> TResponse
+Usenet.Nntp.Parsers.IBufferedMultiLineResponseParser<TResponse>.ParseError(int code, string! message) -> TResponse
+Usenet.Nntp.Contracts.INntpConnection.BufferedMultiLineCommandAsync<TResponse>(string! command, Usenet.Nntp.Parsers.IBufferedMultiLineResponseParser<TResponse>! parser, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<TResponse>!
+Usenet.Nntp.NntpConnection.BufferedMultiLineCommandAsync<TResponse>(string! command, Usenet.Nntp.Parsers.IBufferedMultiLineResponseParser<TResponse>! parser, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<TResponse>!
+*REMOVED*Usenet.Nntp.Responses.NntpArticleResponse.Article.get -> Usenet.Nntp.Models.NntpArticle?
+Usenet.Nntp.Responses.NntpArticleResponse.Body.get -> System.ReadOnlyMemory<byte>
+Usenet.Nntp.Responses.NntpArticleResponse.Dispose() -> void
+Usenet.Nntp.Responses.NntpArticleResponse.DisposeAsync() -> System.Threading.Tasks.ValueTask
+Usenet.Nntp.Responses.NntpArticleResponse.Groups.get -> Usenet.Nntp.Models.NntpGroups!
+Usenet.Nntp.Responses.NntpArticleResponse.Headers.get -> System.Collections.Immutable.ImmutableDictionary<string!, System.Collections.Immutable.ImmutableList<string!>!>!
+Usenet.Nntp.Responses.NntpArticleResponse.MessageId.get -> Usenet.Nntp.Models.NntpMessageId!
+Usenet.Nntp.Responses.NntpArticleResponse.Number.get -> long
+Usenet.Nntp.Responses.NntpArticleResponse.ReadBodyLines() -> System.Collections.Generic.IEnumerable<string!>!
+Usenet.Nntp.Responses.NntpArticleResponse.ReadBodyLines(System.Text.Encoding! encoding) -> System.Collections.Generic.IEnumerable<string!>!
+static Usenet.Nntp.Responses.NntpArticleResponse.LeakedBufferCount.get -> long
 *REMOVED*Usenet.Nntp.Contracts.INntpConnection.Stream.get -> Usenet.Util.CountingStream?
 *REMOVED*Usenet.Nntp.NntpConnection.Stream.get -> Usenet.Util.CountingStream?
 *REMOVED*Usenet.Util.CountingStream
