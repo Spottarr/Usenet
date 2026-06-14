@@ -13,32 +13,19 @@ internal static class ArticleWriter
         CancellationToken cancellationToken
     )
     {
-        await WriteHeadersAsync(connection, article, cancellationToken).ConfigureAwait(false);
-        await connection.WriteLineAsync(string.Empty, cancellationToken).ConfigureAwait(false);
-        await WriteBodyAsync(connection, article, cancellationToken).ConfigureAwait(false);
-        await connection.WriteLineAsync(".", cancellationToken).ConfigureAwait(false);
+        // Buffer the whole article into the connection's write buffer, then flush once. This
+        // replaces the previous flush-per-line behaviour with a single batched flush per command.
+        WriteHeaders(connection, article);
+        connection.BufferLine(string.Empty);
+        WriteBody(connection, article);
+        connection.BufferLine(".");
+        await connection.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    private static async Task WriteHeadersAsync(
-        INntpConnection connection,
-        NntpArticle article,
-        CancellationToken cancellationToken
-    )
+    private static void WriteHeaders(INntpConnection connection, NntpArticle article)
     {
-        await WriteHeaderAsync(
-                connection,
-                NntpHeaders.MessageId,
-                article.MessageId,
-                cancellationToken
-            )
-            .ConfigureAwait(false);
-        await WriteHeaderAsync(
-                connection,
-                NntpHeaders.Newsgroups,
-                article.Groups.ToString(),
-                cancellationToken
-            )
-            .ConfigureAwait(false);
+        WriteHeader(connection, NntpHeaders.MessageId, article.MessageId);
+        WriteHeader(connection, NntpHeaders.Newsgroups, article.Groups.ToString());
         foreach (var (key, value) in article.Headers)
         {
             if (key is NntpHeaders.MessageId or NntpHeaders.Newsgroups)
@@ -47,16 +34,11 @@ internal static class ArticleWriter
                 continue;
             }
 
-            await WriteHeaderAsync(connection, key, value, cancellationToken).ConfigureAwait(false);
+            WriteHeader(connection, key, value);
         }
     }
 
-    private static async Task WriteHeaderAsync(
-        INntpConnection connection,
-        string key,
-        string val,
-        CancellationToken cancellationToken
-    )
+    private static void WriteHeader(INntpConnection connection, string key, string val)
     {
         if (key == NntpHeaders.MessageId)
         {
@@ -66,46 +48,35 @@ internal static class ArticleWriter
         var line = $"{key}: {val}";
         if (line.Length <= MaxHeaderLength)
         {
-            await connection.WriteLineAsync(line, cancellationToken).ConfigureAwait(false);
+            connection.BufferLine(line);
             return;
         }
 
         // header line is too long, fold it
-        await connection
-            .WriteLineAsync(line[..MaxHeaderLength], cancellationToken)
-            .ConfigureAwait(false);
+        connection.BufferLine(line[..MaxHeaderLength]);
         line = line[MaxHeaderLength..];
         while (line.Length > MaxHeaderLength)
         {
-            await connection
-                .WriteLineAsync(
-                    string.Concat("\t".AsSpan(), line.AsSpan(0, MaxHeaderLength - 1)),
-                    cancellationToken
-                )
-                .ConfigureAwait(false);
+            connection.BufferLine(
+                string.Concat("\t".AsSpan(), line.AsSpan(0, MaxHeaderLength - 1))
+            );
             line = line[(MaxHeaderLength - 1)..];
         }
 
-        await connection.WriteLineAsync("\t" + line, cancellationToken).ConfigureAwait(false);
+        connection.BufferLine("\t" + line);
     }
 
-    private static async Task WriteBodyAsync(
-        INntpConnection connection,
-        NntpArticle article,
-        CancellationToken cancellationToken
-    )
+    private static void WriteBody(INntpConnection connection, NntpArticle article)
     {
         foreach (var line in article.Body)
         {
             if (line.Length > 0 && line[0] == '.')
             {
-                await connection
-                    .WriteLineAsync("." + line, cancellationToken)
-                    .ConfigureAwait(false);
+                connection.BufferLine("." + line);
                 continue;
             }
 
-            await connection.WriteLineAsync(line, cancellationToken).ConfigureAwait(false);
+            connection.BufferLine(line);
         }
     }
 }

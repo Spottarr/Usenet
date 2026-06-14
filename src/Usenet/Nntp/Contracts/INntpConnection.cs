@@ -1,3 +1,4 @@
+using System.Buffers;
 using JetBrains.Annotations;
 using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Responses;
@@ -175,6 +176,30 @@ public interface INntpConnection : IDisposable
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task WriteLineAsync(string line, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Buffers a single CRLF-terminated line into the connection's write buffer without flushing it
+    /// to the underlying transport. Call <see cref="FlushAsync"/> to send the buffered bytes. This
+    /// allows a whole command (for example an article) to be batched into a single flush.
+    /// </summary>
+    /// <param name="line">The line to buffer.</param>
+    void BufferLine(string line);
+
+    /// <summary>
+    /// Flushes any bytes buffered by <see cref="BufferLine"/> or written to <see cref="Output"/> to
+    /// the underlying transport.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task FlushAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// The byte sink backing the connection's write buffer. Bytes written here are batched until
+    /// <see cref="FlushAsync"/> is called and are included in <see cref="BytesWritten"/>. This is the
+    /// seam the streaming yEnc encoder writes into so encoded bytes flow straight to the transport
+    /// without an intermediate list of lines.
+    /// </summary>
+    IBufferWriter<byte> Output { get; }
 
     /// <summary>
     /// The number of bytes read from the connection.

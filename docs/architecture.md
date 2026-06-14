@@ -74,8 +74,14 @@ sequenceDiagram
 
 - `YencEncoder` reads the source in blocks and encodes into an `IBufferWriter<byte>` using
   a precomputed escape table. No per-byte reads, no `List<string>` of all lines.
-- `ArticleWriter` writes headers and body into the `PipeWriter`.
-- One batched flush per command instead of a flush per line.
+- The connection exposes that `IBufferWriter<byte>` as `Output` (a counting view over the
+  `PipeWriter`), so the encoder streams yEnc bytes straight into the write buffer.
+- `ArticleWriter` buffers headers (with folding) and body (with dot-stuffing) via
+  `BufferLine`, then `FlushAsync` sends the whole command in one batched flush instead of a
+  flush per line.
+- `TCP_NODELAY` is enabled on the socket: with a single flush per command, the final
+  sub-MSS segment would otherwise stall against the server's delayed ACK before the response
+  could be read.
 
 ```mermaid
 flowchart LR
