@@ -1,10 +1,10 @@
-using System.Collections.Immutable;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Usenet.Extensions;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
+using Usenet.Util;
 
 namespace Usenet.Nntp.Parsers;
 
@@ -46,25 +46,20 @@ internal sealed class ArticleResponseParser : IBufferedMultiLineResponseParser<N
         var (number, messageId) = ParseResponseLine(message);
 
         var bodyOffset = length;
-        var headers = ImmutableDictionary<string, ImmutableList<string>>.Empty.WithComparers(
-            StringComparer.OrdinalIgnoreCase
-        );
+        var headers = NntpHeaderCollection.Empty;
         var groups = NntpGroups.Empty;
 
         // The headers and the empty line separating them from the body are decoded as text; the body
         // bytes are left untouched in the pooled buffer (see ADR-0002).
         if ((_requestType & ArticleRequestType.Head) == ArticleRequestType.Head)
         {
-            var parsed = ParseHeaders(buffer.AsSpan(0, length), out bodyOffset);
-            headers = parsed.ToImmutableDictionary(
-                x => x.Key,
-                x => x.Value.ToImmutableList(),
-                keyComparer: StringComparer.OrdinalIgnoreCase
-            );
+            headers = ParseHeaders(buffer.AsSpan(0, length), out bodyOffset);
 
-            if (parsed.TryGetValue(NntpHeaders.Newsgroups, out var values))
+            if (headers.Contains(NntpHeaders.Newsgroups))
             {
-                groups = new NntpGroupsBuilder().Add(values).Build();
+                groups = new NntpGroupsBuilder()
+                    .Add(headers.GetValues(NntpHeaders.Newsgroups))
+                    .Build();
             }
         }
         else
@@ -99,13 +94,11 @@ internal sealed class ArticleResponseParser : IBufferedMultiLineResponseParser<N
         return (number, messageId);
     }
 
-    private MultiValueDictionary<string, string> ParseHeaders(
-        ReadOnlySpan<byte> span,
-        out int bodyOffset
-    )
+    private NntpHeaderCollection ParseHeaders(ReadOnlySpan<byte> span, out int bodyOffset)
     {
-        var headers = new List<Header>();
-        Header? prevHeader = null;
+        // Parse each header line once into a flat list of key/value pairs, preserving order.
+        // Folded continuation lines are appended onto the previous pair's value in place.
+        var headers = new List<KeyValuePair<string, string>>();
         var position = 0;
         bodyOffset = span.Length;
 
@@ -129,7 +122,7 @@ internal sealed class ArticleResponseParser : IBufferedMultiLineResponseParser<N
             }
 
             var line = UsenetEncoding.Default.GetString(span[position..contentEnd]);
-            if (char.IsWhiteSpace(line[0]) && prevHeader != null)
+            if (char.IsWhiteSpace(line[0]) && headers.Count > 0)
             {
                 var previous = headers[^1];
                 headers[^1] = new KeyValuePair<string, string>(
@@ -154,17 +147,5 @@ internal sealed class ArticleResponseParser : IBufferedMultiLineResponseParser<N
         }
 
         return headers.Count == 0 ? NntpHeaderCollection.Empty : new NntpHeaderCollection(headers);
-    }
-
-    private sealed class Header
-    {
-        public string Key { get; }
-        public string Value { get; set; }
-
-        public Header(string key, string value)
-        {
-            Key = key;
-            Value = value;
-        }
     }
 }

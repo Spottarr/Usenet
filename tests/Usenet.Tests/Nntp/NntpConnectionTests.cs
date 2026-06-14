@@ -84,7 +84,7 @@ internal sealed class NntpConnectionTests
         );
 
         await Assert.That(response.Success).IsTrue();
-        await Assert.That(response.Headers["Subject"]).Contains("test");
+        await Assert.That(response.Headers.GetValues("Subject")).Contains("test");
         await Assert.That(response.ReadBodyLines()).IsEquivalentTo(ExpectedBodyLines);
     }
 
