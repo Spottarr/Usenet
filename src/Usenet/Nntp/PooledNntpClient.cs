@@ -60,29 +60,29 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.XfeatureCompressGzipAsync(withTerminator, cancellationToken));
 
-    public Task<NntpMultiLineResponse> XzhdrAsync(
+    public Task<NntpStreamResponse<NntpHeaderField>> XzhdrAsync(
         string field,
         NntpArticleRange range,
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.XzhdrAsync(field, range, cancellationToken));
 
-    public Task<NntpMultiLineResponse> XzhdrByMessageIdAsync(
+    public Task<NntpHeaderField?> XzhdrByMessageIdAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.XzhdrByMessageIdAsync(field, messageId, cancellationToken));
 
-    public Task<NntpMultiLineResponse> CurrentXzhdrAsync(
+    public Task<NntpStreamResponse<NntpHeaderField>> CurrentXzhdrAsync(
         string field,
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.CurrentXzhdrAsync(field, cancellationToken));
 
-    public Task<NntpMultiLineResponse> XzverAsync(
+    public Task<NntpStreamResponse<NntpArticleOverview>> XzverAsync(
         NntpArticleRange range,
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.XzverAsync(range, cancellationToken));
 
-    public Task<NntpMultiLineResponse> CurrentXzverAsync(
+    public Task<NntpStreamResponse<NntpArticleOverview>> CurrentXzverAsync(
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.CurrentXzverAsync(cancellationToken));
 
