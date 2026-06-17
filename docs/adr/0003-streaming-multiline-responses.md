@@ -69,20 +69,23 @@ release so consumers get ergonomics without bringing their own machinery:
   abandons the connection so the pool discards and reconnects it. Small remainders keep the pooled
   connection; large ones make `break` cheap. The budget can become a public knob later, additively.
 
+- **`OVER` joins `XOVER` as typed streamed rows; the single-article forms return one record.**
+  Shipped in #139. `OVER` was the one unbounded scan left returning raw `NntpMultiLineResponse`
+  strings while its legacy sibling `XOVER` already streamed typed `NntpArticleOverview` — backwards,
+  since `OVER` is the modern RFC 3977 command. `OverAsync` (range) and `CurrentOverAsync` now stream
+  `NntpArticleOverview` through the same per-line parser. The RFC 3977-only `OVER <message-id>` form
+  returns exactly one record, so `OverByMessageIdAsync` returns `Task<NntpArticleOverview?>` rather
+  than a single-row stream — the drain contract is overkill for one row. The same single-vs-many
+  split applies to `HdrByMessageIdAsync`/`XhdrByMessageIdAsync` (`Task<NntpHeaderField?>`). Both
+  `Over*` and `Xover*` (and `Hdr*`/`Xhdr*`) are kept because real servers implement one or the other.
+  A malformed overview row is skipped rather than aborting the enumeration, consistent with the
+  streamed contract above. Power users with a non-standard `overview.fmt` retain the low-level
+  `INntpConnection` streaming seam with a custom parser.
+
 ## Refinement (6.0.0, proposed)
 
-Two follow-ups complete the "typed results, no raw strings" direction this ADR started; neither
-changes the streamed-vs-bounded split.
-
-- **`OVER` joins `XOVER` as typed streamed rows.** `OVER` was the one unbounded scan left
-  returning raw `NntpMultiLineResponse` strings while its legacy sibling `XOVER` already streamed
-  typed `NntpArticleOverview` — backwards, since `OVER` is the modern RFC 3977 command. `OverAsync`
-  (range) and `CurrentOverAsync` now stream `NntpArticleOverview` through the same per-line parser.
-  The RFC 3977-only `OVER <message-id>` form returns exactly one record, so
-  `OverByMessageIdAsync` returns `Task<NntpArticleOverview?>` rather than a single-row stream — the
-  drain contract is overkill for one row. The same single-vs-many split applies to
-  `HdrByMessageIdAsync`/`XhdrByMessageIdAsync` (`Task<NntpHeaderField?>`). Both `Over*` and
-  `Xover*` (and `Hdr*`/`Xhdr*`) are kept because real servers implement one or the other.
+One follow-up remains to complete the "typed results, no raw strings" direction this ADR started; it
+does not change the streamed-vs-bounded split.
 
 - **Bounded commands move to typed results too.** The bounded multi-line commands stop returning
   the raw `NntpMultiLineResponse` string bag: `CAPABILITIES` → `NntpCapabilities`,
