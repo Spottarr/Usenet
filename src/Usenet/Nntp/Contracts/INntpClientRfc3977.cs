@@ -271,8 +271,8 @@ public interface INntpClientRfc3977
     /// understood by this implementation of the server.
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A multi-line response with a short summary of the available commands.</returns>
-    Task<NntpMultiLineResponse> HelpAsync(CancellationToken cancellationToken = default);
+    /// <returns>A text response with a short summary of the available commands.</returns>
+    Task<NntpTextResponse> HelpAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.3">NEWGROUPS</a>
@@ -449,9 +449,9 @@ public interface INntpClientRfc3977
     /// </summary>
     /// <param name="range">Only include article numbers within this range in the list.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A multi-line response containg a list of header
+    /// <returns>A text response containing a list of header
     /// fields that may be retrieved using the HDR command.</returns>
-    Task<NntpMultiLineResponse> ListHeadersAsync(
+    Task<NntpTextResponse> ListHeadersAsync(
         NntpArticleRange range,
         CancellationToken cancellationToken = default
     );
@@ -463,9 +463,9 @@ public interface INntpClientRfc3977
     /// </summary>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A multi-line response containg a list of header
+    /// <returns>A text response containing a list of header
     /// fields that may be retrieved using the HDR command.</returns>
-    Task<NntpMultiLineResponse> ListHeadersByMessageIdAsync(
+    Task<NntpTextResponse> ListHeadersByMessageIdAsync(
         NntpMessageId messageId,
         CancellationToken cancellationToken = default
     );
@@ -476,9 +476,7 @@ public interface INntpClientRfc3977
     /// retrieved using the HDR command for the current article.
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A multi-line response containg a list of header
+    /// <returns>A text response containing a list of header
     /// fields that may be retrieved using the HDR command.</returns>
-    Task<NntpMultiLineResponse> CurrentListHeadersAsync(
-        CancellationToken cancellationToken = default
-    );
+    Task<NntpTextResponse> CurrentListHeadersAsync(CancellationToken cancellationToken = default);
 }
