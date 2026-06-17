@@ -699,33 +699,33 @@ public class NntpClient : INntpClient
     ) => throw new NotImplementedException();
 
     /// <inheritdoc />
-    public Task<NntpMultiLineResponse> XzhdrAsync(
+    public Task<NntpStreamResponse<NntpHeaderField>> XzhdrAsync(
         string field,
         NntpArticleRange range,
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
 
     /// <inheritdoc />
-    public Task<NntpMultiLineResponse> XzhdrByMessageIdAsync(
+    public Task<NntpHeaderField?> XzhdrByMessageIdAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
 
     /// <inheritdoc />
-    public Task<NntpMultiLineResponse> CurrentXzhdrAsync(
+    public Task<NntpStreamResponse<NntpHeaderField>> CurrentXzhdrAsync(
         string field,
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
 
     /// <inheritdoc />
-    public Task<NntpMultiLineResponse> XzverAsync(
+    public Task<NntpStreamResponse<NntpArticleOverview>> XzverAsync(
         NntpArticleRange range,
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
 
     /// <inheritdoc />
-    public Task<NntpMultiLineResponse> CurrentXzverAsync(
+    public Task<NntpStreamResponse<NntpArticleOverview>> CurrentXzverAsync(
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
 }
