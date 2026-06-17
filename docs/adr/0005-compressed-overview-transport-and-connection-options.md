@@ -2,7 +2,7 @@
 
 ## Status
 
-proposed (6.0.0)
+accepted (6.0.0)
 
 ## Decision
 

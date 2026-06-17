@@ -85,6 +85,37 @@ if (overview is not null)
 }
 ```
 
+### Compress the overview transport
+
+Servers that support `XFEATURE COMPRESS GZIP` can gzip the data block of multi-line responses,
+which is a large saving on the headline workload — `XOVER` over millions of articles. It is enabled
+as a connection option rather than a command: set `Compression` on `NntpConnectionOptions` and the
+connection negotiates it after authentication, then transparently inflates the data block of every
+subsequent multi-line response. The streamed scans are unchanged — they just ride compressed bytes:
+
+```csharp
+var options = new NntpConnectionOptions
+{
+    Host = hostname,
+    Port = port,
+    UseSsl = useSsl,
+    // GzipWithTerminator is the robust variant: the server marks the block boundary with a literal
+    // terminating dot line. Use Gzip only for servers that omit it and end the block with the stream.
+    Compression = NntpCompression.GzipWithTerminator,
+};
+
+var client = new NntpClient(new NntpConnection(options));
+await client.ConnectAsync();
+await client.AuthenticateAsync(username, password); // compression is negotiated here
+
+await using var overviews = await client.OverAsync(NntpArticleRange.Range(1, 1_000_000));
+await foreach (var overview in overviews) { /* ... */ }
+```
+
+The pool re-applies the option on every transparent reconnect, so pooled clients stay compressed.
+A truncated or corrupt block surfaces as an `NntpException` on the affected command rather than as
+silently dropped rows.
+
 ### Inspect server capabilities and metadata
 
 The bounded `CAPABILITIES` and `LIST` commands return ready-to-use typed results rather than raw

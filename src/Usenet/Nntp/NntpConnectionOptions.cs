@@ -31,8 +31,10 @@ public sealed class NntpConnectionOptions
     public TimeSpan ConnectTimeout { get; init; } = TimeSpan.FromSeconds(30);
 
     /// <summary>
-    /// The compression mode to negotiate for multi-line data blocks. Reserved for a later slice;
-    /// <see cref="NntpCompression.None"/> is currently the only honoured value.
+    /// The compression mode to negotiate for multi-line data blocks. When set to a gzip variant, the
+    /// connection negotiates <c>XFEATURE COMPRESS GZIP</c> after authentication and transparently
+    /// inflates the compressed data block of subsequent multi-line responses. Defaults to
+    /// <see cref="NntpCompression.None"/>.
     /// </summary>
     public NntpCompression Compression { get; init; } = NntpCompression.None;
 }
