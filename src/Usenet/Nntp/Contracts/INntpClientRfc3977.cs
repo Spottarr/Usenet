@@ -15,8 +15,8 @@ public interface INntpClientRfc3977
     /// </summary>
     /// <param name="keyword">Can be provided for additional features if supported by the server.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A multi-line response containing the capabilities.</returns>
-    Task<NntpMultiLineResponse> CapabilitiesAsync(
+    /// <returns>The capabilities advertised by the server.</returns>
+    Task<NntpCapabilities> CapabilitiesAsync(
         string? keyword = null,
         CancellationToken cancellationToken = default
     );

@@ -86,6 +86,16 @@ static Usenet.DependencyInjection.UsenetServiceCollectionExtensions.AddUsenet(th
 *REMOVED*Usenet.Nntp.NntpClient.NntpClient(Usenet.Nntp.Contracts.INntpConnection! connection) -> void
 *REMOVED*Usenet.Nntp.NntpClientPool.NntpClientPool(int maxPoolSize, string! hostname, int port, bool useSsl, string! username, string! password) -> void
 *REMOVED*Usenet.Nntp.NntpConnection.NntpConnection() -> void
+Usenet.Nntp.Models.NntpCapabilities
+Usenet.Nntp.Models.NntpCapabilities.GetArguments(string! capability) -> System.Collections.Generic.IReadOnlyList<string!>!
+Usenet.Nntp.Models.NntpCapabilities.IsReader.get -> bool
+Usenet.Nntp.Models.NntpCapabilities.Keywords.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
+Usenet.Nntp.Models.NntpCapabilities.ListVariants.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Usenet.Nntp.Models.NntpCapabilities.OverVariants.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Usenet.Nntp.Models.NntpCapabilities.Supports(string! capability) -> bool
+Usenet.Nntp.Models.NntpCapabilities.Supports(string! capability, string! argument) -> bool
+Usenet.Nntp.Models.NntpCapabilities.Version.get -> string?
+static Usenet.Nntp.Models.NntpCapabilities.Empty.get -> Usenet.Nntp.Models.NntpCapabilities!
 Usenet.Nntp.Models.NntpArticleOverview
 Usenet.Nntp.Models.NntpArticleOverview.NntpArticleOverview() -> void
 Usenet.Nntp.Models.NntpArticleOverview.Bytes.get -> long
@@ -137,7 +147,7 @@ Usenet.Nntp.Contracts.INntpClientRfc3977.ArticleAsync(Usenet.Nntp.Models.NntpMes
 Usenet.Nntp.Contracts.INntpClientRfc3977.ArticleByNumberAsync(long number, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpArticleResponse!>!
 Usenet.Nntp.Contracts.INntpClientRfc3977.BodyAsync(Usenet.Nntp.Models.NntpMessageId! messageId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpArticleResponse!>!
 Usenet.Nntp.Contracts.INntpClientRfc3977.BodyByNumberAsync(long number, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpArticleResponse!>!
-Usenet.Nntp.Contracts.INntpClientRfc3977.CapabilitiesAsync(string? keyword = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc3977.CapabilitiesAsync(string? keyword = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Models.NntpCapabilities!>!
 Usenet.Nntp.Contracts.INntpClientRfc3977.CurrentArticleAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpArticleResponse!>!
 Usenet.Nntp.Contracts.INntpClientRfc3977.CurrentBodyAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpArticleResponse!>!
 Usenet.Nntp.Contracts.INntpClientRfc3977.CurrentHdrAsync(string! field, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
@@ -190,7 +200,7 @@ Usenet.Nntp.NntpClient.ArticleByNumberAsync(long number, System.Threading.Cancel
 Usenet.Nntp.NntpClient.AuthenticateAsync(string! username, string! password, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
 Usenet.Nntp.NntpClient.BodyAsync(Usenet.Nntp.Models.NntpMessageId! messageId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpArticleResponse!>!
 Usenet.Nntp.NntpClient.BodyByNumberAsync(long number, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpArticleResponse!>!
-Usenet.Nntp.NntpClient.CapabilitiesAsync(string? keyword = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
+Usenet.Nntp.NntpClient.CapabilitiesAsync(string? keyword = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Models.NntpCapabilities!>!
 Usenet.Nntp.NntpClient.ConnectAsync(string! hostname, int port, bool useSsl, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
 Usenet.Nntp.NntpClient.CurrentArticleAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpArticleResponse!>!
 Usenet.Nntp.NntpClient.CurrentBodyAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpArticleResponse!>!
