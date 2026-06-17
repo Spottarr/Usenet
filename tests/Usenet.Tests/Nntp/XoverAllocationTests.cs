@@ -27,21 +27,18 @@ internal sealed class XoverAllocationTests
     // runtime variation but trips if the per-row cost grows (e.g. extra copies or boxing).
     private const long MaxBytesPerRow = 896;
 
+    private static NntpConnectionOptions LoopbackOptions(int port) =>
+        new() { Host = IPAddress.Loopback.ToString(), Port = port };
+
     [Test]
     internal async Task StreamedOverviewRowShouldStayUnderAllocationCeiling(
         CancellationToken cancellationToken
     )
     {
         await using var server = new OverviewNntpServer();
-        using var connection = new NntpConnection();
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
 
-        await connection.ConnectAsync(
-            IPAddress.Loopback.ToString(),
-            server.Port,
-            false,
-            new ResponseParser(200),
-            cancellationToken
-        );
+        await connection.ConnectAsync(new ResponseParser(200), cancellationToken);
 
         // Warm up both ranges so cached server buffers and JIT costs stay out of the window.
         await ReadOverviewAsync(connection, SmallRange, cancellationToken);

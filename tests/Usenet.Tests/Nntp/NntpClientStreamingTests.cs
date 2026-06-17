@@ -7,19 +7,16 @@ namespace Usenet.Tests.Nntp;
 
 internal sealed class NntpClientStreamingTests
 {
+    private static NntpConnectionOptions LoopbackOptions(int port) =>
+        new() { Host = IPAddress.Loopback.ToString(), Port = port };
+
     private static async Task<NntpClient> ConnectAsync(
         NntpConnection connection,
-        StreamingNntpServer server,
         CancellationToken cancellationToken
     )
     {
         var client = new NntpClient(connection);
-        await client.ConnectAsync(
-            IPAddress.Loopback.ToString(),
-            server.Port,
-            false,
-            cancellationToken
-        );
+        await client.ConnectAsync(cancellationToken);
         return client;
     }
 
@@ -27,8 +24,8 @@ internal sealed class NntpClientStreamingTests
     public async Task ShouldStreamXoverRangePerLine(CancellationToken cancellationToken)
     {
         await using var server = new StreamingNntpServer();
-        using var connection = new NntpConnection();
-        var client = await ConnectAsync(connection, server, cancellationToken);
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
+        var client = await ConnectAsync(connection, cancellationToken);
 
         await using var response = await client.XoverAsync(
             NntpArticleRange.Range(1, 5),
@@ -53,8 +50,8 @@ internal sealed class NntpClientStreamingTests
     public async Task ShouldStreamOverRangePerLine(CancellationToken cancellationToken)
     {
         await using var server = new StreamingNntpServer();
-        using var connection = new NntpConnection();
-        var client = await ConnectAsync(connection, server, cancellationToken);
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
+        var client = await ConnectAsync(connection, cancellationToken);
 
         await using var response = await client.OverAsync(
             NntpArticleRange.Range(1, 5),
@@ -81,8 +78,8 @@ internal sealed class NntpClientStreamingTests
     public async Task ShouldReturnSingleOverviewByMessageId(CancellationToken cancellationToken)
     {
         await using var server = new StreamingNntpServer();
-        using var connection = new NntpConnection();
-        var client = await ConnectAsync(connection, server, cancellationToken);
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
+        var client = await ConnectAsync(connection, cancellationToken);
 
         var overview = await client.OverByMessageIdAsync(
             new NntpMessageId("42@example.com"),
@@ -103,8 +100,8 @@ internal sealed class NntpClientStreamingTests
     public async Task ShouldReturnNullOverviewWhenArticleAbsent(CancellationToken cancellationToken)
     {
         await using var server = new StreamingNntpServer();
-        using var connection = new NntpConnection();
-        var client = await ConnectAsync(connection, server, cancellationToken);
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
+        var client = await ConnectAsync(connection, cancellationToken);
 
         var overview = await client.OverByMessageIdAsync(
             new NntpMessageId(StreamingNntpServer.MissingMessageId),
@@ -118,8 +115,8 @@ internal sealed class NntpClientStreamingTests
     public async Task ShouldReturnSingleHeaderFieldByMessageId(CancellationToken cancellationToken)
     {
         await using var server = new StreamingNntpServer();
-        using var connection = new NntpConnection();
-        var client = await ConnectAsync(connection, server, cancellationToken);
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
+        var client = await ConnectAsync(connection, cancellationToken);
 
         var header = await client.HdrByMessageIdAsync(
             "Subject",
@@ -138,8 +135,8 @@ internal sealed class NntpClientStreamingTests
     )
     {
         await using var server = new StreamingNntpServer();
-        using var connection = new NntpConnection();
-        var client = await ConnectAsync(connection, server, cancellationToken);
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
+        var client = await ConnectAsync(connection, cancellationToken);
 
         var header = await client.XhdrByMessageIdAsync(
             "Subject",
@@ -157,8 +154,8 @@ internal sealed class NntpClientStreamingTests
     )
     {
         await using var server = new StreamingNntpServer();
-        using var connection = new NntpConnection();
-        var client = await ConnectAsync(connection, server, cancellationToken);
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
+        var client = await ConnectAsync(connection, cancellationToken);
 
         var header = await client.HdrByMessageIdAsync(
             "Subject",
@@ -173,8 +170,8 @@ internal sealed class NntpClientStreamingTests
     public async Task ShouldStreamListGroupArticleNumbers(CancellationToken cancellationToken)
     {
         await using var server = new StreamingNntpServer();
-        using var connection = new NntpConnection();
-        var client = await ConnectAsync(connection, server, cancellationToken);
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
+        var client = await ConnectAsync(connection, cancellationToken);
 
         await using var response = await client.ListGroupAsync(
             "misc.test",
@@ -194,8 +191,8 @@ internal sealed class NntpClientStreamingTests
     public async Task ShouldStreamListActiveGroups(CancellationToken cancellationToken)
     {
         await using var server = new StreamingNntpServer();
-        using var connection = new NntpConnection();
-        var client = await ConnectAsync(connection, server, cancellationToken);
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
+        var client = await ConnectAsync(connection, cancellationToken);
 
         await using var response = await client.ListActiveAsync(
             cancellationToken: cancellationToken
@@ -217,8 +214,8 @@ internal sealed class NntpClientStreamingTests
     public async Task ShouldReuseConnectionAfterEarlyDisposal(CancellationToken cancellationToken)
     {
         await using var server = new StreamingNntpServer();
-        using var connection = new NntpConnection();
-        var client = await ConnectAsync(connection, server, cancellationToken);
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
+        var client = await ConnectAsync(connection, cancellationToken);
 
         // Consume a single row then dispose the response without enumerating the rest.
         await using (
@@ -245,8 +242,8 @@ internal sealed class NntpClientStreamingTests
     )
     {
         await using var server = new StreamingNntpServer();
-        using var connection = new NntpConnection();
-        var client = await ConnectAsync(connection, server, cancellationToken);
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
+        var client = await ConnectAsync(connection, cancellationToken);
 
         // Start a stream but do not enumerate or dispose it, leaving the data block on the wire.
         _ = await client.XoverAsync(NntpArticleRange.Range(1, 100), cancellationToken);
@@ -259,8 +256,8 @@ internal sealed class NntpClientStreamingTests
     public async Task ShouldKeepMemoryFlatOverLargeXoverRange(CancellationToken cancellationToken)
     {
         await using var server = new StreamingNntpServer();
-        using var connection = new NntpConnection();
-        var client = await ConnectAsync(connection, server, cancellationToken);
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
+        var client = await ConnectAsync(connection, cancellationToken);
 
         const int count = 200_000;
 

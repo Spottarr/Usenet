@@ -131,17 +131,10 @@ internal sealed class MockConnection : INntpConnection
 
     public void Dispose() { }
 
-    public Task<TResponse> ConnectAsync<TResponse>(
-        string hostname,
-        int port,
-        bool useSsl,
-        IResponseParser<TResponse> parser
-    ) => throw new NotImplementedException();
+    public Task<TResponse> ConnectAsync<TResponse>(IResponseParser<TResponse> parser) =>
+        throw new NotImplementedException();
 
     public Task<TResponse> ConnectAsync<TResponse>(
-        string hostname,
-        int port,
-        bool useSsl,
         IResponseParser<TResponse> parser,
         CancellationToken cancellationToken
     ) => throw new NotImplementedException();

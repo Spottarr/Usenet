@@ -16,19 +16,41 @@ internal sealed class NntpConnectionTests
         "last body line",
     ];
 
+    private static NntpConnectionOptions LoopbackOptions(int port) =>
+        new() { Host = IPAddress.Loopback.ToString(), Port = port };
+
+    [Test]
+    public async Task ShouldDefaultConnectionOptions()
+    {
+        var options = new NntpConnectionOptions();
+
+        await Assert.That(options.Host).IsEqualTo(string.Empty);
+        await Assert.That(options.Port).IsEqualTo(119);
+        await Assert.That(options.UseSsl).IsFalse();
+        await Assert.That(options.ConnectTimeout).IsEqualTo(TimeSpan.FromSeconds(30));
+        await Assert.That(options.Compression).IsEqualTo(NntpCompression.None);
+    }
+
+    [Test]
+    public async Task ShouldThrowWhenConnectingWithoutHost(CancellationToken cancellationToken)
+    {
+        // The host is read from the options; a connection with no host configured cannot connect.
+        using var connection = new NntpConnection();
+
+        await Assert
+            .That(async () =>
+                await connection.ConnectAsync(new ResponseParser(200), cancellationToken)
+            )
+            .ThrowsExactly<ArgumentException>();
+    }
+
     [Test]
     public async Task ShouldFrameSingleLineResponse(CancellationToken cancellationToken)
     {
         await using var server = new ScriptedNntpServer();
-        using var connection = new NntpConnection();
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
 
-        var response = await connection.ConnectAsync(
-            IPAddress.Loopback.ToString(),
-            server.Port,
-            false,
-            new ResponseParser(200),
-            cancellationToken
-        );
+        var response = await connection.ConnectAsync(new ResponseParser(200), cancellationToken);
 
         await Assert.That(response.Code).IsEqualTo(200);
         await Assert.That(response.Message).IsEqualTo("Scripted server ready");
@@ -40,15 +62,9 @@ internal sealed class NntpConnectionTests
     )
     {
         await using var server = new ScriptedNntpServer();
-        using var connection = new NntpConnection();
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
 
-        await connection.ConnectAsync(
-            IPAddress.Loopback.ToString(),
-            server.Port,
-            false,
-            new ResponseParser(200),
-            cancellationToken
-        );
+        await connection.ConnectAsync(new ResponseParser(200), cancellationToken);
 
         var lines = await connection.MultiLineCommandAsync(
             "ARTICLE 1",
@@ -67,15 +83,9 @@ internal sealed class NntpConnectionTests
     )
     {
         await using var server = new ScriptedNntpServer();
-        using var connection = new NntpConnection();
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
 
-        await connection.ConnectAsync(
-            IPAddress.Loopback.ToString(),
-            server.Port,
-            false,
-            new ResponseParser(200),
-            cancellationToken
-        );
+        await connection.ConnectAsync(new ResponseParser(200), cancellationToken);
 
         using var response = await connection.BufferedMultiLineCommandAsync(
             "ARTICLE 1",
@@ -92,15 +102,9 @@ internal sealed class NntpConnectionTests
     public async Task ShouldCountBytesReadAndWritten(CancellationToken cancellationToken)
     {
         await using var server = new ScriptedNntpServer();
-        using var connection = new NntpConnection();
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
 
-        await connection.ConnectAsync(
-            IPAddress.Loopback.ToString(),
-            server.Port,
-            false,
-            new ResponseParser(200),
-            cancellationToken
-        );
+        await connection.ConnectAsync(new ResponseParser(200), cancellationToken);
 
         await connection.MultiLineCommandAsync(
             "ARTICLE 1",
@@ -121,15 +125,9 @@ internal sealed class NntpConnectionTests
     public async Task ShouldStreamMultiLineBlockPerLine(CancellationToken cancellationToken)
     {
         await using var server = new ScriptedNntpServer();
-        using var connection = new NntpConnection();
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
 
-        await connection.ConnectAsync(
-            IPAddress.Loopback.ToString(),
-            server.Port,
-            false,
-            new ResponseParser(200),
-            cancellationToken
-        );
+        await connection.ConnectAsync(new ResponseParser(200), cancellationToken);
 
         await using var response = await connection.MultiLineStreamCommandAsync<string>(
             "XOVER 1-3",
@@ -156,15 +154,9 @@ internal sealed class NntpConnectionTests
     )
     {
         await using var server = new ScriptedNntpServer();
-        using var connection = new NntpConnection();
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
 
-        await connection.ConnectAsync(
-            IPAddress.Loopback.ToString(),
-            server.Port,
-            false,
-            new ResponseParser(200),
-            cancellationToken
-        );
+        await connection.ConnectAsync(new ResponseParser(200), cancellationToken);
 
         // Consume only the first line, then dispose without enumerating the rest.
         await using (

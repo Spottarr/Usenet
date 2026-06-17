@@ -9,19 +9,17 @@ namespace Usenet.Tests.Nntp;
 
 internal sealed class NntpClientPostTests
 {
+    private static NntpConnectionOptions LoopbackOptions(int port) =>
+        new() { Host = IPAddress.Loopback.ToString(), Port = port };
+
     [Test]
     public async Task PostShouldRoundTripArticle(CancellationToken cancellationToken)
     {
         using var server = new TestNntpServer();
-        using var connection = new NntpConnection();
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
         var client = new NntpClient(connection);
 
-        await client.ConnectAsync(
-            IPAddress.Loopback.ToString(),
-            server.Port,
-            false,
-            cancellationToken
-        );
+        await client.ConnectAsync(cancellationToken);
 
         var article = new NntpArticleBuilder()
             .SetMessageId("1@example.com")
@@ -47,15 +45,10 @@ internal sealed class NntpClientPostTests
     public async Task IhaveShouldRoundTripArticle(CancellationToken cancellationToken)
     {
         using var server = new TestNntpServer();
-        using var connection = new NntpConnection();
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
         var client = new NntpClient(connection);
 
-        await client.ConnectAsync(
-            IPAddress.Loopback.ToString(),
-            server.Port,
-            false,
-            cancellationToken
-        );
+        await client.ConnectAsync(cancellationToken);
 
         var article = new NntpArticleBuilder()
             .SetMessageId("2@example.com")
@@ -76,15 +69,9 @@ internal sealed class NntpClientPostTests
     public async Task PostShouldStreamYencBodyThroughOutputSink(CancellationToken cancellationToken)
     {
         using var server = new TestNntpServer();
-        using var connection = new NntpConnection();
+        using var connection = new NntpConnection(LoopbackOptions(server.Port));
 
-        await connection.ConnectAsync(
-            IPAddress.Loopback.ToString(),
-            server.Port,
-            false,
-            new ResponseParser(200),
-            cancellationToken
-        );
+        await connection.ConnectAsync(new ResponseParser(200), cancellationToken);
 
         var initial = await connection.CommandAsync(
             "POST",

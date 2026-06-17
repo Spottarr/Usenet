@@ -17,7 +17,15 @@ internal sealed class UsenetLoggingTests
         using var connection = new NntpConnection();
         var client = new NntpClient(connection);
         var builder = new NntpArticleBuilder();
-        using var pool = new NntpClientPool(1, "example.server", 119, false, "user", "pass");
+        using var pool = new NntpClientPool(
+            new NntpPoolOptions
+            {
+                MaxPoolSize = 1,
+                Username = "user",
+                Password = "pass",
+                Connection = new NntpConnectionOptions { Host = "example.server" },
+            }
+        );
 
         await Assert.That(client).IsNotNull();
         await Assert.That(builder).IsNotNull();
