@@ -103,7 +103,7 @@ public class NntpClient : INntpClient
     }
 
     /// <inheritdoc />
-    public Task<NntpMultiLineResponse> CapabilitiesAsync(
+    public Task<NntpCapabilities> CapabilitiesAsync(
         string? keyword = null,
         CancellationToken cancellationToken = default
     )
@@ -113,7 +113,7 @@ public class NntpClient : INntpClient
             : $"CAPABILITIES {keyword}";
         return Connection.MultiLineCommandAsync(
             command,
-            new MultiLineResponseParser(101),
+            new CapabilitiesResponseParser(),
             cancellationToken
         );
     }
