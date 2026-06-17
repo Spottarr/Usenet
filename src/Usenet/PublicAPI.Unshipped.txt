@@ -1,5 +1,7 @@
 #nullable enable
 *REMOVED*Usenet.Nntp.Models.NntpArticle.Headers.get -> System.Collections.Immutable.ImmutableDictionary<string!, System.Collections.Immutable.ImmutableList<string!>!>!
+*REMOVED*Usenet.Nntp.Responses.NntpMultiLineResponse
+*REMOVED*Usenet.Nntp.Responses.NntpMultiLineResponse.Lines.get -> System.Collections.Immutable.IImmutableList<string!>!
 Usenet.Nntp.Models.NntpArticle.Headers.get -> Usenet.Nntp.Models.NntpHeaderCollection!
 Usenet.Nntp.Models.NntpHeaderCollection
 Usenet.Nntp.Models.NntpHeaderCollection.Contains(string! key) -> bool
