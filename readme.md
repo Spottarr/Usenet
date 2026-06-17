@@ -59,10 +59,25 @@ fully, or dispose it, before issuing the next command on the connection:
 ```csharp
 await client.GroupAsync("alt.binaries.example");
 
-await using var overviews = await client.XoverAsync(NntpArticleRange.Range(1000, 2000));
+// OverAsync (RFC 3977) and XoverAsync (legacy) stream the same typed rows; servers implement one or
+// the other.
+await using var overviews = await client.OverAsync(NntpArticleRange.Range(1000, 2000));
 await foreach (var overview in overviews)
 {
     Console.WriteLine($"{overview.Number}\t{overview.Subject}");
+}
+```
+
+The by-message-id forms address a single article, so they return one record directly instead of a
+stream — `OverByMessageIdAsync` yields `NntpArticleOverview?` and
+`HdrByMessageIdAsync`/`XhdrByMessageIdAsync` yield `NntpHeaderField?` (`null` when the article is
+absent), with no enumerate-or-dispose contract to honour:
+
+```csharp
+var overview = await client.OverByMessageIdAsync(messageId);
+if (overview is not null)
+{
+    Console.WriteLine($"{overview.Subject}\t{overview.Bytes} bytes");
 }
 ```
 

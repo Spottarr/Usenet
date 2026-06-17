@@ -51,11 +51,15 @@ flowchart LR
   G --> H[Pooled Data + pcrc32 verify]
 ```
 
-## Bulk read path (XOVER, HDR, LISTGROUP, NEWNEWS)
+## Bulk read path (OVER/XOVER, HDR/XHDR, LISTGROUP, NEWNEWS)
 
 - Unbounded results stream as `IAsyncEnumerable<T>` of library-parsed **typed rows**
-  (`XOVER` → `NntpArticleOverview`, etc.), parsed per line as they arrive. The consumer never
-  supplies a parser for the standard commands. Malformed rows are skipped.
+  (`OVER`/`XOVER` → `NntpArticleOverview`, `HDR`/`XHDR` → `NntpHeaderField`, etc.), parsed per
+  line as they arrive. The consumer never supplies a parser for the standard commands. Malformed
+  rows are skipped.
+- The by-message-id forms (`OverByMessageIdAsync`, `HdrByMessageIdAsync`, `XhdrByMessageIdAsync`)
+  address a single article, so they materialize that one record and return `NntpArticleOverview?` /
+  `NntpHeaderField?` directly — no stream, no drain contract.
 - Memory stays flat regardless of range size; the consumer starts on the first row.
 - Drain contract: enumerate fully, or dispose the enumerator, before the next command on
   that lease. On early-exit the connection is reclaimed by draining while a small budget
