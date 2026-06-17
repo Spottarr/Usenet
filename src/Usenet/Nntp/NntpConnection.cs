@@ -24,7 +24,7 @@ namespace Usenet.Nntp;
 /// <see cref="System.IO.Pipelines"/>: lines are framed off the raw byte stream, dot-stuffing is undone and the
 /// terminating dot is detected without transcoding the whole stream to <see cref="string"/>.</remarks>
 [PublicAPI]
-public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
+public sealed class NntpConnection : INntpConnection, INntpStreamSource
 {
     private const int StackAllocThreshold = 256;
     private const int InitialDataBlockBufferSize = 4096;
@@ -86,7 +86,7 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
         int port,
         bool useSsl,
         IResponseParser<TResponse> parser,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     )
     {
         _log.Connecting(hostname, port, useSsl);
@@ -107,7 +107,7 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
     public async Task<TResponse> CommandAsync<TResponse>(
         string command,
         IResponseParser<TResponse> parser,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     )
     {
         ThrowIfNotConnected();
@@ -126,7 +126,7 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
     public async Task<TResponse> MultiLineCommandAsync<TResponse>(
         string command,
         IMultiLineResponseParser<TResponse> parser,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     )
     {
         ThrowIfNotConnected();
@@ -149,7 +149,7 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
         string command,
         int successCode,
         NntpStreamLineParser<T> lineParser,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     )
     {
         ThrowIfNotConnected();
@@ -227,7 +227,7 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
     public async Task<TResponse> BufferedMultiLineCommandAsync<TResponse>(
         string command,
         IBufferedMultiLineResponseParser<TResponse> parser,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     )
     {
         ThrowIfNotConnected();
@@ -259,7 +259,7 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
     /// <inheritdoc/>
     public async Task<TResponse> GetResponseAsync<TResponse>(
         IResponseParser<TResponse> parser,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     )
     {
         ThrowIfNotConnected();
@@ -282,14 +282,14 @@ public sealed partial class NntpConnection : INntpConnection, INntpStreamSource
     }
 
     /// <inheritdoc/>
-    public async Task WriteLineAsync(string line, CancellationToken cancellationToken)
+    public async Task WriteLineAsync(string line, CancellationToken cancellationToken = default)
     {
         BufferLine(line);
         await FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public async Task FlushAsync(CancellationToken cancellationToken)
+    public async Task FlushAsync(CancellationToken cancellationToken = default)
     {
         ThrowIfNotConnected();
         await _writer!.FlushAsync(cancellationToken).ConfigureAwait(false);
