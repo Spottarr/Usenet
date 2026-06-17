@@ -56,7 +56,10 @@ internal sealed class NntpClientStreamingTests
         using var connection = new NntpConnection();
         var client = await ConnectAsync(connection, server, cancellationToken);
 
-        await using var response = await client.ListGroupAsync("misc.test", cancellationToken);
+        await using var response = await client.ListGroupAsync(
+            "misc.test",
+            cancellationToken: cancellationToken
+        );
 
         var numbers = new List<long>();
         await foreach (var number in response.WithCancellation(cancellationToken))
@@ -74,7 +77,9 @@ internal sealed class NntpClientStreamingTests
         using var connection = new NntpConnection();
         var client = await ConnectAsync(connection, server, cancellationToken);
 
-        await using var response = await client.ListActiveAsync(cancellationToken);
+        await using var response = await client.ListActiveAsync(
+            cancellationToken: cancellationToken
+        );
 
         var groups = new List<NntpGroup>();
         await foreach (var group in response.WithCancellation(cancellationToken))
