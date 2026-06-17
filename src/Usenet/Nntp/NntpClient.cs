@@ -78,6 +78,26 @@ public class NntpClient : INntpClient
     )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(username);
+        var authenticated = await AuthenticateCoreAsync(username, password, cancellationToken)
+            .ConfigureAwait(false);
+
+        // Compression is the third step of the session-setup recipe (connect -> authenticate ->
+        // enable compression): some servers reject XFEATURE pre-auth, so it is negotiated only after
+        // a successful authentication. See ADR-0005.
+        if (authenticated)
+        {
+            await EnableConfiguredCompressionAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        return authenticated;
+    }
+
+    private async Task<bool> AuthenticateCoreAsync(
+        string username,
+        string password,
+        CancellationToken cancellationToken
+    )
+    {
         var userResponse = await Connection
             .CommandAsync($"AUTHINFO USER {username}", new ResponseParser(281), cancellationToken)
             .ConfigureAwait(false);
@@ -96,6 +116,16 @@ public class NntpClient : INntpClient
             .ConfigureAwait(false);
         return passResponse.Success;
     }
+
+    private Task EnableConfiguredCompressionAsync(CancellationToken cancellationToken) =>
+        Connection
+            is INntpCompressionControl
+            {
+                Compression: not NntpCompression.None,
+                CompressionEnabled: false,
+            } control
+            ? control.EnableCompressionAsync(cancellationToken)
+            : Task.CompletedTask;
 
     /// <inheritdoc />
     public Task<NntpCapabilities> CapabilitiesAsync(
