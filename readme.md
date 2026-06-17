@@ -5,69 +5,116 @@ A .NET library for working with [Usenet](https://en.wikipedia.org/wiki/Usenet). 
 * an [NZB](https://en.wikipedia.org/wiki/NZB) document parser, builder and writer
 * a [yEnc](https://en.wikipedia.org/wiki/YEnc) encoder and decoder
 
-The library is built around a byte-oriented, [`System.IO.Pipelines`](https://learn.microsoft.com/dotnet/standard/io/pipelines)
-based transport that keeps allocations low: article bytes are framed off the wire without
-being transcoded to strings, yEnc parts are decoded into pooled buffers, and yEnc encoding
-streams straight into an `IBufferWriter<byte>`. See [docs/architecture.md](docs/architecture.md)
-for the full streaming/buffering model and the ADRs behind it.
-
-The NNTP client is compliant with [RFC 2980](https://tools.ietf.org/html/rfc2980), [RFC 3977](https://tools.ietf.org/html/rfc3977), [RFC 4643](https://tools.ietf.org/html/rfc4643) and [RFC 6048](https://tools.ietf.org/html/rfc6048).
+It is built around a byte-oriented, [`System.IO.Pipelines`](https://learn.microsoft.com/dotnet/standard/io/pipelines)
+transport that keeps allocations low: article bytes are framed off the wire without being
+transcoded to strings, yEnc parts decode into pooled buffers, and yEnc encoding streams straight
+into an `IBufferWriter<byte>`. The NNTP client is compliant with
+[RFC 2980](https://tools.ietf.org/html/rfc2980), [RFC 3977](https://tools.ietf.org/html/rfc3977),
+[RFC 4643](https://tools.ietf.org/html/rfc4643) and [RFC 6048](https://tools.ietf.org/html/rfc6048).
 
 [![Nuget](https://img.shields.io/nuget/v/Spottarr.Usenet)](https://www.nuget.org/packages/Spottarr.Usenet)
 [![Nuget Prerelease](https://img.shields.io/nuget/vpre/Spottarr.Usenet?label=nuget%20prerelease)](https://www.nuget.org/packages/Spottarr.Usenet)
 
-## Architecture
+## Install
 
-The library is split into independent layers (see [docs/architecture.md](docs/architecture.md)):
-
-* **Connection** — the transport. Owns the socket, the optional `SslStream` and the
-  `PipeReader`/`PipeWriter`. It frames lines off the raw byte stream, undoes dot-stuffing
-  and counts bytes (`BytesRead`/`BytesWritten`/`ResetCounters`).
-* **Client** — the command API: the RFC command methods built on top of a connection.
-* **Pool** — a manager of authenticated, connected clients reused across operations, handed
-  out as disposable leases.
-* **yEnc** and **NZB** are independent layers. The client hands over bytes and never decodes;
-  consumers invoke yEnc/NZB explicitly.
-
-The read path copies one article (one yEnc part, bounded around 1 MB) into a single buffer
-rented from `ArrayPool`. The byte-input `YencDecoder` decodes that into pooled `Data` and
-verifies the per-part `pcrc32` in the same pass. On the write path `YencEncoder` reads the
-source in blocks and encodes into an `IBufferWriter<byte>` through a precomputed escape table,
-and the connection batches a single flush per command.
-
-## Getting started
-Install the [NuGet](https://www.nuget.org/packages/Spottarr.Usenet) package:
 ```zsh
 dotnet add package Spottarr.Usenet
 ```
 
-## Examples
-Connect to a Usenet server:
+## Usage
+
+### Connect and authenticate
+
 ```csharp
 var client = new NntpClient(new NntpConnection());
 await client.ConnectAsync(hostname, port, useSsl);
-```
-Authenticate:
-```csharp
 await client.AuthenticateAsync(username, password);
 ```
-Enable logging by handing the library an `ILoggerFactory`:
+
+### Retrieve an article
+
+An article response owns a pooled buffer, so dispose it (`using`/`await using`). Read the body as
+raw bytes via `Body`, or as text lines on demand via `ReadBodyLines()`:
+
 ```csharp
-ILoggerFactory factory = new SomeLoggerFactory();
-Usenet.Logger.Factory = factory;
-```
-Retrieve an article and read its body lines:
-```csharp
-var response = await client.ArticleAsync(messageId);
-if (response.Success && response.Article is { } article)
+await using var response = await client.ArticleAsync(messageId);
+if (response.Success)
 {
-    foreach (var line in article.Body)
+    foreach (var line in response.ReadBodyLines())
     {
-        ...
+        // ...
     }
 }
 ```
-Build an article and post it to the server:
+
+To inspect headers without paying to transfer the body, use `HeadAsync` first and issue a
+conditional `BodyAsync` only when needed.
+
+### Stream an overview range
+
+Unbounded scans (`XOVER`/`OVER`, `HDR`, `LISTGROUP`, `NEWNEWS`, …) stream typed rows as an
+`IAsyncEnumerable<T>`, so memory stays flat over arbitrarily large ranges. Enumerate the result
+fully, or dispose it, before issuing the next command on the connection:
+
+```csharp
+await client.GroupAsync("alt.binaries.example");
+
+await using var overviews = await client.XoverAsync(NntpArticleRange.Range(1000, 2000));
+await foreach (var overview in overviews)
+{
+    Console.WriteLine($"{overview.Number}\t{overview.Subject}");
+}
+```
+
+### Decode a yEnc part
+
+`YencDecoder.Decode` returns a `YencPart` that owns a buffer rented from `ArrayPool`. Its `Data`
+view is valid until the part is disposed, and the per-part `pcrc32` (or `crc32` for a single-part
+file) is verified during decoding:
+
+```csharp
+// encoded holds the raw yEnc bytes of one part (ReadOnlyMemory<byte> or ReadOnlySequence<byte>)
+using var part = YencDecoder.Decode(encoded);
+
+YencHeader header = part.Header;
+ReadOnlyMemory<byte> data = part.Data;
+
+using var file = File.Open(header.FileName, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
+file.Position = header.PartOffset;
+await file.WriteAsync(data);
+```
+
+### Download an NZB document
+
+Parse the document, then for each segment retrieve the article, decode its body, and write the
+decoded part to the file at its offset. Only one article is held in memory at a time:
+
+```csharp
+var nzbDocument = await NzbParser.ParseAsync(await File.ReadAllTextAsync(nzbPath));
+
+foreach (var nzbFile in nzbDocument.Files)
+{
+    foreach (var segment in nzbFile.Segments)
+    {
+        await using var response = await client.BodyAsync(segment.MessageId);
+        if (!response.Success)
+            continue;
+
+        using var part = YencDecoder.Decode(response.Body);
+        var header = part.Header;
+
+        using var file = File.Open(header.FileName, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
+        if (file.Length == 0)
+            file.SetLength(header.FileSize); // pre-allocate on first segment
+
+        file.Position = header.PartOffset;
+        await file.WriteAsync(part.Data);
+    }
+}
+```
+
+### Build and post an article
+
 ```csharp
 var messageId = $"{Guid.NewGuid()}@example.net";
 
@@ -82,56 +129,20 @@ var article = new NntpArticleBuilder()
 
 await client.PostAsync(article);
 ```
-Decode a yEnc-encoded part into a pooled `Data` buffer. The returned `YencPart` owns a buffer
-rented from `ArrayPool`; its `Data` view is valid until the part is disposed, and the per-part
-`pcrc32` (or `crc32` for a single-part file) is verified during decoding:
+
+### Encode yEnc into a buffer
+
+The encoder reads the source in blocks and writes straight into an `IBufferWriter<byte>` through a
+precomputed escape table:
+
 ```csharp
-// encoded holds the raw yEnc bytes of one part (ReadOnlyMemory<byte> or ReadOnlySequence<byte>)
-using var part = YencDecoder.Decode(encoded);
-
-YencHeader header = part.Header;
-ReadOnlyMemory<byte> data = part.Data;
-
-using var file = File.Open(header.FileName, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
-file.Position = header.PartOffset;
-await file.WriteAsync(data);
+var writer = new ArrayBufferWriter<byte>();
+await YencEncoder.EncodeAsync(header, stream, writer);
+ReadOnlyMemory<byte> encodedBytes = writer.WrittenMemory;
 ```
-Parse an NZB document, download each segment, decode it and write the parts streaming to a file:
-```csharp
-var nzbDocument = await NzbParser.ParseAsync(await File.ReadAllTextAsync(nzbPath));
 
-foreach (var file in nzbDocument.Files)
-{
-    foreach (var segment in file.Segments)
-    {
-        // retrieve the article for this segment from the Usenet server
-        var response = await client.BodyAsync(segment.MessageId);
-        if (!response.Success || response.Article is not { } article)
-            continue;
+### Build and write an NZB document
 
-        // decode the yEnc-encoded body, streaming the decoded parts out
-        using var yencStream = YencStreamDecoder.Decode(article.Body);
-
-        var header = yencStream.Header;
-
-        if (!File.Exists(header.FileName))
-        {
-            // create the file and pre-allocate disk space for it
-            using var stream = File.Create(header.FileName);
-            stream.SetLength(header.FileSize);
-        }
-        else
-        {
-            using var stream = File.Open(header.FileName, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
-
-            // copy the incoming parts to the file at the part offset
-            stream.Position = header.PartOffset;
-            yencStream.CopyTo(stream);
-        }
-    }
-}
-```
-Build an NZB document and write it to a file:
 ```csharp
 var fileProvider = new PhysicalFileProvider(Path.GetFullPath("testdata"));
 
@@ -151,66 +162,49 @@ var nzbDocument = builder.Build();
 
 using var file = File.Create("Pictures.nzb");
 await using var writer = new StreamWriter(file, UsenetEncoding.Default);
-
 await writer.WriteNzbDocumentAsync(nzbDocument);
 ```
-Encode the files referenced by an NZB document in yEnc format and post them. The text overload
-returns the encoded body as lines, ready to hand to the article builder:
-```csharp
-foreach (var file in nzbDocument.Files)
-{
-    // open the source file
-    var fileInfo = fileProvider.GetFileInfo(file.FileName);
-    using var stream = fileInfo.CreateReadStream();
-    foreach (var segment in file.Segments)
-    {
-        stream.Position = segment.Offset;
 
-        // encode the part in yEnc format
-        var header = new YencHeader(
-            file.FileName, file.Size, 128, segment.Number, file.Segments.Count,
-            segment.Size, segment.Offset);
-        var encodedBody = await YencEncoder.EncodeAsync(header, stream);
-
-        // build the article
-        var article = new NntpArticleBuilder()
-            .AddGroups(file.Groups)
-            .SetMessageId(segment.MessageId)
-            .SetFrom(file.Poster)
-            .SetSubject(segment.MessageId)
-            .SetBody(encodedBody)
-            .Build();
-
-        // post the article
-        await client.PostAsync(article);
-    }
-}
-```
-For a low-allocation write path, encode straight into an `IBufferWriter<byte>` instead of
-materializing the encoded lines:
-```csharp
-var writer = new ArrayBufferWriter<byte>();
-await YencEncoder.EncodeAsync(header, stream, writer);
-ReadOnlyMemory<byte> encodedBytes = writer.WrittenMemory;
-```
-Close the connection:
-```csharp
-await client.QuitAsync();
-```
-
-## Connection pooling
+### Connection pooling
 
 `NntpClientPool` manages a set of authenticated, connected clients and hands them out as
 disposable leases. Connecting and authenticating happen lazily the first time a client is
 borrowed, and idle clients are disconnected automatically:
+
 ```csharp
 using var pool = new NntpClientPool(
     maxPoolSize: 10, hostname, port, useSsl, username, password);
 
 using var lease = await pool.GetLease();
-var response = await lease.Client.ArticleAsync(messageId);
+await using var response = await lease.Client.ArticleAsync(messageId);
 // the client is returned to the pool when the lease is disposed
 ```
+
+### Logging
+
+Logging is optional and flows through `Microsoft.Extensions.Logging`. Hand the components an
+`ILoggerFactory` directly, or register them with DI and they resolve one from the container:
+
+```csharp
+// direct
+var client = new NntpClient(new NntpConnection(loggerFactory), loggerFactory);
+
+// dependency injection
+services.AddUsenet();
+```
+
+### Close the connection
+
+```csharp
+await client.QuitAsync();
+```
+
+## Architecture
+
+The library is split into independent layers — **Connection** (transport), **Client** (the RFC
+command API), **Pool** (reusable authenticated clients), and the independent **yEnc** and **NZB**
+codecs. The streaming/buffering model and the reasoning behind it are documented for maintainers in
+[docs/architecture.md](docs/architecture.md), backed by the [ADRs](docs/adr/).
 
 ## License
 
@@ -223,5 +217,3 @@ which was in turn based on [Kristian Hellang](https://github.com/khellang)'s wor
 * [khellang/yEnc](https://github.com/khellang/yEnc)
 * [khellang/NntpLib.Net](https://github.com/khellang/NntpLib.Net)
 * [khellang/Nzb](https://github.com/khellang/Nzb)
-</content>
-</invoke>

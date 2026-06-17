@@ -69,6 +69,29 @@ release so consumers get ergonomics without bringing their own machinery:
   abandons the connection so the pool discards and reconnects it. Small remainders keep the pooled
   connection; large ones make `break` cheap. The budget can become a public knob later, additively.
 
+## Refinement (6.0.0, proposed)
+
+Two follow-ups complete the "typed results, no raw strings" direction this ADR started; neither
+changes the streamed-vs-bounded split.
+
+- **`OVER` joins `XOVER` as typed streamed rows.** `OVER` was the one unbounded scan left
+  returning raw `NntpMultiLineResponse` strings while its legacy sibling `XOVER` already streamed
+  typed `NntpArticleOverview` — backwards, since `OVER` is the modern RFC 3977 command. `OverAsync`
+  (range) and `CurrentOverAsync` now stream `NntpArticleOverview` through the same per-line parser.
+  The RFC 3977-only `OVER <message-id>` form returns exactly one record, so
+  `OverByMessageIdAsync` returns `Task<NntpArticleOverview?>` rather than a single-row stream — the
+  drain contract is overkill for one row. The same single-vs-many split applies to
+  `HdrByMessageIdAsync`/`XhdrByMessageIdAsync` (`Task<NntpHeaderField?>`). Both `Over*` and
+  `Xover*` (and `Hdr*`/`Xhdr*`) are kept because real servers implement one or the other.
+
+- **Bounded commands move to typed results too.** The bounded multi-line commands stop returning
+  the raw `NntpMultiLineResponse` string bag: `CAPABILITIES` → `NntpCapabilities`,
+  `LIST OVERVIEW.FMT` → `NntpOverviewFormat` (which can later drive the overview parser for
+  servers with non-standard field orders), `LIST SUBSCRIPTIONS` → `NntpGroups`, and
+  `LIST DISTRIBUTIONS`/`MODERATORS`/`DISTRIB.PATS` → small typed records. Only the genuinely
+  free-form commands (`HELP`, `LIST MOTD`) keep a lines-based response, renamed
+  `NntpTextResponse` to say so; `NntpMultiLineResponse` as the universal string bag is retired.
+
 ## Measured outcomes
 
 Recorded after the rebuild landed (#122). The `XOVER` read over a loopback connection

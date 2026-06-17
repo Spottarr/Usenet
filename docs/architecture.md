@@ -5,7 +5,9 @@ reasoning behind each decision:
 
 - [ADR-0001](adr/0001-article-buffering-and-streaming-model.md): buffer each part whole
 - [ADR-0002](adr/0002-byte-oriented-article-bodies.md): byte-oriented bodies, pooled and caller-owned
-- [ADR-0003](adr/0003-streaming-multiline-responses.md): streamed multi-line responses
+- [ADR-0003](adr/0003-streaming-multiline-responses.md): streamed multi-line responses (+ typed `OVER` and bounded commands)
+- [ADR-0004](adr/0004-cancellation-and-de-overloaded-command-api.md): optional cancellation tokens, de-overloaded command API
+- [ADR-0005](adr/0005-compressed-overview-transport-and-connection-options.md): compressed overview transport, consolidated connection options
 
 ## Layering
 
