@@ -20,22 +20,6 @@ public interface INntpConnection : IDisposable
     /// <param name="port">The port to use.</param>
     /// <param name="useSsl">A value to indicate whether to use SSL encryption.</param>
     /// <param name="parser">The response parser to use.</param>
-    /// <returns>A response object of type <typeparamref name="TResponse"/>.</returns>
-    Task<TResponse> ConnectAsync<TResponse>(
-        string hostname,
-        int port,
-        bool useSsl,
-        IResponseParser<TResponse> parser
-    );
-
-    /// <summary>
-    /// Attempts to establish a connection with a usenet server.
-    /// </summary>
-    /// <typeparam name="TResponse">The type of the parsed response.</typeparam>
-    /// <param name="hostname">The hostname of the usenet server.</param>
-    /// <param name="port">The port to use.</param>
-    /// <param name="useSsl">A value to indicate whether to use SSL encryption.</param>
-    /// <param name="parser">The response parser to use.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A response object of type <typeparamref name="TResponse"/>.</returns>
     Task<TResponse> ConnectAsync<TResponse>(
@@ -43,17 +27,8 @@ public interface INntpConnection : IDisposable
         int port,
         bool useSsl,
         IResponseParser<TResponse> parser,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     );
-
-    /// <summary>
-    /// Sends a command to the usenet server asynchronously. The response is expected to be a single line.
-    /// </summary>
-    /// <typeparam name="TResponse">The type of the parsed response.</typeparam>
-    /// <param name="command">The command to send to the server.</param>
-    /// <param name="parser">The response parser to use.</param>
-    /// <returns>A response object of type <typeparamref name="TResponse"/>.</returns>
-    Task<TResponse> CommandAsync<TResponse>(string command, IResponseParser<TResponse> parser);
 
     /// <summary>
     /// Sends a command to the usenet server asynchronously. The response is expected to be a single line.
@@ -66,19 +41,7 @@ public interface INntpConnection : IDisposable
     Task<TResponse> CommandAsync<TResponse>(
         string command,
         IResponseParser<TResponse> parser,
-        CancellationToken cancellationToken
-    );
-
-    /// <summary>
-    /// Sends a command to the usenet server asynchronously. The response is expected to be multiple lines.
-    /// </summary>
-    /// <typeparam name="TResponse">The type of the parsed response.</typeparam>
-    /// <param name="command">The command to send to the server.</param>
-    /// <param name="parser">The multi-line response parser to use.</param>
-    /// <returns>A response object of type <typeparamref name="TResponse"/>.</returns>
-    Task<TResponse> MultiLineCommandAsync<TResponse>(
-        string command,
-        IMultiLineResponseParser<TResponse> parser
+        CancellationToken cancellationToken = default
     );
 
     /// <summary>
@@ -92,22 +55,7 @@ public interface INntpConnection : IDisposable
     Task<TResponse> MultiLineCommandAsync<TResponse>(
         string command,
         IMultiLineResponseParser<TResponse> parser,
-        CancellationToken cancellationToken
-    );
-
-    /// <summary>
-    /// Sends a command to the usenet server asynchronously and streams the multi-line data block,
-    /// parsing each line as it arrives instead of materializing the whole range.
-    /// </summary>
-    /// <typeparam name="T">The type each data-block line is parsed into.</typeparam>
-    /// <param name="command">The command to send to the server.</param>
-    /// <param name="successCode">The response code that indicates a data block follows.</param>
-    /// <param name="lineParser">The per-line parser to use.</param>
-    /// <returns>A streamed response that must be fully enumerated or disposed before the next command.</returns>
-    Task<NntpStreamResponse<T>> MultiLineStreamCommandAsync<T>(
-        string command,
-        int successCode,
-        NntpStreamLineParser<T> lineParser
+        CancellationToken cancellationToken = default
     );
 
     /// <summary>
@@ -124,7 +72,7 @@ public interface INntpConnection : IDisposable
         string command,
         int successCode,
         NntpStreamLineParser<T> lineParser,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     );
 
     /// <summary>
@@ -139,16 +87,8 @@ public interface INntpConnection : IDisposable
     Task<TResponse> BufferedMultiLineCommandAsync<TResponse>(
         string command,
         IBufferedMultiLineResponseParser<TResponse> parser,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     );
-
-    /// <summary>
-    /// Gets a single-line response from the usenet server asynchronously.
-    /// </summary>
-    /// <typeparam name="TResponse">The type of the parsed response.</typeparam>
-    /// <param name="parser">The response parser to use.</param>
-    /// <returns>A response object of type <typeparamref name="TResponse"/>.</returns>
-    Task<TResponse> GetResponseAsync<TResponse>(IResponseParser<TResponse> parser);
 
     /// <summary>
     /// Gets a single-line response from the usenet server asynchronously.
@@ -159,15 +99,8 @@ public interface INntpConnection : IDisposable
     /// <returns>A response object of type <typeparamref name="TResponse"/>.</returns>
     Task<TResponse> GetResponseAsync<TResponse>(
         IResponseParser<TResponse> parser,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     );
-
-    /// <summary>
-    /// Sends a line to the usenet server asynchronously.
-    /// </summary>
-    /// <param name="line">The line to send to the usenet server.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task WriteLineAsync(string line);
 
     /// <summary>
     /// Sends a line to the usenet server asynchronously.
@@ -175,7 +108,7 @@ public interface INntpConnection : IDisposable
     /// <param name="line">The line to send to the usenet server.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task WriteLineAsync(string line, CancellationToken cancellationToken);
+    Task WriteLineAsync(string line, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Buffers a single CRLF-terminated line into the connection's write buffer without flushing it
@@ -191,7 +124,7 @@ public interface INntpConnection : IDisposable
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task FlushAsync(CancellationToken cancellationToken);
+    Task FlushAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The byte sink backing the connection's write buffer. Bytes written here are batched until

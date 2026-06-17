@@ -27,14 +27,7 @@ public interface INntpClientPool : IDisposable
     /// Gets a lease on an authenticated and connected NNTP client from the pool.
     /// If no clients are available, it will wait until one becomes available or the wait times out.
     /// </summary>
-    /// <returns></returns>
-    Task<IPooledNntpClientLease> GetLease();
-
-    /// <summary>
-    /// Gets a lease on an authenticated and connected NNTP client from the pool.
-    /// If no clients are available, it will wait until one becomes available or the wait times out.
-    /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns></returns>
-    Task<IPooledNntpClientLease> GetLease(CancellationToken cancellationToken);
+    Task<IPooledNntpClientLease> GetLease(CancellationToken cancellationToken = default);
 }
