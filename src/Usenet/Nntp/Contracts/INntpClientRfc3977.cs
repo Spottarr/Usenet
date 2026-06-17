@@ -392,11 +392,8 @@ public interface INntpClientRfc3977
     /// the database for which it is consistent (as described above).
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A multi-line response containing a description of the fields
-    /// in the overview database for which it is consistent.</returns>
-    Task<NntpMultiLineResponse> ListOverviewFormatAsync(
-        CancellationToken cancellationToken = default
-    );
+    /// <returns>The overview database field layout for which the server is consistent.</returns>
+    Task<NntpOverviewFormat> ListOverviewFormatAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.5">HDR</a>

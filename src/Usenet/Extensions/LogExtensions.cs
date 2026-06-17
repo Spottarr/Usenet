@@ -61,6 +61,12 @@ internal static partial class LogExtensions
 
     [LoggerMessage(
         Level = LogLevel.Warning,
+        Message = "Invalid overview format line, skipping it: {Line} Expected: {{field}}: or :{{metadata}}"
+    )]
+    public static partial void InvalidOverviewFormatLine(this ILogger logger, string line);
+
+    [LoggerMessage(
+        Level = LogLevel.Warning,
         Message = "Invalid newsgroup description line, skipping it: {Line} Expected: {{group}} {{description}}"
     )]
     public static partial void InvalidNewsgroupDescriptionLine(this ILogger logger, string line);

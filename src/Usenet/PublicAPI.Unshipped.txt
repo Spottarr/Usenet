@@ -86,6 +86,17 @@ static Usenet.DependencyInjection.UsenetServiceCollectionExtensions.AddUsenet(th
 *REMOVED*Usenet.Nntp.NntpClient.NntpClient(Usenet.Nntp.Contracts.INntpConnection! connection) -> void
 *REMOVED*Usenet.Nntp.NntpClientPool.NntpClientPool(int maxPoolSize, string! hostname, int port, bool useSsl, string! username, string! password) -> void
 *REMOVED*Usenet.Nntp.NntpConnection.NntpConnection() -> void
+Usenet.Nntp.Models.NntpOverviewField
+Usenet.Nntp.Models.NntpOverviewField.NntpOverviewField() -> void
+Usenet.Nntp.Models.NntpOverviewField.IncludesHeaderName.get -> bool
+Usenet.Nntp.Models.NntpOverviewField.IncludesHeaderName.init -> void
+Usenet.Nntp.Models.NntpOverviewField.IsMetadata.get -> bool
+Usenet.Nntp.Models.NntpOverviewField.IsMetadata.init -> void
+Usenet.Nntp.Models.NntpOverviewField.Name.get -> string!
+Usenet.Nntp.Models.NntpOverviewField.Name.init -> void
+Usenet.Nntp.Models.NntpOverviewFormat
+Usenet.Nntp.Models.NntpOverviewFormat.Fields.get -> System.Collections.Generic.IReadOnlyList<Usenet.Nntp.Models.NntpOverviewField!>!
+static Usenet.Nntp.Models.NntpOverviewFormat.Empty.get -> Usenet.Nntp.Models.NntpOverviewFormat!
 Usenet.Nntp.Models.NntpCapabilities
 Usenet.Nntp.Models.NntpCapabilities.GetArguments(string! capability) -> System.Collections.Generic.IReadOnlyList<string!>!
 Usenet.Nntp.Models.NntpCapabilities.IsReader.get -> bool
@@ -170,7 +181,7 @@ Usenet.Nntp.Contracts.INntpClientRfc3977.ListGroupAsync(string? group = null, Us
 Usenet.Nntp.Contracts.INntpClientRfc3977.ListHeadersAsync(Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpTextResponse!>!
 Usenet.Nntp.Contracts.INntpClientRfc3977.ListHeadersByMessageIdAsync(Usenet.Nntp.Models.NntpMessageId! messageId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpTextResponse!>!
 Usenet.Nntp.Contracts.INntpClientRfc3977.ListNewsgroupsAsync(string? wildmat = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpNewsgroupDescription!>!>!
-Usenet.Nntp.Contracts.INntpClientRfc3977.ListOverviewFormatAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
+Usenet.Nntp.Contracts.INntpClientRfc3977.ListOverviewFormatAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Models.NntpOverviewFormat!>!
 Usenet.Nntp.Contracts.INntpClientRfc3977.ModeReaderAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpModeReaderResponse!>!
 Usenet.Nntp.Contracts.INntpClientRfc3977.NewGroupsAsync(Usenet.Nntp.Models.NntpDateTime! sinceDateTime, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpGroupsResponse!>!
 Usenet.Nntp.Contracts.INntpClientRfc3977.NewNewsAsync(string! wildmat, Usenet.Nntp.Models.NntpDateTime! sinceDateTime, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpMessageId!>!>!
@@ -233,7 +244,7 @@ Usenet.Nntp.NntpClient.ListHeadersByMessageIdAsync(Usenet.Nntp.Models.NntpMessag
 Usenet.Nntp.NntpClient.ListModeratorsAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
 Usenet.Nntp.NntpClient.ListMotdAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpTextResponse!>!
 Usenet.Nntp.NntpClient.ListNewsgroupsAsync(string? wildmat = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpNewsgroupDescription!>!>!
-Usenet.Nntp.NntpClient.ListOverviewFormatAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
+Usenet.Nntp.NntpClient.ListOverviewFormatAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Models.NntpOverviewFormat!>!
 Usenet.Nntp.NntpClient.ListSubscriptionsAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpMultiLineResponse!>!
 Usenet.Nntp.NntpClient.ModeReaderAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpModeReaderResponse!>!
 Usenet.Nntp.NntpClient.NewGroupsAsync(Usenet.Nntp.Models.NntpDateTime! sinceDateTime, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpGroupsResponse!>!

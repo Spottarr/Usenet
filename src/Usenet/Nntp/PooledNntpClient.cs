@@ -252,7 +252,7 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.CurrentOverAsync(cancellationToken));
 
-    public Task<NntpMultiLineResponse> ListOverviewFormatAsync(
+    public Task<NntpOverviewFormat> ListOverviewFormatAsync(
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.ListOverviewFormatAsync(cancellationToken));
 
