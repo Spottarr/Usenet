@@ -61,10 +61,8 @@ public interface INntpClientRfc6048
     /// of this server.
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A multi-line response containing a list of recommended subscriptions.</returns>
-    Task<NntpMultiLineResponse> ListSubscriptionsAsync(
-        CancellationToken cancellationToken = default
-    );
+    /// <returns>The list of recommended newsgroup subscriptions.</returns>
+    Task<NntpGroups> ListSubscriptionsAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-3">LIST ACTIVE</a>
