@@ -81,6 +81,31 @@ if (overview is not null)
 }
 ```
 
+### Inspect server capabilities and metadata
+
+The bounded `CAPABILITIES` and `LIST` commands return ready-to-use typed results rather than raw
+lines. `CapabilitiesAsync` yields an `NntpCapabilities` you can query directly, and the bounded
+`LIST` variants return typed models (`NntpOverviewFormat`, `NntpGroups`, `NntpDistribution`, …):
+
+```csharp
+var capabilities = await client.CapabilitiesAsync();
+if (capabilities.IsReader && capabilities.Supports("OVER", "MSGID"))
+{
+    var overview = await client.OverByMessageIdAsync(messageId);
+    // ...
+}
+
+// The overview field layout, in order, including :metadata items and :full header-name fields.
+var format = await client.ListOverviewFormatAsync();
+foreach (var field in format.Fields)
+{
+    Console.WriteLine(field.IsMetadata ? $":{field.Name}" : field.Name);
+}
+```
+
+The genuinely free-form `HELP`, `LIST MOTD` and `LIST HEADERS` commands return an
+`NntpTextResponse` exposing the raw `Lines` plus a convenience joined `Text`.
+
 ### Decode a yEnc part
 
 `YencDecoder.Decode` returns a `YencPart` that owns a buffer rented from `ArrayPool`. Its `Data`

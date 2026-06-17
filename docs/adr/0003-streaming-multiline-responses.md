@@ -82,18 +82,21 @@ release so consumers get ergonomics without bringing their own machinery:
   streamed contract above. Power users with a non-standard `overview.fmt` retain the low-level
   `INntpConnection` streaming seam with a custom parser.
 
-## Refinement (6.0.0, proposed)
-
-One follow-up remains to complete the "typed results, no raw strings" direction this ADR started; it
-does not change the streamed-vs-bounded split.
-
-- **Bounded commands move to typed results too.** The bounded multi-line commands stop returning
-  the raw `NntpMultiLineResponse` string bag: `CAPABILITIES` → `NntpCapabilities`,
-  `LIST OVERVIEW.FMT` → `NntpOverviewFormat` (which can later drive the overview parser for
-  servers with non-standard field orders), `LIST SUBSCRIPTIONS` → `NntpGroups`, and
-  `LIST DISTRIBUTIONS`/`MODERATORS`/`DISTRIB.PATS` → small typed records. Only the genuinely
-  free-form commands (`HELP`, `LIST MOTD`) keep a lines-based response, renamed
-  `NntpTextResponse` to say so; `NntpMultiLineResponse` as the universal string bag is retired.
+- **Bounded commands move to typed results too; the string bag is retired.** Shipped in #140, this
+  completed the "typed results, no raw strings" direction without changing the streamed-vs-bounded
+  split. The bounded multi-line commands stopped returning the raw `NntpMultiLineResponse` string
+  bag: `CAPABILITIES` → `NntpCapabilities` (typed `Supports(...)`, reader mode, the `OVER`/`LIST`
+  variants), `LIST OVERVIEW.FMT` → `NntpOverviewFormat` (an ordered `NntpOverviewField` layout that
+  can later drive the overview parser for servers with non-standard field orders),
+  `LIST SUBSCRIPTIONS` → `NntpGroups`, and `LIST DISTRIBUTIONS`/`MODERATORS`/`DISTRIB.PATS` → small
+  typed records (`NntpDistribution`, `NntpModerator`, `NntpDistributionPattern`). Only the genuinely
+  free-form commands (`HELP`, `LIST MOTD`, and the `LIST HEADERS` field-name list) keep a
+  lines-based shape, renamed `NntpTextResponse` (an `IReadOnlyList<string> Lines` plus a convenience
+  joined `Text`) to say so. Malformed lines are skipped or defaulted, consistent with the streamed
+  parsers. `NntpMultiLineResponse` is removed entirely. The unimplemented `XZVER`/`XZHDR`
+  compression stubs, which were the last holders of the string bag, were retyped to the typed
+  streamed results their plaintext siblings use (the shape [ADR-0005](0005-compressed-overview-transport-and-connection-options.md)
+  records for when they are eventually built).
 
 ## Measured outcomes
 
