@@ -74,7 +74,7 @@ internal sealed class XoverAllocationTests
     {
         var response = await connection.MultiLineCommandAsync(
             string.Create(CultureInfo.InvariantCulture, $"XOVER 1-{count}"),
-            new MultiLineResponseParser(224),
+            new TextResponseParser(224),
             cancellationToken
         );
 
