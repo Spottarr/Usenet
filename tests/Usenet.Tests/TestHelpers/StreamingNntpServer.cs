@@ -105,16 +105,39 @@ internal sealed class StreamingNntpServer : IAsyncDisposable
                 break;
             case "XOVER":
             {
-                await writer.WriteLineAsync("224 Overview information follows");
-                var (low, high) = ParseRange(parts.Length > 1 ? parts[1] : "1-3");
-                for (var i = low; i <= high; i++)
+                await WriteOverviewRangeAsync(
+                    writer,
+                    parts.Length > 1 ? parts[1] : "1-3",
+                    cancellationToken
+                );
+                break;
+            }
+            case "OVER":
+            {
+                var arg = parts.Length > 1 ? parts[1] : null;
+                if (arg != null && arg.StartsWith('<'))
                 {
-                    await writer.WriteLineAsync(
-                        $"{i}\tSubject {i}\tposter@example.com\tdate\t<{i}@example.com>\t\t1024\t8"
-                    );
+                    await WriteOverviewByMessageIdAsync(writer, arg, cancellationToken);
+                    break;
                 }
 
-                await writer.WriteLineAsync(".");
+                await WriteOverviewRangeAsync(writer, arg ?? "1-3", cancellationToken);
+                break;
+            }
+            case "HDR":
+            case "XHDR":
+            {
+                // parts: command, field, range-or-message-id
+                var code = command == "HDR" ? "225" : "221";
+                var field = parts.Length > 1 ? parts[1] : "Subject";
+                var arg = parts.Length > 2 ? parts[2] : null;
+                if (arg != null && arg.StartsWith('<'))
+                {
+                    await WriteHeaderByMessageIdAsync(writer, code, field, arg, cancellationToken);
+                    break;
+                }
+
+                await WriteHeaderRangeAsync(writer, code, field, arg ?? "1-3", cancellationToken);
                 break;
             }
             case "LISTGROUP":
@@ -146,6 +169,91 @@ internal sealed class StreamingNntpServer : IAsyncDisposable
                 await writer.WriteLineAsync("500 Command not recognized");
                 break;
         }
+    }
+
+    // A message-id the by-message-id forms treat as absent, so the no-article path can be exercised.
+    public const string MissingMessageId = "<404@example.com>";
+
+    private static async Task WriteOverviewRangeAsync(
+        StreamWriter writer,
+        string range,
+        CancellationToken cancellationToken
+    )
+    {
+        await writer.WriteLineAsync("224 Overview information follows");
+        var (low, high) = ParseRange(range);
+        for (var i = low; i <= high; i++)
+        {
+            await writer.WriteLineAsync(
+                $"{i}\tSubject {i}\tposter@example.com\tdate\t<{i}@example.com>\t\t1024\t8"
+            );
+        }
+
+        await writer.WriteLineAsync(".");
+        await writer.FlushAsync(cancellationToken);
+    }
+
+    private static async Task WriteOverviewByMessageIdAsync(
+        StreamWriter writer,
+        string messageId,
+        CancellationToken cancellationToken
+    )
+    {
+        if (messageId == MissingMessageId)
+        {
+            await writer.WriteLineAsync("430 No article with that message-id");
+            await writer.FlushAsync(cancellationToken);
+            return;
+        }
+
+        // The by-message-id form replaces the article number with 0 (RFC 3977 section 8.3).
+        await writer.WriteLineAsync("224 Overview information follows");
+        await writer.WriteLineAsync(
+            $"0\tSubject for {messageId}\tposter@example.com\tdate\t{messageId}\t\t2048\t16"
+        );
+        await writer.WriteLineAsync(".");
+        await writer.FlushAsync(cancellationToken);
+    }
+
+    private static async Task WriteHeaderRangeAsync(
+        StreamWriter writer,
+        string code,
+        string field,
+        string range,
+        CancellationToken cancellationToken
+    )
+    {
+        await writer.WriteLineAsync($"{code} Headers for {field} follow");
+        var (low, high) = ParseRange(range);
+        for (var i = low; i <= high; i++)
+        {
+            await writer.WriteLineAsync($"{i} {field} value {i}");
+        }
+
+        await writer.WriteLineAsync(".");
+        await writer.FlushAsync(cancellationToken);
+    }
+
+    private static async Task WriteHeaderByMessageIdAsync(
+        StreamWriter writer,
+        string code,
+        string field,
+        string messageId,
+        CancellationToken cancellationToken
+    )
+    {
+        if (messageId == MissingMessageId)
+        {
+            await writer.WriteLineAsync("430 No article with that message-id");
+            await writer.FlushAsync(cancellationToken);
+            return;
+        }
+
+        // The by-message-id form reports article number 0 (RFC 3977 section 8.5).
+        await writer.WriteLineAsync($"{code} Headers for {field} follow");
+        await writer.WriteLineAsync($"0 {field} value for {messageId}");
+        await writer.WriteLineAsync(".");
+        await writer.FlushAsync(cancellationToken);
     }
 
     private static (long Low, long High) ParseRange(string range)
