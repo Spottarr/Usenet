@@ -67,6 +67,24 @@ internal static partial class LogExtensions
 
     [LoggerMessage(
         Level = LogLevel.Warning,
+        Message = "Invalid distribution line, skipping it: {Line} Expected: {{value}} {{description}}"
+    )]
+    public static partial void InvalidDistributionLine(this ILogger logger, string line);
+
+    [LoggerMessage(
+        Level = LogLevel.Warning,
+        Message = "Invalid moderator line, skipping it: {Line} Expected: {{group-pattern}}:{{address}}"
+    )]
+    public static partial void InvalidModeratorLine(this ILogger logger, string line);
+
+    [LoggerMessage(
+        Level = LogLevel.Warning,
+        Message = "Invalid distribution pattern line, skipping it: {Line} Expected: {{weight}}:{{wildmat}}:{{value}}"
+    )]
+    public static partial void InvalidDistribPatLine(this ILogger logger, string line);
+
+    [LoggerMessage(
+        Level = LogLevel.Warning,
         Message = "Invalid newsgroup description line, skipping it: {Line} Expected: {{group}} {{description}}"
     )]
     public static partial void InvalidNewsgroupDescriptionLine(this ILogger logger, string line);

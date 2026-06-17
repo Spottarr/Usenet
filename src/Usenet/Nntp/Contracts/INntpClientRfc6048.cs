@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using JetBrains.Annotations;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Responses;
@@ -30,8 +31,8 @@ public interface INntpClientRfc6048
     /// in a news article header and about what the values mean.
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A multi-line response object containing the distributions list.</returns>
-    Task<NntpMultiLineResponse> ListDistributionsAsync(
+    /// <returns>The distributions list maintained by the server.</returns>
+    Task<IImmutableList<NntpDistribution>> ListDistributionsAsync(
         CancellationToken cancellationToken = default
     );
 
@@ -43,8 +44,10 @@ public interface INntpClientRfc6048
     /// newsgroup.
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A multi-line response object containing the moderators list.</returns>
-    Task<NntpMultiLineResponse> ListModeratorsAsync(CancellationToken cancellationToken = default);
+    /// <returns>The moderators list maintained by the server.</returns>
+    Task<IImmutableList<NntpModerator>> ListModeratorsAsync(
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-2.5">LIST MOTD</a>

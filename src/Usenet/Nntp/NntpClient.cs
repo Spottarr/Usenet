@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -394,12 +395,12 @@ public class NntpClient : INntpClient
         );
 
     /// <inheritdoc />
-    public Task<NntpMultiLineResponse> ListDistribPatsAsync(
+    public Task<IImmutableList<NntpDistributionPattern>> ListDistribPatsAsync(
         CancellationToken cancellationToken = default
     ) =>
         Connection.MultiLineCommandAsync(
             "LIST DISTRIB.PATS",
-            new MultiLineResponseParser(215),
+            new DistribPatsResponseParser(_loggerFactory),
             cancellationToken
         );
 
@@ -644,22 +645,22 @@ public class NntpClient : INntpClient
         );
 
     /// <inheritdoc />
-    public Task<NntpMultiLineResponse> ListDistributionsAsync(
+    public Task<IImmutableList<NntpDistribution>> ListDistributionsAsync(
         CancellationToken cancellationToken = default
     ) =>
         Connection.MultiLineCommandAsync(
             "LIST DISTRIBUTIONS",
-            new MultiLineResponseParser(215),
+            new DistributionsResponseParser(_loggerFactory),
             cancellationToken
         );
 
     /// <inheritdoc />
-    public Task<NntpMultiLineResponse> ListModeratorsAsync(
+    public Task<IImmutableList<NntpModerator>> ListModeratorsAsync(
         CancellationToken cancellationToken = default
     ) =>
         Connection.MultiLineCommandAsync(
             "LIST MODERATORS",
-            new MultiLineResponseParser(215),
+            new ModeratorsResponseParser(_loggerFactory),
             cancellationToken
         );
 
