@@ -25,9 +25,13 @@ dotnet add package Spottarr.Usenet
 
 ### Connect and authenticate
 
+Connection identity (host, port, SSL) lives on `NntpConnectionOptions`, so `ConnectAsync` reads it
+from configuration rather than taking it as arguments:
+
 ```csharp
-var client = new NntpClient(new NntpConnection());
-await client.ConnectAsync(hostname, port, useSsl);
+var options = new NntpConnectionOptions { Host = hostname, Port = port, UseSsl = useSsl };
+var client = new NntpClient(new NntpConnection(options));
+await client.ConnectAsync();
 await client.AuthenticateAsync(username, password);
 ```
 
@@ -213,7 +217,13 @@ borrowed, and idle clients are disconnected automatically:
 
 ```csharp
 using var pool = new NntpClientPool(
-    maxPoolSize: 10, hostname, port, useSsl, username, password);
+    new NntpPoolOptions
+    {
+        MaxPoolSize = 10,
+        Username = username,
+        Password = password,
+        Connection = new NntpConnectionOptions { Host = hostname, Port = port, UseSsl = useSsl },
+    });
 
 using var lease = await pool.GetLease();
 await using var response = await lease.Client.ArticleAsync(messageId);
@@ -227,9 +237,10 @@ Logging is optional and flows through `Microsoft.Extensions.Logging`. Hand the c
 
 ```csharp
 // direct
-var client = new NntpClient(new NntpConnection(loggerFactory), loggerFactory);
+var connection = new NntpConnection(options, loggerFactory);
+var client = new NntpClient(connection, loggerFactory);
 
-// dependency injection
+// dependency injection — register an NntpConnectionOptions to configure the connection
 services.AddUsenet();
 ```
 
