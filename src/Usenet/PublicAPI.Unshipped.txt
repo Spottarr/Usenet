@@ -77,8 +77,34 @@ Usenet.Nntp.NntpConnection.BufferLine(string! line) -> void
 Usenet.DependencyInjection.UsenetServiceCollectionExtensions
 Usenet.Nntp.Builders.NntpArticleBuilder.NntpArticleBuilder(Microsoft.Extensions.Logging.ILoggerFactory? loggerFactory = null) -> void
 Usenet.Nntp.NntpClient.NntpClient(Usenet.Nntp.Contracts.INntpConnection! connection, Microsoft.Extensions.Logging.ILoggerFactory? loggerFactory = null) -> void
-Usenet.Nntp.NntpClientPool.NntpClientPool(int maxPoolSize, string! hostname, int port, bool useSsl, string! username, string! password, Microsoft.Extensions.Logging.ILoggerFactory? loggerFactory = null) -> void
-Usenet.Nntp.NntpConnection.NntpConnection(Microsoft.Extensions.Logging.ILoggerFactory? loggerFactory = null) -> void
+Usenet.Nntp.NntpClientPool.NntpClientPool(Usenet.Nntp.NntpPoolOptions! options, Microsoft.Extensions.Logging.ILoggerFactory? loggerFactory = null) -> void
+Usenet.Nntp.NntpConnection.NntpConnection(Usenet.Nntp.NntpConnectionOptions? options = null, Microsoft.Extensions.Logging.ILoggerFactory? loggerFactory = null) -> void
+Usenet.Nntp.NntpCompression
+Usenet.Nntp.NntpCompression.None = 0 -> Usenet.Nntp.NntpCompression
+Usenet.Nntp.NntpCompression.GzipWithTerminator = 1 -> Usenet.Nntp.NntpCompression
+Usenet.Nntp.NntpCompression.Gzip = 2 -> Usenet.Nntp.NntpCompression
+Usenet.Nntp.NntpConnectionOptions
+Usenet.Nntp.NntpConnectionOptions.NntpConnectionOptions() -> void
+Usenet.Nntp.NntpConnectionOptions.Host.get -> string!
+Usenet.Nntp.NntpConnectionOptions.Host.init -> void
+Usenet.Nntp.NntpConnectionOptions.Port.get -> int
+Usenet.Nntp.NntpConnectionOptions.Port.init -> void
+Usenet.Nntp.NntpConnectionOptions.UseSsl.get -> bool
+Usenet.Nntp.NntpConnectionOptions.UseSsl.init -> void
+Usenet.Nntp.NntpConnectionOptions.ConnectTimeout.get -> System.TimeSpan
+Usenet.Nntp.NntpConnectionOptions.ConnectTimeout.init -> void
+Usenet.Nntp.NntpConnectionOptions.Compression.get -> Usenet.Nntp.NntpCompression
+Usenet.Nntp.NntpConnectionOptions.Compression.init -> void
+Usenet.Nntp.NntpPoolOptions
+Usenet.Nntp.NntpPoolOptions.NntpPoolOptions() -> void
+Usenet.Nntp.NntpPoolOptions.Connection.get -> Usenet.Nntp.NntpConnectionOptions!
+Usenet.Nntp.NntpPoolOptions.Connection.init -> void
+Usenet.Nntp.NntpPoolOptions.Username.get -> string!
+Usenet.Nntp.NntpPoolOptions.Username.init -> void
+Usenet.Nntp.NntpPoolOptions.Password.get -> string!
+Usenet.Nntp.NntpPoolOptions.Password.init -> void
+Usenet.Nntp.NntpPoolOptions.MaxPoolSize.get -> int
+Usenet.Nntp.NntpPoolOptions.MaxPoolSize.init -> void
 static Usenet.DependencyInjection.UsenetServiceCollectionExtensions.AddUsenet(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 *REMOVED*static Usenet.Logger.Create<T>() -> Microsoft.Extensions.Logging.ILogger!
 *REMOVED*static Usenet.Logger.Factory.get -> Microsoft.Extensions.Logging.ILoggerFactory!
@@ -168,7 +194,7 @@ Usenet.Nntp.Contracts.INntpClientCompression.XfeatureCompressGzipAsync(bool with
 Usenet.Nntp.Contracts.INntpClientCompression.XzhdrAsync(string! field, Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
 Usenet.Nntp.Contracts.INntpClientCompression.XzhdrByMessageIdAsync(string! field, Usenet.Nntp.Models.NntpMessageId! messageId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Models.NntpHeaderField?>!
 Usenet.Nntp.Contracts.INntpClientCompression.XzverAsync(Usenet.Nntp.Models.NntpArticleRange! range, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpArticleOverview!>!>!
-Usenet.Nntp.Contracts.INntpClientConnection.ConnectAsync(string! hostname, int port, bool useSsl, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
+Usenet.Nntp.Contracts.INntpClientConnection.ConnectAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
 Usenet.Nntp.Contracts.INntpClientConnection.QuitAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpResponse!>!
 Usenet.Nntp.Contracts.INntpClientPool.GetLease(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Contracts.IPooledNntpClientLease!>!
 Usenet.Nntp.Contracts.INntpClientRfc2980.CurrentXhdrAsync(string! field, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
@@ -222,7 +248,7 @@ Usenet.Nntp.Contracts.INntpClientRfc6048.ListMotdAsync(System.Threading.Cancella
 Usenet.Nntp.Contracts.INntpClientRfc6048.ListSubscriptionsAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Models.NntpGroups!>!
 Usenet.Nntp.Contracts.INntpConnection.BufferedMultiLineCommandAsync<TResponse>(string! command, Usenet.Nntp.Parsers.IBufferedMultiLineResponseParser<TResponse>! parser, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
 Usenet.Nntp.Contracts.INntpConnection.CommandAsync<TResponse>(string! command, Usenet.Nntp.Parsers.IResponseParser<TResponse>! parser, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
-Usenet.Nntp.Contracts.INntpConnection.ConnectAsync<TResponse>(string! hostname, int port, bool useSsl, Usenet.Nntp.Parsers.IResponseParser<TResponse>! parser, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
+Usenet.Nntp.Contracts.INntpConnection.ConnectAsync<TResponse>(Usenet.Nntp.Parsers.IResponseParser<TResponse>! parser, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
 Usenet.Nntp.Contracts.INntpConnection.FlushAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Usenet.Nntp.Contracts.INntpConnection.GetResponseAsync<TResponse>(Usenet.Nntp.Parsers.IResponseParser<TResponse>! parser, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
 Usenet.Nntp.Contracts.INntpConnection.MultiLineCommandAsync<TResponse>(string! command, Usenet.Nntp.Parsers.IMultiLineResponseParser<TResponse>! parser, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
@@ -234,7 +260,7 @@ Usenet.Nntp.NntpClient.AuthenticateAsync(string! username, string! password, Sys
 Usenet.Nntp.NntpClient.BodyAsync(Usenet.Nntp.Models.NntpMessageId! messageId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpArticleResponse!>!
 Usenet.Nntp.NntpClient.BodyByNumberAsync(long number, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpArticleResponse!>!
 Usenet.Nntp.NntpClient.CapabilitiesAsync(string? keyword = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Models.NntpCapabilities!>!
-Usenet.Nntp.NntpClient.ConnectAsync(string! hostname, int port, bool useSsl, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
+Usenet.Nntp.NntpClient.ConnectAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
 Usenet.Nntp.NntpClient.CurrentArticleAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpArticleResponse!>!
 Usenet.Nntp.NntpClient.CurrentBodyAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpArticleResponse!>!
 Usenet.Nntp.NntpClient.CurrentHdrAsync(string! field, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Responses.NntpStreamResponse<Usenet.Nntp.Models.NntpHeaderField!>!>!
@@ -288,7 +314,7 @@ Usenet.Nntp.NntpClient.XzverAsync(Usenet.Nntp.Models.NntpArticleRange! range, Sy
 Usenet.Nntp.NntpClientPool.GetLease(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Usenet.Nntp.Contracts.IPooledNntpClientLease!>!
 Usenet.Nntp.NntpConnection.BufferedMultiLineCommandAsync<TResponse>(string! command, Usenet.Nntp.Parsers.IBufferedMultiLineResponseParser<TResponse>! parser, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
 Usenet.Nntp.NntpConnection.CommandAsync<TResponse>(string! command, Usenet.Nntp.Parsers.IResponseParser<TResponse>! parser, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
-Usenet.Nntp.NntpConnection.ConnectAsync<TResponse>(string! hostname, int port, bool useSsl, Usenet.Nntp.Parsers.IResponseParser<TResponse>! parser, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
+Usenet.Nntp.NntpConnection.ConnectAsync<TResponse>(Usenet.Nntp.Parsers.IResponseParser<TResponse>! parser, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
 Usenet.Nntp.NntpConnection.FlushAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Usenet.Nntp.NntpConnection.GetResponseAsync<TResponse>(Usenet.Nntp.Parsers.IResponseParser<TResponse>! parser, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
 Usenet.Nntp.NntpConnection.MultiLineCommandAsync<TResponse>(string! command, Usenet.Nntp.Parsers.IMultiLineResponseParser<TResponse>! parser, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!

@@ -26,6 +26,7 @@ public static class UsenetServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
 
         services.TryAddTransient<INntpConnection>(sp => new NntpConnection(
+            sp.GetService<NntpConnectionOptions>(),
             sp.GetService<ILoggerFactory>()
         ));
 

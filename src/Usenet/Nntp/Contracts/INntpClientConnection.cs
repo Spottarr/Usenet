@@ -7,19 +7,13 @@ namespace Usenet.Nntp.Contracts;
 public interface INntpClientConnection
 {
     /// <summary>
-    /// Attempts to establish a <a href="https://tools.ietf.org/html/rfc3977#section-5.1">connection</a> with a usenet server.
+    /// Attempts to establish a <a href="https://tools.ietf.org/html/rfc3977#section-5.1">connection</a>
+    /// with a usenet server. The host, port and SSL setting are read from the
+    /// <see cref="NntpConnectionOptions"/> the underlying connection was created with.
     /// </summary>
-    /// <param name="hostname">The hostname of the usenet server.</param>
-    /// <param name="port">The port to use.</param>
-    /// <param name="useSsl">A value to indicate whether or not to use SSL encryption.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>true if a connection was made; otherwise false</returns>
-    Task<bool> ConnectAsync(
-        string hostname,
-        int port,
-        bool useSsl,
-        CancellationToken cancellationToken = default
-    );
+    Task<bool> ConnectAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The client uses the
