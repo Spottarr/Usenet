@@ -9,7 +9,6 @@ namespace Usenet.Nntp;
 /// Compression is configuration rather than a command: it is negotiated as part of the connection's
 /// session-setup recipe so it survives transparent pool reconnects. See
 /// <a href="https://github.com/Spottarr/Usenet/blob/main/docs/adr/0005-compressed-overview-transport-and-connection-options.md">ADR-0005</a>.
-/// Only <see cref="None"/> is honoured today; the gzip variants are reserved for a later slice.
 /// </remarks>
 [PublicAPI]
 public enum NntpCompression

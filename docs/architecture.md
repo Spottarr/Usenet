@@ -80,6 +80,33 @@ sequenceDiagram
   Note over C,Cl: enumerate fully or dispose to drain before next command
 ```
 
+## Compressed transport (XFEATURE COMPRESS GZIP)
+
+- Compression is a **transparent connection mode**, not a command. It is configured as an
+  `NntpCompression` value on `NntpConnectionOptions` and negotiated as the third step of the
+  session-setup recipe (connect → authenticate → enable compression), since some servers reject the
+  feature pre-auth. The pool re-applies the whole recipe on every transparent reconnect, so a
+  replaced connection is never left in plain mode while the framer expects compressed bytes.
+- With the mode on, the transport adds an **inflate stage ahead of line framing, scoped to the data
+  block**: the clear-text status line is read off the wire first, then the compressed payload is read
+  and inflated, and the existing framing (and so every streamed/buffered scan) rides the decompressed
+  bytes unchanged. Byte counting stays on wire bytes.
+- The `GzipWithTerminator` variant finds the block boundary by the literal terminating dot line the
+  server appends after the payload; the `Gzip` variant relies on the gzip stream being
+  self-delimiting. A truncated or corrupt block surfaces as an `NntpException` on the affected command
+  rather than as silently dropped rows. The wrapper (gzip member, zlib stream or bare DEFLATE) is
+  detected from the leading bytes.
+
+```mermaid
+flowchart LR
+  A[Socket bytes] --> B[PipeReader sequence]
+  B --> S[Read clear-text status line]
+  B --> P[Read compressed payload to boundary]
+  P --> I[Inflate: gzip / zlib / deflate]
+  I --> C[Frame CRLF, undo dot-stuffing, detect terminating dot]
+  C --> R[Streamed typed rows / pooled buffer]
+```
+
 ## Write path (encode and post)
 
 - `YencEncoder` reads the source in blocks and encodes into an `IBufferWriter<byte>` using

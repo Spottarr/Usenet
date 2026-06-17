@@ -19,8 +19,10 @@ namespace Usenet.Nntp;
 /// A standard implementation of an NNTP connection.
 /// Based on Kristian Hellang's NntpLib.Net project https://github.com/khellang/NntpLib.Net.
 /// </summary>
-/// <remarks>This implementation of the <see cref="INntpConnection"/> interface does support SSL encryption but
-/// does not support compressed multi-line results. The transport is built on
+/// <remarks>This implementation of the <see cref="INntpConnection"/> interface supports SSL encryption and,
+/// when an <see cref="NntpCompression"/> mode is configured, the transparent <c>XFEATURE COMPRESS GZIP</c>
+/// transport: the compressed data block of each multi-line response is inflated ahead of line framing while
+/// the status line stays clear text. The transport is built on
 /// <see cref="System.IO.Pipelines"/>: lines are framed off the raw byte stream, dot-stuffing is undone and the
 /// terminating dot is detected without transcoding the whole stream to <see cref="string"/>.</remarks>
 [PublicAPI]
