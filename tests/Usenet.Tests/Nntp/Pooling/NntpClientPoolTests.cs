@@ -15,7 +15,20 @@ internal sealed class NntpClientPoolTests
     {
         await Assert
             .That(() =>
-                new NntpClientPool(maxPoolSize, string.Empty, 0, true, string.Empty, string.Empty)
+                new NntpClientPool(
+                    new NntpPoolOptions
+                    {
+                        MaxPoolSize = maxPoolSize,
+                        Username = string.Empty,
+                        Password = string.Empty,
+                        Connection = new NntpConnectionOptions
+                        {
+                            Host = string.Empty,
+                            Port = 0,
+                            UseSsl = true,
+                        },
+                    }
+                )
             )
             .ThrowsExactly<ArgumentOutOfRangeException>();
     }
@@ -25,12 +38,18 @@ internal sealed class NntpClientPoolTests
     public async Task AllClientsBorrowed(CancellationToken cancellationToken)
     {
         using var pool = new NntpClientPool(
-            1,
-            "example.server",
-            563,
-            true,
-            "example.user",
-            "example.pass"
+            new NntpPoolOptions
+            {
+                MaxPoolSize = 1,
+                Username = "example.user",
+                Password = "example.pass",
+                Connection = new NntpConnectionOptions
+                {
+                    Host = "example.server",
+                    Port = 563,
+                    UseSsl = true,
+                },
+            }
         )
         {
             WaitTimeout = TimeSpan.Zero,
@@ -50,12 +69,18 @@ internal sealed class NntpClientPoolTests
     public async Task ClientAvailable(CancellationToken cancellationToken)
     {
         using var pool = new NntpClientPool(
-            1,
-            "example.server",
-            563,
-            true,
-            "example.user",
-            "example.pass"
+            new NntpPoolOptions
+            {
+                MaxPoolSize = 1,
+                Username = "example.user",
+                Password = "example.pass",
+                Connection = new NntpConnectionOptions
+                {
+                    Host = "example.server",
+                    Port = 563,
+                    UseSsl = true,
+                },
+            }
         )
         {
             WaitTimeout = TimeSpan.Zero,
@@ -77,12 +102,18 @@ internal sealed class NntpClientPoolTests
     {
         using var server = new TestNntpServer();
         using var pool = new NntpClientPool(
-            1,
-            "127.0.0.1",
-            server.Port,
-            false,
-            "example.user",
-            "example.pass"
+            new NntpPoolOptions
+            {
+                MaxPoolSize = 1,
+                Username = "example.user",
+                Password = "example.pass",
+                Connection = new NntpConnectionOptions
+                {
+                    Host = "127.0.0.1",
+                    Port = server.Port,
+                    UseSsl = false,
+                },
+            }
         )
         {
             WaitTimeout = TimeSpan.Zero,
@@ -125,12 +156,18 @@ internal sealed class NntpClientPoolTests
         const int maxPoolSize = 4;
 
         using var pool = new NntpClientPool(
-            maxPoolSize,
-            "example.server",
-            563,
-            true,
-            "example.user",
-            "example.pass"
+            new NntpPoolOptions
+            {
+                MaxPoolSize = maxPoolSize,
+                Username = "example.user",
+                Password = "example.pass",
+                Connection = new NntpConnectionOptions
+                {
+                    Host = "example.server",
+                    Port = 563,
+                    UseSsl = true,
+                },
+            }
         )
         {
             // Keep the idle monitor out of the way so it does not race the borrow/return storm.
@@ -161,12 +198,18 @@ internal sealed class NntpClientPoolTests
     {
         await using var server = new StreamingNntpServer();
         using var pool = new NntpClientPool(
-            1,
-            "127.0.0.1",
-            server.Port,
-            false,
-            "example.user",
-            "example.pass"
+            new NntpPoolOptions
+            {
+                MaxPoolSize = 1,
+                Username = "example.user",
+                Password = "example.pass",
+                Connection = new NntpConnectionOptions
+                {
+                    Host = "127.0.0.1",
+                    Port = server.Port,
+                    UseSsl = false,
+                },
+            }
         )
         {
             WaitTimeout = TimeSpan.Zero,
@@ -212,12 +255,18 @@ internal sealed class NntpClientPoolTests
     {
         await using var server = new StreamingNntpServer();
         using var pool = new NntpClientPool(
-            1,
-            "127.0.0.1",
-            server.Port,
-            false,
-            "example.user",
-            "example.pass"
+            new NntpPoolOptions
+            {
+                MaxPoolSize = 1,
+                Username = "example.user",
+                Password = "example.pass",
+                Connection = new NntpConnectionOptions
+                {
+                    Host = "127.0.0.1",
+                    Port = server.Port,
+                    UseSsl = false,
+                },
+            }
         )
         {
             WaitTimeout = TimeSpan.Zero,

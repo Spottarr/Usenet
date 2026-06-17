@@ -29,9 +29,11 @@ public class PostBenchmarks
     public async Task Setup()
     {
         _server = new BenchmarkNntpServer();
-        _connection = new NntpConnection();
+        _connection = new NntpConnection(
+            new NntpConnectionOptions { Host = "127.0.0.1", Port = _server.Port }
+        );
         _client = new NntpClient(_connection);
-        await _client.ConnectAsync("127.0.0.1", _server.Port, false);
+        await _client.ConnectAsync();
 
         var builder = new NntpArticleBuilder()
             .SetMessageId("benchmark@example.com")
