@@ -38,6 +38,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource
     private const int StreamDrainBudgetBytes = 64 * 1024;
 
     private readonly ILogger _log;
+    private readonly NntpConnectionOptions _options;
     private readonly TcpClient _client = new();
     private Stream? _stream;
     private PipeReader? _reader;
@@ -50,12 +51,22 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource
     /// <summary>
     /// Creates a new instance of the <see cref="NntpConnection"/> class.
     /// </summary>
+    /// <param name="options">
+    /// The transport configuration (host, port, SSL, timeouts and compression) used when connecting.
+    /// When <see langword="null"/>, a default <see cref="NntpConnectionOptions"/> is used.
+    /// </param>
     /// <param name="loggerFactory">
     /// An optional <see cref="ILoggerFactory"/> used to create the connection's logger.
     /// When <see langword="null"/>, logging is disabled via <see cref="NullLoggerFactory"/>.
     /// </param>
-    public NntpConnection(ILoggerFactory? loggerFactory = null) =>
+    public NntpConnection(
+        NntpConnectionOptions? options = null,
+        ILoggerFactory? loggerFactory = null
+    )
+    {
+        _options = options ?? new NntpConnectionOptions();
         _log = (loggerFactory ?? NullLoggerFactory.Instance).CreateLogger<NntpConnection>();
+    }
 
     /// <inheritdoc/>
     public IBufferWriter<byte> Output
@@ -82,15 +93,18 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource
 
     /// <inheritdoc/>
     public async Task<TResponse> ConnectAsync<TResponse>(
-        string hostname,
-        int port,
-        bool useSsl,
         IResponseParser<TResponse> parser,
         CancellationToken cancellationToken = default
     )
     {
+        var hostname = _options.Host;
+        ArgumentException.ThrowIfNullOrWhiteSpace(hostname);
+
+        var port = _options.Port;
+        var useSsl = _options.UseSsl;
+
         _log.Connecting(hostname, port, useSsl);
-        await _client.ConnectAsync(hostname, port, cancellationToken).ConfigureAwait(false);
+        await ConnectClientAsync(hostname, port, cancellationToken).ConfigureAwait(false);
         // Disable Nagle's algorithm: now that a command is sent as a single batched flush, the
         // final sub-MSS segment would otherwise stall ~40ms against the server's delayed ACK
         // before the response can be read. NNTP is a request/response protocol that wants the
@@ -101,6 +115,38 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource
         _writer = PipeWriter.Create(_stream, new StreamPipeWriterOptions(leaveOpen: true));
         _output = new CountingBufferWriter(_writer, this);
         return await GetResponseAsync(parser, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Establishes the TCP connection, applying <see cref="NntpConnectionOptions.ConnectTimeout"/> when
+    /// it is positive. A timeout that elapses before the caller's token is cancelled surfaces as a
+    /// <see cref="TimeoutException"/>.
+    /// </summary>
+    private async Task ConnectClientAsync(
+        string hostname,
+        int port,
+        CancellationToken cancellationToken
+    )
+    {
+        var timeout = _options.ConnectTimeout;
+        if (timeout <= TimeSpan.Zero)
+        {
+            await _client.ConnectAsync(hostname, port, cancellationToken).ConfigureAwait(false);
+            return;
+        }
+
+        using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeoutCts.CancelAfter(timeout);
+        try
+        {
+            await _client.ConnectAsync(hostname, port, timeoutCts.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new TimeoutException(
+                $"Timed out connecting to '{hostname}:{port}' after {timeout}."
+            );
+        }
     }
 
     /// <inheritdoc/>

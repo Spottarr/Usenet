@@ -62,16 +62,10 @@ public class NntpClient : INntpClient
     }
 
     /// <inheritdoc />
-    public async Task<bool> ConnectAsync(
-        string hostname,
-        int port,
-        bool useSsl,
-        CancellationToken cancellationToken = default
-    )
+    public async Task<bool> ConnectAsync(CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(hostname);
         var response = await Connection
-            .ConnectAsync(hostname, port, useSsl, new ResponseParser(200, 201), cancellationToken)
+            .ConnectAsync(new ResponseParser(200, 201), cancellationToken)
             .ConfigureAwait(false);
         return response.Success;
     }

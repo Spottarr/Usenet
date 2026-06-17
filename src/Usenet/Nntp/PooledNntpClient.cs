@@ -20,24 +20,17 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
     public bool HasError { get; private set; }
     public bool HasPendingStream => _connection.HasPendingStream;
 
-    public PooledNntpClient(ILoggerFactory? loggerFactory = null)
+    public PooledNntpClient(NntpConnectionOptions options, ILoggerFactory? loggerFactory = null)
     {
-        _connection = new NntpConnection(loggerFactory);
+        _connection = new NntpConnection(options, loggerFactory);
         _client = new NntpClient(_connection, loggerFactory);
     }
 
     #region INntpClient
 
-    public async Task<bool> ConnectAsync(
-        string hostname,
-        int port,
-        bool useSsl,
-        CancellationToken cancellationToken = default
-    )
+    public async Task<bool> ConnectAsync(CancellationToken cancellationToken = default)
     {
-        var res = await _client
-            .ConnectAsync(hostname, port, useSsl, cancellationToken)
-            .ConfigureAwait(false);
+        var res = await _client.ConnectAsync(cancellationToken).ConfigureAwait(false);
         NntpConnected = res;
         return res;
     }

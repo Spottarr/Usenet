@@ -13,19 +13,14 @@ namespace Usenet.Nntp.Contracts;
 public interface INntpConnection : IDisposable
 {
     /// <summary>
-    /// Attempts to establish a connection with a usenet server.
+    /// Attempts to establish a connection with a usenet server. The host, port and SSL setting are
+    /// read from the <see cref="NntpConnectionOptions"/> the connection was created with.
     /// </summary>
     /// <typeparam name="TResponse">The type of the parsed response.</typeparam>
-    /// <param name="hostname">The hostname of the usenet server.</param>
-    /// <param name="port">The port to use.</param>
-    /// <param name="useSsl">A value to indicate whether to use SSL encryption.</param>
     /// <param name="parser">The response parser to use.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A response object of type <typeparamref name="TResponse"/>.</returns>
     Task<TResponse> ConnectAsync<TResponse>(
-        string hostname,
-        int port,
-        bool useSsl,
         IResponseParser<TResponse> parser,
         CancellationToken cancellationToken = default
     );

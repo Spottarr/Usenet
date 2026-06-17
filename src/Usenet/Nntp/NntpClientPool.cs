@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Usenet.Extensions;
 using Usenet.Nntp.Contracts;
-using Usenet.Util;
 
 namespace Usenet.Nntp;
 
@@ -27,9 +26,7 @@ public sealed class NntpClientPool : INntpClientPool
     private readonly SemaphoreSlim _semaphore;
 
     private readonly int _maxPoolSize;
-    private readonly string _hostname;
-    private readonly int _port;
-    private readonly bool _useSsl;
+    private readonly NntpConnectionOptions _connectionOptions;
     private readonly string _username;
     private readonly string _password;
 
@@ -42,30 +39,23 @@ public sealed class NntpClientPool : INntpClientPool
 
     internal Func<IInternalPooledNntpClient> ClientFactory { get; init; }
 
-    public NntpClientPool(
-        int maxPoolSize,
-        string hostname,
-        int port,
-        bool useSsl,
-        string username,
-        string password,
-        ILoggerFactory? loggerFactory = null
-    )
+    public NntpClientPool(NntpPoolOptions options, ILoggerFactory? loggerFactory = null)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxPoolSize);
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(options.Connection);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(options.MaxPoolSize);
 
         _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
         _logger = _loggerFactory.CreateLogger<NntpClientPool>();
-        ClientFactory = () => new PooledNntpClient(_loggerFactory);
 
-        _semaphore = new SemaphoreSlim(maxPoolSize, maxPoolSize);
+        _maxPoolSize = options.MaxPoolSize;
+        _connectionOptions = options.Connection;
+        _username = options.Username;
+        _password = options.Password;
 
-        _maxPoolSize = maxPoolSize;
-        _hostname = hostname;
-        _port = port;
-        _useSsl = useSsl;
-        _username = username;
-        _password = password;
+        ClientFactory = () => new PooledNntpClient(_connectionOptions, _loggerFactory);
+
+        _semaphore = new SemaphoreSlim(_maxPoolSize, _maxPoolSize);
 
         // Start the background idle-monitor. The task is tracked so it can be awaited
         // to a clean stop on dispose, leaving no orphaned task or timer behind.
@@ -96,9 +86,7 @@ public sealed class NntpClientPool : INntpClientPool
             return client;
 
         if (!client.Connected)
-            await client
-                .ConnectAsync(_hostname, _port, _useSsl, cancellationToken)
-                .ConfigureAwait(false);
+            await client.ConnectAsync(cancellationToken).ConfigureAwait(false);
         if (!client.Authenticated)
             await client
                 .AuthenticateAsync(_username, _password, cancellationToken)
@@ -106,7 +94,8 @@ public sealed class NntpClientPool : INntpClientPool
 
         if (!client.Connected || !client.Authenticated)
             throw new InvalidOperationException(
-                $"Failed to connect to '{_hostname}:{_port}' SSL={_useSsl} C={client.Connected} A={client.Authenticated}.'"
+                $"Failed to connect to '{_connectionOptions.Host}:{_connectionOptions.Port}' "
+                    + $"SSL={_connectionOptions.UseSsl} C={client.Connected} A={client.Authenticated}.'"
             );
 
         return client;
