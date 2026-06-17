@@ -672,12 +672,10 @@ public class NntpClient : INntpClient
         );
 
     /// <inheritdoc />
-    public Task<NntpMultiLineResponse> ListSubscriptionsAsync(
-        CancellationToken cancellationToken = default
-    ) =>
+    public Task<NntpGroups> ListSubscriptionsAsync(CancellationToken cancellationToken = default) =>
         Connection.MultiLineCommandAsync(
             "LIST SUBSCRIPTIONS",
-            new MultiLineResponseParser(215),
+            new SubscriptionsResponseParser(),
             cancellationToken
         );
 

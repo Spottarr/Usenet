@@ -303,9 +303,8 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
     public Task<NntpTextResponse> ListMotdAsync(CancellationToken cancellationToken = default) =>
         ExecuteCommandAsync(c => c.ListMotdAsync(cancellationToken));
 
-    public Task<NntpMultiLineResponse> ListSubscriptionsAsync(
-        CancellationToken cancellationToken = default
-    ) => ExecuteCommandAsync(c => c.ListSubscriptionsAsync(cancellationToken));
+    public Task<NntpGroups> ListSubscriptionsAsync(CancellationToken cancellationToken = default) =>
+        ExecuteCommandAsync(c => c.ListSubscriptionsAsync(cancellationToken));
 
     public Task<NntpStreamResponse<NntpGroup>> ListActiveAsync(
         string? wildmat = null,
