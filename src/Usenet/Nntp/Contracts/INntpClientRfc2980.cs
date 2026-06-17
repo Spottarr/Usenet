@@ -28,8 +28,9 @@ public interface INntpClientRfc2980
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="messageId">The message-id of the article to retrieve the header for.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A multi-line response object containing the header.</returns>
-    Task<NntpStreamResponse<NntpHeaderField>> XhdrByMessageIdAsync(
+    /// <returns>The requested header field for the article, or <see langword="null"/> when the
+    /// article is absent or carries no such field.</returns>
+    Task<NntpHeaderField?> XhdrByMessageIdAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken = default

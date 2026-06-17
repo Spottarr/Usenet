@@ -352,8 +352,9 @@ public interface INntpClientRfc3977
     /// </summary>
     /// <param name="range">Only include article numbers within this range in the list.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A multi-line response containing header fields.</returns>
-    Task<NntpMultiLineResponse> OverAsync(
+    /// <returns>A streamed response yielding one <see cref="NntpArticleOverview"/> per article;
+    /// enumerate it fully or dispose it before the next command on the connection.</returns>
+    Task<NntpStreamResponse<NntpArticleOverview>> OverAsync(
         NntpArticleRange range,
         CancellationToken cancellationToken = default
     );
@@ -365,8 +366,9 @@ public interface INntpClientRfc3977
     /// </summary>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A multi-line response containing header fields.</returns>
-    Task<NntpMultiLineResponse> OverByMessageIdAsync(
+    /// <returns>The overview record for the article, or <see langword="null"/> when the article is
+    /// absent.</returns>
+    Task<NntpArticleOverview?> OverByMessageIdAsync(
         NntpMessageId messageId,
         CancellationToken cancellationToken = default
     );
@@ -377,8 +379,11 @@ public interface INntpClientRfc3977
     /// database for the current article in the currently selected newsgroup.
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A multi-line response containing header fields.</returns>
-    Task<NntpMultiLineResponse> CurrentOverAsync(CancellationToken cancellationToken = default);
+    /// <returns>A streamed response yielding one <see cref="NntpArticleOverview"/> per article;
+    /// enumerate it fully or dispose it before the next command on the connection.</returns>
+    Task<NntpStreamResponse<NntpArticleOverview>> CurrentOverAsync(
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-8.4">LIST OVERVIEW.FMT</a>
@@ -416,8 +421,9 @@ public interface INntpClientRfc3977
     /// <param name="field">The header field to retrieve.</param>
     /// <param name="messageId">The message-id of the article to received from the server.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A multi-line response containing the specfied header fields.</returns>
-    Task<NntpStreamResponse<NntpHeaderField>> HdrByMessageIdAsync(
+    /// <returns>The requested header field for the article, or <see langword="null"/> when the
+    /// article is absent or carries no such field.</returns>
+    Task<NntpHeaderField?> HdrByMessageIdAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken = default
