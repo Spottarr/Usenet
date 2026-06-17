@@ -451,12 +451,12 @@ public class NntpClient : INntpClient
         );
 
     /// <inheritdoc />
-    public Task<NntpMultiLineResponse> ListOverviewFormatAsync(
+    public Task<NntpOverviewFormat> ListOverviewFormatAsync(
         CancellationToken cancellationToken = default
     ) =>
         Connection.MultiLineCommandAsync(
             "LIST OVERVIEW.FMT",
-            new MultiLineResponseParser(215),
+            new OverviewFormatResponseParser(_loggerFactory),
             cancellationToken
         );
 
