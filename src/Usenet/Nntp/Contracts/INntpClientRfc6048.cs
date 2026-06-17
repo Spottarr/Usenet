@@ -51,8 +51,8 @@ public interface INntpClientRfc6048
     /// command contains a "message of the day" relevant to the news server.
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A multi-line response object containing the message of the day.</returns>
-    Task<NntpMultiLineResponse> ListMotdAsync(CancellationToken cancellationToken = default);
+    /// <returns>A text response containing the message of the day.</returns>
+    Task<NntpTextResponse> ListMotdAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc6048#section-2.6">LIST SUBSCRIPTIONS</a>
