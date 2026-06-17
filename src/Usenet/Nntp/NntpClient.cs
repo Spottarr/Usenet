@@ -420,34 +420,37 @@ public class NntpClient : INntpClient
         );
 
     /// <inheritdoc />
-    public Task<NntpMultiLineResponse> OverAsync(
+    public Task<NntpStreamResponse<NntpArticleOverview>> OverAsync(
         NntpArticleRange range,
         CancellationToken cancellationToken = default
     ) =>
-        Connection.MultiLineCommandAsync(
+        Connection.MultiLineStreamCommandAsync<NntpArticleOverview>(
             $"OVER {range}",
-            new MultiLineResponseParser(224),
+            224,
+            _streamLineParsers.Overview,
             cancellationToken
         );
 
     /// <inheritdoc />
-    public Task<NntpMultiLineResponse> OverByMessageIdAsync(
+    public Task<NntpArticleOverview?> OverByMessageIdAsync(
         NntpMessageId messageId,
         CancellationToken cancellationToken = default
     ) =>
-        Connection.MultiLineCommandAsync(
+        SingleRecordAsync<NntpArticleOverview>(
             $"OVER {messageId}",
-            new MultiLineResponseParser(224),
+            224,
+            _streamLineParsers.Overview,
             cancellationToken
         );
 
     /// <inheritdoc />
-    public Task<NntpMultiLineResponse> CurrentOverAsync(
+    public Task<NntpStreamResponse<NntpArticleOverview>> CurrentOverAsync(
         CancellationToken cancellationToken = default
     ) =>
-        Connection.MultiLineCommandAsync(
+        Connection.MultiLineStreamCommandAsync<NntpArticleOverview>(
             "OVER",
-            new MultiLineResponseParser(224),
+            224,
+            _streamLineParsers.Overview,
             cancellationToken
         );
 
@@ -475,12 +478,12 @@ public class NntpClient : INntpClient
         );
 
     /// <inheritdoc />
-    public Task<NntpStreamResponse<NntpHeaderField>> HdrByMessageIdAsync(
+    public Task<NntpHeaderField?> HdrByMessageIdAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken = default
     ) =>
-        Connection.MultiLineStreamCommandAsync<NntpHeaderField>(
+        SingleRecordAsync<NntpHeaderField>(
             $"HDR {field} {messageId}",
             225,
             _streamLineParsers.HeaderField,
@@ -545,17 +548,62 @@ public class NntpClient : INntpClient
         );
 
     /// <inheritdoc />
-    public Task<NntpStreamResponse<NntpHeaderField>> XhdrByMessageIdAsync(
+    public Task<NntpHeaderField?> XhdrByMessageIdAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken = default
     ) =>
-        Connection.MultiLineStreamCommandAsync<NntpHeaderField>(
+        SingleRecordAsync<NntpHeaderField>(
             $"XHDR {field} {messageId}",
             221,
             _streamLineParsers.HeaderField,
             cancellationToken
         );
+
+    /// <summary>
+    /// Issues a command whose message-id form yields exactly one record (the RFC 3977
+    /// <c>OVER</c>/<c>HDR</c> and the legacy <c>XHDR</c> single-article forms), materializes its
+    /// small data block, and returns the single row parsed by the shared per-line parser. A one-row
+    /// stream with its drain contract would be overkill for one record (ADR-0003).
+    /// </summary>
+    /// <typeparam name="T">The type the single data-block line is parsed into.</typeparam>
+    /// <param name="command">The command to send to the server.</param>
+    /// <param name="successCode">The response code that indicates a data block follows.</param>
+    /// <param name="lineParser">The shared per-line parser to apply to the record.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>The parsed record, or <see langword="null"/> when the article is absent or the
+    /// record is unparseable.</returns>
+    private async Task<T?> SingleRecordAsync<T>(
+        string command,
+        int successCode,
+        NntpStreamLineParser<T> lineParser,
+        CancellationToken cancellationToken
+    )
+        where T : class
+    {
+        var response = await Connection
+            .MultiLineCommandAsync(
+                command,
+                new MultiLineResponseParser(successCode),
+                cancellationToken
+            )
+            .ConfigureAwait(false);
+
+        if (!response.Success)
+        {
+            return null;
+        }
+
+        foreach (var line in response.Lines)
+        {
+            if (lineParser(line, out var value))
+            {
+                return value;
+            }
+        }
+
+        return null;
+    }
 
     /// <inheritdoc />
     public Task<NntpStreamResponse<NntpHeaderField>> CurrentXhdrAsync(

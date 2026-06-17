@@ -93,7 +93,7 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.XhdrAsync(field, range, cancellationToken));
 
-    public Task<NntpStreamResponse<NntpHeaderField>> XhdrByMessageIdAsync(
+    public Task<NntpHeaderField?> XhdrByMessageIdAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken = default
@@ -238,17 +238,17 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.ListNewsgroupsAsync(wildmat, cancellationToken));
 
-    public Task<NntpMultiLineResponse> OverAsync(
+    public Task<NntpStreamResponse<NntpArticleOverview>> OverAsync(
         NntpArticleRange range,
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.OverAsync(range, cancellationToken));
 
-    public Task<NntpMultiLineResponse> OverByMessageIdAsync(
+    public Task<NntpArticleOverview?> OverByMessageIdAsync(
         NntpMessageId messageId,
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.OverByMessageIdAsync(messageId, cancellationToken));
 
-    public Task<NntpMultiLineResponse> CurrentOverAsync(
+    public Task<NntpStreamResponse<NntpArticleOverview>> CurrentOverAsync(
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.CurrentOverAsync(cancellationToken));
 
@@ -262,7 +262,7 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.HdrAsync(field, range, cancellationToken));
 
-    public Task<NntpStreamResponse<NntpHeaderField>> HdrByMessageIdAsync(
+    public Task<NntpHeaderField?> HdrByMessageIdAsync(
         string field,
         NntpMessageId messageId,
         CancellationToken cancellationToken = default
