@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using Usenet.Nntp.Models;
@@ -326,8 +327,10 @@ public interface INntpClientRfc3977
     /// of a news article being posted.
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A multi-line response object containing newsgroup distribution information.</returns>
-    Task<NntpMultiLineResponse> ListDistribPatsAsync(CancellationToken cancellationToken = default);
+    /// <returns>The weighted distribution-pattern rules maintained by the server.</returns>
+    Task<IImmutableList<NntpDistributionPattern>> ListDistribPatsAsync(
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// The <a href="https://tools.ietf.org/html/rfc3977#section-7.6.6">newsgroups list</a>

@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.Extensions.Logging;
 using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
@@ -229,7 +230,7 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.ListActiveTimesAsync(wildmat, cancellationToken));
 
-    public Task<NntpMultiLineResponse> ListDistribPatsAsync(
+    public Task<IImmutableList<NntpDistributionPattern>> ListDistribPatsAsync(
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.ListDistribPatsAsync(cancellationToken));
 
@@ -292,11 +293,11 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.ListCountsAsync(wildmat, cancellationToken));
 
-    public Task<NntpMultiLineResponse> ListDistributionsAsync(
+    public Task<IImmutableList<NntpDistribution>> ListDistributionsAsync(
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.ListDistributionsAsync(cancellationToken));
 
-    public Task<NntpMultiLineResponse> ListModeratorsAsync(
+    public Task<IImmutableList<NntpModerator>> ListModeratorsAsync(
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.ListModeratorsAsync(cancellationToken));
 
