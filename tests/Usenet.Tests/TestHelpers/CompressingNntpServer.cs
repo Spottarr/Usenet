@@ -7,45 +7,32 @@ using System.Text;
 namespace Usenet.Tests.TestHelpers;
 
 /// <summary>
-/// How the server should mangle the compressed payload, to exercise the transport's error handling.
-/// </summary>
-internal enum CompressionFault
-{
-    /// <summary>Send a well-formed compressed block.</summary>
-    None,
-
-    /// <summary>Omit the terminating dot line and close, so the block ends before its terminator.</summary>
-    DropTerminator,
-
-    /// <summary>Send a payload that cannot be inflated.</summary>
-    CorruptPayload,
-}
-
-/// <summary>
-/// A loopback NNTP server that speaks <c>XFEATURE COMPRESS GZIP</c>: it negotiates the feature after
-/// authentication and then gzip-compresses the data block of multi-line responses, so the transport's
-/// inflate stage can be exercised end to end against a fabricated compressed block.
+/// A loopback NNTP server that speaks <a href="https://www.rfc-editor.org/rfc/rfc8054">RFC 8054</a>
+/// <c>COMPRESS DEFLATE</c>: it negotiates the feature after authentication and then carries the whole
+/// session as a continuous raw-DEFLATE stream in both directions — commands the client sends and every
+/// response it returns, overview and article alike. The connection stays open across commands, so the
+/// transport is exercised exactly as it is against a real persistent server (a self-delimiting block
+/// that never sees a socket close).
 /// </summary>
 internal sealed class CompressingNntpServer : IAsyncDisposable
 {
     private readonly TcpListener _listener;
     private readonly CancellationTokenSource _cts = new();
-    private readonly bool _withTerminator;
-    private readonly CompressionFault _fault;
+    private readonly bool _refuseCompression;
     private int _negotiations;
 
     public int Port => ((IPEndPoint)_listener.LocalEndpoint).Port;
 
-    /// <summary>The number of times <c>XFEATURE COMPRESS GZIP</c> was negotiated across all connections.</summary>
+    /// <summary>The number of times <c>COMPRESS DEFLATE</c> was negotiated across all connections.</summary>
     public int Negotiations => Volatile.Read(ref _negotiations);
 
-    public CompressingNntpServer(
-        bool withTerminator = true,
-        CompressionFault fault = CompressionFault.None
-    )
+    /// <param name="refuseCompression">
+    /// When <see langword="true"/>, the server rejects <c>COMPRESS DEFLATE</c> with a <c>403</c> so the
+    /// transport's fail-fast negotiation can be exercised.
+    /// </param>
+    public CompressingNntpServer(bool refuseCompression = false)
     {
-        _withTerminator = withTerminator;
-        _fault = fault;
+        _refuseCompression = refuseCompression;
         _listener = new TcpListener(IPAddress.Loopback, 0);
         _listener.Start();
         _ = AcceptLoop();
@@ -72,68 +59,93 @@ internal sealed class CompressingNntpServer : IAsyncDisposable
 
     private async Task HandleClientAsync(TcpClient client, CancellationToken cancellationToken)
     {
+        DeflateStream? compressStream = null;
+        DeflateStream? decompressStream = null;
         try
         {
-            var stream = client.GetStream();
-            using var reader = new StreamReader(
-                stream,
-                Encoding.ASCII,
-                false,
-                1024,
-                leaveOpen: true
-            );
+            var socket = client.GetStream();
 
-            await WriteAsciiAsync(stream, "200 Compressing server ready\r\n", cancellationToken);
+            // Reads and writes start in clear text; once COMPRESS DEFLATE is negotiated both swap to a
+            // raw-DEFLATE stream over the socket, mirroring the client's transport. Commands are read a
+            // byte at a time so the clear-text reader never over-reads past the COMPRESS line into the
+            // first compressed command.
+            Stream read = socket;
+            Stream write = socket;
 
-            var compressed = false;
+            await SendAsync(write, "200 Compressing server ready\r\n", cancellationToken);
+
             while (!cancellationToken.IsCancellationRequested)
             {
-                var line = await reader.ReadLineAsync(cancellationToken);
+                var line = await ReadLineAsync(read, cancellationToken);
                 if (line == null)
                     break;
 
-                var command = line.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0]
-                    .ToUpperInvariant();
+                var parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                var command = parts.Length > 0 ? parts[0].ToUpperInvariant() : string.Empty;
 
-                if (command == "AUTHINFO")
+                switch (command)
                 {
-                    await WriteAsciiAsync(
-                        stream,
-                        "281 Authentication accepted\r\n",
-                        cancellationToken
-                    );
-                }
-                else if (command == "XFEATURE")
-                {
-                    Interlocked.Increment(ref _negotiations);
-                    compressed = true;
-                    await WriteAsciiAsync(stream, "290 compression enabled\r\n", cancellationToken);
-                }
-                else if (command is "XOVER" or "OVER")
-                {
-                    var range = line.Split(' ', StringSplitOptions.RemoveEmptyEntries) is [_, var r]
-                        ? r
-                        : "1-3";
-                    await WriteOverviewAsync(stream, range, compressed, cancellationToken);
-                    if (!_withTerminator || _fault == CompressionFault.DropTerminator)
-                        return; // the data phase ended with the stream; the connection is spent.
-                }
-                else if (command == "DATE")
-                {
-                    await WriteAsciiAsync(stream, "111 20260101000000\r\n", cancellationToken);
-                }
-                else if (command == "QUIT")
-                {
-                    await WriteAsciiAsync(stream, "205 Goodbye\r\n", cancellationToken);
-                    return;
-                }
-                else
-                {
-                    await WriteAsciiAsync(
-                        stream,
-                        "500 Command not recognized\r\n",
-                        cancellationToken
-                    );
+                    case "AUTHINFO":
+                        await SendAsync(
+                            write,
+                            "281 Authentication accepted\r\n",
+                            cancellationToken
+                        );
+                        break;
+
+                    case "COMPRESS":
+                        if (_refuseCompression)
+                        {
+                            await SendAsync(
+                                write,
+                                "403 Compression not available\r\n",
+                                cancellationToken
+                            );
+                            break;
+                        }
+
+                        Interlocked.Increment(ref _negotiations);
+                        // The 206 is sent in clear text; compression takes effect for both directions
+                        // immediately afterwards (RFC 8054 §2.2).
+                        await SendAsync(write, "206 Compression active\r\n", cancellationToken);
+                        compressStream = new DeflateStream(
+                            socket,
+                            CompressionMode.Compress,
+                            leaveOpen: true
+                        );
+                        decompressStream = new DeflateStream(
+                            socket,
+                            CompressionMode.Decompress,
+                            leaveOpen: true
+                        );
+                        write = compressStream;
+                        read = decompressStream;
+                        break;
+
+                    case "XOVER":
+                    case "OVER":
+                        await SendAsync(
+                            write,
+                            BuildOverview(parts.Length > 1 ? parts[1] : "1-3"),
+                            cancellationToken
+                        );
+                        break;
+
+                    case "ARTICLE":
+                        await SendAsync(write, BuildArticle(), cancellationToken);
+                        break;
+
+                    case "DATE":
+                        await SendAsync(write, "111 20260101000000\r\n", cancellationToken);
+                        break;
+
+                    case "QUIT":
+                        await SendAsync(write, "205 Goodbye\r\n", cancellationToken);
+                        return;
+
+                    default:
+                        await SendAsync(write, "500 Command not recognized\r\n", cancellationToken);
+                        break;
                 }
             }
         }
@@ -141,28 +153,29 @@ internal sealed class CompressingNntpServer : IAsyncDisposable
         {
             // Client disconnected.
         }
+        catch (InvalidDataException)
+        {
+            // The client sent something that did not decode as DEFLATE; treat as a disconnect.
+        }
         catch (OperationCanceledException)
         {
             // Server shutting down.
         }
         finally
         {
+            if (compressStream != null)
+                await compressStream.DisposeAsync();
+            if (decompressStream != null)
+                await decompressStream.DisposeAsync();
             client.Close();
             client.Dispose();
         }
     }
 
-    private async Task WriteOverviewAsync(
-        NetworkStream stream,
-        string range,
-        bool compressed,
-        CancellationToken cancellationToken
-    )
+    private static string BuildOverview(string range)
     {
-        await WriteAsciiAsync(stream, "224 Overview information follows\r\n", cancellationToken);
-
         var (low, high) = ParseRange(range);
-        var body = new StringBuilder();
+        var body = new StringBuilder("224 Overview information follows\r\n");
         for (var i = low; i <= high; i++)
         {
             body.Append(
@@ -171,59 +184,63 @@ internal sealed class CompressingNntpServer : IAsyncDisposable
             );
         }
 
-        if (!compressed)
-        {
-            body.Append(".\r\n");
-            await WriteAsciiAsync(stream, body.ToString(), cancellationToken);
-            return;
-        }
-
-        // The non-terminator variant carries the terminating dot inside the compressed payload; the
-        // terminator variant gets a literal dot line on the wire after the payload instead.
-        if (!_withTerminator)
-            body.Append(".\r\n");
-
-        var payload = Gzip(Encoding.ASCII.GetBytes(body.ToString()));
-        if (_fault == CompressionFault.CorruptPayload)
-            Corrupt(payload);
-
-        await stream.WriteAsync(payload, cancellationToken);
-
-        if (_withTerminator && _fault != CompressionFault.DropTerminator)
-            await WriteAsciiAsync(stream, "\r\n.\r\n", cancellationToken);
-
-        await stream.FlushAsync(cancellationToken);
+        body.Append(".\r\n");
+        return body.ToString();
     }
 
-    private static byte[] Gzip(byte[] data)
-    {
-        using var output = new MemoryStream();
-        using (var gzip = new GZipStream(output, CompressionLevel.Optimal, leaveOpen: true))
-        {
-            gzip.Write(data);
-        }
+    private static string BuildArticle() =>
+        "220 1 <1@example.com>\r\n"
+        + "Subject: Article subject\r\n"
+        + "From: poster@example.com\r\n"
+        + "\r\n"
+        + "Body line one\r\n"
+        + "Body line two\r\n"
+        + ".\r\n";
 
-        return output.ToArray();
-    }
-
-    private static void Corrupt(byte[] gzip)
-    {
-        // Leave the gzip header intact so the inflate stage takes the gzip path, then flip the body
-        // bytes so decompression fails on invalid codes.
-        for (var i = 13; i < gzip.Length - 8; i++)
-        {
-            gzip[i] ^= 0xff;
-        }
-    }
-
-    private static async Task WriteAsciiAsync(
-        NetworkStream stream,
+    /// <summary>
+    /// Writes an ASCII payload to the current write stream and flushes it. The flush matters once the
+    /// write stream is a compressing <see cref="DeflateStream"/>: it emits a sync flush so the client
+    /// can decompress the response without waiting for more input.
+    /// </summary>
+    private static async Task SendAsync(
+        Stream stream,
         string text,
         CancellationToken cancellationToken
     )
     {
-        await stream.WriteAsync(Encoding.ASCII.GetBytes(text), cancellationToken);
+        var bytes = Encoding.ASCII.GetBytes(text);
+        await stream.WriteAsync(bytes, cancellationToken);
         await stream.FlushAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Reads a single CRLF-terminated line, one byte at a time, off the current read stream. Reading
+    /// byte by byte keeps the clear-text phase from buffering past the COMPRESS line, and over the
+    /// decompressing stream it stops exactly at the command boundary the client flushed to.
+    /// </summary>
+    private static async Task<string?> ReadLineAsync(
+        Stream stream,
+        CancellationToken cancellationToken
+    )
+    {
+        var builder = new StringBuilder();
+        var one = new byte[1];
+        while (true)
+        {
+            var read = await stream.ReadAsync(one.AsMemory(0, 1), cancellationToken);
+            if (read == 0)
+                return builder.Length == 0 ? null : builder.ToString();
+
+            var c = (char)one[0];
+            if (c == '\n')
+            {
+                if (builder.Length > 0 && builder[^1] == '\r')
+                    builder.Length--;
+                return builder.ToString();
+            }
+
+            builder.Append(c);
+        }
     }
 
     private static (long Low, long High) ParseRange(string range)
