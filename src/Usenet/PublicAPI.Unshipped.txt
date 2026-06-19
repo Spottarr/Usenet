@@ -81,8 +81,7 @@ Usenet.Nntp.NntpClientPool.NntpClientPool(Usenet.Nntp.NntpPoolOptions! options, 
 Usenet.Nntp.NntpConnection.NntpConnection(Usenet.Nntp.NntpConnectionOptions? options = null, Microsoft.Extensions.Logging.ILoggerFactory? loggerFactory = null) -> void
 Usenet.Nntp.NntpCompression
 Usenet.Nntp.NntpCompression.None = 0 -> Usenet.Nntp.NntpCompression
-Usenet.Nntp.NntpCompression.GzipWithTerminator = 1 -> Usenet.Nntp.NntpCompression
-Usenet.Nntp.NntpCompression.Gzip = 2 -> Usenet.Nntp.NntpCompression
+Usenet.Nntp.NntpCompression.Deflate = 1 -> Usenet.Nntp.NntpCompression
 Usenet.Nntp.NntpConnectionOptions
 Usenet.Nntp.NntpConnectionOptions.NntpConnectionOptions() -> void
 Usenet.Nntp.NntpConnectionOptions.Host.get -> string!

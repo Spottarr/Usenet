@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.IO.Compression;
 using System.IO.Pipelines;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -20,10 +21,11 @@ namespace Usenet.Nntp;
 /// Based on Kristian Hellang's NntpLib.Net project https://github.com/khellang/NntpLib.Net.
 /// </summary>
 /// <remarks>This implementation of the <see cref="INntpConnection"/> interface supports SSL encryption and,
-/// when an <see cref="NntpCompression"/> mode is configured, the transparent <c>XFEATURE COMPRESS GZIP</c>
-/// transport: the compressed data block of each multi-line response is inflated ahead of line framing while
-/// the status line stays clear text. The transport is built on
-/// <see cref="System.IO.Pipelines"/>: lines are framed off the raw byte stream, dot-stuffing is undone and the
+/// when an <see cref="NntpCompression"/> mode is configured, the transparent <c>COMPRESS DEFLATE</c>
+/// transport (<a href="https://www.rfc-editor.org/rfc/rfc8054">RFC 8054</a>): once negotiated, the whole
+/// session is carried as a continuous DEFLATE stream in both directions and the line framer rides the
+/// decompressed bytes unchanged. The transport is built on
+/// <see cref="System.IO.Pipelines"/>: lines are framed off the byte stream, dot-stuffing is undone and the
 /// terminating dot is detected without transcoding the whole stream to <see cref="string"/>.</remarks>
 [PublicAPI]
 public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCompressionControl
@@ -31,11 +33,6 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     private const int StackAllocThreshold = 256;
     private const int InitialDataBlockBufferSize = 4096;
     private const string AuthInfoPass = "AUTHINFO PASS";
-
-    // The literal terminating dot line the server appends after the compressed payload in the
-    // TERMINATOR variant, so the transport can find the block boundary without trusting the gzip
-    // trailer. See ADR-0005.
-    private static ReadOnlySpan<byte> CompressedBlockTerminator => "\r\n.\r\n"u8;
 
     // NNTP cannot tell the server to stop sending mid-data-block, so reclaiming a connection from a
     // partially-consumed streamed response means either draining to the terminating dot (paying the
@@ -56,9 +53,11 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     private bool _streaming;
     private bool _compressionActive;
 
-    // While a compressed data block is in flight this holds an in-memory reader over the inflated
-    // bytes; the data-block framing reads from it instead of the wire. Null in plain mode.
-    private PipeReader? _dataReader;
+    // The bidirectional DEFLATE layer installed once COMPRESS DEFLATE is negotiated (RFC 8054). The
+    // command writer compresses into _compressStream and the line framer reads inflated bytes off
+    // _decompressStream; both are null in plain mode. See ADR-0005.
+    private DeflateStream? _compressStream;
+    private DeflateStream? _decompressStream;
 
     /// <summary>
     /// Creates a new instance of the <see cref="NntpConnection"/> class.
@@ -170,32 +169,74 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     /// <inheritdoc/>
     async Task INntpCompressionControl.EnableCompressionAsync(CancellationToken cancellationToken)
     {
-        var mode = _options.Compression;
-        if (mode == NntpCompression.None || _compressionActive)
+        if (_options.Compression == NntpCompression.None || _compressionActive)
         {
             return;
         }
 
-        var command =
-            mode == NntpCompression.GzipWithTerminator
-                ? "XFEATURE COMPRESS GZIP TERMINATOR"
-                : "XFEATURE COMPRESS GZIP";
-
-        // The status-line response stays clear text; only subsequent multi-line data blocks compress.
-        var response = await CommandAsync(command, new ResponseParser(), cancellationToken)
+        // The COMPRESS command and its status-line response are exchanged in clear text; compression
+        // takes effect for both directions immediately after the 206 CRLF (RFC 8054 §2.2).
+        var response = await CommandAsync(
+                "COMPRESS DEFLATE",
+                new ResponseParser(),
+                cancellationToken
+            )
             .ConfigureAwait(false);
 
-        // XFEATURE responses are not standardized to a single code across providers, so accept any
-        // 2xx. A rejection must throw rather than silently leave the framer expecting compressed
-        // bytes the server will never send.
-        if (response.Code is < 200 or >= 300)
+        // 206 = compression active; 502 = already active. Anything else must throw rather than
+        // silently leave the transport expecting a compressed stream the server will never send.
+        if (response.Code is not (206 or 502))
         {
             throw new NntpException(
-                $"Server rejected '{command}': {response.Code} {response.Message}"
+                $"Server rejected 'COMPRESS DEFLATE': {response.Code} {response.Message}"
             );
         }
 
+        InstallDeflateLayer();
         _compressionActive = true;
+    }
+
+    /// <summary>
+    /// Installs the bidirectional raw-DEFLATE layer over the live stream and rebuilds the pipe reader,
+    /// writer and counting output on top of it. Because RFC 8054 starts compression immediately after
+    /// the 206 CRLF, a server may pipeline the status line and the first compressed bytes into one TCP
+    /// segment; any such bytes the plaintext reader buffered past the status line are recovered and
+    /// replayed through the decompressor ahead of the socket so the segment decodes correctly.
+    /// </summary>
+    private void InstallDeflateLayer()
+    {
+        var leftover = DrainBufferedBytes(_reader!);
+        _reader!.Complete();
+        _writer!.Complete();
+
+        var decompressInput = leftover.Length > 0 ? new PrefixStream(leftover, _stream!) : _stream!;
+        _decompressStream = new DeflateStream(
+            decompressInput,
+            CompressionMode.Decompress,
+            leaveOpen: true
+        );
+        _compressStream = new DeflateStream(_stream!, CompressionMode.Compress, leaveOpen: true);
+
+        _reader = PipeReader.Create(_decompressStream);
+        _writer = PipeWriter.Create(_compressStream);
+        _output = new CountingBufferWriter(_writer, this);
+    }
+
+    /// <summary>
+    /// Returns the bytes already buffered in <paramref name="reader"/> without waiting on the socket,
+    /// leaving the reader fully consumed. Used to recover bytes over-read past the COMPRESS status line.
+    /// </summary>
+    private static byte[] DrainBufferedBytes(PipeReader reader)
+    {
+        if (!reader.TryRead(out var result))
+        {
+            return [];
+        }
+
+        var buffer = result.Buffer;
+        var bytes = buffer.ToArray();
+        reader.AdvanceTo(buffer.End);
+        return bytes;
     }
 
     /// <inheritdoc/>
@@ -235,23 +276,11 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
             return parser.Parse(response.Code, response.Message, []);
         }
 
-        if (_compressionActive)
-        {
-            await BeginCompressedDataBlockAsync(cancellationToken).ConfigureAwait(false);
-        }
+        var dataBlock = await ReadMultiLineDataBlockAsync(cancellationToken)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
 
-        try
-        {
-            var dataBlock = await ReadMultiLineDataBlockAsync(cancellationToken)
-                .ToListAsync(cancellationToken)
-                .ConfigureAwait(false);
-
-            return parser.Parse(response.Code, response.Message, dataBlock);
-        }
-        finally
-        {
-            EndCompressedDataBlock();
-        }
+        return parser.Parse(response.Code, response.Message, dataBlock);
     }
 
     /// <inheritdoc/>
@@ -273,14 +302,9 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
             return new NntpStreamResponse<T>(response.Code, response.Message, lineParser);
         }
 
-        // With compression on, the whole compressed payload is read off the wire and inflated up
-        // front, then streamed per line from memory; the wire is clean once this returns. In plain
-        // mode the data block stays on the wire until the caller enumerates or disposes the response.
-        if (_compressionActive)
-        {
-            await BeginCompressedDataBlockAsync(cancellationToken).ConfigureAwait(false);
-        }
-
+        // When compression is active the data block is transparently inflated by the transport's
+        // DEFLATE layer, so the response streams per line off the decompressing reader exactly as it
+        // does in plain mode; the data block stays buffered until the caller enumerates or disposes.
         _streaming = true;
         return new NntpStreamResponse<T>(response.Code, response.Message, this, lineParser);
     }
@@ -299,7 +323,6 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
         if (processed == null)
         {
             _streaming = false;
-            EndCompressedDataBlock();
         }
 
         return processed;
@@ -314,7 +337,6 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
             if (ProcessLine(line) == null)
             {
                 _streaming = false;
-                EndCompressedDataBlock();
                 return;
             }
 
@@ -342,120 +364,6 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     /// </summary>
     internal bool HasPendingStream => _streaming;
 
-    /// <summary>
-    /// The reader the data-block framing pulls from: the in-memory inflated reader while a compressed
-    /// data block is in flight, otherwise the live wire reader. The clear-text status line is always
-    /// read off the wire before a data block begins, so it never sees the inflated reader.
-    /// </summary>
-    private PipeReader DataBlockReader => _dataReader ?? _reader!;
-
-    /// <summary>
-    /// Reads the compressed payload of the current multi-line response off the wire, inflates it, and
-    /// arms <see cref="_dataReader"/> so the existing line framing rides the decompressed bytes. The
-    /// whole block is materialized: streaming per line off the wire is incompatible with an inflate
-    /// stage scoped to the block on a persistent connection (ADR-0005).
-    /// </summary>
-    private async Task BeginCompressedDataBlockAsync(CancellationToken cancellationToken)
-    {
-        var (buffer, length) = await ReadCompressedPayloadAsync(cancellationToken)
-            .ConfigureAwait(false);
-        try
-        {
-            var inflated = NntpCompressedBlock.Inflate(buffer, length);
-            _dataReader = PipeReader.Create(new ReadOnlySequence<byte>(inflated));
-        }
-        finally
-        {
-            ArrayPool<byte>.Shared.Return(buffer);
-        }
-    }
-
-    /// <summary>
-    /// Completes and clears the in-memory inflated reader once a compressed data block has been fully
-    /// consumed. A no-op in plain mode.
-    /// </summary>
-    private void EndCompressedDataBlock()
-    {
-        if (_dataReader == null)
-        {
-            return;
-        }
-
-        _dataReader.Complete();
-        _dataReader = null;
-    }
-
-    /// <summary>
-    /// Reads the compressed payload of a multi-line data block off the wire into a pooled buffer. The
-    /// <see cref="NntpCompression.GzipWithTerminator"/> variant reads up to the literal terminating dot
-    /// line the server appends after the payload; the <see cref="NntpCompression.Gzip"/> variant relies
-    /// on the gzip stream being self-delimiting and reads until the wire reports completion.
-    /// </summary>
-    private async Task<(byte[] Buffer, int Length)> ReadCompressedPayloadAsync(
-        CancellationToken cancellationToken
-    )
-    {
-        var withTerminator = _options.Compression == NntpCompression.GzipWithTerminator;
-        while (true)
-        {
-            var result = await _reader!.ReadAsync(cancellationToken).ConfigureAwait(false);
-            var segment = result.Buffer;
-
-            if (withTerminator && TryReadToTerminator(segment, out var payload, out var consumed))
-            {
-                var buffer = CopyToPooledBuffer(payload, out var length);
-                AddBytesRead(consumed);
-                _reader.AdvanceTo(segment.GetPosition(consumed));
-                return (buffer, length);
-            }
-
-            if (result.IsCompleted)
-            {
-                if (withTerminator)
-                {
-                    _reader.AdvanceTo(segment.Start, segment.End);
-                    throw new NntpException(
-                        "The compressed multi-line data block ended before its terminator."
-                    );
-                }
-
-                var buffer = CopyToPooledBuffer(segment, out var length);
-                AddBytesRead(segment.Length);
-                _reader.AdvanceTo(segment.End);
-                return (buffer, length);
-            }
-
-            // Need more bytes: nothing consumed, everything examined.
-            _reader.AdvanceTo(segment.Start, segment.End);
-        }
-    }
-
-    private static bool TryReadToTerminator(
-        in ReadOnlySequence<byte> segment,
-        out ReadOnlySequence<byte> payload,
-        out long consumed
-    )
-    {
-        var reader = new SequenceReader<byte>(segment);
-        if (reader.TryReadTo(out payload, CompressedBlockTerminator, advancePastDelimiter: true))
-        {
-            consumed = reader.Consumed;
-            return true;
-        }
-
-        payload = default;
-        consumed = 0;
-        return false;
-    }
-
-    private static byte[] CopyToPooledBuffer(in ReadOnlySequence<byte> sequence, out int length)
-    {
-        length = (int)sequence.Length;
-        var buffer = ArrayPool<byte>.Shared.Rent(Math.Max(length, 1));
-        sequence.CopyTo(buffer);
-        return buffer;
-    }
-
     /// <inheritdoc/>
     public async Task<TResponse> BufferedMultiLineCommandAsync<TResponse>(
         string command,
@@ -474,30 +382,18 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
             return parser.ParseError(response.Code, response.Message);
         }
 
-        if (_compressionActive)
-        {
-            await BeginCompressedDataBlockAsync(cancellationToken).ConfigureAwait(false);
-        }
+        var (buffer, length) = await ReadDataBlockToBufferAsync(cancellationToken)
+            .ConfigureAwait(false);
 
         try
         {
-            var (buffer, length) = await ReadDataBlockToBufferAsync(cancellationToken)
-                .ConfigureAwait(false);
-
-            try
-            {
-                // The parser takes ownership of the pooled buffer on the success path.
-                return parser.Parse(response.Code, response.Message, buffer, length);
-            }
-            catch
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-                throw;
-            }
+            // The parser takes ownership of the pooled buffer on the success path.
+            return parser.Parse(response.Code, response.Message, buffer, length);
         }
-        finally
+        catch
         {
-            EndCompressedDataBlock();
+            ArrayPool<byte>.Shared.Return(buffer);
+            throw;
         }
     }
 
@@ -596,7 +492,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
         CancellationToken cancellationToken
     )
     {
-        var reader = DataBlockReader;
+        var reader = _reader!;
         var buffer = ArrayPool<byte>.Shared.Rent(InitialDataBlockBufferSize);
         var length = 0;
         try
@@ -607,7 +503,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
                 var segment = result.Buffer;
 
                 var consumed = AppendLines(segment, ref buffer, ref length, out var completed);
-                AddDataBlockBytesRead(consumed);
+                AddBytesRead(consumed);
                 var consumedPosition = segment.GetPosition(consumed);
 
                 if (completed || result.IsCompleted)
@@ -734,7 +630,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     /// </summary>
     private async ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
     {
-        var reader = DataBlockReader;
+        var reader = _reader!;
         while (true)
         {
             var result = await reader.ReadAsync(cancellationToken).ConfigureAwait(false);
@@ -742,7 +638,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
 
             if (TryReadLine(ref buffer, out var line, out var consumed))
             {
-                AddDataBlockBytesRead(consumed);
+                AddBytesRead(consumed);
                 reader.AdvanceTo(buffer.Start);
                 return line;
             }
@@ -756,7 +652,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
                 }
 
                 // The stream ended on a final line without a trailing CRLF.
-                AddDataBlockBytesRead(buffer.Length);
+                AddBytesRead(buffer.Length);
                 var remaining = DecodeLine(buffer);
                 reader.AdvanceTo(buffer.End);
                 return remaining;
@@ -870,6 +766,11 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
         return line[1] == '.' ? line[1..] : line;
     }
 
+    /// <summary>
+    /// Counts bytes framed off the reader. When compression is active the reader sits above the
+    /// DEFLATE layer, so this counts decompressed (logical) bytes; the compressed wire size is not
+    /// tracked separately (ADR-0005).
+    /// </summary>
     private void AddBytesRead(long count)
     {
         unchecked
@@ -879,19 +780,6 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
             {
                 ResetCounters();
             }
-        }
-    }
-
-    /// <summary>
-    /// Counts bytes framed out of a data block. Only wire bytes are counted: while a compressed block
-    /// is in flight the framing rides the in-memory inflated reader, and its wire cost was already
-    /// counted when the compressed payload was read off the socket.
-    /// </summary>
-    private void AddDataBlockBytesRead(long count)
-    {
-        if (_dataReader == null)
-        {
-            AddBytesRead(count);
         }
     }
 
@@ -910,9 +798,12 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     /// <inheritdoc/>
     public void Dispose()
     {
-        _dataReader?.Complete();
+        // Completing the reader/writer disposes the DEFLATE streams when they are installed; both are
+        // created with leaveOpen so the underlying stream survives until it is disposed below.
         _reader?.Complete();
         CompleteWriter();
+        _decompressStream?.Dispose();
+        _compressStream?.Dispose();
         _stream?.Dispose();
         _client.Dispose();
     }
@@ -952,5 +843,75 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
         {
             // The remote end dropped the connection; the buffered bytes are abandoned with the stream.
         }
+    }
+
+    /// <summary>
+    /// A read-only stream that yields a fixed prefix of bytes before delegating to an inner stream.
+    /// Used to replay bytes over-read past the COMPRESS status line back into the decompressor ahead
+    /// of the socket, so a server that coalesces the 206 response and the first compressed bytes into
+    /// one segment decodes correctly. See ADR-0005.
+    /// </summary>
+    private sealed class PrefixStream(byte[] prefix, Stream inner) : Stream
+    {
+        private int _offset;
+
+        public override bool CanRead => true;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override long Length => throw new NotSupportedException();
+        public override long Position
+        {
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
+        }
+
+        public override int Read(byte[] buffer, int offset, int count) =>
+            Read(buffer.AsSpan(offset, count));
+
+        public override int Read(Span<byte> buffer)
+        {
+            if (_offset >= prefix.Length)
+            {
+                return inner.Read(buffer);
+            }
+
+            var n = Math.Min(buffer.Length, prefix.Length - _offset);
+            prefix.AsSpan(_offset, n).CopyTo(buffer);
+            _offset += n;
+            return n;
+        }
+
+        public override Task<int> ReadAsync(
+            byte[] buffer,
+            int offset,
+            int count,
+            CancellationToken cancellationToken
+        ) => ReadAsync(buffer.AsMemory(offset, count), cancellationToken).AsTask();
+
+        public override ValueTask<int> ReadAsync(
+            Memory<byte> buffer,
+            CancellationToken cancellationToken = default
+        )
+        {
+            if (_offset >= prefix.Length)
+            {
+                return inner.ReadAsync(buffer, cancellationToken);
+            }
+
+            var n = Math.Min(buffer.Length, prefix.Length - _offset);
+            prefix.AsSpan(_offset, n).CopyTo(buffer.Span);
+            _offset += n;
+            return ValueTask.FromResult(n);
+        }
+
+        public override void Flush() { }
+
+        public override long Seek(long offset, SeekOrigin origin) =>
+            throw new NotSupportedException();
+
+        public override void SetLength(long value) => throw new NotSupportedException();
+
+        public override void Write(byte[] buffer, int offset, int count) =>
+            throw new NotSupportedException();
     }
 }

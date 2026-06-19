@@ -9,8 +9,7 @@ namespace Usenet.Nntp;
 /// <remarks>
 /// Consolidating connection identity into an options object lets
 /// <see cref="Usenet.Nntp.Contracts.INntpConnection.ConnectAsync{TResponse}"/> read the host, port and
-/// SSL setting from configuration instead of taking them as method arguments. See
-/// <a href="https://github.com/Spottarr/Usenet/blob/main/docs/adr/0005-compressed-overview-transport-and-connection-options.md">ADR-0005</a>.
+/// SSL setting from configuration instead of taking them as method arguments.
 /// </remarks>
 [PublicAPI]
 public sealed class NntpConnectionOptions
@@ -31,10 +30,11 @@ public sealed class NntpConnectionOptions
     public TimeSpan ConnectTimeout { get; init; } = TimeSpan.FromSeconds(30);
 
     /// <summary>
-    /// The compression mode to negotiate for multi-line data blocks. When set to a gzip variant, the
-    /// connection negotiates <c>XFEATURE COMPRESS GZIP</c> after authentication and transparently
-    /// inflates the compressed data block of subsequent multi-line responses. Defaults to
-    /// <see cref="NntpCompression.None"/>.
+    /// The compression mode to negotiate for the connection. When set to
+    /// <see cref="NntpCompression.Deflate"/>, the connection negotiates
+    /// <a href="https://www.rfc-editor.org/rfc/rfc8054">RFC 8054</a> <c>COMPRESS DEFLATE</c> after
+    /// authentication, after which the whole session is transparently compressed in both directions.
+    /// Defaults to <see cref="NntpCompression.None"/>.
     /// </summary>
     public NntpCompression Compression { get; init; } = NntpCompression.None;
 }
