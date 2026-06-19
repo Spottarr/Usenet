@@ -82,8 +82,8 @@ public class NntpClient : INntpClient
             .ConfigureAwait(false);
 
         // Compression is the third step of the session-setup recipe (connect -> authenticate ->
-        // enable compression): some servers reject XFEATURE pre-auth, so it is negotiated only after
-        // a successful authentication. See ADR-0005.
+        // enable compression): RFC 8054 §2.2 forbids authenticating once COMPRESS is active, so it is
+        // negotiated only after a successful authentication. See ADR-0005.
         if (authenticated)
         {
             await EnableConfiguredCompressionAsync(cancellationToken).ConfigureAwait(false);

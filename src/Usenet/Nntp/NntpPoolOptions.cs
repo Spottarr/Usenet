@@ -8,8 +8,7 @@ namespace Usenet.Nntp;
 /// </summary>
 /// <remarks>
 /// The pool re-applies the connection options and credentials on every transparent reconnect, so they
-/// are configuration rather than per-lease arguments. See
-/// <a href="https://github.com/Spottarr/Usenet/blob/main/docs/adr/0005-compressed-overview-transport-and-connection-options.md">ADR-0005</a>.
+/// are configuration rather than per-lease arguments.
 /// </remarks>
 [PublicAPI]
 public sealed class NntpPoolOptions
