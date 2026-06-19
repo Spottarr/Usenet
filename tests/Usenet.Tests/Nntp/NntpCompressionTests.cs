@@ -28,13 +28,11 @@ internal sealed class NntpCompressionTests
     }
 
     [Test]
-    public async Task ShouldStreamXoverOverTerminatedCompressedBlock(
-        CancellationToken cancellationToken
-    )
+    public async Task ShouldStreamXoverOverCompressedConnection(CancellationToken cancellationToken)
     {
-        await using var server = new CompressingNntpServer(withTerminator: true);
+        await using var server = new CompressingNntpServer();
         using var connection = new NntpConnection(
-            LoopbackOptions(server.Port, NntpCompression.GzipWithTerminator)
+            LoopbackOptions(server.Port, NntpCompression.Deflate)
         );
         var client = await ConnectAndAuthenticateAsync(connection, cancellationToken);
 
@@ -59,36 +57,76 @@ internal sealed class NntpCompressionTests
     }
 
     [Test]
-    public async Task ShouldStreamXoverOverNonTerminatedCompressedBlock(
+    public async Task ShouldRetrieveArticleOverCompressedConnection(
         CancellationToken cancellationToken
     )
     {
-        await using var server = new CompressingNntpServer(withTerminator: false);
+        // Unlike the legacy XFEATURE mode, RFC 8054 compresses every response uniformly, so article
+        // retrieval rides the same compressed connection as the overview scan.
+        await using var server = new CompressingNntpServer();
         using var connection = new NntpConnection(
-            LoopbackOptions(server.Port, NntpCompression.Gzip)
+            LoopbackOptions(server.Port, NntpCompression.Deflate)
         );
         var client = await ConnectAndAuthenticateAsync(connection, cancellationToken);
 
-        await using var response = await client.XoverAsync(
-            NntpArticleRange.Range(1, 3),
-            cancellationToken
-        );
+        using var response = await client.ArticleAsync("1@example.com", cancellationToken);
 
-        var rows = new List<NntpArticleOverview>();
-        await foreach (var row in response.WithCancellation(cancellationToken))
+        await Assert.That(response.Success).IsTrue();
+        await Assert.That(response.Headers.Contains("Subject")).IsTrue();
+        var body = response.ReadBodyLines().ToList();
+        await Assert.That(body).Contains("Body line one");
+        await Assert.That(body).Contains("Body line two");
+    }
+
+    [Test]
+    public async Task ShouldServeManyCommandsOverOnePersistentCompressedConnection(
+        CancellationToken cancellationToken
+    )
+    {
+        // The headline regression: a self-delimiting compressed response on a persistent connection
+        // must return without waiting on a socket close, so successive commands keep working.
+        await using var server = new CompressingNntpServer();
+        using var connection = new NntpConnection(
+            LoopbackOptions(server.Port, NntpCompression.Deflate)
+        );
+        var client = await ConnectAndAuthenticateAsync(connection, cancellationToken);
+
+        await Assert
+            .That(await CountRowsAsync(client, NntpArticleRange.Range(1, 3), cancellationToken))
+            .IsEqualTo(3);
+
+        using (var article = await client.ArticleAsync("1@example.com", cancellationToken))
         {
-            rows.Add(row);
+            await Assert.That(article.Success).IsTrue();
         }
 
+        await Assert
+            .That(await CountRowsAsync(client, NntpArticleRange.Range(1, 7), cancellationToken))
+            .IsEqualTo(7);
+
         await Assert.That(server.Negotiations).IsEqualTo(1);
-        await Assert.That(rows.Count).IsEqualTo(3);
-        await Assert.That(rows[2].MessageId.Value).IsEqualTo("3@example.com");
+    }
+
+    private static async Task<int> CountRowsAsync(
+        NntpClient client,
+        NntpArticleRange range,
+        CancellationToken cancellationToken
+    )
+    {
+        await using var response = await client.XoverAsync(range, cancellationToken);
+        var count = 0;
+        await foreach (var _ in response.WithCancellation(cancellationToken))
+        {
+            count++;
+        }
+
+        return count;
     }
 
     [Test]
     public async Task ShouldNotNegotiateWhenCompressionDisabled(CancellationToken cancellationToken)
     {
-        await using var server = new CompressingNntpServer(withTerminator: true);
+        await using var server = new CompressingNntpServer();
         using var connection = new NntpConnection(
             LoopbackOptions(server.Port, NntpCompression.None)
         );
@@ -110,43 +148,20 @@ internal sealed class NntpCompressionTests
     }
 
     [Test]
-    public async Task ShouldSurfaceTransportErrorOnCorruptCompressedBlock(
-        CancellationToken cancellationToken
-    )
+    public async Task ShouldThrowWhenServerRefusesCompression(CancellationToken cancellationToken)
     {
-        await using var server = new CompressingNntpServer(
-            withTerminator: true,
-            fault: CompressionFault.CorruptPayload
-        );
+        await using var server = new CompressingNntpServer(refuseCompression: true);
         using var connection = new NntpConnection(
-            LoopbackOptions(server.Port, NntpCompression.GzipWithTerminator)
+            LoopbackOptions(server.Port, NntpCompression.Deflate)
         );
-        var client = await ConnectAndAuthenticateAsync(connection, cancellationToken);
+        var client = new NntpClient(connection);
+        await client.ConnectAsync(cancellationToken);
 
+        // Negotiation is fail-fast: a refusal surfaces on the authentication step that runs the
+        // session-setup recipe rather than silently leaving the connection in plain text.
         await Assert
             .That(async () =>
-                await client.XoverAsync(NntpArticleRange.Range(1, 3), cancellationToken)
-            )
-            .ThrowsExactly<NntpException>();
-    }
-
-    [Test]
-    public async Task ShouldSurfaceTransportErrorWhenTerminatorMissing(
-        CancellationToken cancellationToken
-    )
-    {
-        await using var server = new CompressingNntpServer(
-            withTerminator: true,
-            fault: CompressionFault.DropTerminator
-        );
-        using var connection = new NntpConnection(
-            LoopbackOptions(server.Port, NntpCompression.GzipWithTerminator)
-        );
-        var client = await ConnectAndAuthenticateAsync(connection, cancellationToken);
-
-        await Assert
-            .That(async () =>
-                await client.XoverAsync(NntpArticleRange.Range(1, 3), cancellationToken)
+                await client.AuthenticateAsync("example.user", "example.pass", cancellationToken)
             )
             .ThrowsExactly<NntpException>();
     }
@@ -154,14 +169,14 @@ internal sealed class NntpCompressionTests
     [Test]
     public async Task PoolReAppliesCompressionOnReconnect(CancellationToken cancellationToken)
     {
-        await using var server = new CompressingNntpServer(withTerminator: true);
+        await using var server = new CompressingNntpServer();
         using var pool = new NntpClientPool(
             new NntpPoolOptions
             {
                 MaxPoolSize = 1,
                 Username = "example.user",
                 Password = "example.pass",
-                Connection = LoopbackOptions(server.Port, NntpCompression.GzipWithTerminator),
+                Connection = LoopbackOptions(server.Port, NntpCompression.Deflate),
             }
         )
         {
@@ -177,7 +192,7 @@ internal sealed class NntpCompressionTests
         lease1.Dispose();
 
         // The replacement connection must re-run the full recipe (including compression), so it never
-        // ends up in plain mode while the framer expects compressed bytes.
+        // ends up uncompressed while the transport expects a compressed stream.
         var lease2 = await pool.GetLease(cancellationToken);
         await Assert.That(ReferenceEquals(lease2.Client, client1)).IsFalse();
 
