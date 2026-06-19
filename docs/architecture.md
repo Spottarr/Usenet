@@ -80,31 +80,33 @@ sequenceDiagram
   Note over C,Cl: enumerate fully or dispose to drain before next command
 ```
 
-## Compressed transport (XFEATURE COMPRESS GZIP)
+## Compressed transport (COMPRESS DEFLATE, RFC 8054)
 
 - Compression is a **transparent connection mode**, not a command. It is configured as an
   `NntpCompression` value on `NntpConnectionOptions` and negotiated as the third step of the
-  session-setup recipe (connect → authenticate → enable compression), since some servers reject the
-  feature pre-auth. The pool re-applies the whole recipe on every transparent reconnect, so a
-  replaced connection is never left in plain mode while the framer expects compressed bytes.
-- With the mode on, the transport adds an **inflate stage ahead of line framing, scoped to the data
-  block**: the clear-text status line is read off the wire first, then the compressed payload is read
-  and inflated, and the existing framing (and so every streamed/buffered scan) rides the decompressed
-  bytes unchanged. Byte counting stays on wire bytes.
-- The `GzipWithTerminator` variant finds the block boundary by the literal terminating dot line the
-  server appends after the payload; the `Gzip` variant relies on the gzip stream being
-  self-delimiting. A truncated or corrupt block surfaces as an `NntpException` on the affected command
-  rather than as silently dropped rows. The wrapper (gzip member, zlib stream or bare DEFLATE) is
-  detected from the leading bytes.
+  session-setup recipe (connect → authenticate → `COMPRESS DEFLATE`), because RFC 8054 §2.2 forbids
+  authenticating once compression is active. The pool re-applies the whole recipe on every transparent
+  reconnect, so a replaced connection is never left uncompressed while the transport expects a
+  compressed stream.
+- Negotiation is **optimistic and fail-fast**: the connection issues `COMPRESS DEFLATE` directly (no
+  `CAPABILITIES` pre-check); `206`/`502`-already-active is success, anything else throws an
+  `NntpException` rather than silently serving plaintext.
+- Once the `206` CRLF is read the transport installs a **bidirectional raw-DEFLATE layer**: a
+  decompressing `DeflateStream` feeds the line framer and a compressing `DeflateStream` wraps the
+  command writer (flushed per command so the server can decode it incrementally). The layer is uniform
+  and invisible — every command, overview and article alike, rides it with no per-command branching.
+- Because RFC 8054 starts compression immediately after the `206` CRLF, a server may coalesce the
+  status line and the first compressed bytes into one segment. Bytes the plaintext reader over-read
+  past the status line are recovered and replayed through the decompressor ahead of the socket. Byte
+  counting moves to decompressed (logical) bytes, since the framer sits above the layer.
 
 ```mermaid
 flowchart LR
-  A[Socket bytes] --> B[PipeReader sequence]
-  B --> S[Read clear-text status line]
-  B --> P[Read compressed payload to boundary]
-  P --> I[Inflate: gzip / zlib / deflate]
-  I --> C[Frame CRLF, undo dot-stuffing, detect terminating dot]
+  A[Socket bytes] --> X[Decompress: raw DEFLATE]
+  X --> B[PipeReader sequence]
+  B --> C[Frame CRLF, undo dot-stuffing, detect terminating dot]
   C --> R[Streamed typed rows / pooled buffer]
+  W[Command bytes] --> Z[Compress: raw DEFLATE, flush per command] --> A
 ```
 
 ## Write path (encode and post)
