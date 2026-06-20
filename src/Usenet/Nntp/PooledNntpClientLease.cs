@@ -8,7 +8,7 @@ internal sealed class PooledNntpClientLease : IPooledNntpClientLease
     private readonly IInternalPooledNntpClient _client;
     private bool _disposed;
 
-    public IPooledNntpClient Client => _client;
+    public IPooledNntpClient Client => _client.Client;
 
     internal PooledNntpClientLease(NntpClientPool pool, IInternalPooledNntpClient client)
     {
