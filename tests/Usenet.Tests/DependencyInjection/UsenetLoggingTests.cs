@@ -77,7 +77,7 @@ internal sealed class UsenetLoggingTests
         await using var provider = services.BuildServiceProvider();
         _ = provider.GetRequiredService<INntpConnection>();
 
-        await Assert.That(factory.Categories).Contains("Usenet.Nntp.NntpConnection");
+        await Assert.That(factory.Categories).Contains("Usenet.Nntp.Client.NntpConnection");
     }
 
     [Test]
