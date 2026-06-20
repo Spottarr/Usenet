@@ -1,31 +1,36 @@
 using System.Collections.Concurrent;
 using System.Globalization;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Usenet.Nntp;
-using Usenet.Nntp.Parsers;
+using Usenet.Nntp.Models;
 using Usenet.Tests.TestHelpers;
 
 namespace Usenet.Tests.Nntp;
 
 /// <summary>
-/// Allocation-regression guard for the streamed <c>XOVER</c> read path (ADR-0003). It measures
-/// the <em>marginal</em> managed allocation of a single overview row by reading two ranges of
-/// different sizes over a loopback connection and dividing the allocation delta by the row
-/// delta, so the fixed per-command overhead (command write, status line, socket and pipe setup)
-/// cancels out. The loopback server replies from a pre-built byte buffer, so it does not
-/// allocate per row and only the client framing/parsing is measured.
+/// Allocation-regression guard for the streamed <c>XZVER</c> read path (ADR-0006), the compressed
+/// sibling of <see cref="XoverAllocationTests"/>. It measures the <em>marginal</em> managed
+/// allocation of a single inflated overview row by reading two ranges and dividing the allocation
+/// delta by the row delta, so the fixed per-command overhead — including the constant decompression
+/// window and input buffer — cancels out, pinning the steady per-row cost of the streamed
+/// decompress/frame/parse path so an accidental O(rows) copy, boxing, or per-row buffer regression
+/// trips CI. The loopback server replies from a pre-built, cached compressed buffer, so it allocates
+/// nothing per row and only the client decompress/framing/parsing is measured.
 /// </summary>
-internal sealed class XoverAllocationTests
+internal sealed class XzverAllocationTests
 {
     private const int SmallRange = 200;
     private const int LargeRange = 2_200;
 
-    // A framed overview row is ~130 bytes of text, so the dominant per-row managed allocation is
-    // the decoded string plus its slot in the materialized list. The ceiling leaves headroom for
-    // runtime variation but trips if the per-row cost grows (e.g. extra copies or boxing).
-    private const long MaxBytesPerRow = 896;
+    // The marginal cost is the per-row managed churn of the streamed, typed read: the parsed
+    // NntpArticleOverview (several strings, message-id and references) plus the async-enumerator and
+    // decompress-pipe work. The decompressor's window and input buffer are fixed per-command costs
+    // that cancel in the marginal measurement. Measured ~3 KB/row; the ceiling leaves runtime headroom
+    // and trips on a gross regression.
+    private const long MaxBytesPerRow = 4608;
 
     private static NntpConnectionOptions LoopbackOptions(int port) =>
         new() { Host = IPAddress.Loopback.ToString(), Port = port };
@@ -34,29 +39,26 @@ internal sealed class XoverAllocationTests
     // must run exclusively: a concurrent test allocating on another thread would inflate the reading.
     [Test]
     [NotInParallel]
-    internal async Task StreamedOverviewRowShouldStayUnderAllocationCeiling(
+    internal async Task StreamedXzverRowShouldStayUnderAllocationCeiling(
         CancellationToken cancellationToken
     )
     {
-        await using var server = new OverviewNntpServer();
+        await using var server = new CachedXzServer();
         using var connection = new NntpConnection(LoopbackOptions(server.Port));
+        var client = new NntpClient(connection);
+        await client.ConnectAsync(cancellationToken);
 
-        await connection.ConnectAsync(new ResponseParser(200), cancellationToken);
+        await ReadXzverAsync(client, SmallRange, cancellationToken);
+        await ReadXzverAsync(client, LargeRange, cancellationToken);
 
-        // Warm up both ranges so cached server buffers and JIT costs stay out of the window.
-        await ReadOverviewAsync(connection, SmallRange, cancellationToken);
-        await ReadOverviewAsync(connection, LargeRange, cancellationToken);
-
-        // Take the lowest marginal cost over a few repetitions to filter transient background
-        // noise from the runtime and the loopback server thread.
         var perRow = long.MaxValue;
         for (var repeat = 0; repeat < 5; repeat++)
         {
             var smallBytes = await AllocationMeasurement.TotalAsync(() =>
-                ReadOverviewAsync(connection, SmallRange, cancellationToken)
+                ReadXzverAsync(client, SmallRange, cancellationToken)
             );
             var largeBytes = await AllocationMeasurement.TotalAsync(() =>
-                ReadOverviewAsync(connection, LargeRange, cancellationToken)
+                ReadXzverAsync(client, LargeRange, cancellationToken)
             );
 
             var marginal = (largeBytes - smallBytes) / (LargeRange - SmallRange);
@@ -66,31 +68,35 @@ internal sealed class XoverAllocationTests
         await Assert.That(perRow).IsLessThanOrEqualTo(MaxBytesPerRow);
     }
 
-    private static async Task ReadOverviewAsync(
-        NntpConnection connection,
+    private static async Task ReadXzverAsync(
+        NntpClient client,
         int count,
         CancellationToken cancellationToken
     )
     {
-        var response = await connection.MultiLineCommandAsync(
-            string.Create(CultureInfo.InvariantCulture, $"XOVER 1-{count}"),
-            new TextResponseParser(224),
+        await using var response = await client.XzverAsync(
+            NntpArticleRange.Range(1, count),
             cancellationToken
         );
 
-        if (response.Lines.Count != count)
+        var rows = 0;
+        await foreach (var _ in response.WithCancellation(cancellationToken))
         {
-            throw new InvalidOperationException(
-                $"Expected {count} overview rows, got {response.Lines.Count}."
-            );
+            rows++;
+        }
+
+        if (rows != count)
+        {
+            throw new InvalidOperationException($"Expected {count} overview rows, got {rows}.");
         }
     }
 
     /// <summary>
-    /// A minimal loopback NNTP server that replies to <c>XOVER from-to</c> with a pre-built,
-    /// cached byte buffer so it allocates nothing per row while the client read is measured.
+    /// A loopback server that answers <c>XZVER from-to</c> with a clear-text status line and a
+    /// pre-built, cached zlib member (dot terminator inside) so it allocates nothing per row while
+    /// the client read is measured.
     /// </summary>
-    private sealed class OverviewNntpServer : IAsyncDisposable
+    private sealed class CachedXzServer : IAsyncDisposable
     {
         private readonly TcpListener _listener;
         private readonly CancellationTokenSource _cts = new();
@@ -98,7 +104,7 @@ internal sealed class XoverAllocationTests
 
         public int Port => ((IPEndPoint)_listener.LocalEndpoint).Port;
 
-        public OverviewNntpServer()
+        public CachedXzServer()
         {
             _listener = new TcpListener(IPAddress.Loopback, 0);
             _listener.Start();
@@ -138,7 +144,7 @@ internal sealed class XoverAllocationTests
                 );
 
                 await stream.WriteAsync(
-                    Encoding.ASCII.GetBytes("200 Overview server ready\r\n"),
+                    Encoding.ASCII.GetBytes("200 XZ server ready\r\n"),
                     cancellationToken
                 );
 
@@ -148,19 +154,11 @@ internal sealed class XoverAllocationTests
                     if (line == null)
                         break;
 
-                    if (line.StartsWith("XOVER", StringComparison.OrdinalIgnoreCase))
+                    if (line.StartsWith("XZVER", StringComparison.OrdinalIgnoreCase))
                     {
                         var count = ParseRangeCount(line);
-                        var payload = _cache.GetOrAdd(count, BuildOverview);
+                        var payload = _cache.GetOrAdd(count, BuildCompressedResponse);
                         await stream.WriteAsync(payload, cancellationToken);
-                    }
-                    else if (line.StartsWith("QUIT", StringComparison.OrdinalIgnoreCase))
-                    {
-                        await stream.WriteAsync(
-                            Encoding.ASCII.GetBytes("205 Goodbye\r\n"),
-                            cancellationToken
-                        );
-                        return;
                     }
                     else
                     {
@@ -192,18 +190,28 @@ internal sealed class XoverAllocationTests
             return dash < 0 ? 1 : int.Parse(command.AsSpan(dash + 1), CultureInfo.InvariantCulture);
         }
 
-        private static byte[] BuildOverview(int count)
+        private static byte[] BuildCompressedResponse(int count)
         {
-            var builder = new StringBuilder("224 Overview information follows\r\n");
+            var block = new StringBuilder();
             for (var number = 1; number <= count; number++)
             {
-                builder.Append(
+                block.Append(
                     CultureInfo.InvariantCulture,
                     $"{number}\t[01/42] \"benchmark.bin\" yEnc (1/128)\tposter@example.com\tSat, 14 Jun 2026 12:00:00 +0000\t<{number}@benchmark>\t<parent@benchmark>\t8192\t128\r\n"
                 );
             }
-            builder.Append(".\r\n");
-            return Encoding.ASCII.GetBytes(builder.ToString());
+            block.Append(".\r\n");
+
+            using var output = new MemoryStream();
+            output.Write(
+                Encoding.ASCII.GetBytes("224 Overview information follows [COMPRESS=GZIP]\r\n")
+            );
+            using (var zlib = new ZLibStream(output, CompressionLevel.Optimal, leaveOpen: true))
+            {
+                zlib.Write(Encoding.ASCII.GetBytes(block.ToString()));
+            }
+
+            return output.ToArray();
         }
 
         public async ValueTask DisposeAsync()

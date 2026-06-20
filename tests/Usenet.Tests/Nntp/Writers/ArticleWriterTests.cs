@@ -174,6 +174,13 @@ internal sealed class MockConnection : INntpConnection
         CancellationToken cancellationToken
     ) => throw new NotImplementedException();
 
+    public Task<NntpStreamResponse<T>> MultiLineDecompressedStreamCommandAsync<T>(
+        string command,
+        int successCode,
+        NntpStreamLineParser<T> lineParser,
+        CancellationToken cancellationToken = default
+    ) => throw new NotImplementedException();
+
     public Task<TResponse> BufferedMultiLineCommandAsync<TResponse>(
         string command,
         IBufferedMultiLineResponseParser<TResponse> parser,
