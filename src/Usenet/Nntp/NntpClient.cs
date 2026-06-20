@@ -20,7 +20,9 @@ namespace Usenet.Nntp;
 /// Based on Kristian Hellang's NntpLib.Net project https://github.com/khellang/NntpLib.Net.
 /// </summary>
 [PublicAPI]
-public class NntpClient : INntpClient
+// IPooledNntpClient is a subset of INntpClient, so the pool can hand the lease an NntpClient
+// directly as its command surface without a hand-written per-command decorator.
+public class NntpClient : INntpClient, IPooledNntpClient
 {
     protected INntpConnection Connection { get; }
 

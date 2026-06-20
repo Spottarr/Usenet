@@ -53,6 +53,12 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     private bool _streaming;
     private bool _compressionActive;
 
+    // Set when an operation faults the transport (broken pipe, lost response, unsynced stream). The
+    // pool reads this via HasError to drop a connection rather than hand back a broken one. Owning
+    // the flag here removes the need for the pooled client to intercept every command. See ADR-0003.
+    private bool _faulted;
+    private bool _disposed;
+
     // The bidirectional DEFLATE layer installed once COMPRESS DEFLATE is negotiated (RFC 8054). The
     // command writer compresses into _compressStream and the line framer reads inflated bytes off
     // _decompressStream; both are null in plain mode. See ADR-0005.
@@ -461,6 +467,12 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     /// </summary>
     internal bool HasPendingStream => _streaming;
 
+    /// <summary>
+    /// Indicates that the transport has faulted (a read or write failed, or a response was lost),
+    /// so the connection is in an unknown state and must not be reused.
+    /// </summary>
+    internal bool HasError => _faulted;
+
     /// <inheritdoc/>
     public async Task<TResponse> BufferedMultiLineCommandAsync<TResponse>(
         string command,
@@ -508,11 +520,14 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
 
         if (responseText == null)
         {
+            // A lost response leaves the connection unsynchronized; fault it so it is not reused.
+            _faulted = true;
             throw new NntpException("Received no response.");
         }
 
         if (responseText.Length < 3 || !int.TryParse(responseText.AsSpan(0, 3), out var code))
         {
+            _faulted = true;
             throw new NntpException("Received invalid response.");
         }
 
@@ -530,13 +545,22 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     public async Task FlushAsync(CancellationToken cancellationToken = default)
     {
         ThrowIfNotConnected();
-        await _writer!.FlushAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await _writer!.FlushAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch
+        {
+            _faulted = true;
+            throw;
+        }
     }
 
     internal bool Connected => _client.Connected;
 
     private void ThrowIfNotConnected()
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
         if (!_client.Connected || _reader == null || _writer == null)
             throw new NntpException("Client not connected.");
     }
@@ -615,6 +639,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
         catch
         {
             ArrayPool<byte>.Shared.Return(buffer);
+            _faulted = true;
             throw;
         }
     }
@@ -728,34 +753,42 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     private async ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
     {
         var reader = _reader!;
-        while (true)
+        try
         {
-            var result = await reader.ReadAsync(cancellationToken).ConfigureAwait(false);
-            var buffer = result.Buffer;
-
-            if (TryReadLine(ref buffer, out var line, out var consumed))
+            while (true)
             {
-                AddBytesRead(consumed);
-                reader.AdvanceTo(buffer.Start);
-                return line;
-            }
+                var result = await reader.ReadAsync(cancellationToken).ConfigureAwait(false);
+                var buffer = result.Buffer;
 
-            if (result.IsCompleted)
-            {
-                if (buffer.IsEmpty)
+                if (TryReadLine(ref buffer, out var line, out var consumed))
                 {
-                    reader.AdvanceTo(buffer.Start, buffer.End);
-                    return null;
+                    AddBytesRead(consumed);
+                    reader.AdvanceTo(buffer.Start);
+                    return line;
                 }
 
-                // The stream ended on a final line without a trailing CRLF.
-                AddBytesRead(buffer.Length);
-                var remaining = DecodeLine(buffer);
-                reader.AdvanceTo(buffer.End);
-                return remaining;
-            }
+                if (result.IsCompleted)
+                {
+                    if (buffer.IsEmpty)
+                    {
+                        reader.AdvanceTo(buffer.Start, buffer.End);
+                        return null;
+                    }
 
-            reader.AdvanceTo(buffer.Start, buffer.End);
+                    // The stream ended on a final line without a trailing CRLF.
+                    AddBytesRead(buffer.Length);
+                    var remaining = DecodeLine(buffer);
+                    reader.AdvanceTo(buffer.End);
+                    return remaining;
+                }
+
+                reader.AdvanceTo(buffer.Start, buffer.End);
+            }
+        }
+        catch
+        {
+            _faulted = true;
+            throw;
         }
     }
 
@@ -895,6 +928,10 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     /// <inheritdoc/>
     public void Dispose()
     {
+        if (_disposed)
+            return;
+        _disposed = true;
+
         // Completing the reader/writer disposes the DEFLATE streams when they are installed; both are
         // created with leaveOpen so the underlying stream survives until it is disposed below.
         _reader?.Complete();

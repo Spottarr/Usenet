@@ -125,6 +125,9 @@ public sealed class NntpClientPool : INntpClientPool
             }
             else
             {
+                // Stamp the activity time on return so the idle monitor measures the idle interval
+                // from when the connection became available again.
+                client.Touch();
                 _availableClients.Enqueue(client);
             }
         }
