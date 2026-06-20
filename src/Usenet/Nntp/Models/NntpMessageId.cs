@@ -1,6 +1,5 @@
 using JetBrains.Annotations;
 using Usenet.Extensions;
-using Usenet.Util;
 
 namespace Usenet.Nntp.Models;
 

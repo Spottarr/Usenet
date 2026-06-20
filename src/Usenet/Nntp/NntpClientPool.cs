@@ -106,11 +106,11 @@ public sealed class NntpClientPool : INntpClientPool
         ArgumentNullException.ThrowIfNull(client);
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        _logger.ReturningNntpClient();
-
         bool dispose;
         lock (_lock)
         {
+            _logger.ReturningNntpClient();
+
             if (!_usedClients.Remove(client))
                 throw new InvalidOperationException("Client not borrowed from this pool.");
 

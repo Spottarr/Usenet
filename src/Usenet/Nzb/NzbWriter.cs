@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Xml;
 using JetBrains.Annotations;
-using Usenet.Util;
 
 namespace Usenet.Nzb;
 

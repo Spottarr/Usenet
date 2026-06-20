@@ -1,5 +1,3 @@
-using Usenet.Util;
-
 namespace Usenet.Extensions;
 
 internal static class StreamExtensions
