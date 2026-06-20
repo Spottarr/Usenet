@@ -1,6 +1,5 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using Usenet.Util;
 
 namespace Usenet.Extensions;
 
@@ -76,6 +75,32 @@ internal static class DictionaryExtensions
             target[item.Key] = item.Value;
         }
         return target;
+    }
+
+    /// <summary>
+    /// Adds a value to the set of values associated with the given key, creating the backing
+    /// <see cref="HashSet{TValue}"/> on first use. Duplicate values for a key are collapsed by the set.
+    /// </summary>
+    /// <typeparam name="TKey">Type of the dictionary key.</typeparam>
+    /// <typeparam name="TValue">Type of the dictionary value.</typeparam>
+    /// <param name="dictionary">The multi-value dictionary to add to.</param>
+    /// <param name="key">The key to add the value under.</param>
+    /// <param name="value">The value to add.</param>
+    public static void AddValue<TKey, TValue>(
+        this IDictionary<TKey, ICollection<TValue>> dictionary,
+        TKey key,
+        TValue value
+    )
+    {
+        ArgumentNullException.ThrowIfNull(dictionary);
+
+        if (!dictionary.TryGetValue(key, out var values))
+        {
+            values = new HashSet<TValue>();
+            dictionary.Add(key, values);
+        }
+
+        values.Add(value);
     }
 
     /// <summary>
