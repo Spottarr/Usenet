@@ -50,6 +50,9 @@ The command-oriented API (the RFC command methods) built on top of a connection.
 **Pool**:
 A manager of authenticated, connected clients that can be reused across operations. _Avoid_: cache.
 
+**Pool entry**:
+The pool's internal record for one pooled connection (`NntpPoolEntry`): it owns the connect/authenticate lifecycle and the idle/error state the pool needs, and exposes the underlying **Client** to the lease holder. Distinct from the **Client** it wraps. _Avoid_: using "pooled client" for this wrapper — that name belongs to the public command surface (`IPooledNntpClient`).
+
 **Lease**:
 A client borrowed from the pool for the duration of an operation and returned to the pool when disposed. _Avoid_: rental, checkout.
 
