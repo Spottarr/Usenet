@@ -15,6 +15,8 @@ reasoning behind each decision:
   `PipeReader`/`PipeWriter`. Frames lines, undoes dot-stuffing, counts bytes.
 - **Client**: command API (the RFC methods) built on a connection.
 - **Pool**: manager of authenticated, connected clients reused across operations.
+- **Pool entry** (`NntpPoolEntry`): the pool's internal wrapper owning one connection's
+  connect/auth lifecycle and idle/error state; exposes its **Client** to the lease.
 - **Lease**: a client borrowed from the pool for one operation, returned on dispose.
 - **yEnc** and **NZB** are independent layers. The client hands over bytes and never
   decodes; consumers invoke yEnc/NZB explicitly.
