@@ -71,6 +71,25 @@ public interface INntpConnection : IDisposable
     );
 
     /// <summary>
+    /// Sends a command whose multi-line data block arrives as a single compressed member (the
+    /// <c>XZVER</c>/<c>XZHDR</c> family) and streams the inflated lines, parsing each as it arrives.
+    /// The decoder is selected by sniffing the data block's first byte and torn down at the dot
+    /// terminator so the next command reads plaintext again. See ADR-0006.
+    /// </summary>
+    /// <typeparam name="T">The type each data-block line is parsed into.</typeparam>
+    /// <param name="command">The command to send to the server.</param>
+    /// <param name="successCode">The response code that indicates a compressed data block follows.</param>
+    /// <param name="lineParser">The per-line parser to use.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A streamed response that must be fully enumerated or disposed before the next command.</returns>
+    Task<NntpStreamResponse<T>> MultiLineDecompressedStreamCommandAsync<T>(
+        string command,
+        int successCode,
+        NntpStreamLineParser<T> lineParser,
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>
     /// Sends a command to the usenet server asynchronously and materializes the multi-line data block
     /// into a single contiguous, pooled byte buffer instead of decoding it into <see cref="string"/> lines.
     /// </summary>

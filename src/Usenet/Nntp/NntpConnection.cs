@@ -59,6 +59,13 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     private DeflateStream? _compressStream;
     private DeflateStream? _decompressStream;
 
+    // The per-command decompression scope installed for an XZVER/XZHDR data block (ADR-0006). Unlike
+    // the session-wide DEFLATE layer above, this is scoped to one command's data block: the line
+    // framer reads inflated bytes off _scopeDecompressStream, and the scope is torn down at the
+    // in-band dot terminator so subsequent commands read plaintext again. Null when no scope is active.
+    private Stream? _scopeDecompressStream;
+    private bool _decompressionScopeActive;
+
     /// <summary>
     /// Creates a new instance of the <see cref="NntpConnection"/> class.
     /// </summary>
@@ -309,6 +316,96 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
         return new NntpStreamResponse<T>(response.Code, response.Message, this, lineParser);
     }
 
+    /// <inheritdoc/>
+    public async Task<NntpStreamResponse<T>> MultiLineDecompressedStreamCommandAsync<T>(
+        string command,
+        int successCode,
+        NntpStreamLineParser<T> lineParser,
+        CancellationToken cancellationToken = default
+    )
+    {
+        ThrowIfNotConnected();
+        ArgumentNullException.ThrowIfNull(lineParser);
+
+        var response = await CommandAsync(command, new ResponseParser(), cancellationToken)
+            .ConfigureAwait(false);
+
+        if (response.Code != successCode)
+        {
+            return new NntpStreamResponse<T>(response.Code, response.Message, lineParser);
+        }
+
+        // The data block is a single compressed member with the dot terminator inside it. Install a
+        // per-command decompression scope (codec chosen by sniffing the first byte), then stream the
+        // inflated lines through the existing framer exactly as the plaintext siblings do. See ADR-0006.
+        await InstallDecompressionScopeAsync(cancellationToken).ConfigureAwait(false);
+        _streaming = true;
+        return new NntpStreamResponse<T>(response.Code, response.Message, this, lineParser);
+    }
+
+    /// <summary>
+    /// Installs the per-command decompression scope over the live stream and rebuilds the line reader
+    /// on top of it. The data block's first byte selects the decoder — the <c>[COMPRESS=GZIP]</c> label
+    /// is unreliable, so <c>0x78</c> (a zlib header) maps to <see cref="ZLibStream"/>, <c>0x1f</c> (the
+    /// gzip magic) to <see cref="GZipStream"/>, and anything else to a raw <see cref="DeflateStream"/>.
+    /// Any bytes the plaintext reader buffered past the status line are recovered and replayed through
+    /// the decompressor ahead of the socket via <see cref="PrefixStream"/>. See ADR-0006.
+    /// </summary>
+    private async ValueTask InstallDecompressionScopeAsync(CancellationToken cancellationToken)
+    {
+        var leftover = DrainBufferedBytes(_reader!);
+        await _reader!.CompleteAsync().ConfigureAwait(false);
+
+        // The decoder is chosen from the first data-block byte, so make sure one is available to peek.
+        if (leftover.Length == 0)
+        {
+            var first = new byte[1];
+            var read = await _stream!.ReadAsync(first, cancellationToken).ConfigureAwait(false);
+            leftover = read == 0 ? [] : first;
+        }
+
+        var input = leftover.Length > 0 ? new PrefixStream(leftover, _stream!) : _stream!;
+        var magic = leftover.Length > 0 ? leftover[0] : (byte)0;
+        _scopeDecompressStream = magic switch
+        {
+            0x78 => new ZLibStream(input, CompressionMode.Decompress, leaveOpen: true),
+            0x1f => new GZipStream(input, CompressionMode.Decompress, leaveOpen: true),
+            _ => new DeflateStream(input, CompressionMode.Decompress, leaveOpen: true),
+        };
+        _reader = PipeReader.Create(_scopeDecompressStream);
+        _decompressionScopeActive = true;
+    }
+
+    /// <summary>
+    /// Tears down the per-command decompression scope at the dot terminator, disposing the
+    /// decompressor and restoring a plaintext reader over the live stream so the next command reads
+    /// uncompressed bytes. A no-op when no scope is active. The decompressor is created with
+    /// <c>leaveOpen</c>, so disposing it leaves the underlying stream intact.
+    /// </summary>
+    private void TeardownDecompressionScope()
+    {
+        if (!_decompressionScopeActive)
+        {
+            return;
+        }
+
+        _decompressionScopeActive = false;
+        _reader!.Complete();
+        _scopeDecompressStream!.Dispose();
+        _scopeDecompressStream = null;
+        _reader = PipeReader.Create(_stream!, new StreamPipeReaderOptions(leaveOpen: true));
+    }
+
+    /// <summary>
+    /// Marks the in-flight stream as finished and tears down any per-command decompression scope so
+    /// the connection is ready to serve the next command in plaintext.
+    /// </summary>
+    private void EndStream()
+    {
+        _streaming = false;
+        TeardownDecompressionScope();
+    }
+
     async ValueTask<string?> INntpStreamSource.ReadStreamLineAsync(
         CancellationToken cancellationToken
     )
@@ -322,7 +419,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
         var processed = ProcessLine(line);
         if (processed == null)
         {
-            _streaming = false;
+            EndStream();
         }
 
         return processed;
@@ -336,7 +433,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
             var line = await ReadLineAsync(cancellationToken).ConfigureAwait(false);
             if (ProcessLine(line) == null)
             {
-                _streaming = false;
+                EndStream();
                 return;
             }
 
@@ -804,6 +901,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
         CompleteWriter();
         _decompressStream?.Dispose();
         _compressStream?.Dispose();
+        _scopeDecompressStream?.Dispose();
         _stream?.Dispose();
         _client.Dispose();
     }
