@@ -10,7 +10,8 @@ namespace Usenet.Util;
 public static class UsenetEncoding
 {
     /// <summary>
-    /// Returns iso-8859-1, the default usenet character encoding.
+    /// Returns iso-8859-1 (Latin-1), the default usenet character encoding. On modern .NET this is the
+    /// static, allocation-free <see cref="Encoding.Latin1"/> rather than a code-page lookup.
     /// </summary>
-    public static Encoding Default { get; } = Encoding.GetEncoding("iso-8859-1");
+    public static Encoding Default { get; } = Encoding.Latin1;
 }

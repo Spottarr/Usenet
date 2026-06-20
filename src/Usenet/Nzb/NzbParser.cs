@@ -13,9 +13,10 @@ namespace Usenet.Nzb;
 /// Based on Kristian Hellang's Nzb project https://github.com/khellang/Nzb.
 /// </summary>
 [PublicAPI]
-public static class NzbParser
+public static partial class NzbParser
 {
-    private static readonly Regex FileNameRegex = new("\"([^\"]*)\"", RegexOptions.Compiled);
+    [GeneratedRegex("\"([^\"]*)\"")]
+    private static partial Regex FileNameRegex();
 
     /// <summary>
     /// Asynchronously parses the xml input from a string into an instance of the <see cref="NzbDocument"/> class.
@@ -191,7 +192,7 @@ public static class NzbParser
 
     private static string GetFileName(string subject)
     {
-        var match = FileNameRegex.Match(subject);
+        var match = FileNameRegex().Match(subject);
         if (match.Success)
         {
             return match.Groups[1].Value;
