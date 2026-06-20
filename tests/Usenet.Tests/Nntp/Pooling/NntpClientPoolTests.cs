@@ -1,4 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
+using Usenet.Nntp.Client;
+using Usenet.Nntp.Client.Pooling;
 using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
 using Usenet.Tests.TestHelpers;

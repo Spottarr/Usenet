@@ -1,5 +1,6 @@
 using System.Net;
 using Usenet.Nntp.Builders;
+using Usenet.Nntp.Client;
 using Usenet.Nntp.Parsers;
 using Usenet.Tests.TestHelpers;
 using Usenet.Yenc;

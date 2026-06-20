@@ -2,6 +2,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Usenet.DependencyInjection;
 using Usenet.Nntp.Builders;
+using Usenet.Nntp.Client;
+using Usenet.Nntp.Client.Pooling;
 using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Parsers;
 using Usenet.Tests.TestHelpers;
