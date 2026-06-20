@@ -76,6 +76,26 @@ internal sealed class PooledNntpClient : IInternalPooledNntpClient
         CancellationToken cancellationToken = default
     ) => ExecuteCommandAsync(c => c.CurrentXoverAsync(cancellationToken));
 
+    public Task<NntpStreamResponse<NntpArticleOverview>> XzverAsync(
+        NntpArticleRange range,
+        CancellationToken cancellationToken = default
+    ) => ExecuteCommandAsync(c => c.XzverAsync(range, cancellationToken));
+
+    public Task<NntpStreamResponse<NntpArticleOverview>> CurrentXzverAsync(
+        CancellationToken cancellationToken = default
+    ) => ExecuteCommandAsync(c => c.CurrentXzverAsync(cancellationToken));
+
+    public Task<NntpStreamResponse<NntpHeaderField>> XzhdrAsync(
+        string field,
+        NntpArticleRange range,
+        CancellationToken cancellationToken = default
+    ) => ExecuteCommandAsync(c => c.XzhdrAsync(field, range, cancellationToken));
+
+    public Task<NntpStreamResponse<NntpHeaderField>> CurrentXzhdrAsync(
+        string field,
+        CancellationToken cancellationToken = default
+    ) => ExecuteCommandAsync(c => c.CurrentXzhdrAsync(field, cancellationToken));
+
     public Task<NntpCapabilities> CapabilitiesAsync(
         string? keyword = null,
         CancellationToken cancellationToken = default

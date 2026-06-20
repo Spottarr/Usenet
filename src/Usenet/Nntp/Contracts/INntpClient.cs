@@ -8,6 +8,7 @@ public interface INntpClient
         INntpClientRfc3977,
         INntpClientRfc4643,
         INntpClientRfc6048,
+        INntpClientXz,
         INntpClientConnection
 {
     // Intentionally left blank
