@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Usenet.Nntp.Client;
 using Usenet.Nntp.Parsers;
 using Usenet.Tests.TestHelpers;
 

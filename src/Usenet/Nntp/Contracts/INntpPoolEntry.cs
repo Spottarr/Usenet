@@ -1,3 +1,5 @@
+using Usenet.Nntp.Client.Pooling;
+
 namespace Usenet.Nntp.Contracts;
 
 /// <summary>
