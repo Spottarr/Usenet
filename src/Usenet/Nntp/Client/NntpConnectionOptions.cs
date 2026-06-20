@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Usenet.Nntp;
+namespace Usenet.Nntp.Client;
 
 /// <summary>
 /// Transport configuration for an <see cref="NntpConnection"/>: where to connect, whether to encrypt,

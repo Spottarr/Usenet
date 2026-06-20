@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using Usenet.Nntp.Client;
 using Usenet.Nntp.Responses;
 
 namespace Usenet.Nntp.Contracts;

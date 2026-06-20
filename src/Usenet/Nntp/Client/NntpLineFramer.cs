@@ -3,7 +3,7 @@ using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 using Usenet.Util;
 
-namespace Usenet.Nntp;
+namespace Usenet.Nntp.Client;
 
 /// <summary>
 /// Frames CRLF-terminated lines and multi-line data blocks off a <see cref="PipeReader"/>, undoing

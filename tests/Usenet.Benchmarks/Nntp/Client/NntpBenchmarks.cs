@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using Usenet.Benchmarks.Helpers;
-using Usenet.Nntp;
+using Usenet.Nntp.Client;
 using Usenet.Nntp.Models;
 
 namespace Usenet.Benchmarks.Nntp.Client;

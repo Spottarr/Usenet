@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Usenet.Nntp;
+namespace Usenet.Nntp.Client;
 
 /// <summary>
 /// The compression mode negotiated for a connection.

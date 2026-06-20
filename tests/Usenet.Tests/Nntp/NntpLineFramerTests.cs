@@ -1,6 +1,5 @@
 using System.IO.Pipelines;
 using System.Text;
-using Usenet.Nntp;
 
 namespace Usenet.Tests.Nntp;
 

@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Attributes;
 using Usenet.Benchmarks.Helpers;
-using Usenet.Nntp;
 using Usenet.Nntp.Builders;
+using Usenet.Nntp.Client;
 using Usenet.Nntp.Models;
 using Usenet.Nntp.Parsers;
 

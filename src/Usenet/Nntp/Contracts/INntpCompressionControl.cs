@@ -1,3 +1,5 @@
+using Usenet.Nntp.Client;
+
 namespace Usenet.Nntp.Contracts;
 
 /// <summary>

@@ -1,6 +1,6 @@
 using Usenet.Nntp.Contracts;
 
-namespace Usenet.Nntp;
+namespace Usenet.Nntp.Client.Pooling;
 
 internal sealed class PooledNntpClientLease : IPooledNntpClientLease
 {

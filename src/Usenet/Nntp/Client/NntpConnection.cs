@@ -13,7 +13,7 @@ using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Responses;
 using Usenet.Util;
 
-namespace Usenet.Nntp;
+namespace Usenet.Nntp.Client;
 
 /// <summary>
 /// A standard implementation of an NNTP connection.

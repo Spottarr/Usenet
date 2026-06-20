@@ -9,7 +9,7 @@ using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Responses;
 using Usenet.Nntp.Writers;
 
-namespace Usenet.Nntp;
+namespace Usenet.Nntp.Client;
 
 /// <summary>
 /// An NNTP client that is compliant with

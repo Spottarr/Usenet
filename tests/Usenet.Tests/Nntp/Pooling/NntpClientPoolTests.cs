@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Usenet.Nntp;
 using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Models;
 using Usenet.Tests.TestHelpers;

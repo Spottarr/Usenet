@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Usenet.DependencyInjection;
-using Usenet.Nntp;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Contracts;
 using Usenet.Nntp.Parsers;
