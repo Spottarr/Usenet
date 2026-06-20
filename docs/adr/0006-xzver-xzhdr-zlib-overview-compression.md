@@ -8,13 +8,20 @@ proposed
 
 Implement `XZVER` and `XZHDR` as first-class commands that stream the same typed rows as their
 plaintext siblings (`XZVER` → `NntpArticleOverview`, `XZHDR` → `NntpHeaderField`), decoding the
-compressed data block as a **per-command, streaming zlib layer**. The data block is a single
-[zlib](https://www.rfc-editor.org/rfc/rfc1950) stream ([RFC 1950](https://www.rfc-editor.org/rfc/rfc1950),
-raw DEFLATE wrapped in a 2-byte header and an Adler-32 footer); once the status line is read the
-transport feeds the remaining bytes through a decompressing `ZLibStream`, frames the **decompressed**
-bytes with the existing line framer, and runs the existing per-line overview/header parser. Memory
-stays flat: the zlib window and input buffer are a constant per-command overhead (~40 KB), and the
-per-row marginal allocation is identical to `XOVER`/`XHDR` because the final parse stage is unchanged.
+compressed data block as a **per-command, streaming decompression layer whose codec is chosen by
+sniffing the data block's first byte**. The `[COMPRESS=GZIP]` label on the status line is not trusted:
+the magic byte selects the decoder — `0x78` (a valid [zlib](https://www.rfc-editor.org/rfc/rfc1950)
+header, [RFC 1950](https://www.rfc-editor.org/rfc/rfc1950)) → `ZLibStream`; `0x1f` (`1f 8b`,
+[gzip](https://www.rfc-editor.org/rfc/rfc1952), RFC 1952) → `GZipStream`; otherwise raw DEFLATE
+([RFC 1951](https://www.rfc-editor.org/rfc/rfc1951)) → `DeflateStream`. All three are BCL streams; no
+vendored inflater is needed. Once the status line is read the transport feeds the remaining bytes
+through the chosen decompressor, frames the **decompressed** bytes with the existing line framer, and
+runs the existing per-line overview/header parser. Memory stays flat: the decompression window and
+input buffer are a constant per-command overhead (~40 KB), and the per-row marginal allocation is
+identical to `XOVER`/`XHDR` because the final parse stage is unchanged. The decompressed read loop is
+capped by the same drain-budget ceiling the plaintext streams use, so a malformed member that never
+yields the in-band `.` terminator cannot block indefinitely (this matters for `GZipStream`; see
+below).
 
 `XZVER`/`XZHDR` are exposed as **explicit siblings** of `Xover*`/`Xhdr*` — mirroring the existing
 `Over`/`Xover` duality the API already keeps "because real servers implement one or the other." The
@@ -49,24 +56,47 @@ The behaviour was verified empirically against `news.eweka.nl` (a throwaway prob
   is no wire-terminator to search for and no ambiguity.
 - **The BCL `ZLibStream` decodes one member off a live socket and stops cleanly.** Reading straight
   from the socket, `ZLibStream` consumed exactly the 80957-byte member, returned the full decompressed
-  block, and stopped at the Adler-32 footer without over-reading or blocking.
+  block, and stopped at the Adler-32 footer without over-reading or blocking. eweka's payload is zlib,
+  but the wire format is not guaranteed to be zlib on every server that advertises these commands, so
+  the decoder is chosen by sniffing the magic byte rather than hard-coding zlib (see below).
 - **`XZVER` and `XFEATURE COMPRESS GZIP TERMINATOR` + `XOVER` produce identical bytes** (same 80957-byte
   zlib member). The per-command form needs no connection mode, so it is the simpler of the two.
 - **Ratio ≈ 3.88×** (~74% less bandwidth) on the overview scan. Modest but real, and it applies to the
   indexer's dominant traffic.
 
 This also explains why ADR-0005's earlier `XFEATURE COMPRESS GZIP` attempt "hung forever." It treated
-the stream as gzip and used `GZipStream`, which (a) cannot parse a `78 01` zlib header and (b) eagerly
-scans for *concatenated gzip members* and so blocks on a persistent connection that never closes.
-`ZLibStream` on the actual zlib format does neither — it terminates at the single member's footer. The
+a `78 01` zlib stream as gzip via `GZipStream` and combined it with an `XFEATURE` framing that had no
+in-band terminator and waited for a socket close that never comes on a persistent connection. The
 "block boundary is unknowable" problem was in large part a **wrong-decoder problem**.
+
+The `GZipStream` blocking behaviour is real but **conditional**, and was originally mis-stated here as
+an absolute reason to avoid the BCL gzip decoder. It was re-tested directly on net9.0 by delivering a
+single compressed member to a stream that then blocks forever (simulating a persistent socket where
+the server awaits the next command):
+
+- Read **to EOF**, `GZipStream` **hangs** — after the member's CRC32/ISIZE footer it speculatively
+  reads the source for a *concatenated gzip member* (RFC 1952 permits several), and that read blocks.
+  `ZLibStream` returns a clean EOF because the zlib format has no concatenated-member concept.
+- Read only **until the in-band `.` terminator** — which is exactly what the line framer does, since
+  the dot lives *inside* the decompressed payload — **neither decoder hangs**. The framer stops
+  pulling bytes at the dot and never triggers the post-member probe.
+
+So native `GZipStream` is usable for `XZVER`/`XZHDR` on the happy path. Its one residual asymmetry:
+a **truncated or terminator-less member** makes the framer read past the member, where `GZipStream`
+hangs (bounded only by the caller's cancellation token) while `ZLibStream`/`DeflateStream` surface a
+clean EOF. The drain-budget ceiling on the decompressed read loop neutralises this.
 
 ## Considered options
 
-- **Decoder: `ZLibStream` (chosen) vs `GZipStream`.** The wire format is zlib (`78 01`) regardless of
-  the `GZIP` label. `GZipStream` mis-parses the header and hangs scanning for concatenated members;
-  `ZLibStream` reads exactly one member and stops. This single choice is what makes the feature
-  tractable with the BCL — no vendored inflater is needed.
+- **Decoder: header-sniff native dispatch (chosen) vs hard-coded `ZLibStream` vs a vendored
+  inflater.** The `[COMPRESS=GZIP]` label is unreliable and the wire format is not guaranteed across
+  servers (eweka sends zlib `78 01`; others may send true gzip or raw DEFLATE), so the first byte
+  selects the codec: `0x78` → `ZLibStream`, `0x1f` → `GZipStream`, otherwise raw `DeflateStream`. All
+  three are BCL streams, so no vendored inflater is needed. This mirrors how battle-tested clients
+  (e.g. NZBGet) decode with zlib's automatic header detection instead of trusting the advertised
+  name. Hard-coding `ZLibStream` would have been simpler but eweka-specific; the sniff costs one byte
+  and makes the feature generic. The decompressed read loop is capped by the existing drain-budget
+  ceiling so the gzip arm's truncation-hang asymmetry (above) cannot block indefinitely.
 - **Framing: per-command `XZVER`/`XZHDR` (chosen) vs the `XFEATURE COMPRESS GZIP` mode.** Both produce
   identical compressed bytes. The per-command commands are stateless — no `290`-enabled connection
   mode that the pool would have to re-apply on every transparent reconnect (the exact problem that
@@ -87,14 +117,18 @@ scans for *concatenated gzip members* and so blocks on a persistent connection t
 
 ## Consequences
 
+- The chosen decoder is selected per command by sniffing the data block's first byte
+  (`0x78`→`ZLibStream`, `0x1f`→`GZipStream`, else raw `DeflateStream`); all three are BCL streams. A
+  malformed member that never yields the in-band `.` is bounded by the drain-budget ceiling, closing
+  the `GZipStream` truncation-hang.
 - New public `XzverAsync`/`XzhdrAsync` (range and current-pointer forms, following the ADR-0004 naming
   convention), returning the same `NntpStreamResponse<NntpArticleOverview>` /
   `NntpStreamResponse<NntpHeaderField>` as their plaintext siblings. Malformed rows are skipped, as in
   ADR-0003.
-- The transport gains a per-command zlib scope that mirrors `InstallDeflateLayer`: after the XZ status
-  line, wrap the underlying stream in a decompressing `ZLibStream`, frame lines off a `PipeReader` over
-  it, and tear the layer down when the `.` terminator is reached so subsequent commands read plaintext
-  again. Bytes the plaintext reader over-reads past the status line are recovered and replayed through
+- The transport gains a per-command decompression scope that mirrors `InstallDeflateLayer`: after the
+  XZ status line, sniff the first data-block byte, wrap the underlying stream in the matching
+  decompressor, frame lines off a `PipeReader` over it, and tear the layer down when the `.` terminator
+  is reached so subsequent commands read plaintext again. Bytes the plaintext reader over-reads past the status line are recovered and replayed through
   the decompressor using the existing `PrefixStream`/leftover-recovery already built for ADR-0005.
 - Memory stays flat over arbitrarily large ranges; the only added cost is a constant ~40 KB per active
   XZ command (zlib window + input buffer). An allocation test pins the per-row marginal cost under a
