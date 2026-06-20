@@ -658,6 +658,54 @@ public class NntpClient : INntpClient
         );
 
     /// <inheritdoc />
+    public Task<NntpStreamResponse<NntpArticleOverview>> XzverAsync(
+        NntpArticleRange range,
+        CancellationToken cancellationToken = default
+    ) =>
+        Connection.MultiLineDecompressedStreamCommandAsync<NntpArticleOverview>(
+            $"XZVER {range}",
+            224,
+            _streamLineParsers.Overview,
+            cancellationToken
+        );
+
+    /// <inheritdoc />
+    public Task<NntpStreamResponse<NntpArticleOverview>> CurrentXzverAsync(
+        CancellationToken cancellationToken = default
+    ) =>
+        Connection.MultiLineDecompressedStreamCommandAsync<NntpArticleOverview>(
+            "XZVER",
+            224,
+            _streamLineParsers.Overview,
+            cancellationToken
+        );
+
+    /// <inheritdoc />
+    public Task<NntpStreamResponse<NntpHeaderField>> XzhdrAsync(
+        string field,
+        NntpArticleRange range,
+        CancellationToken cancellationToken = default
+    ) =>
+        Connection.MultiLineDecompressedStreamCommandAsync<NntpHeaderField>(
+            $"XZHDR {field} {range}",
+            221,
+            _streamLineParsers.HeaderField,
+            cancellationToken
+        );
+
+    /// <inheritdoc />
+    public Task<NntpStreamResponse<NntpHeaderField>> CurrentXzhdrAsync(
+        string field,
+        CancellationToken cancellationToken = default
+    ) =>
+        Connection.MultiLineDecompressedStreamCommandAsync<NntpHeaderField>(
+            $"XZHDR {field}",
+            221,
+            _streamLineParsers.HeaderField,
+            cancellationToken
+        );
+
+    /// <inheritdoc />
     public Task<NntpGroupsResponse> ListCountsAsync(
         string? wildmat = null,
         CancellationToken cancellationToken = default
