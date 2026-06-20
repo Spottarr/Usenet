@@ -5,9 +5,10 @@ namespace Usenet.Extensions;
 /// <summary>
 /// String extension methods.
 /// </summary>
-internal static class StringExtensions
+internal static partial class StringExtensions
 {
-    private static readonly Regex WhitespaceRegex = new(@"\s+", RegexOptions.Compiled);
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex WhitespaceRegex();
 
     /// <summary>
     /// Converts a string safely to an integer. If the string does not represent a valid integer the result is null.
@@ -22,5 +23,6 @@ internal static class StringExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static string Pack(this string source) => WhitespaceRegex.Replace(source, string.Empty);
+    public static string Pack(this string source) =>
+        WhitespaceRegex().Replace(source, string.Empty);
 }
