@@ -1,5 +1,6 @@
 using System.Buffers;
 using JetBrains.Annotations;
+using Usenet.Nntp.Client;
 using Usenet.Nntp.Parsers;
 using Usenet.Nntp.Responses;
 

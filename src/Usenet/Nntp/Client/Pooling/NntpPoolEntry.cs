@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Usenet.Nntp.Contracts;
 
-namespace Usenet.Nntp;
+namespace Usenet.Nntp.Client.Pooling;
 
 /// <summary>
 /// Holds a pooled <see cref="NntpClient"/> together with its <see cref="NntpConnection"/> and the

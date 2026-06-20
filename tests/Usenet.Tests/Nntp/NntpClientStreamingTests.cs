@@ -1,5 +1,4 @@
 using System.Net;
-using Usenet.Nntp;
 using Usenet.Nntp.Models;
 using Usenet.Tests.TestHelpers;
 

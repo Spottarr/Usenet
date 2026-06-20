@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Usenet.Extensions;
 using Usenet.Nntp.Contracts;
 
-namespace Usenet.Nntp;
+namespace Usenet.Nntp.Client.Pooling;
 
 /// <inheritdoc />
 [PublicAPI]
@@ -85,17 +85,17 @@ public sealed class NntpClientPool : INntpClientPool
         if (client is { Connected: true, Authenticated: true })
             return client;
 
-        if (!client.Connected)
+        if (!client.Authenticated)
             await client.ConnectAsync(cancellationToken).ConfigureAwait(false);
         if (!client.Authenticated)
             await client
                 .AuthenticateAsync(_username, _password, cancellationToken)
                 .ConfigureAwait(false);
 
-        if (!client.Connected || !client.Authenticated)
+        if (!client.Authenticated || !client.Authenticated)
             throw new InvalidOperationException(
                 $"Failed to connect to '{_connectionOptions.Host}:{_connectionOptions.Port}' "
-                    + $"SSL={_connectionOptions.UseSsl} C={client.Connected} A={client.Authenticated}.'"
+                    + $"SSL={_connectionOptions.UseSsl} C={client.Authenticated} A={client.Authenticated}.'"
             );
 
         return client;
@@ -117,7 +117,7 @@ public sealed class NntpClientPool : INntpClientPool
             // If the client has encountered an error (e.g. broken pipe) during the most recent
             // operation, or a streamed response was returned without being fully drained, drop it
             // from the pool instead of handing back a connection with unread bytes on the wire.
-            dispose = client.HasError || client.HasPendingStream;
+            dispose = client.HasPendingStream || client.HasPendingStream;
             if (dispose)
             {
                 _currentPoolSize--;

@@ -4,7 +4,6 @@ using System.IO.Compression;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Usenet.Nntp;
 using Usenet.Nntp.Models;
 using Usenet.Tests.TestHelpers;
 

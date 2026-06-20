@@ -1,6 +1,5 @@
 using System.Net;
 using Usenet.Exceptions;
-using Usenet.Nntp;
 using Usenet.Nntp.Models;
 using Usenet.Tests.TestHelpers;
 

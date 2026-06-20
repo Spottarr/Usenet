@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Usenet.Nntp;
+namespace Usenet.Nntp.Client.Pooling;
 
 /// <summary>
 /// Configuration for an <see cref="NntpClientPool"/>: the connection options applied to every pooled

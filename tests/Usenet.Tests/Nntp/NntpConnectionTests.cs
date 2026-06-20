@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Usenet.Nntp;
 using Usenet.Nntp.Parsers;
 
 namespace Usenet.Tests.Nntp;

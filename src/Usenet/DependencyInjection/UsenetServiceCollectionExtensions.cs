@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Usenet.Nntp;
+using Usenet.Nntp.Client;
 using Usenet.Nntp.Contracts;
 
 // Placed in the conventional DI namespace so consumers only need a single using.
