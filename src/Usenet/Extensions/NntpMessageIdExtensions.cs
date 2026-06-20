@@ -1,5 +1,4 @@
 ﻿using Usenet.Nntp.Models;
-using Usenet.Util;
 
 namespace Usenet.Extensions;
 
