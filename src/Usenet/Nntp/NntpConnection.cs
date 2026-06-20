@@ -3,7 +3,6 @@ using System.IO.Compression;
 using System.IO.Pipelines;
 using System.Net.Security;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -30,8 +29,6 @@ namespace Usenet.Nntp;
 [PublicAPI]
 public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCompressionControl
 {
-    private const int StackAllocThreshold = 256;
-    private const int InitialDataBlockBufferSize = 4096;
     private const string AuthInfoPass = "AUTHINFO PASS";
 
     // NNTP cannot tell the server to stop sending mid-data-block, so reclaiming a connection from a
@@ -44,11 +41,14 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     private readonly ILogger _log;
     private readonly NntpConnectionOptions _options;
     private readonly TcpClient _client = new();
+
+    // Pure byte->line framing over the live reader. The connection swaps _framer.Reader whenever it
+    // rebuilds the transport (e.g. installing a compression layer); the framer itself stays oblivious
+    // to sockets and compression. See ADR-0005.
+    private readonly NntpLineFramer _framer = new();
     private Stream? _stream;
-    private PipeReader? _reader;
     private PipeWriter? _writer;
     private CountingBufferWriter? _output;
-    private long _bytesRead;
     private long _bytesWritten;
     private bool _streaming;
     private bool _compressionActive;
@@ -103,7 +103,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     }
 
     /// <inheritdoc/>
-    public long BytesRead => _bytesRead;
+    public long BytesRead => _framer.BytesRead;
 
     /// <inheritdoc/>
     public long BytesWritten => _bytesWritten;
@@ -111,7 +111,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     /// <inheritdoc/>
     public void ResetCounters()
     {
-        _bytesRead = 0;
+        _framer.ResetCounter();
         _bytesWritten = 0;
     }
 
@@ -135,7 +135,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
         // bytes on the wire immediately.
         _client.NoDelay = true;
         _stream = await GetStreamAsync(hostname, useSsl).ConfigureAwait(false);
-        _reader = PipeReader.Create(_stream, new StreamPipeReaderOptions(leaveOpen: true));
+        _framer.Reader = PipeReader.Create(_stream, new StreamPipeReaderOptions(leaveOpen: true));
         _writer = PipeWriter.Create(_stream, new StreamPipeWriterOptions(leaveOpen: true));
         _output = new CountingBufferWriter(_writer, this);
         return await GetResponseAsync(parser, cancellationToken).ConfigureAwait(false);
@@ -218,8 +218,8 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     /// </summary>
     private void InstallDeflateLayer()
     {
-        var leftover = DrainBufferedBytes(_reader!);
-        _reader!.Complete();
+        var leftover = DrainBufferedBytes(_framer.Reader!);
+        _framer.Reader!.Complete();
         _writer!.Complete();
 
         var decompressInput = leftover.Length > 0 ? new PrefixStream(leftover, _stream!) : _stream!;
@@ -230,7 +230,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
         );
         _compressStream = new DeflateStream(_stream!, CompressionMode.Compress, leaveOpen: true);
 
-        _reader = PipeReader.Create(_decompressStream);
+        _framer.Reader = PipeReader.Create(_decompressStream);
         _writer = PipeWriter.Create(_compressStream);
         _output = new CountingBufferWriter(_writer, this);
     }
@@ -289,7 +289,8 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
             return parser.Parse(response.Code, response.Message, []);
         }
 
-        var dataBlock = await ReadMultiLineDataBlockAsync(cancellationToken)
+        var dataBlock = await _framer
+            .ReadDataBlockLinesAsync(cancellationToken)
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
@@ -359,8 +360,8 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     /// </summary>
     private async ValueTask InstallDecompressionScopeAsync(CancellationToken cancellationToken)
     {
-        var leftover = DrainBufferedBytes(_reader!);
-        await _reader!.CompleteAsync().ConfigureAwait(false);
+        var leftover = DrainBufferedBytes(_framer.Reader!);
+        await _framer.Reader!.CompleteAsync().ConfigureAwait(false);
 
         // The decoder is chosen from the first data-block byte, so make sure one is available to peek.
         if (leftover.Length == 0)
@@ -378,7 +379,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
             0x1f => new GZipStream(input, CompressionMode.Decompress, leaveOpen: true),
             _ => new DeflateStream(input, CompressionMode.Decompress, leaveOpen: true),
         };
-        _reader = PipeReader.Create(_scopeDecompressStream);
+        _framer.Reader = PipeReader.Create(_scopeDecompressStream);
         _decompressionScopeActive = true;
     }
 
@@ -396,10 +397,10 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
         }
 
         _decompressionScopeActive = false;
-        _reader!.Complete();
+        _framer.Reader!.Complete();
         _scopeDecompressStream!.Dispose();
         _scopeDecompressStream = null;
-        _reader = PipeReader.Create(_stream!, new StreamPipeReaderOptions(leaveOpen: true));
+        _framer.Reader = PipeReader.Create(_stream!, new StreamPipeReaderOptions(leaveOpen: true));
     }
 
     /// <summary>
@@ -421,8 +422,8 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
             return null;
         }
 
-        var line = await ReadLineAsync(cancellationToken).ConfigureAwait(false);
-        var processed = ProcessLine(line);
+        var line = await _framer.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+        var processed = NntpLineFramer.ProcessLine(line);
         if (processed == null)
         {
             EndStream();
@@ -433,11 +434,11 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
 
     async ValueTask INntpStreamSource.DrainStreamAsync(CancellationToken cancellationToken)
     {
-        var budgetStart = _bytesRead;
+        var budgetStart = _framer.BytesRead;
         while (_streaming)
         {
-            var line = await ReadLineAsync(cancellationToken).ConfigureAwait(false);
-            if (ProcessLine(line) == null)
+            var line = await _framer.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+            if (NntpLineFramer.ProcessLine(line) == null)
             {
                 EndStream();
                 return;
@@ -445,7 +446,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
 
             // Past the drain budget the remainder is too large to skip cheaply, so abandon the
             // connection instead of reading it all off the wire (ADR-0003).
-            if (_bytesRead - budgetStart > StreamDrainBudgetBytes)
+            if (_framer.BytesRead - budgetStart > StreamDrainBudgetBytes)
             {
                 AbandonStream();
                 return;
@@ -471,7 +472,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     /// Indicates that the transport has faulted (a read or write failed, or a response was lost),
     /// so the connection is in an unknown state and must not be reused.
     /// </summary>
-    internal bool HasError => _faulted;
+    internal bool HasError => _faulted || _framer.HasFault;
 
     /// <inheritdoc/>
     public async Task<TResponse> BufferedMultiLineCommandAsync<TResponse>(
@@ -491,7 +492,8 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
             return parser.ParseError(response.Code, response.Message);
         }
 
-        var (buffer, length) = await ReadDataBlockToBufferAsync(cancellationToken)
+        var (buffer, length) = await _framer
+            .ReadDataBlockToBufferAsync(cancellationToken)
             .ConfigureAwait(false);
 
         try
@@ -515,7 +517,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
         ThrowIfNotConnected();
         ArgumentNullException.ThrowIfNull(parser);
 
-        var responseText = await ReadLineAsync(cancellationToken).ConfigureAwait(false);
+        var responseText = await _framer.ReadLineAsync(cancellationToken).ConfigureAwait(false);
         _log.ReceivedResponse(responseText ?? "");
 
         if (responseText == null)
@@ -561,7 +563,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     private void ThrowIfNotConnected()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        if (!_client.Connected || _reader == null || _writer == null)
+        if (!_client.Connected || _framer.Reader == null || _writer == null)
             throw new NntpException("Client not connected.");
     }
 
@@ -586,276 +588,6 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
         return sslStream;
     }
 
-    private async IAsyncEnumerable<string> ReadMultiLineDataBlockAsync(
-        [EnumeratorCancellation] CancellationToken cancellationToken
-    )
-    {
-        while (true)
-        {
-            var line = await ReadLineAsync(cancellationToken).ConfigureAwait(false);
-            var processed = ProcessLine(line);
-            if (processed == null)
-            {
-                yield break;
-            }
-
-            yield return processed;
-        }
-    }
-
-    /// <summary>
-    /// Reads a complete multi-line data block off the byte stream into a single contiguous buffer
-    /// rented from <see cref="ArrayPool{T}"/>. Dot-stuffing is undone and the terminating dot is
-    /// detected on the raw bytes, without transcoding the body to <see cref="string"/>. Each line is
-    /// stored with a normalized CRLF terminator. The caller takes ownership of the returned buffer.
-    /// </summary>
-    private async Task<(byte[] Buffer, int Length)> ReadDataBlockToBufferAsync(
-        CancellationToken cancellationToken
-    )
-    {
-        var reader = _reader!;
-        var buffer = ArrayPool<byte>.Shared.Rent(InitialDataBlockBufferSize);
-        var length = 0;
-        try
-        {
-            while (true)
-            {
-                var result = await reader.ReadAsync(cancellationToken).ConfigureAwait(false);
-                var segment = result.Buffer;
-
-                var consumed = AppendLines(segment, ref buffer, ref length, out var completed);
-                AddBytesRead(consumed);
-                var consumedPosition = segment.GetPosition(consumed);
-
-                if (completed || result.IsCompleted)
-                {
-                    reader.AdvanceTo(consumedPosition);
-                    return (buffer, length);
-                }
-
-                reader.AdvanceTo(consumedPosition, segment.End);
-            }
-        }
-        catch
-        {
-            ArrayPool<byte>.Shared.Return(buffer);
-            _faulted = true;
-            throw;
-        }
-    }
-
-    private static long AppendLines(
-        in ReadOnlySequence<byte> segment,
-        ref byte[] buffer,
-        ref int length,
-        out bool completed
-    )
-    {
-        completed = false;
-        var reader = new SequenceReader<byte>(segment);
-        while (
-            reader.TryReadTo(
-                out ReadOnlySequence<byte> lineSequence,
-                (byte)'\n',
-                advancePastDelimiter: true
-            )
-        )
-        {
-            if (AppendLine(lineSequence, ref buffer, ref length))
-            {
-                completed = true;
-                break;
-            }
-        }
-
-        return reader.Consumed;
-    }
-
-    /// <summary>
-    /// Appends a single framed line to the data block buffer, returning <see langword="true"/> when the
-    /// line is the terminating dot of the data block.
-    /// </summary>
-    private static bool AppendLine(
-        in ReadOnlySequence<byte> lineSequence,
-        ref byte[] buffer,
-        ref int length
-    )
-    {
-        if (lineSequence.IsSingleSegment)
-        {
-            return AppendLine(lineSequence.FirstSpan, ref buffer, ref length);
-        }
-
-        var lineLength = (int)lineSequence.Length;
-        byte[]? rented = null;
-        var line =
-            lineLength <= StackAllocThreshold
-                ? stackalloc byte[StackAllocThreshold]
-                : (rented = ArrayPool<byte>.Shared.Rent(lineLength));
-        try
-        {
-            lineSequence.CopyTo(line);
-            return AppendLine(line[..lineLength], ref buffer, ref length);
-        }
-        finally
-        {
-            if (rented != null)
-            {
-                ArrayPool<byte>.Shared.Return(rented);
-            }
-        }
-    }
-
-    private static bool AppendLine(ReadOnlySpan<byte> line, ref byte[] buffer, ref int length)
-    {
-        // Strip the trailing CR of the CRLF terminator.
-        if (line.Length > 0 && line[^1] == (byte)'\r')
-        {
-            line = line[..^1];
-        }
-
-        // A line containing only "." terminates the data block.
-        if (line.Length == 1 && line[0] == (byte)'.')
-        {
-            return true;
-        }
-
-        // Undo dot-stuffing of a line that begins with ".".
-        if (line.Length > 0 && line[0] == (byte)'.')
-        {
-            line = line[1..];
-        }
-
-        EnsureCapacity(ref buffer, length, length + line.Length + 2);
-        line.CopyTo(buffer.AsSpan(length));
-        length += line.Length;
-        buffer[length++] = (byte)'\r';
-        buffer[length++] = (byte)'\n';
-        return false;
-    }
-
-    private static void EnsureCapacity(ref byte[] buffer, int length, int required)
-    {
-        if (buffer.Length >= required)
-        {
-            return;
-        }
-
-        var next = ArrayPool<byte>.Shared.Rent(Math.Max(buffer.Length * 2, required));
-        buffer.AsSpan(0, length).CopyTo(next);
-        ArrayPool<byte>.Shared.Return(buffer);
-        buffer = next;
-    }
-
-    /// <summary>
-    /// Reads a single CRLF-terminated line off the byte stream, counting the consumed bytes.
-    /// </summary>
-    private async ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
-    {
-        var reader = _reader!;
-        try
-        {
-            while (true)
-            {
-                var result = await reader.ReadAsync(cancellationToken).ConfigureAwait(false);
-                var buffer = result.Buffer;
-
-                if (TryReadLine(ref buffer, out var line, out var consumed))
-                {
-                    AddBytesRead(consumed);
-                    reader.AdvanceTo(buffer.Start);
-                    return line;
-                }
-
-                if (result.IsCompleted)
-                {
-                    if (buffer.IsEmpty)
-                    {
-                        reader.AdvanceTo(buffer.Start, buffer.End);
-                        return null;
-                    }
-
-                    // The stream ended on a final line without a trailing CRLF.
-                    AddBytesRead(buffer.Length);
-                    var remaining = DecodeLine(buffer);
-                    reader.AdvanceTo(buffer.End);
-                    return remaining;
-                }
-
-                reader.AdvanceTo(buffer.Start, buffer.End);
-            }
-        }
-        catch
-        {
-            _faulted = true;
-            throw;
-        }
-    }
-
-    private static bool TryReadLine(
-        ref ReadOnlySequence<byte> buffer,
-        out string line,
-        out long consumed
-    )
-    {
-        var reader = new SequenceReader<byte>(buffer);
-        if (
-            reader.TryReadTo(
-                out ReadOnlySequence<byte> lineSequence,
-                (byte)'\n',
-                advancePastDelimiter: true
-            )
-        )
-        {
-            consumed = reader.Consumed;
-            line = DecodeLine(lineSequence);
-            buffer = buffer.Slice(reader.Position);
-            return true;
-        }
-
-        line = string.Empty;
-        consumed = 0;
-        return false;
-    }
-
-    private static string DecodeLine(in ReadOnlySequence<byte> sequence)
-    {
-        if (sequence.IsSingleSegment)
-        {
-            return DecodeSpan(sequence.FirstSpan);
-        }
-
-        var length = (int)sequence.Length;
-        byte[]? rented = null;
-        var buffer =
-            length <= StackAllocThreshold
-                ? stackalloc byte[StackAllocThreshold]
-                : (rented = ArrayPool<byte>.Shared.Rent(length));
-        try
-        {
-            sequence.CopyTo(buffer);
-            return DecodeSpan(buffer[..length]);
-        }
-        finally
-        {
-            if (rented != null)
-            {
-                ArrayPool<byte>.Shared.Return(rented);
-            }
-        }
-    }
-
-    private static string DecodeSpan(ReadOnlySpan<byte> span)
-    {
-        // Strip the trailing CR of the CRLF terminator.
-        if (span.Length > 0 && span[^1] == (byte)'\r')
-        {
-            span = span[..^1];
-        }
-
-        return UsenetEncoding.Default.GetString(span);
-    }
-
     /// <inheritdoc/>
     public void BufferLine(string line)
     {
@@ -871,48 +603,6 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
         _output.Advance(written + 2);
     }
 
-    /// <summary>
-    /// Undoes dot-stuffing and detects the terminating dot of a multi-line data block, following the
-    /// <a href="https://tools.ietf.org/html/rfc3977#section-3.1.1">RFC 3977</a> rules. The terminating
-    /// line (".") and the end of input both map to <see langword="null"/>.
-    /// </summary>
-    private static string? ProcessLine(string? line)
-    {
-        if (line == null)
-        {
-            return null;
-        }
-
-        if (line.Length == 0 || line[0] != '.')
-        {
-            return line;
-        }
-
-        if (line.Length == 1)
-        {
-            return null;
-        }
-
-        return line[1] == '.' ? line[1..] : line;
-    }
-
-    /// <summary>
-    /// Counts bytes framed off the reader. When compression is active the reader sits above the
-    /// DEFLATE layer, so this counts decompressed (logical) bytes; the compressed wire size is not
-    /// tracked separately (ADR-0005).
-    /// </summary>
-    private void AddBytesRead(long count)
-    {
-        unchecked
-        {
-            _bytesRead += count;
-            if (_bytesRead < 0)
-            {
-                ResetCounters();
-            }
-        }
-    }
-
     private void AddBytesWritten(long count)
     {
         unchecked
@@ -920,7 +610,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
             _bytesWritten += count;
             if (_bytesWritten < 0)
             {
-                ResetCounters();
+                _bytesWritten = 0;
             }
         }
     }
@@ -934,7 +624,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
 
         // Completing the reader/writer disposes the DEFLATE streams when they are installed; both are
         // created with leaveOpen so the underlying stream survives until it is disposed below.
-        _reader?.Complete();
+        _framer.Reader?.Complete();
         CompleteWriter();
         _decompressStream?.Dispose();
         _compressStream?.Dispose();
