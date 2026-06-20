@@ -44,7 +44,8 @@ public class NzbWriter
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        using var writer = GetXmlWriter();
+        var writer = GetXmlWriter();
+        await using var _ = writer.ConfigureAwait(false);
         await writer
             .WriteDocTypeAsync(NzbKeywords.Nzb, NzbKeywords.PubId, NzbKeywords.SysId, null)
             .ConfigureAwait(false);
