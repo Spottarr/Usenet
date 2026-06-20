@@ -18,10 +18,10 @@ vendored inflater is needed. Once the status line is read the transport feeds th
 through the chosen decompressor, frames the **decompressed** bytes with the existing line framer, and
 runs the existing per-line overview/header parser. Memory stays flat: the decompression window and
 input buffer are a constant per-command overhead (~40 KB), and the per-row marginal allocation is
-identical to `XOVER`/`XHDR` because the final parse stage is unchanged. The decompressed read loop is
-capped by the same drain-budget ceiling the plaintext streams use, so a malformed member that never
-yields the in-band `.` terminator cannot block indefinitely (this matters for `GZipStream`; see
-below).
+identical to `XOVER`/`XHDR` because the final parse stage is unchanged. `ZLibStream` and `DeflateStream`
+turn a truncated or terminator-less member into a clean EOF, so the framer terminates gracefully;
+`GZipStream` is the one arm that can block on such a malformed member, bounded by the caller's
+cancellation token (see below).
 
 `XZVER`/`XZHDR` are exposed as **explicit siblings** of `Xover*`/`Xhdr*` — mirroring the existing
 `Over`/`Xover` duality the API already keeps "because real servers implement one or the other." The
@@ -83,8 +83,12 @@ the server awaits the next command):
 
 So native `GZipStream` is usable for `XZVER`/`XZHDR` on the happy path. Its one residual asymmetry:
 a **truncated or terminator-less member** makes the framer read past the member, where `GZipStream`
-hangs (bounded only by the caller's cancellation token) while `ZLibStream`/`DeflateStream` surface a
-clean EOF. The drain-budget ceiling on the decompressed read loop neutralises this.
+hangs (bounded by the caller's cancellation token) while `ZLibStream`/`DeflateStream` surface a clean
+EOF and let the framer terminate. The drain budget still bounds a *well-formed but oversized*
+remainder when a partially-read stream is abandoned; it cannot interrupt the blocking read of a
+truncated `GZipStream` member, so that case relies on the caller's cancellation token. The indexer's
+hot path always supplies one, and no known server emits true gzip here, so the residual risk is a
+malformed-server edge rather than a normal path.
 
 ## Considered options
 
@@ -95,8 +99,7 @@ clean EOF. The drain-budget ceiling on the decompressed read loop neutralises th
   three are BCL streams, so no vendored inflater is needed. This mirrors how battle-tested clients
   (e.g. NZBGet) decode with zlib's automatic header detection instead of trusting the advertised
   name. Hard-coding `ZLibStream` would have been simpler but eweka-specific; the sniff costs one byte
-  and makes the feature generic. The decompressed read loop is capped by the existing drain-budget
-  ceiling so the gzip arm's truncation-hang asymmetry (above) cannot block indefinitely.
+  and makes the feature generic.
 - **Framing: per-command `XZVER`/`XZHDR` (chosen) vs the `XFEATURE COMPRESS GZIP` mode.** Both produce
   identical compressed bytes. The per-command commands are stateless — no `290`-enabled connection
   mode that the pool would have to re-apply on every transparent reconnect (the exact problem that
@@ -119,8 +122,8 @@ clean EOF. The drain-budget ceiling on the decompressed read loop neutralises th
 
 - The chosen decoder is selected per command by sniffing the data block's first byte
   (`0x78`→`ZLibStream`, `0x1f`→`GZipStream`, else raw `DeflateStream`); all three are BCL streams. A
-  malformed member that never yields the in-band `.` is bounded by the drain-budget ceiling, closing
-  the `GZipStream` truncation-hang.
+  truncated member surfaces a clean EOF on the `ZLibStream`/`DeflateStream` arms; on the `GZipStream`
+  arm it is bounded by the caller's cancellation token (a malformed-server edge, not a normal path).
 - New public `XzverAsync`/`XzhdrAsync` (range and current-pointer forms, following the ADR-0004 naming
   convention), returning the same `NntpStreamResponse<NntpArticleOverview>` /
   `NntpStreamResponse<NntpHeaderField>` as their plaintext siblings. Malformed rows are skipped, as in
