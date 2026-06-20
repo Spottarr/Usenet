@@ -47,7 +47,7 @@ internal sealed class ArticleResponseParserTests
         ];
         var (buffer, length) = BuildDataBlock(lines);
 
-        using var response = new ArticleResponseParser(ArticleRequestType.Article).Parse(
+        await using var response = new ArticleResponseParser(ArticleRequestType.Article).Parse(
             220,
             "123 <123@poster.com>",
             buffer,
@@ -72,7 +72,7 @@ internal sealed class ArticleResponseParserTests
         string[] lines = ["This is just a test article (2).", "With two lines."];
         var (buffer, length) = BuildDataBlock(lines);
 
-        using var response = new ArticleResponseParser(ArticleRequestType.Body).Parse(
+        await using var response = new ArticleResponseParser(ArticleRequestType.Body).Parse(
             222,
             "123 <123@poster.com>",
             buffer,
@@ -98,7 +98,7 @@ internal sealed class ArticleResponseParserTests
         ];
         var (buffer, length) = BuildDataBlock(lines);
 
-        using var response = new ArticleResponseParser(ArticleRequestType.Head).Parse(
+        await using var response = new ArticleResponseParser(ArticleRequestType.Head).Parse(
             221,
             "123 <123@poster.com>",
             buffer,
@@ -119,7 +119,7 @@ internal sealed class ArticleResponseParserTests
         string[] lines = ["Invalid header line", "Path: pathost!demo!whitehouse!not-for-mail"];
         var (buffer, length) = BuildDataBlock(lines);
 
-        using var response = new ArticleResponseParser(ArticleRequestType.Head).Parse(
+        await using var response = new ArticleResponseParser(ArticleRequestType.Head).Parse(
             221,
             "123 <123@poster.com>",
             buffer,
@@ -138,7 +138,7 @@ internal sealed class ArticleResponseParserTests
         string[] lines = ["Newsgroups: alt.test,alt.demo", "", "body"];
         var (buffer, length) = BuildDataBlock(lines);
 
-        using var response = new ArticleResponseParser(ArticleRequestType.Article).Parse(
+        await using var response = new ArticleResponseParser(ArticleRequestType.Article).Parse(
             220,
             "123 <123@poster.com>",
             buffer,
@@ -169,7 +169,7 @@ internal sealed class ArticleResponseParserTests
 
         await Assert.That(parser.IsSuccessResponse(responseCode)).IsFalse();
 
-        using var response = parser.ParseError(responseCode, responseMessage);
+        await using var response = parser.ParseError(responseCode, responseMessage);
         await Assert.That(response.Success).IsFalse();
         await Assert.That(response.Body.Length).IsEqualTo(0);
     }

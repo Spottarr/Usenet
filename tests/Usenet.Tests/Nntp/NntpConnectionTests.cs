@@ -87,7 +87,7 @@ internal sealed class NntpConnectionTests
 
         await connection.ConnectAsync(new ResponseParser(200), cancellationToken);
 
-        using var response = await connection.BufferedMultiLineCommandAsync(
+        await using var response = await connection.BufferedMultiLineCommandAsync(
             "ARTICLE 1",
             new ArticleResponseParser(ArticleRequestType.Article),
             cancellationToken
