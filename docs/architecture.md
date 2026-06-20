@@ -109,6 +109,25 @@ flowchart LR
   W[Command bytes] --> Z[Compress: raw DEFLATE, flush per command] --> A
 ```
 
+## Compressed overview commands (XZVER/XZHDR, Highwinds-family)
+
+- Highwinds-family servers (eweka and many resellers) do **not** advertise RFC 8054 `COMPRESS`, so
+  `NntpCompression.Deflate` is unavailable against them and would throw at session setup. They instead
+  offer the non-standard `XZVER`/`XZHDR` commands — compressed siblings of `XOVER`/`XHDR`. These are
+  exposed as explicit `XzverAsync`/`CurrentXzverAsync`/`XzhdrAsync`/`CurrentXzhdrAsync` methods,
+  selected by the consumer from the typed `NntpCapabilities`; there is no transparent upgrade of
+  `XOVER`/`XHDR`.
+- Unlike `COMPRESS DEFLATE`, this is **command selection, not a transport mode**: only the data block
+  of that one command is compressed, the status line stays clear text, and no connection state is left
+  for the pool to re-apply. The data block is a single compressed member with the `.` terminator
+  *inside* it, so the existing framer and terminator detection apply unchanged to the inflated bytes.
+- The decoder is chosen by **sniffing the data block's first byte** rather than trusting the
+  `[COMPRESS=GZIP]` label (which is unreliable — eweka ships zlib despite it): `0x78` → `ZLibStream`,
+  `0x1f` → `GZipStream`, otherwise a raw `DeflateStream`. The transport installs this per-command
+  decompression scope after the status line, frames inflated lines off a `PipeReader` over it, and
+  tears it down at the dot terminator so the next command reads plaintext again. `BytesRead` counts
+  decompressed (logical) bytes. See [ADR-0006](adr/0006-xzver-xzhdr-zlib-overview-compression.md).
+
 ## Write path (encode and post)
 
 - `YencEncoder` reads the source in blocks and encodes into an `IBufferWriter<byte>` using
