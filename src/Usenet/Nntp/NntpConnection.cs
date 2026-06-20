@@ -63,7 +63,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
     // command writer compresses into _compressStream and the line framer reads inflated bytes off
     // _decompressStream; both are null in plain mode. See ADR-0005.
     private DeflateStream? _compressStream;
-    private DeflateStream? _decompressStream;
+    private Stream? _decompressStream;
 
     // The per-command decompression scope installed for an XZVER/XZHDR data block (ADR-0006). Unlike
     // the session-wide DEFLATE layer above, this is scoped to one command's data block: the line
@@ -222,9 +222,8 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
         _framer.Reader!.Complete();
         _writer!.Complete();
 
-        var decompressInput = leftover.Length > 0 ? new PrefixStream(leftover, _stream!) : _stream!;
         _decompressStream = new DeflateStream(
-            decompressInput,
+            ReplayInput(leftover),
             CompressionMode.Decompress,
             leaveOpen: true
         );
@@ -234,6 +233,16 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
         _writer = PipeWriter.Create(_compressStream);
         _output = new CountingBufferWriter(_writer, this);
     }
+
+    /// <summary>
+    /// Builds the stream a decompressor reads from, replaying any bytes the plaintext reader buffered
+    /// past the status line (<paramref name="leftover"/>) through a <see cref="PrefixStream"/> ahead of
+    /// the socket so a server that coalesces the status line and the first compressed bytes into one
+    /// segment still decodes. Shared by the session-wide DEFLATE layer (RFC 8054) and the per-command
+    /// decompression scope (ADR-0006); the codec choice stays at each call site.
+    /// </summary>
+    private Stream ReplayInput(byte[] leftover) =>
+        leftover.Length > 0 ? new PrefixStream(leftover, _stream!) : _stream!;
 
     /// <summary>
     /// Returns the bytes already buffered in <paramref name="reader"/> without waiting on the socket,
@@ -371,7 +380,7 @@ public sealed class NntpConnection : INntpConnection, INntpStreamSource, INntpCo
             leftover = read == 0 ? [] : first;
         }
 
-        var input = leftover.Length > 0 ? new PrefixStream(leftover, _stream!) : _stream!;
+        var input = ReplayInput(leftover);
         var magic = leftover.Length > 0 ? leftover[0] : (byte)0;
         _scopeDecompressStream = magic switch
         {
