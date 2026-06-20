@@ -28,7 +28,8 @@ internal sealed class ArticleResponseParser : IBufferedMultiLineResponseParser<N
     )
     {
         _log = (loggerFactory ?? NullLoggerFactory.Instance).CreateLogger<ArticleResponseParser>();
-        _successCode = (_requestType = requestType) switch
+        _requestType = requestType;
+        _successCode = requestType switch
         {
             ArticleRequestType.Head => 221,
             ArticleRequestType.Body => 222,
