@@ -1,5 +1,4 @@
 ﻿using Usenet.Nzb;
-using Usenet.Util;
 
 namespace Usenet.Tests.Nzb;
 
@@ -8,13 +7,13 @@ internal sealed class NzbDocumentTests
     public static IEnumerable<(NzbDocument, NzbDocument)> EqualsWithSameValues()
     {
         yield return (
-            new NzbDocument(MultiValueDictionary<string, string>.Empty, []),
-            new NzbDocument(MultiValueDictionary<string, string>.Empty, [])
+            new NzbDocument(new Dictionary<string, ICollection<string>>(), []),
+            new NzbDocument(new Dictionary<string, ICollection<string>>(), [])
         );
 
         yield return (
             new NzbDocument(
-                MultiValueDictionary<string, string>.Empty,
+                new Dictionary<string, ICollection<string>>(),
                 [
                     new NzbFile(
                         "poster",
@@ -35,7 +34,7 @@ internal sealed class NzbDocumentTests
                 ]
             ),
             new NzbDocument(
-                MultiValueDictionary<string, string>.Empty,
+                new Dictionary<string, ICollection<string>>(),
                 [
                     new NzbFile(
                         "poster",
@@ -59,7 +58,7 @@ internal sealed class NzbDocumentTests
 
         yield return (
             new NzbDocument(
-                MultiValueDictionary<string, string>.Empty,
+                new Dictionary<string, ICollection<string>>(),
                 [
                     new NzbFile(
                         "poster",
@@ -80,7 +79,7 @@ internal sealed class NzbDocumentTests
                 ]
             ),
             new NzbDocument(
-                MultiValueDictionary<string, string>.Empty,
+                new Dictionary<string, ICollection<string>>(),
                 [
                     new NzbFile(
                         "poster",

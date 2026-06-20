@@ -4,7 +4,6 @@ using JetBrains.Annotations;
 using Usenet.Exceptions;
 using Usenet.Extensions;
 using Usenet.Nntp.Models;
-using Usenet.Util;
 
 namespace Usenet.Nzb;
 
@@ -136,27 +135,28 @@ public static class NzbParser
         return new NzbDocument(metaData, files);
     }
 
-    private static MultiValueDictionary<string, string> GetMetaData(
+    private static Dictionary<string, ICollection<string>> GetMetaData(
         NzbParserContext context,
         XContainer nzbElement
     )
     {
+        var dict = new Dictionary<string, ICollection<string>>();
+
         var headElement = nzbElement.Element(context.Namespace + NzbKeywords.Head);
         if (headElement == null)
         {
-            return [];
+            return dict;
         }
 
         var headers =
             from metaElement in headElement.Elements(context.Namespace + NzbKeywords.Meta)
             let typeAttribute = metaElement.Attribute(NzbKeywords.Type)
             where typeAttribute != null
-            select new Tuple<string, string>(typeAttribute.Value, metaElement.Value);
+            select (Key: typeAttribute.Value, Value: metaElement.Value);
 
-        var dict = new MultiValueDictionary<string, string>();
         foreach (var header in headers)
         {
-            dict.Add(header.Item1, header.Item2);
+            dict.AddValue(header.Key, header.Value);
         }
 
         return dict;

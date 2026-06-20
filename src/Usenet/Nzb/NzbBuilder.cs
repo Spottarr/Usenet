@@ -1,9 +1,9 @@
 using System.Globalization;
 using JetBrains.Annotations;
 using Microsoft.Extensions.FileProviders;
+using Usenet.Extensions;
 using Usenet.Nntp.Builders;
 using Usenet.Nntp.Models;
-using Usenet.Util;
 
 namespace Usenet.Nzb;
 
@@ -15,7 +15,7 @@ public class NzbBuilder
 {
     private readonly List<File> _files = [];
     private readonly NntpGroupsBuilder _groupsBuilder = new();
-    private readonly MultiValueDictionary<string, string> _metaData = new();
+    private readonly Dictionary<string, ICollection<string>> _metaData = new();
     private string _messageBase = "unknown.com";
     private string _documentPoster = "Anonymous <anonymous@unknown.com>";
     private long _partSize = 384_000;
@@ -102,7 +102,7 @@ public class NzbBuilder
     /// <returns>The <see cref="NzbBuilder"/> so that additional calls can be chained.</returns>
     public NzbBuilder AddMetaData(string key, string value)
     {
-        _metaData.Add(key, value);
+        _metaData.AddValue(key, value);
         return this;
     }
 
@@ -110,23 +110,9 @@ public class NzbBuilder
     /// Creates a <see cref="NzbDocument"/> with al the properties from the <see cref="NzbBuilder"/>.
     /// </summary>
     /// <returns>The <see cref="NzbDocument"/>.</returns>
-    public NzbDocument Build() => new(GetMetaData(), GetFiles());
-
-    private MultiValueDictionary<string, string> GetMetaData()
-    {
-        var headers =
-            from pair in _metaData
-            from val in pair.Value
-            select new Tuple<string, string>(pair.Key, val);
-
-        var dict = new MultiValueDictionary<string, string>();
-        foreach (var header in headers)
-        {
-            dict.Add(header.Item1, header.Item2);
-        }
-
-        return dict;
-    }
+    // NzbDocument materializes its own immutable copy of the metadata, so the builder can hand over
+    // its live dictionary without a defensive copy.
+    public NzbDocument Build() => new(_metaData, GetFiles());
 
     private List<NzbFile> GetFiles()
     {
