@@ -308,9 +308,9 @@ internal sealed class NntpClientPoolTests
         "CA1859",
         Justification = "Must return the interface type to match the pool's ClientFactory delegate."
     )]
-    private static IInternalPooledNntpClient GetClientMock()
+    private static INntpPoolEntry GetClientMock()
     {
-        var client = IInternalPooledNntpClient.Mock();
+        var client = INntpPoolEntry.Mock();
         client.Connected.Returns(true);
         client.Authenticated.Returns(true);
         return client;

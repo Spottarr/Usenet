@@ -1,12 +1,12 @@
 namespace Usenet.Nntp.Contracts;
 
 /// <summary>
-/// The pool-facing surface of a pooled NNTP client. The pool manages connection and authentication
-/// state through this interface and hands the underlying <see cref="Client"/> to callers via a lease;
-/// the per-command interception that previously lived here has moved down into the connection, which
-/// now owns the <see cref="HasError"/> flag directly.
+/// A single entry in the <see cref="NntpClientPool"/>. The pool manages connection and authentication
+/// state through this interface and hands the underlying command <see cref="Client"/> to callers via a
+/// lease; the per-command interception that previously lived here has moved down into the connection,
+/// which now owns the <see cref="HasError"/> flag directly.
 /// </summary>
-internal interface IInternalPooledNntpClient : IDisposable
+internal interface INntpPoolEntry : IDisposable
 {
     /// <summary>
     /// The connected, authenticated NNTP client exposed to the lease holder.
