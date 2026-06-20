@@ -95,7 +95,7 @@ internal sealed class YencEncoderTests
         var writer = new ArrayBufferWriter<byte>();
         await YencEncoder.EncodeAsync(header, stream, writer, cancellationToken);
 
-        using var part = YencDecoder.Decode(writer.WrittenMemory);
+        await using var part = YencDecoder.Decode(writer.WrittenMemory);
 
         await Assert.That(part.Data.ToArray()).IsEquivalentTo(data);
     }

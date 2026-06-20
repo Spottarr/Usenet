@@ -69,7 +69,7 @@ internal sealed class NntpCompressionTests
         );
         var client = await ConnectAndAuthenticateAsync(connection, cancellationToken);
 
-        using var response = await client.ArticleAsync("1@example.com", cancellationToken);
+        await using var response = await client.ArticleAsync("1@example.com", cancellationToken);
 
         await Assert.That(response.Success).IsTrue();
         await Assert.That(response.Headers.Contains("Subject")).IsTrue();
@@ -95,7 +95,7 @@ internal sealed class NntpCompressionTests
             .That(await CountRowsAsync(client, NntpArticleRange.Range(1, 3), cancellationToken))
             .IsEqualTo(3);
 
-        using (var article = await client.ArticleAsync("1@example.com", cancellationToken))
+        await using (var article = await client.ArticleAsync("1@example.com", cancellationToken))
         {
             await Assert.That(article.Success).IsTrue();
         }

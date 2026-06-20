@@ -16,7 +16,7 @@ internal sealed class YencDecoderTests
     {
         var expectedData = expected.ReadAllBytes();
 
-        using var part = YencDecoder.Decode(actual.ReadAllBytes());
+        await using var part = YencDecoder.Decode(actual.ReadAllBytes());
 
         await Assert.That(part.Header.IsFilePart).IsFalse();
         await Assert.That(part.Header.LineLength).IsEqualTo(128);
@@ -50,7 +50,7 @@ internal sealed class YencDecoderTests
     {
         const int expectedDataLength = 11250;
 
-        using var part = YencDecoder.Decode(actual.ReadAllBytes());
+        await using var part = YencDecoder.Decode(actual.ReadAllBytes());
 
         await Assert.That(part.Header.IsFilePart).IsTrue();
         await Assert.That(part.Data.Length).IsEqualTo(expectedDataLength);
@@ -74,8 +74,8 @@ internal sealed class YencDecoderTests
         const string expectedFileName = "joystick.jpg";
         var expected = expectedFile.ReadAllBytes();
 
-        using var part1 = YencDecoder.Decode(part1File.ReadAllBytes());
-        using var part2 = YencDecoder.Decode(part2File.ReadAllBytes());
+        await using var part1 = YencDecoder.Decode(part1File.ReadAllBytes());
+        await using var part2 = YencDecoder.Decode(part2File.ReadAllBytes());
 
         using var actual = new MemoryStream();
 
@@ -119,7 +119,7 @@ internal sealed class YencDecoderTests
         var bytes = actual.ReadAllBytes();
         var sequence = new ReadOnlySequence<byte>(bytes);
 
-        using var part = YencDecoder.Decode(sequence);
+        await using var part = YencDecoder.Decode(sequence);
 
         await Assert.That(part.Data.Length).IsEqualTo(11250);
     }
