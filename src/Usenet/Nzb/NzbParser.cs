@@ -118,10 +118,10 @@ public static partial class NzbParser
 
         if (nzbElement == null)
         {
+            // Fall back to the no-namespace form for NZBs that omit the xmlns declaration.
             ns = XNamespace.None;
+            nzbElement = doc.Element(ns + NzbKeywords.Nzb);
         }
-
-        nzbElement = doc.Element(ns + NzbKeywords.Nzb);
 
         if (nzbElement == null)
         {
