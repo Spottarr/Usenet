@@ -5,15 +5,15 @@ namespace Usenet.Nntp;
 internal sealed class PooledNntpClientLease : IPooledNntpClientLease
 {
     private readonly NntpClientPool _pool;
-    private readonly IInternalPooledNntpClient _client;
+    private readonly INntpPoolEntry _entry;
     private bool _disposed;
 
-    public IPooledNntpClient Client => _client.Client;
+    public IPooledNntpClient Client => _entry.Client;
 
-    internal PooledNntpClientLease(NntpClientPool pool, IInternalPooledNntpClient client)
+    internal PooledNntpClientLease(NntpClientPool pool, INntpPoolEntry entry)
     {
         _pool = pool;
-        _client = client;
+        _entry = entry;
     }
 
     public void Dispose()
@@ -21,7 +21,7 @@ internal sealed class PooledNntpClientLease : IPooledNntpClientLease
         if (_disposed)
             return;
 
-        _pool.ReturnClient(_client);
+        _pool.ReturnClient(_entry);
         _disposed = true;
     }
 }

@@ -9,14 +9,14 @@ namespace Usenet.Nntp;
 /// <see cref="HasError"/> and <see cref="HasPendingStream"/> flags, so this type no longer mirrors the
 /// command surface — the lease exposes the underlying <see cref="NntpClient"/> directly.
 /// </summary>
-internal sealed class PooledNntpClient : IInternalPooledNntpClient
+internal sealed class NntpPoolEntry : INntpPoolEntry
 {
     private readonly NntpConnection _connection;
     private readonly NntpClient _client;
     private bool _disposed;
     private bool _nntpConnected;
 
-    public PooledNntpClient(NntpConnectionOptions options, ILoggerFactory? loggerFactory = null)
+    public NntpPoolEntry(NntpConnectionOptions options, ILoggerFactory? loggerFactory = null)
     {
         _connection = new NntpConnection(options, loggerFactory);
         _client = new NntpClient(_connection, loggerFactory);

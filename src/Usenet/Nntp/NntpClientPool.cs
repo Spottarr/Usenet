@@ -16,8 +16,8 @@ public sealed class NntpClientPool : INntpClientPool
     private readonly object _lock = new();
 #endif
 
-    private readonly Queue<IInternalPooledNntpClient> _availableClients = [];
-    private readonly HashSet<IInternalPooledNntpClient> _usedClients = [];
+    private readonly Queue<INntpPoolEntry> _availableClients = [];
+    private readonly HashSet<INntpPoolEntry> _usedClients = [];
     private readonly CancellationTokenSource _cts = new();
     private readonly Task _monitorTask;
 
@@ -37,7 +37,7 @@ public sealed class NntpClientPool : INntpClientPool
     public TimeSpan IdleTimeout { get; init; } = TimeSpan.FromSeconds(30);
     public TimeSpan WaitTimeout { get; init; } = TimeSpan.FromSeconds(60);
 
-    internal Func<IInternalPooledNntpClient> ClientFactory { get; init; }
+    internal Func<INntpPoolEntry> ClientFactory { get; init; }
 
     public NntpClientPool(NntpPoolOptions options, ILoggerFactory? loggerFactory = null)
     {
@@ -53,7 +53,7 @@ public sealed class NntpClientPool : INntpClientPool
         _username = options.Username;
         _password = options.Password;
 
-        ClientFactory = () => new PooledNntpClient(_connectionOptions, _loggerFactory);
+        ClientFactory = () => new NntpPoolEntry(_connectionOptions, _loggerFactory);
 
         _semaphore = new SemaphoreSlim(_maxPoolSize, _maxPoolSize);
 
@@ -70,7 +70,7 @@ public sealed class NntpClientPool : INntpClientPool
         return new PooledNntpClientLease(this, client);
     }
 
-    private async Task<IInternalPooledNntpClient> BorrowClient(CancellationToken cancellationToken)
+    private async Task<INntpPoolEntry> BorrowClient(CancellationToken cancellationToken)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
@@ -101,7 +101,7 @@ public sealed class NntpClientPool : INntpClientPool
         return client;
     }
 
-    internal void ReturnClient(IInternalPooledNntpClient client)
+    internal void ReturnClient(INntpPoolEntry client)
     {
         ArgumentNullException.ThrowIfNull(client);
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -139,7 +139,7 @@ public sealed class NntpClientPool : INntpClientPool
         _semaphore.Release();
     }
 
-    private IInternalPooledNntpClient BorrowClientInternal()
+    private INntpPoolEntry BorrowClientInternal()
     {
         lock (_lock)
         {
@@ -187,7 +187,7 @@ public sealed class NntpClientPool : INntpClientPool
     private void EvictIdleClients()
     {
         var now = DateTimeOffset.Now;
-        List<IInternalPooledNntpClient>? idleClients = null;
+        List<INntpPoolEntry>? idleClients = null;
 
         lock (_lock)
         {
@@ -226,7 +226,7 @@ public sealed class NntpClientPool : INntpClientPool
         _cts.Cancel();
         _monitorTask.GetAwaiter().GetResult();
 
-        List<IInternalPooledNntpClient> clients;
+        List<INntpPoolEntry> clients;
         lock (_lock)
         {
             clients = [.. _availableClients, .. _usedClients];
