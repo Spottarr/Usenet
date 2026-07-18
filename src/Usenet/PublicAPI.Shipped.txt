@@ -612,3 +612,4 @@ static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, Syste
 static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Buffers.IBufferWriter<byte>! writer, System.Text.Encoding! encoding) -> System.Threading.Tasks.Task!
 static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Buffers.IBufferWriter<byte>! writer, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
 static Usenet.Yenc.YencEncoder.EncodeAsync(Usenet.Yenc.YencHeader! header, System.IO.Stream! stream, System.Buffers.IBufferWriter<byte>! writer, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+virtual Usenet.Nntp.Responses.NntpStreamLineParser<T>.Invoke(string! line, out T value) -> bool
