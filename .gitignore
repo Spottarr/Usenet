@@ -13,6 +13,7 @@ Desktop.ini
 .DS_Store
 
 .claude/
+.agents/
 
 node_modules/
 dist/
