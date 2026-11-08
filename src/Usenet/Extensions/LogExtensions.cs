@@ -168,4 +168,14 @@ internal static partial class LogExtensions
         int currentPoolSize,
         int maxPoolSize
     );
+
+    [LoggerMessage(
+        Level = LogLevel.Error,
+        Message = "Disposing NNTP client that failed to connect or authenticate ({CurrentPoolSize}/{MaxPoolSize})"
+    )]
+    public static partial void DisposingFailedNntpClient(
+        this ILogger logger,
+        int currentPoolSize,
+        int maxPoolSize
+    );
 }

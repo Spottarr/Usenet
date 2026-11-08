@@ -74,31 +74,75 @@ public sealed class NntpClientPool : INntpClientPool
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        var success = await _semaphore
+        var acquired = await _semaphore
             .WaitAsync(WaitTimeout, cancellationToken)
             .ConfigureAwait(false);
-        if (!success)
+        if (!acquired)
             throw new InvalidOperationException("Timed out waiting for NNTP (usenet) client");
 
-        var client = BorrowClientInternal();
-
-        if (client is { Connected: true, Authenticated: true })
+        // From here on a slot is held, but only a lease can hand it back. Anything that throws
+        // before the caller has that lease must discard the attempt itself, or every failure
+        // shrinks the pool until no client can be borrowed at all.
+        INntpPoolEntry? client = null;
+        try
+        {
+            client = BorrowClientInternal();
+            await ConnectAndAuthenticate(client, cancellationToken).ConfigureAwait(false);
             return client;
+        }
+        catch
+        {
+            DiscardFailedAttempt(client);
+            throw;
+        }
+    }
+
+    private async Task ConnectAndAuthenticate(
+        INntpPoolEntry client,
+        CancellationToken cancellationToken
+    )
+    {
+        if (client is { Connected: true, Authenticated: true })
+            return;
 
         if (!client.Connected)
             await client.ConnectAsync(cancellationToken).ConfigureAwait(false);
+
         if (!client.Authenticated)
             await client
                 .AuthenticateAsync(_username, _password, cancellationToken)
                 .ConfigureAwait(false);
 
-        if (!client.Connected || !client.Authenticated)
-            throw new InvalidOperationException(
-                $"Failed to connect to '{_connectionOptions.Host}:{_connectionOptions.Port}' "
-                    + $"SSL={_connectionOptions.UseSsl} C={client.Connected} A={client.Authenticated}.'"
-            );
+        if (client is { Connected: true, Authenticated: true })
+            return;
 
-        return client;
+        throw new InvalidOperationException(
+            $"Failed to connect to '{_connectionOptions.Host}:{_connectionOptions.Port}' "
+                + $"SSL={_connectionOptions.UseSsl} C={client.Connected} A={client.Authenticated}.'"
+        );
+    }
+
+    /// <summary>
+    /// Undoes a borrow attempt that never produced a lease: drops the client it had already taken
+    /// from the pool, if any, and releases the slot it was holding.
+    /// </summary>
+    private void DiscardFailedAttempt(INntpPoolEntry? client)
+    {
+        if (client is not null)
+        {
+            lock (_lock)
+            {
+                if (_usedClients.Remove(client))
+                    _currentPoolSize--;
+
+                _logger.DisposingFailedNntpClient(_currentPoolSize, _maxPoolSize);
+            }
+
+            // Disposing closes the underlying connection, which may block, so keep it out of the lock.
+            client.Dispose();
+        }
+
+        _semaphore.Release();
     }
 
     internal void ReturnClient(INntpPoolEntry client)
@@ -154,10 +198,12 @@ public sealed class NntpClientPool : INntpClientPool
             if (_currentPoolSize >= _maxPoolSize)
                 throw new InvalidOperationException("No available clients in the pool.");
 
+            // Only count the client once it exists: a factory that throws must not leave the pool
+            // thinking it is one client larger than it is.
+            var newClient = ClientFactory.Invoke();
+
             _currentPoolSize++;
             _logger.CreatingNewNntpClient(_currentPoolSize, _maxPoolSize);
-
-            var newClient = ClientFactory.Invoke();
 
             _usedClients.Add(newClient);
             return newClient;
