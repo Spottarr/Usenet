@@ -304,6 +304,130 @@ internal sealed class NntpClientPoolTests
         lease2.Dispose();
     }
 
+    [Test]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+    public async Task ReleaseSlotWhenConnectThrows(CancellationToken cancellationToken)
+    {
+        var failingClient = INntpPoolEntry.Mock();
+        failingClient.Connected.Returns(false);
+        failingClient.ConnectAsync(Arg.Any<CancellationToken>()).Throws<IOException>();
+
+        var clients = new Queue<INntpPoolEntry>([failingClient, GetClientMock()]);
+
+        using var pool = new NntpClientPool(
+            new NntpPoolOptions
+            {
+                MaxPoolSize = 1,
+                Username = "example.user",
+                Password = "example.pass",
+                Connection = new NntpConnectionOptions
+                {
+                    Host = "example.server",
+                    Port = 563,
+                    UseSsl = true,
+                },
+            }
+        )
+        {
+            WaitTimeout = TimeSpan.Zero,
+            MonitorInterval = TimeSpan.FromMinutes(1),
+            ClientFactory = clients.Dequeue,
+        };
+
+        // Connecting fails, so the caller never receives a lease that could return the client
+        await Assert
+            .That(async () => await pool.GetLease(cancellationToken))
+            .ThrowsExactly<IOException>();
+
+        // The client that failed to connect is dropped from the pool
+        failingClient.Dispose().WasCalled(Times.Once);
+
+        // Its slot is released as well, so the next lease gets a fresh, working client
+        var lease = await pool.GetLease(cancellationToken);
+        lease.Dispose();
+    }
+
+    [Test]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+    public async Task ReleaseSlotWhenAuthenticationFails(CancellationToken cancellationToken)
+    {
+        var failingClient = INntpPoolEntry.Mock();
+        failingClient.Connected.Returns(true);
+        failingClient.Authenticated.Returns(false);
+        failingClient
+            .AuthenticateAsync(Any<string>(), Any<string>(), Any<CancellationToken>())
+            .Returns(false);
+
+        var clients = new Queue<INntpPoolEntry>([failingClient, GetClientMock()]);
+
+        using var pool = new NntpClientPool(
+            new NntpPoolOptions
+            {
+                MaxPoolSize = 1,
+                Username = "example.user",
+                Password = "example.pass",
+                Connection = new NntpConnectionOptions
+                {
+                    Host = "example.server",
+                    Port = 563,
+                    UseSsl = true,
+                },
+            }
+        )
+        {
+            WaitTimeout = TimeSpan.Zero,
+            MonitorInterval = TimeSpan.FromMinutes(1),
+            ClientFactory = clients.Dequeue,
+        };
+
+        // Authentication is refused, so the pool reports the failure instead of handing out a lease
+        await Assert
+            .That(async () => await pool.GetLease(cancellationToken))
+            .ThrowsExactly<InvalidOperationException>();
+
+        failingClient.Dispose().WasCalled(Times.Once);
+
+        // The unauthenticated client did not take its slot with it
+        var lease = await pool.GetLease(cancellationToken);
+        lease.Dispose();
+    }
+
+    [Test]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+    public async Task ReleaseSlotWhenClientFactoryThrows(CancellationToken cancellationToken)
+    {
+        var failures = 1;
+
+        using var pool = new NntpClientPool(
+            new NntpPoolOptions
+            {
+                MaxPoolSize = 1,
+                Username = "example.user",
+                Password = "example.pass",
+                Connection = new NntpConnectionOptions
+                {
+                    Host = "example.server",
+                    Port = 563,
+                    UseSsl = true,
+                },
+            }
+        )
+        {
+            WaitTimeout = TimeSpan.Zero,
+            MonitorInterval = TimeSpan.FromMinutes(1),
+            ClientFactory = () =>
+                failures-- > 0 ? throw new InvalidOperationException("No client") : GetClientMock(),
+        };
+
+        // No client was created, so neither the slot nor the pool size may be consumed by it
+        await Assert
+            .That(async () => await pool.GetLease(cancellationToken))
+            .ThrowsExactly<InvalidOperationException>();
+
+        var lease = await pool.GetLease(cancellationToken);
+        lease.Dispose();
+    }
+
     [SuppressMessage(
         "Performance",
         "CA1859",

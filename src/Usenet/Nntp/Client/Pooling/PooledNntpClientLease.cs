@@ -21,7 +21,9 @@ internal sealed class PooledNntpClientLease : IPooledNntpClientLease
         if (_disposed)
             return;
 
-        _pool.ReturnClient(_entry);
+        // Mark the lease as returned before handing the client back: if the pool refuses the
+        // return (e.g. it was disposed underneath us) a second dispose must not try again.
         _disposed = true;
+        _pool.ReturnClient(_entry);
     }
 }
