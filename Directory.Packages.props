@@ -12,12 +12,12 @@
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.15" />
     <PackageVersion
       Include="Microsoft.Extensions.DependencyInjection.Abstractions"
-      Version="10.0.15"
+      Version="11.0.0"
     />
     <PackageVersion Include="Microsoft.Extensions.FileProviders.Abstractions" Version="11.0.0" />
     <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.15" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.15" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.15" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="11.0.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.404" PrivateAssets="All" />
     <PackageVersion Include="PolySharp" Version="1.17.1" />
     <PackageVersion Include="System.Collections.Immutable" Version="10.0.15" />
